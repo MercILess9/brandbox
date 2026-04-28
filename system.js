@@ -14,16 +14,20 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function checkSystemAuth() {
     const { data: { session }, error } = await supabaseClient.auth.getSession();
     
-    // รายชื่อหน้าที่ไม่ต้องล็อกอินก็เข้าได้
     const publicPages = ['login.html', 'register.html'];
     const currentPage = window.location.pathname.split("/").pop() || 'index.html';
 
+    // เคสที่ 1: ไม่มีบัตร แต่จะเข้าหน้า Private -> ไล่ไป Login
     if (!session && !publicPages.includes(currentPage)) {
-        // ไม่มีกุญแจ + ไม่ได้อยู่หน้า Public -> ไปหน้า Login
         window.location.href = "login.html";
     }
+    
+    // เคสที่ 2: มีบัตรแล้ว แต่อยากเข้าหน้า Login/Register -> ไล่ไปหน้าแรก (Index)
+    if (session && publicPages.includes(currentPage)) {
+        window.location.href = "index.html"; 
+    }
 
-    return session; // ส่ง session กลับไปเผื่อหน้าต่างๆ อยากใช้ข้อมูล User
+    return session;
 }
 
 /**
