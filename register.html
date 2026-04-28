@@ -13,9 +13,10 @@
     <style>
         :root {
             --brand-accent: #bdc432;
-            --brand-dark: #8b893a;
+            --brand-accent-dark: #8b893a;
             --font-main: "Outfit", sans-serif;
-            --bg-gradient: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-accent) 100%);
+            /* BG Gradient ตามที่พี่ระบุ */
+            --bg-gradient: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
@@ -29,7 +30,7 @@
         .login-card {
             background: #fff; padding: 2.5rem; border-radius: 20px;
             width: 100%; max-width: 450px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
         }
 
         .brand-logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 2rem; letter-spacing: -1px; }
@@ -42,27 +43,29 @@
             border-radius: 12px; font-size: 15px; transition: 0.2s;
         }
 
+        /* ขยับ Padding ขวาหลบ Bitwarden */
+        input[type="password"], .pass-input { padding-right: 85px !important; }
+
         input:focus, select:focus { outline: none; border-color: var(--brand-accent); background: #fafbf2; }
 
-        /* จัดแถว Role กับ ID */
         .row-inputs { display: flex; gap: 0.8rem; }
         .row-inputs > .input-group { flex: 1; }
 
+        /* ปุ่มรูปตา ขยับมาทางซ้ายหลบไอคอน Password Manager */
         .password-toggle-btn {
-            position: absolute; right: 14px; top: 38px;
+            position: absolute; right: 48px; top: 38px;
             z-index: 10; background: none; border: none;
-            cursor: pointer; color: #888;
+            cursor: pointer; color: #999; padding: 4px;
         }
 
         .btn-signup {
             width: 100%; padding: 16px; background: var(--brand-accent);
             border: none; border-radius: 12px; color: #fff;
             font-weight: 700; font-size: 16px; cursor: pointer;
-            margin-top: 1rem; transition: transform 0.1s;
+            margin-top: 1rem; transition: 0.2s;
         }
 
-        .btn-signup:active { transform: scale(0.98); }
-
+        .btn-signup:hover { opacity: 0.9; transform: translateY(-1px); }
         .signin-link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: #666; }
         .signin-link a { color: #000; text-decoration: none; font-weight: 700; }
     </style>
@@ -96,13 +99,13 @@
 
         <div class="input-group">
             <label>Password</label>
-            <input id="password" type="password" placeholder="Min 6 characters" required>
+            <input id="password" type="password" class="pass-input" placeholder="Min 6 characters" required>
             <button type="button" class="password-toggle-btn" onclick="togglePass('password', this)"></button>
         </div>
 
         <div class="input-group">
             <label>Confirm Password</label>
-            <input id="confirm_password" type="password" placeholder="Repeat password" required>
+            <input id="confirm_password" type="password" class="pass-input" placeholder="Repeat password" required>
             <button type="button" class="password-toggle-btn" onclick="togglePass('confirm_password', this)"></button>
         </div>
 
@@ -112,7 +115,7 @@
 </div>
 
 <script>
-    // 1. ICONS & TOGGLE
+    // 1. SHOW/HIDE LOGIC
     const iconEye = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const iconEyeOff = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
@@ -125,39 +128,45 @@
         btn.innerHTML = isPass ? iconEyeOff : iconEye;
     }
 
-    // 2. SUPABASE INIT (ดึงตัวแปรจาก config.js)
+    // 2. SUPABASE INIT
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // 3. SUBMIT LOGIC
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const form = {
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value,
-            confirm: document.getElementById("confirm_password").value,
-            employee_id: document.getElementById("employee_id").value,
-            nick_name: document.getElementById("nick_name").value,
-            full_name: document.getElementById("full_name").value,
-            role: document.getElementById("role").value
-        };
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const confirm = document.getElementById("confirm_password").value;
 
-        // Validation
-        if (form.password !== form.confirm) return Swal.fire("Error", "Passwords do not match", "error");
-        if (!form.email.endsWith('@brand-strom.com')) return Swal.fire("Access Denied", "Please use @brand-strom.com email", "warning");
+        if (password !== confirm) {
+            Swal.fire({ icon: "error", title: "Error", text: "Passwords do not match!", confirmButtonColor: "#000" });
+            return;
+        }
 
-        Swal.fire({ title: "Creating account...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        if (!email.endsWith('@brand-strom.com')) {
+            Swal.fire({ icon: "warning", title: "Wait", text: "Use @brand-strom.com email only.", confirmButtonColor: var(--brand-accent) });
+            return;
+        }
+
+        // Show Loading BEFORE Supabase call
+        Swal.fire({
+            title: "Creating account...",
+            text: "Establishing connection to B-QUEST",
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
 
         try {
-            const { error } = await supabaseClient.auth.signUp({
-                email: form.email,
-                password: form.password,
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
                 options: {
                     data: {
-                        employee_id: form.employee_id,
-                        nick_name: form.nick_name,
-                        full_name: form.full_name,
-                        role: form.role
+                        employee_id: document.getElementById("employee_id").value,
+                        nick_name: document.getElementById("nick_name").value,
+                        full_name: document.getElementById("full_name").value,
+                        role: document.getElementById("role").value
                     }
                 }
             });
@@ -166,13 +175,20 @@
 
             Swal.fire({
                 icon: "success",
-                title: "Registration Complete",
-                text: "Check your email for confirmation link",
+                title: "Registration Complete!",
+                text: "Please verify your email to continue.",
                 confirmButtonColor: "#bdc432"
-            }).then(() => location.href = "login.html");
+            }).then(() => {
+                window.location.href = "login.html";
+            });
 
         } catch (err) {
-            Swal.fire("Registration Failed", err.message, "error");
+            Swal.fire({
+                icon: "error",
+                title: "Signup Failed",
+                text: err.message,
+                confirmButtonColor: "#000"
+            });
         }
     });
 </script>
