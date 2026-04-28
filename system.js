@@ -12,19 +12,25 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
  * ยกเว้นหน้าที่ระบุไว้ใน publicPages
  */
 async function checkSystemAuth() {
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     
     const publicPages = ['login.html', 'register.html'];
-    const currentPage = window.location.pathname.split("/").pop() || 'index.html';
+    // หาชื่อไฟล์ปัจจุบัน ถ้าเป็นค่าว่างให้ถือว่าเป็น index.html
+    let currentPage = window.location.pathname.split("/").pop();
+    if (currentPage === "" || !currentPage) currentPage = 'index.html';
 
-    // เคสที่ 1: ไม่มีบัตร แต่จะเข้าหน้า Private -> ไล่ไป Login
+    // [เคสที่ 1] ไม่มีบัตร (Session) และไม่ได้อยู่หน้า Login/Register
+    // ผลคือ: ดีดไปหน้า Login
     if (!session && !publicPages.includes(currentPage)) {
         window.location.href = "login.html";
+        return null;
     }
     
-    // เคสที่ 2: มีบัตรแล้ว แต่อยากเข้าหน้า Login/Register -> ไล่ไปหน้าแรก (Index)
+    // [เคสที่ 2] **มีบัตรแล้ว** (Session) แต่อยากจะเข้าหน้า Login หรือ Register
+    // ผลคือ: ดีดกลับไปหน้า Index ทันที (ป้องกันคนล็อกอินแล้วมาหน้า Login ซ้ำ)
     if (session && publicPages.includes(currentPage)) {
-        window.location.href = "index.html"; 
+        window.location.href = "index.html";
+        return session;
     }
 
     return session;
