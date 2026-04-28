@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-QUEST | Mission Control</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="config.js"></script>
+    <script src="system.js"></script>
+
+    <style>
+        :root {
+            --primary: rgb(45, 71, 57);
+            --accent: rgb(189, 196, 50);
+        }
+        body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .quest-item { 
+            border-left: 5px solid var(--accent); 
+            padding: 15px; margin-bottom: 10px; 
+            background: #fff; display: flex; justify-content: space-between;
+        }
+        .logout-btn { color: red; cursor: pointer; font-weight: bold; border: none; background: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1 style="color: var(--primary); margin: 0;">B-QUEST</h1>
+            <p>Welcome, <span id="player-name">...</span></p>
+        </div>
+        <button class="logout-btn" onclick="BQuest.logout()">[ Sign Out ]</button>
+    </div>
+
+    <div class="card">
+        <h2>Active Quests</h2>
+        <div id="quest-container">
+            <p style="color: #999;">กำลังโหลดภารกิจของคุณ...</p>
+        </div>
+    </div>
+
+    <script>
+        // เมื่อหน้าโหลดเสร็จ
+        async function initPage() {
+            // 1. ดึง Session (ระบบยามจะเช็คให้อัตโนมัติอยู่แล้วจาก system.js)
+            const { data: { session } } = await supabaseClient.auth.getSession();
+
+            if (session) {
+                // 2. ดึง Profile มาโชว์ (ใช้ Utility จาก system.js)
+                const profile = await BQuest.getProfile(session.user.id);
+                if (profile) {
+                    BQuest.setText("player-name", profile.nick_name || "นักล่าเควส");
+                }
+
+                // 3. เตรียมที่ไว้ใส่ Logic ดึงข้อมูลเควส (เดี๋ยวเราค่อยมาต่อกัน)
+                renderQuests();
+            }
+        }
+
+        function renderQuests() {
+            // จำลองข้อมูลเควสก่อน
+            const container = document.getElementById("quest-container");
+            container.innerHTML = `
+                <div class="quest-item">
+                    <div>
+                        <strong>เควสแรก: ตรวจรับสินค้า</strong>
+                        <div style="font-size: 12px; color: #666;">รางวัล: 50 XP</div>
+                    </div>
+                    <button style="background: var(--primary); color: white; border: none; border-radius: 5px; padding: 5px 10px;">รับเควส</button>
+                </div>
+            `;
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
