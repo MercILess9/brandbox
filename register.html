@@ -4,23 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B-QUEST Registration | BrandBox Platform</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --brand-primary: #000000;
             --brand-bg: #ffffff;
-            --brand-accent: #bdc432;
+            --brand-accent: #bdc432; /* สีเขียวมะกอกตามรูป */
             --brand-text: #000000;
             --brand-on-accent: #ffffff;
-            /* Font stack ตามที่พี่ให้มาเป๊ะๆ */
-            --brand-font-sans: "Outfit", "LINESeedSansTH", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            --brand-font-sans: "Outfit", "LINESeedSansTH", system-ui, -apple-system, sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: var(--brand-font-sans);
+            /* Gradient Background ตามตัวอย่างที่พี่ส่งมา */
             background: linear-gradient(135deg, #a39f40 0%, #bdc432 100%);
             display: flex;
             justify-content: center;
@@ -90,7 +93,7 @@
             font-size: 16px;
             cursor: pointer;
             margin-top: 1rem;
-            transition: transform 0.1s, opacity 0.2s;
+            transition: all 0.2s;
         }
 
         button.btn-signup:hover {
@@ -136,7 +139,7 @@
 
         <div class="input-group">
             <label>Nick Name</label>
-            <input type="text" id="nick_name" placeholder="Your nickname">
+            <input type="text" id="nick_name" placeholder="Enter nickname">
         </div>
 
         <div class="input-group">
@@ -163,12 +166,12 @@
     </form>
 
     <div class="signin-link">
-        Already have an account? <a href="index.html">Sign in</a>
+        Already have an account? <a href="login.html">Sign in</a>
     </div>
 </div>
 
 <script>
-    // --- INSERT YOUR SUPABASE KEYS HERE ---
+    // --- ⚠️ สำคัญ: ใส่ API KEY ของพี่ตรงนี้ ⚠️ ---
     const SUPABASE_URL = 'YOUR_SUPABASE_URL';
     const SUPABASE_KEY = 'YOUR_ANON_KEY';
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -182,16 +185,36 @@
         const password = document.getElementById('password').value;
         const confirm_pass = document.getElementById('confirm_password').value;
         
+        // 1. ตรวจสอบรหัสผ่าน
         if (password !== confirm_pass) {
-            alert("Passwords do not match!");
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Passwords do not match!',
+                confirmButtonColor: '#000000'
+            });
             return;
         }
 
+        // 2. ตรวจสอบ Domain Email
         if (!email.endsWith('@brand-strom.com')) {
-            alert("Please use @brand-strom.com email only.");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Email',
+                text: 'Please use @brand-strom.com only.',
+                confirmButtonColor: '#bdc432'
+            });
             return;
         }
 
+        // แสดง Loading ตอนกดปุ่ม
+        Swal.fire({
+            title: 'Processing...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        // 3. ส่งข้อมูลไป Supabase
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
@@ -206,10 +229,24 @@
         });
 
         if (error) {
-            alert("Error: " + error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: error.message,
+                confirmButtonColor: '#000000'
+            });
         } else {
-            alert("Registration successful! Please check your email for verification.");
-            form.reset();
+            // ✅ สำเร็จ! แสดง Popup และเด้งไปหน้า login.html
+            Swal.fire({
+                icon: 'success',
+                title: 'Complete!',
+                text: 'Registration successful! Check your email to verify.',
+                confirmButtonColor: '#bdc432',
+                timer: 3000,
+                timerProgressBar: true
+            }).then(() => {
+                window.location.href = 'login.html';
+            });
         }
     };
 </script>
