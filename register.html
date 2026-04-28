@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-QUEST | Registration</title>
+    <title>B-QUEST | Register</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-
-    <style>
+    <script src="config.js"></script> <style>
         :root {
             --brand-accent: #bdc432;
             --brand-accent-dark: #7c7a2d;
@@ -20,7 +18,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
         body {
-            /* BG Gradient ตามที่พี่ต้องการ */
+            /* ไล่เฉดสีตามสั่ง */
             background: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px;
@@ -29,35 +27,38 @@
         .card {
             background: #fff; padding: 2.5rem; border-radius: 20px;
             width: 100%; max-width: 450px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
         }
 
         .logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 2rem; letter-spacing: -1px; }
 
-        /* กล่องหุ้ม Input ทั่วไป */
         .group { margin-bottom: 1.2rem; }
-        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #444; }
+        label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #333; }
 
-        /* ระบบ Wrapper สำหรับ Password (สำคัญมาก) */
-        .input-wrapper { position: relative; display: flex; align-items: center; }
+        /* กล่องหุ้มเพื่อให้ปุ่มตาชิดขวาได้แม่นยำ */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
         input, select {
             width: 100%; padding: 12px 16px; border: 1.5px solid #eee;
             border-radius: 12px; font-size: 15px; outline: none; transition: 0.2s;
         }
 
+        /* เผื่อที่ด้านขวาให้รูปตา */
+        .pass-input { padding-right: 50px !important; }
+
         input:focus { border-color: var(--brand-accent); background: #fafbf2; }
 
-        /* เฉพาะช่องรหัสผ่าน เผื่อที่ให้ Bitwarden และ ปุ่มตา */
-        .pass-input { padding-right: 85px !important; }
-
-        /* ปุ่มรูปตาใน Wrapper */
+        /* ปุ่มรูปตา: ชิดขวาเป๊ะ 15px */
         .eye-btn {
-            position: absolute; 
-            right: 42px; /* ขยับหลบ Bitwarden */
+            position: absolute;
+            right: 15px;
             background: none; border: none; cursor: pointer;
             color: #888; display: flex; align-items: center;
-            padding: 5px; z-index: 10;
+            z-index: 5;
         }
 
         .row { display: flex; gap: 0.8rem; }
@@ -100,7 +101,7 @@
             <label>Password</label>
             <div class="input-wrapper">
                 <input id="pass_val" type="password" class="pass-input" placeholder="Min 6 characters" required>
-                <button type="button" class="eye-btn" onclick="toggle('pass_val', this)"></button>
+                <button type="button" class="eye-btn" onclick="togglePass('pass_val', this)"></button>
             </div>
         </div>
 
@@ -108,7 +109,7 @@
             <label>Confirm Password</label>
             <div class="input-wrapper">
                 <input id="conf_val" type="password" class="pass-input" placeholder="Repeat password" required>
-                <button type="button" class="eye-btn" onclick="toggle('conf_val', this)"></button>
+                <button type="button" class="eye-btn" onclick="togglePass('conf_val', this)"></button>
             </div>
         </div>
 
@@ -118,41 +119,34 @@
 </div>
 
 <script>
-    // 1. ICONS (SVG ลายเส้นที่พี่ต้องการ)
-    const iconEye = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-    const iconEyeOff = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+    // 1. ICONS Setup
+    const eyeIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    const eyeOffIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
-    document.querySelectorAll(".eye-btn").forEach(b => b.innerHTML = iconEye);
+    document.querySelectorAll(".eye-btn").forEach(btn => btn.innerHTML = eyeIcon);
 
-    function toggle(id, btn) {
-        const x = document.getElementById(id);
-        if (x.type === "password") {
-            x.type = "text"; btn.innerHTML = iconEyeOff;
+    function togglePass(id, btn) {
+        const input = document.getElementById(id);
+        if (input.type === "password") {
+            input.type = "text"; btn.innerHTML = eyeOffIcon;
         } else {
-            x.type = "password"; btn.innerHTML = iconEye;
+            input.type = "password"; btn.innerHTML = eyeIcon;
         }
     }
 
-    // 2. SUPABASE INIT (เช็คว่าตัวแปรจาก config.js มาไหม)
-    let sb;
-    try {
-        if (typeof SUPABASE_URL !== 'undefined') {
-            sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } else {
-            console.error("SUPABASE_URL is not defined. Check config.js");
-        }
-    } catch(e) { console.error("Init Error:", e); }
+    // 2. SUPABASE
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 3. SUBMIT LOGIC
+    // 3. SUBMIT
     document.getElementById("regForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // แสดง Popup ทันทีที่กด (ถ้าไม่เด้ง แปลว่ามี Error ใน Code ส่วนบน)
+        // เด้ง Popup ทันทีที่กดเพื่อให้รู้ว่า Code ทำงาน
         Swal.fire({
-            title: 'Connecting...',
-            text: 'Setting up your B-QUEST profile',
+            title: 'Please wait...',
+            text: 'Creating your account',
             allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
+            didOpen: () => { Swal.showLoading(); }
         });
 
         const p1 = document.getElementById("pass_val").value;
@@ -165,12 +159,12 @@
         }
 
         if (!em.endsWith('@brand-strom.com')) {
-            Swal.fire("Access Denied", "Use @brand-strom.com email only.", "warning");
+            Swal.fire("Warning", "Use @brand-strom.com only", "warning");
             return;
         }
 
         try {
-            const { error } = await sb.auth.signUp({
+            const { error } = await supabaseClient.auth.signUp({
                 email: em,
                 password: p1,
                 options: {
@@ -187,13 +181,13 @@
 
             Swal.fire({
                 icon: "success",
-                title: "Welcome aboard!",
-                text: "Please check your email to verify your account.",
+                title: "Success!",
+                text: "Registration complete. Please check your email.",
                 confirmButtonColor: "#bdc432"
-            }).then(() => location.href = "login.html");
+            }).then(() => { location.href = "login.html"; });
 
         } catch (err) {
-            Swal.fire("Signup Failed", err.message, "error");
+            Swal.fire("Failed", err.message, "error");
         }
     });
 </script>
