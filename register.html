@@ -1,265 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>B-QUEST Registration | BrandBox</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-QUEST Registration | BrandBox</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --brand-accent: #bdc432;
+            --brand-dark: #8b893a;
+            --font-main: "Outfit", sans-serif;
+            --bg-gradient: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-accent) 100%);
+        }
 
-<style>
-:root {
-    --accent:#bdc432;
-    --font:"Outfit",sans-serif;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
-* {
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+        body {
+            background: var(--bg-gradient);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 20px;
+        }
 
-body {
-    font-family:var(--font);
-    background:linear-gradient(135deg,#a39f40,#bdc432);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    padding:20px;
-}
+        .login-card {
+            background: #fff; padding: 2.5rem; border-radius: 20px;
+            width: 100%; max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
 
-/* CARD */
-.login-card {
-    background:#fff;
-    padding:2.5rem;
-    border-radius:16px;
-    width:100%;
-    max-width:450px;
-    box-shadow:0 20px 40px rgba(0,0,0,0.15);
-}
+        .brand-logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 2rem; letter-spacing: -1px; }
 
-.brand-logo {
-    font-size:32px;
-    font-weight:700;
-    text-align:center;
-    margin-bottom:2rem;
-}
+        .input-group { margin-bottom: 1.2rem; position: relative; }
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #444; }
 
-/* INPUT */
-.input-group {
-    margin-bottom:1.2rem;
-    position:relative;
-    overflow:visible;
-}
+        input, select {
+            width: 100%; padding: 12px 16px; border: 1.5px solid #eee;
+            border-radius: 12px; font-size: 15px; transition: 0.2s;
+        }
 
-label {
-    display:block;
-    font-size:14px;
-    font-weight:600;
-    margin-bottom:6px;
-}
+        input:focus, select:focus { outline: none; border-color: var(--brand-accent); background: #fafbf2; }
 
-input, select {
-    width:100%;
-    padding:12px 45px 12px 16px;
-    border:1.5px solid #eee;
-    border-radius:10px;
-    font-size:15px;
-}
+        /* จัดแถว Role กับ ID */
+        .row-inputs { display: flex; gap: 0.8rem; }
+        .row-inputs > .input-group { flex: 1; }
 
-input:focus, select:focus {
-    outline:none;
-    border-color:var(--accent);
-    background:#fafbf2;
-}
+        .password-toggle-btn {
+            position: absolute; right: 14px; top: 38px;
+            z-index: 10; background: none; border: none;
+            cursor: pointer; color: #888;
+        }
 
-/* ROW */
-.row-inputs {
-    display:flex;
-    gap:1rem;
-}
+        .btn-signup {
+            width: 100%; padding: 16px; background: var(--brand-accent);
+            border: none; border-radius: 12px; color: #fff;
+            font-weight: 700; font-size: 16px; cursor: pointer;
+            margin-top: 1rem; transition: transform 0.1s;
+        }
 
-/* PASSWORD BUTTON */
-.password-toggle-btn {
-    position:absolute;
-    right:12px;
-    top:38px;
-    z-index:10;
-    background:none;
-    border:none;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#666;
-}
+        .btn-signup:active { transform: scale(0.98); }
 
-/* BUTTON */
-.btn-signup {
-    width:100%;
-    padding:16px;
-    background:var(--accent);
-    border:none;
-    border-radius:10px;
-    color:#fff;
-    font-weight:700;
-    cursor:pointer;
-    margin-top:1rem;
-}
-
-.signin-link {
-    text-align:center;
-    margin-top:1.5rem;
-    font-size:14px;
-}
-</style>
+        .signin-link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: #666; }
+        .signin-link a { color: #000; text-decoration: none; font-weight: 700; }
+    </style>
 </head>
 
 <body>
 
 <div class="login-card">
-<div class="brand-logo">B-QUEST</div>
+    <div class="brand-logo">B-QUEST</div>
 
-<form id="registerForm">
+    <form id="registerForm">
+        <div class="row-inputs">
+            <div class="input-group">
+                <label>Employer ID</label>
+                <input id="employee_id" placeholder="BXXXX" required>
+            </div>
+            <div class="input-group">
+                <label>Role</label>
+                <select id="role" required>
+                    <option value="">Select</option>
+                    <option>Creative</option>
+                    <option>Designer</option>
+                    <option>AE</option>
+                </select>
+            </div>
+        </div>
 
-<div class="row-inputs">
-<div class="input-group">
-<label>Employer ID</label>
-<input id="employee_id" required>
-</div>
+        <div class="input-group"><label>Nick Name</label><input id="nick_name" placeholder="Nick name"></div>
+        <div class="input-group"><label>Full Name</label><input id="full_name" placeholder="Enter full name" required></div>
+        <div class="input-group"><label>Email</label><input id="email" type="email" placeholder="name@brand-strom.com" required></div>
 
-<div class="input-group">
-<label>Role</label>
-<select id="role" required>
-<option value="">Select Role</option>
-<option>Creative</option>
-<option>Designer</option>
-<option>AE</option>
-</select>
-</div>
-</div>
+        <div class="input-group">
+            <label>Password</label>
+            <input id="password" type="password" placeholder="Min 6 characters" required>
+            <button type="button" class="password-toggle-btn" onclick="togglePass('password', this)"></button>
+        </div>
 
-<div class="input-group">
-<label>Nick Name</label>
-<input id="nick_name">
-</div>
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input id="confirm_password" type="password" placeholder="Repeat password" required>
+            <button type="button" class="password-toggle-btn" onclick="togglePass('confirm_password', this)"></button>
+        </div>
 
-<div class="input-group">
-<label>Full Name</label>
-<input id="full_name" required>
-</div>
-
-<div class="input-group">
-<label>Email</label>
-<input id="email" type="email" required>
-</div>
-
-<div class="input-group">
-<label>Password</label>
-<input id="password" type="password" required>
-<button type="button" class="password-toggle-btn" onclick="toggle('password',this)"></button>
-</div>
-
-<div class="input-group">
-<label>Confirm Password</label>
-<input id="confirm_password" type="password" required>
-<button type="button" class="password-toggle-btn" onclick="toggle('confirm_password',this)"></button>
-</div>
-
-<button class="btn-signup" type="submit">Sign Up</button>
-
-</form>
+        <button class="btn-signup" type="submit">Sign Up</button>
+    </form>
+    <div class="signin-link">Already have an account? <a href="login.html">Sign in</a></div>
 </div>
 
 <script>
-// =====================
-// SVG ICONS
-// =====================
-const eye = `
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-<circle cx="12" cy="12" r="3"/>
-</svg>`;
+    // 1. ICONS & TOGGLE
+    const iconEye = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    const iconEyeOff = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
-const eyeOff = `
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<path d="M17.94 17.94A10 10 0 0 1 12 20C5 20 1 12 1 12"/>
-<line x1="1" y1="1" x2="23" y2="23"/>
-</svg>`;
+    document.querySelectorAll(".password-toggle-btn").forEach(btn => btn.innerHTML = iconEye);
 
-// init icons
-document.querySelectorAll(".password-toggle-btn").forEach(btn=>{
-    btn.innerHTML = eye;
-});
-
-// =====================
-// TOGGLE PASSWORD
-// =====================
-function toggle(id, btn){
-    const el = document.getElementById(id);
-    const show = el.type === "password";
-    el.type = show ? "text" : "password";
-    btn.innerHTML = show ? eyeOff : eye;
-}
-
-// =====================
-// SUPABASE INIT
-// =====================
-const SUPABASE_URL = "YOUR_URL";
-const SUPABASE_KEY = "YOUR_KEY";
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// =====================
-// SUBMIT
-// =====================
-document.getElementById("registerForm").addEventListener("submit", async (e)=>{
-    e.preventDefault();
-
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const confirm = document.getElementById("confirm_password").value;
-
-    if(password !== confirm){
-        Swal.fire("Error","Passwords do not match","error");
-        return;
+    function togglePass(id, btn) {
+        const el = document.getElementById(id);
+        const isPass = el.type === "password";
+        el.type = isPass ? "text" : "password";
+        btn.innerHTML = isPass ? iconEyeOff : iconEye;
     }
 
-    Swal.fire({
-        title:"Creating account...",
-        allowOutsideClick:false,
-        didOpen:()=>Swal.showLoading()
-    });
+    // 2. SUPABASE INIT (ดึงตัวแปรจาก config.js)
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    try{
-        const { error } = await supabaseClient.auth.signUp({
-            email,
-            password,
-            options:{
-                data:{
-                    employee_id: employee_id.value,
-                    nick_name: nick_name.value,
-                    full_name: full_name.value,
-                    role: role.value
+    // 3. SUBMIT LOGIC
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const form = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+            confirm: document.getElementById("confirm_password").value,
+            employee_id: document.getElementById("employee_id").value,
+            nick_name: document.getElementById("nick_name").value,
+            full_name: document.getElementById("full_name").value,
+            role: document.getElementById("role").value
+        };
+
+        // Validation
+        if (form.password !== form.confirm) return Swal.fire("Error", "Passwords do not match", "error");
+        if (!form.email.endsWith('@brand-strom.com')) return Swal.fire("Access Denied", "Please use @brand-strom.com email", "warning");
+
+        Swal.fire({ title: "Creating account...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const { error } = await supabaseClient.auth.signUp({
+                email: form.email,
+                password: form.password,
+                options: {
+                    data: {
+                        employee_id: form.employee_id,
+                        nick_name: form.nick_name,
+                        full_name: form.full_name,
+                        role: form.role
+                    }
                 }
-            }
-        });
+            });
 
-        if(error) throw error;
+            if (error) throw error;
 
-        Swal.fire({
-            icon:"success",
-            title:"Success",
-            text:"Check your email to confirm account"
-        }).then(()=>location.href="login.html");
+            Swal.fire({
+                icon: "success",
+                title: "Registration Complete",
+                text: "Check your email for confirmation link",
+                confirmButtonColor: "#bdc432"
+            }).then(() => location.href = "login.html");
 
-    }catch(err){
-        Swal.fire("Error",err.message,"error");
-    }
-});
+        } catch (err) {
+            Swal.fire("Registration Failed", err.message, "error");
+        }
+    });
 </script>
 
 </body>
