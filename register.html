@@ -8,34 +8,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script> <style>
+    <script src="config.js"></script>
+
+    <style>
         :root {
-            --brand-accent: #bdc432;
-            --brand-accent-dark: #7c7a2d;
+            /* ค่าสีจากหน้าจอ Inspect ของพี่เป๊ะๆ */
+            --brand-accent-dark: rgb(45, 71, 57);
+            --brand-accent: rgb(189, 196, 50);
             --font-main: "Outfit", sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
         body {
-            /* ไล่เฉดสีตามสั่ง */
+            /* Background Gradient ตามรูปที่พี่ส่งมา */
             background: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px;
         }
 
         .card {
-            background: #fff; padding: 2.5rem; border-radius: 20px;
+            background: #fff; padding: 2.5rem; border-radius: 24px;
             width: 100%; max-width: 450px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
         }
 
         .logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 2rem; letter-spacing: -1px; }
 
         .group { margin-bottom: 1.2rem; }
-        label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #333; }
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #333; }
 
-        /* กล่องหุ้มเพื่อให้ปุ่มตาชิดขวาได้แม่นยำ */
+        /* Wrapper เพื่อให้ปุ่มตาชิดขวาภายในกล่อง */
         .input-wrapper {
             position: relative;
             display: flex;
@@ -47,18 +50,18 @@
             border-radius: 12px; font-size: 15px; outline: none; transition: 0.2s;
         }
 
-        /* เผื่อที่ด้านขวาให้รูปตา */
-        .pass-input { padding-right: 50px !important; }
-
         input:focus { border-color: var(--brand-accent); background: #fafbf2; }
 
-        /* ปุ่มรูปตา: ชิดขวาเป๊ะ 15px */
-        .eye-btn {
+        /* ปรับ Padding ด้านขวาหลบปุ่มตา */
+        .pass-input { padding-right: 45px !important; }
+
+        /* ปุ่มตาชิดขวาสุดของกล่อง */
+        .password-toggle-btn {
             position: absolute;
-            right: 15px;
+            right: 15px; /* ชิดขวาเป๊ะตามตัวอย่าง */
             background: none; border: none; cursor: pointer;
             color: #888; display: flex; align-items: center;
-            z-index: 5;
+            padding: 0; z-index: 10;
         }
 
         .row { display: flex; gap: 0.8rem; }
@@ -70,7 +73,7 @@
             font-weight: 700; font-size: 16px; cursor: pointer;
             margin-top: 1rem; transition: 0.2s;
         }
-        .btn-main:hover { background: var(--brand-accent-dark); }
+        .btn-main:hover { opacity: 0.9; }
 
         .link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: #666; }
         .link a { color: #000; text-decoration: none; font-weight: 700; }
@@ -101,7 +104,9 @@
             <label>Password</label>
             <div class="input-wrapper">
                 <input id="pass_val" type="password" class="pass-input" placeholder="Min 6 characters" required>
-                <button type="button" class="eye-btn" onclick="togglePass('pass_val', this)"></button>
+                <button type="button" class="password-toggle-btn" onclick="togglePass('pass_val', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
             </div>
         </div>
 
@@ -109,7 +114,9 @@
             <label>Confirm Password</label>
             <div class="input-wrapper">
                 <input id="conf_val" type="password" class="pass-input" placeholder="Repeat password" required>
-                <button type="button" class="eye-btn" onclick="togglePass('conf_val', this)"></button>
+                <button type="button" class="password-toggle-btn" onclick="togglePass('conf_val', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
             </div>
         </div>
 
@@ -119,18 +126,16 @@
 </div>
 
 <script>
-    // 1. ICONS Setup
-    const eyeIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-    const eyeOffIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
-
-    document.querySelectorAll(".eye-btn").forEach(btn => btn.innerHTML = eyeIcon);
+    // 1. ไอคอน SVG สลับสถานะ
+    const svgOpen = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    const svgClose = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
     function togglePass(id, btn) {
         const input = document.getElementById(id);
         if (input.type === "password") {
-            input.type = "text"; btn.innerHTML = eyeOffIcon;
+            input.type = "text"; btn.innerHTML = svgClose;
         } else {
-            input.type = "password"; btn.innerHTML = eyeIcon;
+            input.type = "password"; btn.innerHTML = svgOpen;
         }
     }
 
@@ -141,10 +146,9 @@
     document.getElementById("regForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // เด้ง Popup ทันทีที่กดเพื่อให้รู้ว่า Code ทำงาน
+        // แสดงผลทันทีที่กดปุ่ม เพื่อให้รู้ว่าโค้ดทำงาน
         Swal.fire({
-            title: 'Please wait...',
-            text: 'Creating your account',
+            title: 'Connecting to B-QUEST...',
             allowOutsideClick: false,
             didOpen: () => { Swal.showLoading(); }
         });
@@ -159,7 +163,7 @@
         }
 
         if (!em.endsWith('@brand-strom.com')) {
-            Swal.fire("Warning", "Use @brand-strom.com only", "warning");
+            Swal.fire("Wait!", "Use @brand-strom.com email only.", "warning");
             return;
         }
 
@@ -181,9 +185,9 @@
 
             Swal.fire({
                 icon: "success",
-                title: "Success!",
-                text: "Registration complete. Please check your email.",
-                confirmButtonColor: "#bdc432"
+                title: "Welcome aboard!",
+                text: "Check your email for confirmation link.",
+                confirmButtonColor: "rgb(189, 196, 50)"
             }).then(() => { location.href = "login.html"; });
 
         } catch (err) {
