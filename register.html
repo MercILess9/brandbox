@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script src="config.js"></script>
 
     <style>
@@ -45,23 +46,14 @@
 
         input:focus { border-color: var(--brand-accent); background: #fafbf2; }
 
-        /* สไตล์ปุ่มเติม Domain */
-        .domain-btn {
-            position: absolute; right: 8px;
-            background: #f0f0f0; border: none; padding: 6px 10px;
-            border-radius: 8px; font-size: 11px; font-weight: 700;
-            color: #666; cursor: pointer; transition: 0.2s;
-        }
-        .domain-btn:hover { background: var(--brand-accent); color: #fff; }
-
-        /* เผื่อที่ให้ปุ่มในช่อง Email */
-        .email-input { padding-right: 110px !important; }
+        /* ปรับ Padding ให้สมดุล เพราะไม่มีปุ่ม Domain แล้ว */
         .pass-input { padding-right: 45px !important; }
 
         .password-toggle-btn {
             position: absolute; right: 15px;
             background: none; border: none; cursor: pointer;
             color: #888; display: flex; align-items: center;
+            padding: 0; z-index: 10;
         }
 
         .row { display: flex; gap: 0.8rem; }
@@ -100,11 +92,8 @@
         <div class="group"><label>Full Name</label><input id="full" placeholder="Full name" required></div>
         
         <div class="group">
-            <label>Email</label>
-            <div class="input-wrapper">
-                <input id="email_val" class="email-input" type="text" placeholder="username" required>
-                <button type="button" class="domain-btn" onclick="appendDomain()">@brand-strom.com</button>
-            </div>
+            <label>Email Address</label>
+            <input id="email_val" type="email" placeholder="example@email.com" required>
         </div>
 
         <div class="group">
@@ -134,28 +123,7 @@
 </div>
 
 <script>
-    // ฟังก์ชันเติม Domain อัตโนมัติ
-    function appendDomain(event) {
-        // ป้องกันไม่ให้เกิดการเปิดหน้าใหม่ หรือ Submit Form
-        if (event) event.preventDefault(); 
-
-        const emailInput = document.getElementById("email_val");
-        let val = emailInput.value.trim();
-        
-        if (val === "") return;
-        
-        // ถ้ายังไม่มี @ ให้เติมต่อท้าย
-        if (!val.includes("@")) {
-            emailInput.value = val + "@brand-strom.com";
-        } else {
-            // ถ้ามี @ แล้วแต่ไม่ใช่ของบริษัท ให้แก้ให้ถูกต้อง
-            if (!val.endsWith("@brand-strom.com")) {
-                const username = val.split("@")[0];
-                emailInput.value = username + "@brand-strom.com";
-            }
-        }
-    }
-
+    // ฟังก์ชัน Show/Hide Password
     function togglePass(id, btn) {
         const input = document.getElementById(id);
         const isPass = input.type === "password";
@@ -169,18 +137,19 @@
 
     document.getElementById("regForm").addEventListener("submit", async (e) => {
         e.preventDefault();
-        
-        // ก่อนส่ง ให้เรียก appendDomain เผื่อพนักงานลืมกดปุ่ม
-        appendDomain();
 
         const email = document.getElementById("email_val").value;
         const password = document.getElementById("pass_val").value;
         const confirm = document.getElementById("conf_val").value;
 
+        // ตรวจสอบรหัสผ่านตรงกันไหม
         if (password !== confirm) return Swal.fire("Error", "Passwords do not match!", "error");
-        if (!email.endsWith('@brand-strom.com')) return Swal.fire("Warning", "Use @brand-strom.com only", "warning");
 
-        Swal.fire({ title: 'Connecting...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ 
+            title: 'Connecting...', 
+            allowOutsideClick: false, 
+            didOpen: () => Swal.showLoading() 
+        });
 
         try {
             const { error } = await supabaseClient.auth.signUp({
@@ -198,7 +167,14 @@
             });
 
             if (error) throw error;
-            Swal.fire({ icon: "success", title: "Complete!", text: "Please check your email." }).then(() => { window.location.href = "/login"; });
+
+            Swal.fire({ 
+                icon: "success", 
+                title: "Complete!", 
+                text: "Please check your email for confirmation." 
+            }).then(() => { 
+                window.location.href = "/login"; 
+            });
 
         } catch (err) {
             Swal.fire("Failed", err.message, "error");
