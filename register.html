@@ -135,16 +135,20 @@
 
 <script>
     // ฟังก์ชันเติม Domain อัตโนมัติ
-    function appendDomain() {
+    function appendDomain(event) {
+        // ป้องกันไม่ให้เกิดการเปิดหน้าใหม่ หรือ Submit Form
+        if (event) event.preventDefault(); 
+
         const emailInput = document.getElementById("email_val");
         let val = emailInput.value.trim();
+        
         if (val === "") return;
         
         // ถ้ายังไม่มี @ ให้เติมต่อท้าย
         if (!val.includes("@")) {
             emailInput.value = val + "@brand-strom.com";
         } else {
-            // ถ้ามี @ แล้วแต่เป็นตัวอื่น อาจจะแจ้งเตือนหรือเปลี่ยนให้ (ในที่นี้ขอแค่ไม่เติมซ้ำ)
+            // ถ้ามี @ แล้วแต่ไม่ใช่ของบริษัท ให้แก้ให้ถูกต้อง
             if (!val.endsWith("@brand-strom.com")) {
                 const username = val.split("@")[0];
                 emailInput.value = username + "@brand-strom.com";
