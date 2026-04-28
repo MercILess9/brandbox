@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-QUEST | Register</title>
+    <title>B-QUEST | Registration</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script src="config.js"></script>
 
     <style>
         :root {
-            /* ค่าสีจากหน้าจอ Inspect ของพี่เป๊ะๆ */
+            /* สีจากรูปพนักงาน BrandBox ที่พี่ส่งมา */
             --brand-accent-dark: rgb(45, 71, 57);
             --brand-accent: rgb(189, 196, 50);
             --font-main: "Outfit", sans-serif;
@@ -21,7 +22,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
         body {
-            /* Background Gradient ตามรูปที่พี่ส่งมา */
             background: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px;
@@ -38,7 +38,7 @@
         .group { margin-bottom: 1.2rem; }
         label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #333; }
 
-        /* Wrapper เพื่อให้ปุ่มตาชิดขวาภายในกล่อง */
+        /* Wrapper สำหรับจัดตำแหน่งปุ่มตา */
         .input-wrapper {
             position: relative;
             display: flex;
@@ -52,13 +52,13 @@
 
         input:focus { border-color: var(--brand-accent); background: #fafbf2; }
 
-        /* ปรับ Padding ด้านขวาหลบปุ่มตา */
-        .pass-input { padding-right: 45px !important; }
+        /* เผื่อที่ให้รูปตาและ Password Manager */
+        .pass-input { padding-right: 50px !important; }
 
-        /* ปุ่มตาชิดขวาสุดของกล่อง */
+        /* ปุ่มรูปตาชิดขวา 15px ตามตัวอย่างที่พี่ชอบ */
         .password-toggle-btn {
             position: absolute;
-            right: 15px; /* ชิดขวาเป๊ะตามตัวอย่าง */
+            right: 15px;
             background: none; border: none; cursor: pointer;
             color: #888; display: flex; align-items: center;
             padding: 0; z-index: 10;
@@ -73,7 +73,7 @@
             font-weight: 700; font-size: 16px; cursor: pointer;
             margin-top: 1rem; transition: 0.2s;
         }
-        .btn-main:hover { opacity: 0.9; }
+        .btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
 
         .link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: #666; }
         .link a { color: #000; text-decoration: none; font-weight: 700; }
@@ -86,12 +86,17 @@
 
     <form id="regForm">
         <div class="row">
-            <div class="group"><label>Employer ID</label><input id="emp_id" placeholder="BXXXX" required></div>
+            <div class="group">
+                <label>Employer ID</label>
+                <input id="emp_id" placeholder="BXXXX" required>
+            </div>
             <div class="group">
                 <label>Role</label>
                 <select id="role_val" required>
                     <option value="">Select</option>
-                    <option>Creative</option><option>Designer</option><option>AE</option>
+                    <option>Creative</option>
+                    <option>Designer</option>
+                    <option>AE</option>
                 </select>
             </div>
         </div>
@@ -103,7 +108,7 @@
         <div class="group">
             <label>Password</label>
             <div class="input-wrapper">
-                <input id="pass_val" type="password" class="pass-input" placeholder="Min 6 characters" required>
+                <input id="pass_val" type="password" class="pass-input" placeholder="Min 6 characters" required minlength="6">
                 <button type="button" class="password-toggle-btn" onclick="togglePass('pass_val', this)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
@@ -126,52 +131,47 @@
 </div>
 
 <script>
-    // 1. ไอคอน SVG สลับสถานะ
+    // 1. Show/Hide Password Logic
     const svgOpen = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const svgClose = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
     function togglePass(id, btn) {
         const input = document.getElementById(id);
-        if (input.type === "password") {
-            input.type = "text"; btn.innerHTML = svgClose;
-        } else {
-            input.type = "password"; btn.innerHTML = svgOpen;
-        }
+        const isPass = input.type === "password";
+        input.type = isPass ? "text" : "password";
+        btn.innerHTML = isPass ? svgClose : svgOpen;
     }
 
-    // 2. SUPABASE
+    // 2. Supabase Client Init
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 3. SUBMIT
+    // 3. Register Submit Logic
     document.getElementById("regForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // แสดงผลทันทีที่กดปุ่ม เพื่อให้รู้ว่าโค้ดทำงาน
+        const email = document.getElementById("email_val").value;
+        const password = document.getElementById("pass_val").value;
+        const confirm = document.getElementById("conf_val").value;
+
+        // Validation
+        if (password !== confirm) return Swal.fire("Error", "Passwords do not match!", "error");
+        if (!email.endsWith('@brand-strom.com')) return Swal.fire("Warning", "Use @brand-strom.com only", "warning");
+
+        // Loading Popup
         Swal.fire({
-            title: 'Connecting to B-QUEST...',
+            title: 'Connecting...',
+            text: 'Setting up your B-QUEST profile',
             allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
+            didOpen: () => Swal.showLoading()
         });
 
-        const p1 = document.getElementById("pass_val").value;
-        const p2 = document.getElementById("conf_val").value;
-        const em = document.getElementById("email_val").value;
-
-        if (p1 !== p2) {
-            Swal.fire("Error", "Passwords do not match!", "error");
-            return;
-        }
-
-        if (!em.endsWith('@brand-strom.com')) {
-            Swal.fire("Wait!", "Use @brand-strom.com email only.", "warning");
-            return;
-        }
-
         try {
-            const { error } = await supabaseClient.auth.signUp({
-                email: em,
-                password: p1,
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
                 options: {
+                    // ใช้ตัวแปร SITE_URL จาก config.js
+                    emailRedirectTo: `${SITE_URL}/login.html`, 
                     data: {
                         employee_id: document.getElementById("emp_id").value,
                         nick_name: document.getElementById("nick").value,
@@ -183,12 +183,15 @@
 
             if (error) throw error;
 
+            // Success Popup
             Swal.fire({
                 icon: "success",
-                title: "Welcome aboard!",
-                text: "Check your email for confirmation link.",
+                title: "Complete!",
+                text: "Registration successful. Please check your email for confirmation link.",
                 confirmButtonColor: "rgb(189, 196, 50)"
-            }).then(() => { location.href = "login.html"; });
+            }).then(() => {
+                window.location.href = "login.html";
+            });
 
         } catch (err) {
             Swal.fire("Failed", err.message, "error");
