@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-QUEST | Register</title>
+    <title>B-QUEST | Registration</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -11,58 +11,67 @@
     <script src="config.js"></script>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Outfit", sans-serif; }
+        :root {
+            --brand-accent: #bdc432;
+            --brand-accent-dark: #7c7a2d;
+            --font-main: "Outfit", sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
         body {
-            /* สีเขียวไล่เฉดตามรูปตัวอย่างเป๊ะๆ */
-            background: linear-gradient(135deg, #7c7a2d 0%, #bdc432 100%);
+            /* BG Gradient ตามที่พี่ต้องการ */
+            background: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px;
         }
 
         .card {
-            background: #fff; padding: 40px; border-radius: 20px;
+            background: #fff; padding: 2.5rem; border-radius: 20px;
             width: 100%; max-width: 450px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        .logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 30px; letter-spacing: -1px; }
+        .logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 2rem; letter-spacing: -1px; }
 
-        .group { margin-bottom: 18px; position: relative; }
-        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #333; }
+        /* กล่องหุ้ม Input ทั่วไป */
+        .group { margin-bottom: 1.2rem; }
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #444; }
+
+        /* ระบบ Wrapper สำหรับ Password (สำคัญมาก) */
+        .input-wrapper { position: relative; display: flex; align-items: center; }
 
         input, select {
-            width: 100%; padding: 12px 15px; border: 1.5px solid #eee;
-            border-radius: 10px; font-size: 15px; outline: none;
+            width: 100%; padding: 12px 16px; border: 1.5px solid #eee;
+            border-radius: 12px; font-size: 15px; outline: none; transition: 0.2s;
         }
-        
-        /* ช่องรหัสผ่าน: เผื่อที่ด้านขวาเยอะๆ หลบ Bitwarden และวางปุ่มตา */
-        .pass-input { padding-right: 80px !important; }
 
-        input:focus { border-color: #bdc432; background: #fafbf2; }
+        input:focus { border-color: var(--brand-accent); background: #fafbf2; }
 
-        .row { display: flex; gap: 10px; }
-        .row .group { flex: 1; }
+        /* เฉพาะช่องรหัสผ่าน เผื่อที่ให้ Bitwarden และ ปุ่มตา */
+        .pass-input { padding-right: 85px !important; }
 
-        /* ปุ่มรูปตา: ล็อคตำแหน่งให้ตายตัวที่ด้านขวา */
+        /* ปุ่มรูปตาใน Wrapper */
         .eye-btn {
             position: absolute; 
-            right: 42px; /* หลบ Bitwarden */
-            top: 36px;   /* วางตำแหน่งกึ่งกลาง input */
+            right: 42px; /* ขยับหลบ Bitwarden */
             background: none; border: none; cursor: pointer;
-            color: #888; padding: 5px; z-index: 99;
-            display: flex; align-items: center;
+            color: #888; display: flex; align-items: center;
+            padding: 5px; z-index: 10;
         }
+
+        .row { display: flex; gap: 0.8rem; }
+        .row .group { flex: 1; }
 
         .btn-main {
-            width: 100%; padding: 16px; background: #bdc432;
-            border: none; border-radius: 10px; color: #fff;
+            width: 100%; padding: 16px; background: var(--brand-accent);
+            border: none; border-radius: 12px; color: #fff;
             font-weight: 700; font-size: 16px; cursor: pointer;
-            margin-top: 10px; transition: 0.2s;
+            margin-top: 1rem; transition: 0.2s;
         }
-        .btn-main:hover { background: #a39f40; }
+        .btn-main:hover { background: var(--brand-accent-dark); }
 
-        .link { text-align: center; margin-top: 20px; font-size: 14px; color: #666; }
+        .link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: #666; }
         .link a { color: #000; text-decoration: none; font-weight: 700; }
     </style>
 </head>
@@ -89,14 +98,18 @@
 
         <div class="group">
             <label>Password</label>
-            <input id="pass_val" type="password" class="pass-input" placeholder="Min 6 chars" required minlength="6">
-            <button type="button" class="eye-btn" onclick="toggle('pass_val', this)"></button>
+            <div class="input-wrapper">
+                <input id="pass_val" type="password" class="pass-input" placeholder="Min 6 characters" required>
+                <button type="button" class="eye-btn" onclick="toggle('pass_val', this)"></button>
+            </div>
         </div>
 
         <div class="group">
             <label>Confirm Password</label>
-            <input id="conf_val" type="password" class="pass-input" placeholder="Repeat password" required>
-            <button type="button" class="eye-btn" onclick="toggle('conf_val', this)"></button>
+            <div class="input-wrapper">
+                <input id="conf_val" type="password" class="pass-input" placeholder="Repeat password" required>
+                <button type="button" class="eye-btn" onclick="toggle('conf_val', this)"></button>
+            </div>
         </div>
 
         <button class="btn-main" type="submit">Sign Up</button>
@@ -105,42 +118,56 @@
 </div>
 
 <script>
-    // 1. ICONS
-    const open = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-    const close = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+    // 1. ICONS (SVG ลายเส้นที่พี่ต้องการ)
+    const iconEye = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    const iconEyeOff = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
-    document.querySelectorAll(".eye-btn").forEach(b => b.innerHTML = open);
+    document.querySelectorAll(".eye-btn").forEach(b => b.innerHTML = iconEye);
 
     function toggle(id, btn) {
         const x = document.getElementById(id);
         if (x.type === "password") {
-            x.type = "text"; btn.innerHTML = close;
+            x.type = "text"; btn.innerHTML = iconEyeOff;
         } else {
-            x.type = "password"; btn.innerHTML = open;
+            x.type = "password"; btn.innerHTML = iconEye;
         }
     }
 
-    // 2. SUPABASE (ใส่การดัก Error ตั้งแต่เริ่ม)
+    // 2. SUPABASE INIT (เช็คว่าตัวแปรจาก config.js มาไหม)
     let sb;
     try {
-        sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } catch(e) {
-        console.error("Config fail:", e);
-    }
+        if (typeof SUPABASE_URL !== 'undefined') {
+            sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } else {
+            console.error("SUPABASE_URL is not defined. Check config.js");
+        }
+    } catch(e) { console.error("Init Error:", e); }
 
-    // 3. SUBMIT
+    // 3. SUBMIT LOGIC
     document.getElementById("regForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // ทริกเกอร์ Popup ทันทีที่กด (จะได้รู้ว่า JS ไม่ตาย)
-        Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        // แสดง Popup ทันทีที่กด (ถ้าไม่เด้ง แปลว่ามี Error ใน Code ส่วนบน)
+        Swal.fire({
+            title: 'Connecting...',
+            text: 'Setting up your B-QUEST profile',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
 
         const p1 = document.getElementById("pass_val").value;
         const p2 = document.getElementById("conf_val").value;
         const em = document.getElementById("email_val").value;
 
-        if (p1 !== p2) return Swal.fire("Error", "Passwords do not match", "error");
-        if (!em.endsWith('@brand-strom.com')) return Swal.fire("Access Denied", "Use @brand-strom.com only", "warning");
+        if (p1 !== p2) {
+            Swal.fire("Error", "Passwords do not match!", "error");
+            return;
+        }
+
+        if (!em.endsWith('@brand-strom.com')) {
+            Swal.fire("Access Denied", "Use @brand-strom.com email only.", "warning");
+            return;
+        }
 
         try {
             const { error } = await sb.auth.signUp({
@@ -158,9 +185,15 @@
 
             if (error) throw error;
 
-            Swal.fire({ icon: "success", title: "Complete!", text: "Check your email." }).then(() => location.href = "login.html");
+            Swal.fire({
+                icon: "success",
+                title: "Welcome aboard!",
+                text: "Please check your email to verify your account.",
+                confirmButtonColor: "#bdc432"
+            }).then(() => location.href = "login.html");
+
         } catch (err) {
-            Swal.fire("Failed", err.message, "error");
+            Swal.fire("Signup Failed", err.message, "error");
         }
     });
 </script>
