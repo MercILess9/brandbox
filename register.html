@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมัครสมาชิก B-Quest | BrandBox Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            /* สีเขียวมะกอกแบรนด์ จากรูปตัวอย่าง */
+            --brand-green-main: #b5b24c; 
+            --brand-green-light: #f1f3e6;
+            --brand-green-dark: #8c893a;
+            --text-dark: #333333;
+            --border-color: #d1d5db;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            /* พื้นหลังสีเขียวไล่ระดับ (Gradient) แบบในรูปเป๊ะๆ */
+            background: linear-gradient(135deg, #a39f40 0%, #d5d392 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 460px;
+            text-align: center;
+        }
+
+        /* โลโก้ B-QUEST เขียนเป็นข้อความสไตล์ BrandBox */
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .brand-logo .box-icon {
+            color: black;
+            font-size: 32px;
+            margin-right: 10px;
+            position: relative;
+            top: -2px;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--brand-green-main);
+            box-shadow: 0 0 0 2px var(--brand-green-light);
+        }
+
+        input::placeholder { color: #9ca3af; font-size: 14px; }
+
+        .password-container { position: relative; }
+
+        /* ไอคอนลูกตา (มีแค่หน้าตา ไม่ได้ทำ Logic เปิด/ปิด ให้ครับ เดี๋ยวซับซ้อนไป) */
+        .eye-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        button.btn-signup {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--brand-green-main);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        button.btn-signup:hover { background-color: var(--brand-green-dark); }
+
+        .signin-link {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .signin-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* จัดระเบียบช่อง Employee ID กับ Role ให้อยู่ข้างกันเพื่อประหยัดพื้นที่ */
+        .row-inputs {
+            display: flex;
+            gap: 1rem;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    
+    <div class="brand-logo">
+        <span class="box-icon">▣</span>B-QUEST
+    </div>
+
+    <form id="registerForm">
+        
+        <div class="row-inputs">
+            <div class="input-group" style="flex: 1;">
+                <label>Employee ID</label>
+                <input type="text" id="employee_id" placeholder="AE-001" required>
+            </div>
+            <div class="input-group" style="flex: 1.5;">
+                <label>Role</label>
+                <select id="role" required>
+                    <option value="">-- Select --</option>
+                    <option value="Creative">Creative</option>
+                    <option value="Designer">Designer</option>
+                    <option value="AE">AE</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row-inputs">
+            <div class="input-group" style="flex: 1;">
+                <label>Nick Name</label>
+                <input type="text" id="nick_name" placeholder="ชื่อเล่น">
+            </div>
+            <div class="input-group" style="flex: 2;">
+                <label>Full Name</label>
+                <input type="text" id="full_name" placeholder="นายสมชาย มีสุข" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="name@brand-strom.com" required>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <div class="password-container">
+                <input type="password" id="password" required minlength="6">
+                <span class="eye-icon">👁️</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <div class="password-container">
+                <input type="password" id="confirm_password" required>
+                <span class="eye-icon">👁️</span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-signup">Sign Up</button>
+    </form>
+
+    <div class="signin-link">
+        Already have an account? <a href="index.html">Sign in</a>
+    </div>
+</div>
+
+<script>
+    // --- Step 2: เอา API Key ของพี่มาใส่ตรงนี้ ---
+    const SUPABASE_URL = 'URL_ของพี่_เอามาจาก_Supabase_Settings_API';
+    const SUPABASE_KEY = 'ANON_KEY_ของพี่_เอามาจาก_Supabase_Settings_API';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById('registerForm');
+    
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirm_pass = document.getElementById('confirm_password').value;
+        
+        // 1. เช็ครหัสผ่านตรงกันไหม
+        if (password !== confirm_pass) {
+            alert("รหัสผ่านไม่ตรงกันครับ!");
+            return;
+        }
+
+        // 2. เช็ค Email Domain (ไม้ตาย)
+        if (!email.endsWith('@brand-strom.com')) {
+            alert("ต้องใช้เมล @brand-strom.com เท่านั้นครับ");
+            return;
+        }
+
+        // 3. สั่งสมัครสมาชิก
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    employee_id: document.getElementById('employee_id').value,
+                    full_name: document.getElementById('full_name').value,
+                    nick_name: document.getElementById('nick_name').value,
+                    role: document.getElementById('role').value
+                }
+            }
+        });
+
+        if (error) {
+            alert("เกิดข้อผิดพลาด: " + error.message);
+        } else {
+            alert("สมัครสำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อกดยืนยันตัวตนนะครับ");
+            form.reset();
+        }
+    };
+</script>
+
+</body>
+</html>
