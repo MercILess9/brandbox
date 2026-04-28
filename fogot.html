@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-QUEST | Forgot Password</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        :root { --brand-accent-dark: rgb(45, 71, 57); --brand-accent: rgb(189, 196, 50); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Outfit", sans-serif; }
+        body { background: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .card { background: #fff; padding: 2.5rem; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); }
+        .logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 1rem; }
+        .desc { text-align: center; color: #666; font-size: 14px; margin-bottom: 2rem; }
+        .group { margin-bottom: 1.2rem; }
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+        input { width: 100%; padding: 12px 16px; border: 1.5px solid #eee; border-radius: 12px; outline: none; }
+        .btn-main { width: 100%; padding: 16px; background: var(--brand-accent); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">B-QUEST</div>
+    <div class="desc">Enter your email to receive a password reset link.</div>
+    <form id="forgotForm">
+        <div class="group">
+            <label>Email Address</label>
+            <input id="email" type="email" placeholder="name@brand-strom.com" required>
+        </div>
+        <button class="btn-main" type="submit">Send Reset Link</button>
+    </form>
+    <div style="text-align: center; margin-top: 1.5rem;"><a href="login.html" style="color: #000; font-size: 14px; text-decoration: none; font-weight: 700;">Back to Login</a></div>
+</div>
+
+<script>
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.getElementById("forgotForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+
+        Swal.fire({ title: 'Sending...', didOpen: () => Swal.showLoading() });
+
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: `${SITE_URL}/reset-password.html`, // ลิงก์ที่จะให้เขากดในเมล
+        });
+
+        if (error) {
+            Swal.fire("Error", error.message, "error");
+        } else {
+            Swal.fire("Success", "Password reset link sent! Check your inbox.", "success");
+        }
+    });
+</script>
+</body>
+</html>

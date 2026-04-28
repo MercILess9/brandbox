@@ -21,34 +21,37 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
         body {
-            /* Background Gradient ตามที่ต้องการ */
+            /* Background Gradient 135deg ตามรูปตัวอย่าง */
             background: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px;
         }
 
         .card {
-            background: #fff; padding: 2.5rem; border-radius: 24px;
-            width: 100%; max-width: 400px;
+            background: #fff; padding: 3rem; border-radius: 24px;
+            /* ตั้งค่าความกว้างตามที่พี่ต้องการ */
+            width: 500px; 
+            min-width: 500px;
+            max-width: 95%; /* เผื่อหน้าจอมือถือที่เล็กกว่า 500px */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
         }
 
-        .logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 2rem; letter-spacing: -1px; }
+        .logo { font-size: 36px; font-weight: 700; text-align: center; margin-bottom: 2.5rem; letter-spacing: -1px; }
 
         .group { margin-bottom: 1.2rem; }
-        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #333; }
+        label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #333; }
 
         .input-wrapper { position: relative; display: flex; align-items: center; }
 
         input {
-            width: 100%; padding: 12px 16px; border: 1.5px solid #eee;
-            border-radius: 12px; font-size: 15px; outline: none; transition: 0.2s;
+            width: 100%; padding: 14px 18px; border: 1.5px solid #eee;
+            border-radius: 12px; font-size: 16px; outline: none; transition: 0.2s;
         }
 
         input:focus { border-color: var(--brand-accent); background: #fafbf2; }
 
         /* เผื่อที่ให้รูปตา */
-        .pass-input { padding-right: 45px !important; }
+        .pass-input { padding-right: 50px !important; }
 
         .password-toggle-btn {
             position: absolute; right: 15px;
@@ -57,15 +60,23 @@
             padding: 0; z-index: 10;
         }
 
-        .btn-main {
-            width: 100%; padding: 16px; background: var(--brand-accent);
-            border: none; border-radius: 12px; color: #fff;
-            font-weight: 700; font-size: 16px; cursor: pointer;
-            margin-top: 1rem; transition: 0.2s;
+        .forgot-link {
+            text-align: right; margin-top: 8px;
         }
-        .btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
+        .forgot-link a {
+            font-size: 13px; color: #666; text-decoration: none; transition: 0.2s;
+        }
+        .forgot-link a:hover { color: var(--brand-accent-dark); text-decoration: underline; }
 
-        .link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: #666; }
+        .btn-main {
+            width: 100%; padding: 18px; background: var(--brand-accent);
+            border: none; border-radius: 12px; color: #fff;
+            font-weight: 700; font-size: 18px; cursor: pointer;
+            margin-top: 1.5rem; transition: 0.2s;
+        }
+        .btn-main:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .link { text-align: center; margin-top: 2rem; font-size: 15px; color: #666; }
         .link a { color: #000; text-decoration: none; font-weight: 700; }
     </style>
 </head>
@@ -85,8 +96,11 @@
             <div class="input-wrapper">
                 <input id="password" type="password" class="pass-input" placeholder="Enter your password" required>
                 <button type="button" class="password-toggle-btn" onclick="togglePass('password', this)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
+            </div>
+            <div class="forgot-link">
+                <a href="forgot.html">Forgot Password?</a>
             </div>
         </div>
 
@@ -98,8 +112,8 @@
 
 <script>
     // 1. Show/Hide Password Logic
-    const svgOpen = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-    const svgClose = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+    const svgOpen = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    const svgClose = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
     function togglePass(id, btn) {
         const input = document.getElementById(id);
@@ -120,8 +134,8 @@
 
         // Loading Popup
         Swal.fire({
-            title: 'Authenticating...',
-            text: 'Verifying your credentials',
+            title: 'Welcome back',
+            text: 'Accessing B-QUEST...',
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
         });
@@ -138,11 +152,10 @@
             Swal.fire({
                 icon: "success",
                 title: "Login Successful",
-                text: "Welcome back to B-QUEST!",
                 timer: 1500,
                 showConfirmButton: false
             }).then(() => {
-                // เด้งไปหน้า index.html
+                // เด้งไปหน้า Dashboard โดยอิงจาก BASE_URL/SITE_URL ใน config
                 window.location.href = "index.html"; 
             });
 
