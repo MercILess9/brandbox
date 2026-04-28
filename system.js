@@ -1,54 +1,71 @@
 // ==========================================
-// B-QUEST SYSTEM ENGINE (FIXED VERSION)
+// B-QUEST SYSTEM ENGINE (CLEAN VERSION)
 // ==========================================
 
 // 1. Supabase Client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 2. Current page helper
+// 2. Pages config (มีแค่นี้พอ)
+const publicPages = [
+    "login.html",
+    "register.html",
+    "forgot-password.html"
+];
+
+// 3. Get current page helper
 function getCurrentPage() {
     let page = window.location.pathname.split("/").pop();
     if (!page || page === "") page = "index.html";
     return page;
 }
 
-// 3. AUTH GUARD (SAFE VERSION)
-function initAuthGuard() {
-    const publicPages = ["login.html", "register.html"];
+// 4. Safe redirect (กัน loop)
+function redirect(to) {
+    const current = getCurrentPage();
+    if (current !== to) {
+        window.location.href = to;
+    }
+}
+
+// 5. AUTH GUARD (SIMPLE + SCALABLE)
+async function initAuthGuard() {
     const currentPage = getCurrentPage();
 
+    // ดึง session ครั้งแรก (กัน timing issue)
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    // ❌ ไม่มี session + อยู่หน้า protected
+    if (!session && !publicPages.includes(currentPage)) {
+        redirect("login.html");
+        return;
+    }
+
+    // ✔ มี session + อยู่หน้า public → เด้งไปหน้า main
+    if (session && publicPages.includes(currentPage)) {
+        redirect("index.html");
+        return;
+    }
+
+    // 🔄 realtime auth change (logout / expire / login)
     supabaseClient.auth.onAuthStateChange((event, session) => {
+        const page = getCurrentPage();
 
-        // ❌ ไม่มี session
-        if (!session && !publicPages.includes(currentPage)) {
-            window.location.href = "login.html";
+        if (!session && !publicPages.includes(page)) {
+            redirect("login.html");
         }
 
-        // ✔ มี session แต่เข้า login/register
-        if (session && publicPages.includes(currentPage)) {
-            window.location.href = "index.html";
-        }
-    });
-
-    // สำรองเช็คตอนโหลดครั้งแรก (กัน delay state)
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-
-        if (!session && !publicPages.includes(currentPage)) {
-            window.location.href = "login.html";
-        }
-
-        if (session && publicPages.includes(currentPage)) {
-            window.location.href = "index.html";
+        if (session && publicPages.includes(page)) {
+            redirect("index.html");
         }
     });
 }
 
-// 4. UTILITIES
+// 6. SYSTEM UTILITIES
 const BQuest = {
 
     async logout() {
         await supabaseClient.auth.signOut();
-        window.location.href = "login.html";
+        redirect("login.html");
     },
 
     async getProfile(userId) {
@@ -79,5 +96,5 @@ const BQuest = {
     }
 };
 
-// 5. INIT (สำคัญ: ไม่ block login page แล้ว)
+// 7. INIT
 initAuthGuard();
