@@ -50,19 +50,32 @@
             justify-content: center; 
         }
 
-        /* Dropdown & Buttons */
+        /* --- Action Buttons & Custom Dropdown --- */
         .action-btns { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
         .quest-card:hover .action-btns { opacity: 1; }
+
+        /* ปุ่มสามจุดแบบไม่มีลูกศร และมี Hover Effect */
+        .btn-more {
+            color: var(--text-muted);
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            line-height: 1;
+            display: inline-block;
+            border: none;
+            background: transparent;
+        }
+        .btn-more:hover {
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            transform: scale(1.1);
+        }
+        .btn-more:active { transform: scale(0.95); }
 
         .header-dl-item { text-align: center; height: 42px; display: flex; flex-direction: column; justify-content: center; }
         .header-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         
-        .dl-tag { 
-            border-radius: 8px; padding: 4px 12px; 
-            font-size: 0.78rem; font-weight: 700;
-            display: inline-block;
-            border: 1px solid transparent;
-        }
+        .dl-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; display: inline-block; border: 1px solid transparent; }
         .tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
         .tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
 
@@ -196,11 +209,11 @@
                         <div class="action-btns">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Edit</button>
                             <div class="dropdown">
-                                <button class="btn btn-link btn-sm text-muted py-0 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
+                                <button class="btn-more" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px; font-size: 0.85rem;">
-                                    <li><a class="dropdown-item py-2" href="#"><i class="bi bi-share me-2"></i> Share Link</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px; font-size: 0.85rem; min-width: 150px;">
+                                    <li><a class="dropdown-item py-2" href="#"><i class="bi bi-eye me-2"></i> View Project</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
                                     <li><a class="dropdown-item py-2 text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete Project</a></li>
                                 </ul>
