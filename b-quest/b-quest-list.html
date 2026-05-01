@@ -15,151 +15,188 @@
     <script src="../system.js"></script>
 
     <style>
+        /* =========================================
+           0. ROOT VARIABLES (ตัวแปรหลักของระบบ)
+        ========================================= */
         :root { 
-            --status-progress: #4e73df; 
-            --status-done: #94a3b8;     
-            --bg-body: #f8fafc;
-            --text-dark: #1e293b;
-            --text-muted: #94a3b8;
-            --slate-main: #626e7f;
-            --bquest-accent: #bdc432;
-            --card-radius: 20px;
+            --c-progress: #4e73df; 
+            --c-done: #94a3b8;     
+            --c-bg: #f8fafc;
+            --c-text-main: #1e293b;
+            --c-text-muted: #94a3b8;
+            --c-slate: #626e7f;
+            --c-accent: #bdc432;
+            --radius-card: 20px;
         }
 
-        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding-bottom: 50px; }
+        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--c-bg); color: var(--c-text-main); padding-bottom: 50px; margin: 0; }
 
-        /* --- UI: HEADER & MENU --- */
-        .top-nav { background: #fff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; }
-        .logo-zone { display: flex; align-items: center; gap: 15px; }
-        .logo-zone img { height: 28px; }
-        .system-name { font-weight: 700; font-size: 1.1rem; color: var(--text-dark); border-left: 2px solid #e2e8f0; padding-left: 15px; }
-        .menu-bar { background: var(--bquest-accent); padding: 0 30px; display: flex; gap: 30px; }
-        .menu-item { padding: 12px 15px; font-size: 0.85rem; font-weight: 700; color: rgba(0,0,0,0.6); text-decoration: none; text-transform: uppercase; }
-        .menu-item.active { color: #000; background: rgba(255,255,255,0.2); }
-
-        /* --- NEW FILTER SYSTEM (PREFIX: bq26-) --- */
-        .bq26-filter-zone { background: #fff; padding: 15px 30px; border-bottom: 1px solid #f1f5f9; }
-        .bq26-main-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .bq26-search-wrap { position: relative; width: 300px; }
-        .bq26-search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .bq26-search-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 12px 8px 35px; font-size: 0.85rem; width: 100%; outline: none; height: 38px; }
+        /* =========================================
+           1. SYSTEM GLOBAL (sys-) -> ส่วนหัวระบบ
+        ========================================= */
+        .sys-topnav { background: #fff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; }
+        .sys-brand { display: flex; align-items: center; gap: 15px; }
+        .sys-logo { height: 28px; }
+        .sys-title { font-weight: 700; font-size: 1.1rem; color: var(--c-text-main); border-left: 2px solid #e2e8f0; padding-left: 15px; }
+        .sys-user-panel { display: flex; align-items: center; gap: 20px; }
+        .sys-user-info { display: flex; align-items: center; gap: 10px; color: var(--c-slate); font-weight: 500; font-size: 0.9rem; }
+        .sys-icon-btn { color: var(--c-text-muted); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .sys-icon-btn:hover { color: var(--c-text-main); }
         
-        .bq26-date-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; padding: 0 10px; height: 38px; }
-        .bq26-date-input { border: none; background: transparent; font-size: 0.82rem; width: 95px; text-align: center; color: var(--slate-main); outline: none; }
+        .sys-menubar { background: var(--c-accent); padding: 0 30px; display: flex; gap: 30px; }
+        .sys-menu-link { padding: 12px 15px; font-size: 0.85rem; font-weight: 700; color: rgba(0,0,0,0.6); text-decoration: none; text-transform: uppercase; }
+        .sys-menu-link.active { color: #000; background: rgba(255,255,255,0.2); }
+
+        /* =========================================
+           2. FILTER ZONE (flt-) -> เครื่องมือค้นหา
+        ========================================= */
+        .flt-wrapper { background: #fff; padding: 15px 30px; border-bottom: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .flt-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         
-        .bq26-btn-icon { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
-        .bq26-btn-adv { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 12px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); cursor: pointer; }
-
-        .bq26-pill-group { display: flex; align-items: center; gap: 6px; padding: 0 15px; border-left: 1px solid #eee; }
-        .bq26-pill-label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
-        .bq26-pill-btn { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; color: var(--slate-main); cursor: pointer; }
-        .bq26-pill-btn.active-role { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
-        .bq26-pill-btn.active-prog { background: #eef2ff; color: var(--status-progress); border-color: #e0e7ff; }
-        .bq26-pill-btn.active-done { background: #f1f5f9; color: var(--status-done); border-color: #e2e8f0; }
-
-        .bq26-advanced-panel { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
-        .bq26-grid-dropdowns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .bq26-sel-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; overflow: hidden; height: 38px; }
-        .bq26-sel-lab { background: #f1f5f9; color: var(--text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 8px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 55px; }
-        .bq26-sel-ui { border: none; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); padding: 0 5px; width: 100%; outline: none; background: transparent; }
-
-        /* --- CARD STYLE (LOCK DONT TOUCH) --- */
-        .quest-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--card-radius); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
-        .status-done { border-left-color: var(--status-done); }
-        .status-progress { border-left-color: var(--status-progress); }
-        .card-clickable { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
-        .project-info { width: 50%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
-        .deadline-grid { display: grid; grid-template-columns: 140px 140px; gap: 20px; flex-grow: 1; justify-content: center; }
-        .header-dl-item { text-align: center; height: 42px; display: flex; flex-direction: column; justify-content: center; }
-        .header-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-        .dl-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; display: inline-block; border: 1px solid transparent; }
-        .tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
-        .tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
-
-        /* --- CONTENT DETAIL STYLE (LOCK DONT TOUCH) --- */
-        .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
-        .meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
-        .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .meta-value { font-size: 0.85rem; font-weight: 600; color: var(--slate-main); }
-        .last-update-text { font-size: 0.72rem; color: var(--slate-main); font-weight: 500; display: flex; align-items: center; gap: 5px; }
-        .section-title { font-size: 0.82rem; font-weight: 700; color: var(--slate-main); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
-        .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; color: var(--slate-main); word-break: break-word; }
-        .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--slate-main); }
-        .role-value { font-weight: 600; }
-        .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
-        .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        .dot-progress { background-color: var(--status-progress); }
-        .dot-done { background-color: var(--status-done); }
+        /* Search & Date */
+        .flt-search { position: relative; width: 320px; }
+        .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
+        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; }
+        .flt-date-group { display: flex; align-items: center; background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 0 12px; height: 38px; }
+        .flt-date-input { border: none; background: transparent; font-size: 0.82rem; width: 95px; text-align: center; color: var(--c-slate); outline: none; }
         
-        /* PREMIUM LINK BUTTON */
-        .btn-link-premium { background: var(--text-dark); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; width: fit-content; }
-        .btn-link-premium:hover { color: #fff; opacity: 0.9; }
+        /* Buttons */
+        .flt-btn-icon { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; height: 38px; width: 38px; display: flex; align-items: center; justify-content: center; color: var(--c-text-muted); cursor: pointer; }
+        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; }
 
-        .col-30 { width: 30%; }
-        .col-40 { width: 40%; }
-        .action-btns { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
-        .quest-card:hover .action-btns { opacity: 1; }
-        .btn-more { color: var(--text-muted); padding: 8px; border: none; background: transparent; cursor: pointer; }
+        /* Pills & Labels */
+        .flt-pill-group { display: flex; align-items: center; gap: 8px; padding: 0 15px; border-left: 1px solid #eee; }
+        .flt-label { font-size: 0.7rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; margin-right: 5px; }
+        .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: 0.2s; }
+        .flt-pill.active-role { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
+        .flt-pill.active-prog { background: #eef2ff; color: var(--c-progress); border-color: #e0e7ff; }
+        .flt-pill.active-done { background: #f1f5f9; color: var(--c-done); border-color: #e2e8f0; }
+
+        /* Expandable Advanced */
+        .flt-advanced-zone { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
+        .flt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; }
+        .flt-select-tag { background: #f1f5f9; color: var(--c-text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
+        .flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; }
+
+        /* =========================================
+           3. B-QUEST CARD (bqc-) -> ห้ามเพี้ยน 100%
+        ========================================= */
+        .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
+        .bqc-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .bqc-status-done { border-left-color: var(--c-done); }
+        .bqc-status-prog { border-left-color: var(--c-progress); }
+
+        /* Header Card */
+        .bqc-header { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
+        .bqc-info-zone { width: 50%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
+        .bqc-title { font-weight: 700; font-size: 1rem; color: var(--c-text-main); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bqc-subtitle { font-size: 0.8rem; color: var(--c-text-muted); }
+        
+        /* Deadline Grid */
+        .bqc-dl-grid { display: grid; grid-template-columns: 140px 140px; gap: 20px; flex-grow: 1; justify-content: center; }
+        .bqc-dl-col { text-align: center; display: flex; flex-direction: column; justify-content: center; height: 42px; }
+        .bqc-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .bqc-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; display: inline-block; border: 1px solid transparent; }
+        .bqc-tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
+        .bqc-tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
+
+        /* Actions */
+        .bqc-actions { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
+        .bqc-card:hover .bqc-actions { opacity: 1; }
+        .bqc-btn-more { color: var(--c-text-muted); padding: 8px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .bqc-btn-more:hover { background: #f1f5f9; color: var(--c-text-main); }
+
+        /* Expanded Body (30/30/40) */
+        .bqc-body { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
+        .bqc-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .bqc-meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
+        .bqc-meta-label { font-size: 0.7rem; font-weight: 700; color: var(--c-text-muted); text-transform: uppercase; }
+        .bqc-meta-val { font-size: 0.85rem; font-weight: 600; color: var(--c-slate); }
+        .bqc-last-update { font-size: 0.72rem; color: var(--c-slate); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        .bqc-btn-link { background: var(--c-text-main); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+        
+        .bqc-layout-row { display: flex; gap: 20px; }
+        .bqc-col-30 { width: 30%; }
+        .bqc-col-40 { width: 40%; }
+        
+        .bqc-sec-title { font-size: 0.82rem; font-weight: 700; color: var(--c-slate); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .bqc-panel { background: white; border-radius: var(--radius-card); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
+        .bqc-detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; color: var(--c-slate); word-break: break-word; }
+        .bqc-detail-box::-webkit-scrollbar { width: 3px; }
+        .bqc-detail-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        
+        .bqc-panel.is-empty { background-color: #fcfcfc; border: 2px dashed #f1f5f9; }
+        .bqc-empty-text { margin-top: 50px; color: var(--c-slate); opacity: 0.5; font-weight: 400; font-size: 0.75rem; text-transform: uppercase; text-align: center; }
+        
+        .bqc-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--c-slate); }
+        .bqc-val { font-weight: 600; }
+        .bqc-divider { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
+        .bqc-dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .bqc-dot-prog { background-color: var(--c-progress); }
+        .bqc-dot-done { background-color: var(--c-done); }
     </style>
 </head>
 <body>
 
-<header class="sticky-top shadow-sm">
-    <div class="top-nav">
-        <div class="logo-zone">
-            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" alt="Logo">
-            <span class="system-name">B-QUEST</span>
+<header id="global-header" class="sticky-top shadow-sm">
+    <div class="sys-topnav">
+        <div class="sys-brand">
+            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo" alt="Logo">
+            <span class="sys-title">B-QUEST</span>
         </div>
-        <div class="user-zone">
-            <div class="user-info"><i class="bi bi-person-circle"></i> <span id="user-display">...</span></div>
-            <i class="bi bi-box-arrow-right nav-icon ms-2" onclick="BQuest.logout()"></i>
+        <div class="sys-user-panel">
+            <div class="sys-user-info"><i class="bi bi-person-circle"></i> <span id="user-display">Loading...</span></div>
+            <i class="bi bi-gear sys-icon-btn"></i>
+            <i class="bi bi-box-arrow-right sys-icon-btn ms-2" onclick="BQuest.logout()" title="Logout"></i>
         </div>
     </div>
-    <nav class="menu-bar">
-        <a href="#" class="menu-item active">List</a>
-        <a href="#" class="menu-item">New Mission</a>
+    <nav class="sys-menubar">
+        <a href="#" class="sys-menu-link active">List</a>
+        <a href="#" class="sys-menu-link">New Mission</a>
     </nav>
-
-    <div class="bq26-filter-zone">
-        <div class="bq26-main-row">
-            <div class="bq26-search-wrap">
-                <i class="bi bi-search"></i>
-                <input type="text" class="bq26-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
-            </div>
-            <div class="bq26-date-box">
-                <input type="text" class="bq26-date-input" id="startDate" placeholder="DD-MM-YYYY">
-                <span style="color:#ccc">-</span>
-                <input type="text" class="bq26-date-input" id="endDate" placeholder="DD-MM-YYYY">
-            </div>
-            <button class="bq26-btn-icon" id="btnToday"><i class="bi bi-calendar-check"></i></button>
-            <button class="bq26-btn-icon" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise"></i></button>
-            <button class="bq26-btn-adv" onclick="toggleAdvanced()"><i class="bi bi-sliders"></i> Filter</button>
-
-            <div class="bq26-pill-group">
-                <span class="bq26-pill-label">Role</span>
-                <button class="bq26-pill-btn active-role">Designer</button>
-                <button class="bq26-pill-btn active-role">Creative</button>
-            </div>
-            <div class="bq26-pill-group">
-                <span class="bq26-pill-label">Status</span>
-                <button class="bq26-pill-btn active-prog">Progress</button>
-                <button class="bq26-pill-btn active-done">Done</button>
-            </div>
-        </div>
-
-        <div class="bq26-advanced-panel" id="advancedFilterZone">
-            <div class="bq26-grid-dropdowns">
-                <div class="bq26-sel-box"><span class="bq26-sel-lab">Work</span><select class="bq26-sel-ui" id="filterWork"><option>All Work</option></select></div>
-                <div class="bq26-sel-box"><span class="bq26-sel-lab">Type</span><select class="bq26-sel-ui" id="filterType"><option>All Type</option></select></div>
-                <div class="bq26-sel-box"><span class="bq26-sel-lab">Assign</span><select class="bq26-sel-ui" id="filterAssign"><option>All Staff</option></select></div>
-                <div class="bq26-sel-box"><span class="bq26-sel-lab">Owner</span><select class="bq26-sel-ui" id="filterOwner"><option>All Owner</option></select></div>
-            </div>
-        </div>
-    </div>
 </header>
 
-<main class="container-fluid px-5 mt-4">
+<section id="filter-zone" class="flt-wrapper">
+    <div class="flt-row">
+        <div class="flt-search">
+            <i class="bi bi-search"></i>
+            <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
+        </div>
+        
+        <div class="flt-date-group">
+            <input type="text" class="flt-date-input" id="startDate" placeholder="DD-MM-YYYY">
+            <span style="color:#cbd5e1; padding: 0 5px;">-</span>
+            <input type="text" class="flt-date-input" id="endDate" placeholder="DD-MM-YYYY">
+        </div>
+        <button class="flt-btn-icon" id="btnToday" title="Set to Today"><i class="bi bi-calendar-check"></i></button>
+        <button class="flt-btn-icon" onclick="window.location.reload()" title="Reset Filters"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Filters</button>
+
+        <div class="flt-pill-group">
+            <span class="flt-label">Role</span>
+            <button class="flt-pill active-role">Designer</button>
+            <button class="flt-pill active-role">Creative</button>
+        </div>
+
+        <div class="flt-pill-group">
+            <span class="flt-label">Status</span>
+            <button class="flt-pill active-prog">Progress</button>
+            <button class="flt-pill active-done">Done</button>
+        </div>
+    </div>
+
+    <div class="flt-advanced-zone" id="advancedFilterZone">
+        <div class="flt-grid">
+            <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"><option>All Work</option></select></div>
+            <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"><option>All Type</option></select></div>
+            <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"><option>All Staff</option></select></div>
+            <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"><option>All Owner</option></select></div>
+        </div>
+    </div>
+</section>
+
+<main id="card-container" class="container-fluid px-5 mt-4">
     <div id="taskContainer" class="row"></div>
     <div id="load-more-trigger" style="height: 100px;"></div>
 </main>
@@ -167,11 +204,24 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function toggleAdvanced() {
+    // ---------------------------------------------------------
+    // 1. UI Logic
+    // ---------------------------------------------------------
+    document.getElementById('toggleFilters').addEventListener('click', function() {
         const zone = document.getElementById('advancedFilterZone');
-        zone.style.display = zone.style.display === 'block' ? 'none' : 'block';
-    }
+        zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'block' : 'none';
+    });
 
+    document.getElementById("btnToday").addEventListener("click", () => {
+        const today = new Date();
+        const formatted = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + today.getFullYear();
+        document.getElementById("startDate").value = formatted;
+        document.getElementById("endDate").value = formatted;
+    });
+
+    // ---------------------------------------------------------
+    // 2. Data Logic (Fetch & Render)
+    // ---------------------------------------------------------
     let currentPage = 0;
     const itemsPerPage = 12;
     let isFetching = false;
@@ -182,10 +232,7 @@
         try {
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return dateStr;
-            const d = String(date.getDate()).padStart(2, '0');
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const y = date.getFullYear();
-            return `${d}-${m}-${y}`;
+            return String(date.getDate()).padStart(2, '0') + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + date.getFullYear();
         } catch (e) { return dateStr; }
     }
 
@@ -227,21 +274,26 @@
 
             const card = document.createElement("div");
             card.className = "col-12";
+            
+            // โครงสร้างใหม่ที่อ้างอิง CSS แบบ BEM (bqc-) ห้ามแก้เด็ดขาด
             card.innerHTML = `
-                <div class="quest-card ${isDone ? 'status-done' : 'status-progress'}">
-                    <div class="card-clickable">
-                        <div class="project-info text-truncate" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <h6 class="fw-bold mb-1" style="color: var(--text-dark);">${task.task_name || 'Untitled Project'}</h6>
-                            <span class="text-muted small">${task.account_name} | ${task.opportunity_name}</span>
+                <div class="bqc-card ${isDone ? 'bqc-status-done' : 'bqc-status-prog'}">
+                    
+                    <div class="bqc-header">
+                        <div class="bqc-info-zone" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                            <div class="bqc-title">${task.task_name || 'Untitled Project'}</div>
+                            <div class="bqc-subtitle">${task.account_name} | ${task.opportunity_name}</div>
                         </div>
-                        <div class="deadline-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="header-dl-item">${task.designer_deadline ? `<div class="header-dl-label">Designer</div><div class="dl-tag tag-des shadow-sm">${dDL}</div>` : ''}</div>
-                            <div class="header-dl-item">${task.creative_deadline ? `<div class="header-dl-label">Creative</div><div class="dl-tag tag-cre shadow-sm">${cDL}</div>` : ''}</div>
+                        
+                        <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                            <div class="bqc-dl-col">${task.designer_deadline ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${dDL}</span>` : ''}</div>
+                            <div class="bqc-dl-col">${task.creative_deadline ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${cDL}</span>` : ''}</div>
                         </div>
-                        <div class="action-btns">
+                        
+                        <div class="bqc-actions">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Edit</button>
                             <div class="dropdown">
-                                <button class="btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                                <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px; font-size: 0.85rem;">
                                     <li><a class="dropdown-item py-2" href="#"><i class="bi bi-eye me-2"></i> View Project</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
@@ -250,32 +302,49 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="collapse" id="${collapseId}">
-                        <div class="expanded-content">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="bqc-body">
+                            
+                            <div class="bqc-meta-row">
                                 <div class="d-flex gap-2">
-                                    <div class="meta-pill shadow-sm"><span class="meta-label">Owner</span><span class="meta-value">${task.owner || '-'}</span></div>
-                                    <div class="meta-pill shadow-sm"><span class="meta-label">Publish Date</span><span class="meta-value">${pubDate}</span></div>
-                                    ${task.link ? `<a href="${task.link}" target="_blank" class="btn-link-premium shadow-sm"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
+                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Owner</span><span class="bqc-meta-val">${task.owner || '-'}</span></div>
+                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Publish</span><span class="bqc-meta-val">${pubDate}</span></div>
+                                    ${task.link ? `<a href="${task.link}" target="_blank" class="bqc-btn-link"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
-                                <div class="last-update-text"><i class="bi bi-clock-history"></i> Last Update : ${updateDate}</div>
+                                <div class="bqc-last-update"><i class="bi bi-clock-history"></i> Last Update : ${updateDate}</div>
                             </div>
-                            <div class="d-flex gap-4">
-                                <div class="col-30">
-                                    <div class="section-title"><i class="bi bi-brush"></i> Designer</div>
-                                    <div class="role-card shadow-sm ${!hasDes ? 'is-empty' : ''}">
-                                        ${hasDes ? `<div class="role-item"><span>Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div><div class="divider-status"></div><div class="role-item"><span>Type</span><span class="role-value">${task.designer_type}</span></div><div class="role-item"><span>Work</span><span class="role-value text-truncate">${task.designer}</span></div><div class="role-item"><span>Assign</span><span class="role-value">${task.designer_assign}</span></div><div class="role-item mt-2"><span>Deadline</span><span class="role-value fw-bold">${dDL}</span></div>` : '<div class="text-center mt-5 opacity-50 small">NO DESIGNER</div>'}
+
+                            <div class="bqc-layout-row">
+                                <div class="bqc-col-30">
+                                    <div class="bqc-sec-title"><i class="bi bi-brush"></i> Designer</div>
+                                    <div class="bqc-panel ${!hasDes ? 'is-empty' : ''}">
+                                        ${hasDes ? `
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${isDone?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.designer_status}</span></div><div class="bqc-divider"></div>
+                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type}</span></div>
+                                            <div class="bqc-item"><span>Work</span><span class="bqc-val text-truncate" style="max-width:120px;">${task.designer}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.designer_assign}</span></div>
+                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${dDL}</span></div>
+                                        ` : '<div class="bqc-empty-text">No Designer</div>'}
                                     </div>
                                 </div>
-                                <div class="col-30">
-                                    <div class="section-title"><i class="bi bi-rocket"></i> Creative</div>
-                                    <div class="role-card shadow-sm ${!hasCre ? 'is-empty' : ''}">
-                                        ${hasCre ? `<div class="role-item"><span>Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div><div class="divider-status"></div><div class="role-item"><span>Type</span><span class="role-value">${task.creative_type}</span></div><div class="role-item"><span>Work</span><span class="role-value text-truncate">${task.creative}</span></div><div class="role-item"><span>Assign</span><span class="role-value">${task.creative_assign}</span></div><div class="role-item mt-2"><span>Deadline</span><span class="role-value fw-bold">${cDL}</span></div>` : '<div class="text-center mt-5 opacity-50 small">NO CREATIVE</div>'}
+                                
+                                <div class="bqc-col-30">
+                                    <div class="bqc-sec-title"><i class="bi bi-rocket"></i> Creative</div>
+                                    <div class="bqc-panel ${!hasCre ? 'is-empty' : ''}">
+                                        ${hasCre ? `
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot bqc-dot-prog"></span>${task.creative_status}</span></div><div class="bqc-divider"></div>
+                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type}</span></div>
+                                            <div class="bqc-item"><span>Work</span><span class="bqc-val text-truncate" style="max-width:120px;">${task.creative}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.creative_assign}</span></div>
+                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${cDL}</span></div>
+                                        ` : '<div class="bqc-empty-text">No Creative</div>'}
                                     </div>
                                 </div>
-                                <div class="col-40">
-                                    <div class="section-title"><i class="bi bi-justify-left"></i> Detail</div>
-                                    <div class="detail-box">${task.detail || '...'}</div>
+                                
+                                <div class="bqc-col-40">
+                                    <div class="bqc-sec-title"><i class="bi bi-justify-left"></i> Detail</div>
+                                    <div class="bqc-panel bqc-detail-box">${task.detail || '...'}</div>
                                 </div>
                             </div>
                         </div>
@@ -293,5 +362,6 @@
 
     initPage();
 </script>
+
 </body>
 </html>
