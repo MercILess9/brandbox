@@ -16,8 +16,8 @@
 
     <style>
         :root { 
-            --status-progress: #0a4da2; 
-            --status-done: #475569;     
+            --status-progress: #4e73df; /* น้ำเงินสว่างหรู สบายตา */
+            --status-done: #94a3b8;     /* เทาอ่อนหรู */
             --bg-body: #f8fafc;
             --text-dark: #1e293b;
             --text-muted: #94a3b8;
@@ -36,41 +36,48 @@
         }
         .quest-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.05); }
         
+        /* สถานะสีใหม่ */
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
 
         .card-clickable { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
-        .project-info { width: 50%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
-        .deadline-group { display: flex; gap: 15px; flex-grow: 1; justify-content: center; }
+        
+        /* ล็อค Layout Header ให้ตรงกันเป๊ะ */
+        .project-info { width: 45%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
+        .deadline-grid { 
+            display: grid; 
+            grid-template-columns: 140px 140px; /* ล็อคช่องละ 140px เท่ากันทุก Card */
+            gap: 20px; 
+            flex-grow: 1; 
+            justify-content: center; 
+        }
         .action-btns { width: 120px; display: flex; justify-content: flex-end; opacity: 0; transition: 0.2s; }
         .quest-card:hover .action-btns { opacity: 1; }
 
-        .header-dl-item { text-align: center; }
-        .header-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; }
+        .header-dl-item { text-align: center; height: 42px; display: flex; flex-direction: column; justify-content: center; }
+        .header-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         
-        .dl-pill { 
-            border-radius: 8px; padding: 4px 14px; 
-            font-size: 0.8rem; font-weight: 700;
+        /* Tag สวยๆ ใน Header */
+        .dl-tag { 
+            border-radius: 8px; padding: 4px 12px; 
+            font-size: 0.78rem; font-weight: 700;
+            display: inline-block;
             border: 1px solid transparent;
         }
-        .dl-active-des { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
-        .dl-active-cre { background: #f1f5f9; color: #334155; border-color: #e2e8f0; }
+        .tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; } /* Blue Tag */
+        .tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; } /* Slate Tag */
 
         .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         .meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
         .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .meta-value { font-size: 0.85rem; font-weight: 600; }
 
-        /* Last Update สีตาม Selection Title */
         .last-update-text { font-size: 0.72rem; color: var(--section-title); font-weight: 500; display: flex; align-items: center; gap: 5px; }
-        .last-update-text i { color: var(--section-title); opacity: 0.7; }
-
         .section-title { font-size: 0.82rem; font-weight: 700; color: var(--section-title); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
         .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
         .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; word-break: break-word; }
         
-        /* Empty Card: No Opacity, just dashed border */
         .role-card.is-empty { background-color: #fcfcfc; border: 2px dashed #f1f5f9; }
         .no-assign-text { margin-top: 50px; color: #cbd5e1; font-weight: 400; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
 
@@ -110,12 +117,11 @@
     let isFetching = false;
     let hasMore = true;
 
-    // Helper Function: Format Date to dd-mm-yyyy
     function formatDate(dateStr) {
         if (!dateStr || dateStr === '-') return '-';
         try {
             const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return dateStr; // ถ้าไม่ใช่รูปแบบวันที่มาตรฐาน ให้คืนค่าเดิม
+            if (isNaN(date.getTime())) return dateStr;
             const d = String(date.getDate()).padStart(2, '0');
             const m = String(date.getMonth() + 1).padStart(2, '0');
             const y = date.getFullYear();
@@ -155,7 +161,6 @@
             const hasCre = !!task.creative && task.creative !== '-';
             const collapseId = `collapse-${task.id}`;
             
-            // Format Dates
             const dDL = (task.designer_deadline && task.designer_deadline !== '-') ? formatDate(task.designer_deadline) : null;
             const cDL = (task.creative_deadline && task.creative_deadline !== '-') ? formatDate(task.creative_deadline) : null;
             const pubDate = formatDate(task.publish_date);
@@ -171,19 +176,19 @@
                             <span class="text-muted small">${task.account_name} | ${task.opportunity_name}</span>
                         </div>
                         
-                        <div class="deadline-group">
-                            ${dDL ? `
-                                <div class="header-dl-item">
+                        <div class="deadline-grid">
+                            <div class="header-dl-item">
+                                ${dDL ? `
                                     <div class="header-dl-label">Designer</div>
-                                    <div class="dl-pill dl-active-des">${dDL}</div>
-                                </div>
-                            ` : ''}
-                            ${cDL ? `
-                                <div class="header-dl-item">
+                                    <div class="dl-tag tag-des shadow-sm">${dDL}</div>
+                                ` : ''}
+                            </div>
+                            <div class="header-dl-item">
+                                ${cDL ? `
                                     <div class="header-dl-label">Creative</div>
-                                    <div class="dl-pill dl-active-cre">${cDL}</div>
-                                </div>
-                            ` : ''}
+                                    <div class="dl-tag tag-cre shadow-sm">${cDL}</div>
+                                ` : ''}
+                            </div>
                         </div>
 
                         <div class="action-btns" onclick="event.stopPropagation()">
@@ -215,7 +220,7 @@
                                             <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div>
                                             <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.designer}</span></div>
                                             <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign}</span></div>
-                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${dDL}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label text-dark font-weight-bold">Deadline</span><span class="role-value fw-bold">${dDL}</span></div>
                                         ` : '<div class="text-center no-assign-text">No Designer Assigned</div>'}
                                     </div>
                                 </div>
@@ -228,7 +233,7 @@
                                             <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div>
                                             <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.creative}</span></div>
                                             <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign}</span></div>
-                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${cDL}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label text-dark font-weight-bold">Deadline</span><span class="role-value fw-bold">${cDL}</span></div>
                                         ` : '<div class="text-center no-assign-text">No Creative Assigned</div>'}
                                     </div>
                                 </div>
