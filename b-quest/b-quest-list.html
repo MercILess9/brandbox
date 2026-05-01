@@ -26,75 +26,81 @@
             --card-radius: 20px;
         }
 
-        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding-bottom: 50px; margin: 0; }
+        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding-bottom: 50px; }
 
-        /* --- 1. TOP NAV & MENU --- */
+        /* --- UI: HEADER & MENU --- */
         .top-nav { background: #fff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; }
         .logo-zone { display: flex; align-items: center; gap: 15px; }
         .logo-zone img { height: 28px; }
         .system-name { font-weight: 700; font-size: 1.1rem; color: var(--text-dark); border-left: 2px solid #e2e8f0; padding-left: 15px; }
-        .user-zone { display: flex; align-items: center; gap: 20px; }
-        .user-info { display: flex; align-items: center; gap: 10px; color: var(--slate-main); font-weight: 500; font-size: 0.9rem; }
-        
         .menu-bar { background: var(--bquest-accent); padding: 0 30px; display: flex; gap: 30px; }
         .menu-item { padding: 12px 15px; font-size: 0.85rem; font-weight: 700; color: rgba(0,0,0,0.6); text-decoration: none; text-transform: uppercase; }
         .menu-item.active { color: #000; background: rgba(255,255,255,0.2); }
 
-        /* --- 2. BQ FILTER ZONE (FULLY PROTECTED CSS) --- */
-        .bq-f-container { background: #ffffff; padding: 15px 30px; border-bottom: 1px solid #f1f5f9; position: relative; z-index: 1000; }
-        .bq-f-main-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        /* --- NEW FILTER SYSTEM (PREFIX: bq26-) --- */
+        .bq26-filter-zone { background: #fff; padding: 15px 30px; border-bottom: 1px solid #f1f5f9; }
+        .bq26-main-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .bq26-search-wrap { position: relative; width: 300px; }
+        .bq26-search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .bq26-search-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 12px 8px 35px; font-size: 0.85rem; width: 100%; outline: none; height: 38px; }
         
-        .bq-f-search-wrap { position: relative; width: 350px; }
-        .bq-f-search-wrap i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
-        .bq-f-search-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; height: 38px; }
-
-        .bq-f-date-group { display: flex; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0 10px; height: 38px; }
-        .bq-f-date-item { border: none; background: transparent; font-size: 0.82rem; width: 90px; text-align: center; color: var(--slate-main); outline: none; }
+        .bq26-date-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; padding: 0 10px; height: 38px; }
+        .bq26-date-input { border: none; background: transparent; font-size: 0.82rem; width: 95px; text-align: center; color: var(--slate-main); outline: none; }
         
-        .bq-f-btn-icon { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; height: 38px; width: 38px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
-        .bq-f-btn-more { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); cursor: pointer; }
+        .bq26-btn-icon { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
+        .bq26-btn-adv { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 12px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); cursor: pointer; }
 
-        .bq-f-pill-box { display: flex; align-items: center; gap: 8px; padding-left: 15px; border-left: 1px solid #eee; }
-        .bq-f-pill-label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-right: 5px; }
-        .bq-f-pill-btn { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--slate-main); cursor: pointer; }
-        .bq-f-pill-btn.active-blue { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
-        .bq-f-pill-btn.active-progress { background: #eef2ff; color: var(--status-progress); border-color: #e0e7ff; }
-        .bq-f-pill-btn.active-done { background: #f1f5f9; color: var(--status-done); border-color: #e2e8f0; }
+        .bq26-pill-group { display: flex; align-items: center; gap: 6px; padding: 0 15px; border-left: 1px solid #eee; }
+        .bq26-pill-label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+        .bq26-pill-btn { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; color: var(--slate-main); cursor: pointer; }
+        .bq26-pill-btn.active-role { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
+        .bq26-pill-btn.active-prog { background: #eef2ff; color: var(--status-progress); border-color: #e0e7ff; }
+        .bq26-pill-btn.active-done { background: #f1f5f9; color: var(--status-done); border-color: #e2e8f0; }
 
-        /* Advanced Area */
-        .bq-f-advanced { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
-        .bq-f-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .bq-f-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; }
-        .bq-f-select-tag { background: #f1f5f9; color: var(--text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 60px; }
-        .bq-f-select-ui { border: none; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); padding: 0 8px; width: 100%; outline: none; background: transparent; }
+        .bq26-advanced-panel { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
+        .bq26-grid-dropdowns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .bq26-sel-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; overflow: hidden; height: 38px; }
+        .bq26-sel-lab { background: #f1f5f9; color: var(--text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 8px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 55px; }
+        .bq26-sel-ui { border: none; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); padding: 0 5px; width: 100%; outline: none; background: transparent; }
 
-        /* --- 3. THE SACRED CARD CSS (DO NOT TOUCH) --- */
-        .quest-card { background: white !important; border: 1px solid #f1f5f9 !important; border-radius: var(--card-radius) !important; margin-bottom: 15px !important; border-left: 6px solid #e2e8f0 !important; transition: 0.3s ease !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02) !important; }
-        .status-done { border-left-color: var(--status-done) !important; }
-        .status-progress { border-left-color: var(--status-progress) !important; }
+        /* --- CARD STYLE (LOCK DONT TOUCH) --- */
+        .quest-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--card-radius); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
+        .status-done { border-left-color: var(--status-done); }
+        .status-progress { border-left-color: var(--status-progress); }
+        .card-clickable { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
+        .project-info { width: 50%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
+        .deadline-grid { display: grid; grid-template-columns: 140px 140px; gap: 20px; flex-grow: 1; justify-content: center; }
+        .header-dl-item { text-align: center; height: 42px; display: flex; flex-direction: column; justify-content: center; }
+        .header-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .dl-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; display: inline-block; border: 1px solid transparent; }
+        .tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
+        .tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
+
+        /* --- CONTENT DETAIL STYLE (LOCK DONT TOUCH) --- */
+        .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
+        .meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
+        .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .meta-value { font-size: 0.85rem; font-weight: 600; color: var(--slate-main); }
+        .last-update-text { font-size: 0.72rem; color: var(--slate-main); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        .section-title { font-size: 0.82rem; font-weight: 700; color: var(--slate-main); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
+        .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; color: var(--slate-main); word-break: break-word; }
+        .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--slate-main); }
+        .role-value { font-weight: 600; }
+        .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
+        .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .dot-progress { background-color: var(--status-progress); }
+        .dot-done { background-color: var(--status-done); }
         
-        .card-clickable { cursor: pointer; padding: 20px 28px !important; display: flex !important; align-items: center !important; width: 100% !important; }
-        .project-info { width: 50% !important; flex-shrink: 0 !important; min-width: 0 !important; padding-right: 20px !important; text-align: left !important; }
-        .deadline-grid { display: grid !important; grid-template-columns: 140px 140px !important; gap: 20px !important; flex-grow: 1 !important; justify-content: center !important; align-items: center !important; }
-        
-        .header-dl-item { text-align: center !important; display: flex !important; flex-direction: column !important; justify-content: center !important; }
-        .header-dl-label { font-size: 0.55rem !important; font-weight: 800 !important; color: var(--text-muted) !important; text-transform: uppercase !important; margin-bottom: 4px !important; }
-        .dl-tag { border-radius: 8px !important; padding: 4px 12px !important; font-size: 0.78rem !important; font-weight: 700 !important; display: inline-block !important; border: 1px solid transparent !important; }
-        .tag-des { background: #eff6ff !important; color: #3b82f6 !important; border-color: #dbeafe !important; }
-        .tag-cre { background: #f8fafc !important; color: #64748b !important; border-color: #f1f5f9 !important; }
-        
-        .action-btns { width: 120px !important; display: flex !important; justify-content: flex-end !important; align-items: center !important; gap: 8px !important; opacity: 0; transition: 0.2s !important; }
-        .quest-card:hover .action-btns { opacity: 1 !important; }
-        .btn-more { color: var(--text-muted) !important; padding: 8px !important; border: none !important; background: transparent !important; cursor: pointer !important; display: inline-flex !important; }
+        /* PREMIUM LINK BUTTON */
+        .btn-link-premium { background: var(--text-dark); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; width: fit-content; }
+        .btn-link-premium:hover { color: #fff; opacity: 0.9; }
 
-        /* Detail Area */
-        .expanded-content { background: #fdfdfd !important; border-top: 1px solid #f1f5f9 !important; padding: 25px !important; }
-        .col-30 { width: 30% !important; }
-        .col-40 { width: 40% !important; }
-        .meta-pill { background: white !important; border: 1px solid #e2e8f0 !important; padding: 6px 14px !important; border-radius: 12px !important; display: flex !important; align-items: center !important; gap: 8px !important; }
-        .role-card, .detail-box { background: white !important; border-radius: var(--card-radius) !important; padding: 20px !important; border: 1px solid #eef2f6 !important; height: 200px !important; }
-        .role-item { display: flex !important; justify-content: space-between !important; margin-bottom: 7px !important; font-size: 0.82rem !important; color: var(--slate-main) !important; }
-        .divider-status { border-bottom: 1px dashed #f1f5f9 !important; margin: 6px 0 10px 0 !important; }
+        .col-30 { width: 30%; }
+        .col-40 { width: 40%; }
+        .action-btns { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
+        .quest-card:hover .action-btns { opacity: 1; }
+        .btn-more { color: var(--text-muted); padding: 8px; border: none; background: transparent; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -107,51 +113,47 @@
         </div>
         <div class="user-zone">
             <div class="user-info"><i class="bi bi-person-circle"></i> <span id="user-display">...</span></div>
-            <i class="bi bi-box-arrow-right nav-icon ms-2" onclick="BQuest.logout()" title="Logout"></i>
+            <i class="bi bi-box-arrow-right nav-icon ms-2" onclick="BQuest.logout()"></i>
         </div>
     </div>
-
     <nav class="menu-bar">
         <a href="#" class="menu-item active">List</a>
         <a href="#" class="menu-item">New Mission</a>
     </nav>
 
-    <div class="bq-f-container">
-        <div class="bq-f-main-row">
-            <div class="bq-f-search-wrap">
+    <div class="bq26-filter-zone">
+        <div class="bq26-main-row">
+            <div class="bq26-search-wrap">
                 <i class="bi bi-search"></i>
-                <input type="text" class="bq-f-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
+                <input type="text" class="bq26-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
             </div>
-            
-            <div class="bq-f-date-group">
-                <input type="text" class="bq-f-date-item" id="startDate" placeholder="DD-MM-YYYY">
-                <span style="color:#cbd5e1">-</span>
-                <input type="text" class="bq-f-date-item" id="endDate" placeholder="DD-MM-YYYY">
+            <div class="bq26-date-box">
+                <input type="text" class="bq26-date-input" id="startDate" placeholder="DD-MM-YYYY">
+                <span style="color:#ccc">-</span>
+                <input type="text" class="bq26-date-input" id="endDate" placeholder="DD-MM-YYYY">
             </div>
-            
-            <button class="bq-f-btn-icon" id="btnToday" title="Today"><i class="bi bi-calendar-check"></i></button>
-            <button class="bq-f-btn-icon" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise"></i></button>
-            <button class="bq-f-btn-more" id="toggleFilters"><i class="bi bi-sliders"></i> Advanced</button>
+            <button class="bq26-btn-icon" id="btnToday"><i class="bi bi-calendar-check"></i></button>
+            <button class="bq26-btn-icon" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise"></i></button>
+            <button class="bq26-btn-adv" onclick="toggleAdvanced()"><i class="bi bi-sliders"></i> Filter</button>
 
-            <div class="bq-f-pill-box">
-                <span class="bq-f-pill-label">Role</span>
-                <button class="bq-f-pill-btn active-blue">Designer</button>
-                <button class="bq-f-pill-btn active-blue">Creative</button>
+            <div class="bq26-pill-group">
+                <span class="bq26-pill-label">Role</span>
+                <button class="bq26-pill-btn active-role">Designer</button>
+                <button class="bq26-pill-btn active-role">Creative</button>
             </div>
-
-            <div class="bq-f-pill-box">
-                <span class="bq-f-pill-label">Status</span>
-                <button class="bq-f-pill-btn active-progress">Progress</button>
-                <button class="bq-f-pill-btn active-done">Done</button>
+            <div class="bq26-pill-group">
+                <span class="bq26-pill-label">Status</span>
+                <button class="bq26-pill-btn active-prog">Progress</button>
+                <button class="bq26-pill-btn active-done">Done</button>
             </div>
         </div>
 
-        <div class="bq-f-advanced" id="advancedFilterZone">
-            <div class="bq-f-grid">
-                <div class="bq-f-select-box"><span class="bq-f-select-tag">Work</span><select class="bq-f-select-ui" id="filterWork"><option>All Work</option></select></div>
-                <div class="bq-f-select-box"><span class="bq-f-select-tag">Type</span><select class="bq-f-select-ui" id="filterType"><option>All Type</option></select></div>
-                <div class="bq-f-select-box"><span class="bq-f-select-tag">Assign</span><select class="bq-f-select-ui" id="filterAssign"><option>All Staff</option></select></div>
-                <div class="bq-f-select-box"><span class="bq-f-select-tag">Owner</span><select class="bq-f-select-ui" id="filterOwner"><option>All Owner</option></select></div>
+        <div class="bq26-advanced-panel" id="advancedFilterZone">
+            <div class="bq26-grid-dropdowns">
+                <div class="bq26-sel-box"><span class="bq26-sel-lab">Work</span><select class="bq26-sel-ui" id="filterWork"><option>All Work</option></select></div>
+                <div class="bq26-sel-box"><span class="bq26-sel-lab">Type</span><select class="bq26-sel-ui" id="filterType"><option>All Type</option></select></div>
+                <div class="bq26-sel-box"><span class="bq26-sel-lab">Assign</span><select class="bq26-sel-ui" id="filterAssign"><option>All Staff</option></select></div>
+                <div class="bq26-sel-box"><span class="bq26-sel-lab">Owner</span><select class="bq26-sel-ui" id="filterOwner"><option>All Owner</option></select></div>
             </div>
         </div>
     </div>
@@ -165,14 +167,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Toggle Logic
-    document.getElementById('toggleFilters').addEventListener('click', function() {
+    function toggleAdvanced() {
         const zone = document.getElementById('advancedFilterZone');
-        const isHidden = window.getComputedStyle(zone).display === 'none';
-        zone.style.display = isHidden ? 'block' : 'none';
-    });
+        zone.style.display = zone.style.display === 'block' ? 'none' : 'block';
+    }
 
-    // Fetch & Render Card Logic (คงเดิมเป๊ะ)
     let currentPage = 0;
     const itemsPerPage = 12;
     let isFetching = false;
@@ -259,23 +258,23 @@
                                     <div class="meta-pill shadow-sm"><span class="meta-label">Publish Date</span><span class="meta-value">${pubDate}</span></div>
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="btn-link-premium shadow-sm"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
-                                <div class="last-update-text">Last Update : ${updateDate}</div>
+                                <div class="last-update-text"><i class="bi bi-clock-history"></i> Last Update : ${updateDate}</div>
                             </div>
                             <div class="d-flex gap-4">
                                 <div class="col-30">
-                                    <div class="section-title">Designer</div>
+                                    <div class="section-title"><i class="bi bi-brush"></i> Designer</div>
                                     <div class="role-card shadow-sm ${!hasDes ? 'is-empty' : ''}">
-                                        ${hasDes ? `<div class="role-item"><span>Status</span><span class="fw-bold"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div><div class="divider-status"></div><div class="role-item"><span>Type</span><span class="fw-bold">${task.designer_type}</span></div><div class="role-item"><span>Work</span><span class="fw-bold">${task.designer}</span></div><div class="role-item"><span>Assign</span><span class="fw-bold">${task.designer_assign}</span></div><div class="role-item mt-2"><span>Deadline</span><span class="fw-bold">${dDL}</span></div>` : '<div class="no-assign-text">No Designer</div>'}
+                                        ${hasDes ? `<div class="role-item"><span>Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div><div class="divider-status"></div><div class="role-item"><span>Type</span><span class="role-value">${task.designer_type}</span></div><div class="role-item"><span>Work</span><span class="role-value text-truncate">${task.designer}</span></div><div class="role-item"><span>Assign</span><span class="role-value">${task.designer_assign}</span></div><div class="role-item mt-2"><span>Deadline</span><span class="role-value fw-bold">${dDL}</span></div>` : '<div class="text-center mt-5 opacity-50 small">NO DESIGNER</div>'}
                                     </div>
                                 </div>
                                 <div class="col-30">
-                                    <div class="section-title">Creative</div>
+                                    <div class="section-title"><i class="bi bi-rocket"></i> Creative</div>
                                     <div class="role-card shadow-sm ${!hasCre ? 'is-empty' : ''}">
-                                        ${hasCre ? `<div class="role-item"><span>Status</span><span class="fw-bold"><span class="dot dot-progress"></span>${task.creative_status}</span></div><div class="divider-status"></div><div class="role-item"><span>Type</span><span class="fw-bold">${task.creative_type}</span></div><div class="role-item"><span>Work</span><span class="fw-bold">${task.creative}</span></div><div class="role-item"><span>Assign</span><span class="fw-bold">${task.creative_assign}</span></div><div class="role-item mt-2"><span>Deadline</span><span class="fw-bold">${cDL}</span></div>` : '<div class="no-assign-text">No Creative</div>'}
+                                        ${hasCre ? `<div class="role-item"><span>Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div><div class="divider-status"></div><div class="role-item"><span>Type</span><span class="role-value">${task.creative_type}</span></div><div class="role-item"><span>Work</span><span class="role-value text-truncate">${task.creative}</span></div><div class="role-item"><span>Assign</span><span class="role-value">${task.creative_assign}</span></div><div class="role-item mt-2"><span>Deadline</span><span class="role-value fw-bold">${cDL}</span></div>` : '<div class="text-center mt-5 opacity-50 small">NO CREATIVE</div>'}
                                     </div>
                                 </div>
                                 <div class="col-40">
-                                    <div class="section-title">Detail</div>
+                                    <div class="section-title"><i class="bi bi-justify-left"></i> Detail</div>
                                     <div class="detail-box">${task.detail || '...'}</div>
                                 </div>
                             </div>
