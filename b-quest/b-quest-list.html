@@ -83,7 +83,7 @@
         .flt-btn-reset-adv:hover { color: var(--c-text-main); background: #f8fafc; }
 
         /* =========================================
-           3. B-QUEST CARD (bqc-) ห้ามเพี้ยน
+           3. B-QUEST CARD (bqc-) ห้ามเพี้ยน 100%
         ========================================= */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
@@ -170,15 +170,15 @@
             </div>
 
             <div class="flt-pill-group">
-                <button class="flt-pill active-role" onclick="togglePill(this, 'designer')">Designer</button>
-                <button class="flt-pill active-role" onclick="togglePill(this, 'creative')">Creative</button>
+                <button id="pill-des" class="flt-pill active-role" onclick="togglePill(this, 'designer')">Designer</button>
+                <button id="pill-cre" class="flt-pill active-role" onclick="togglePill(this, 'creative')">Creative</button>
             </div>
 
             <div class="flt-divider"></div>
 
             <div class="flt-pill-group">
-                <button class="flt-pill active-prog" onclick="togglePill(this, 'progress')">Progress</button>
-                <button class="flt-pill active-done" onclick="togglePill(this, 'done')">Done</button>
+                <button id="pill-prog" class="flt-pill active-prog" onclick="togglePill(this, 'progress')">Progress</button>
+                <button id="pill-done" class="flt-pill active-done" onclick="togglePill(this, 'done')">Done</button>
             </div>
 
             <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
@@ -205,9 +205,8 @@
 
 <script>
     // ==========================================
-    // 🧠 CONFIGURATION & DYNAMIC SETTINGS
+    // ⚙️ SYSTEM & CONFIGURATION
     // ==========================================
-    // อยากให้ค้นหาที่คอลัมน์ไหนบ้าง มาเพิ่ม/ลดตรงนี้ได้เลยครับ! อนาคตเพิ่มตารางก็มาเติมชื่อตรงนี้
     const SEARCH_COLUMNS = [
         'task_name', 'account_name', 'opportunity_name', 
         'designer', 'creative', 'designer_assign', 'creative_assign', 
@@ -220,29 +219,24 @@
     let hasMore = true;
 
     // ==========================================
-    // 🎛️ UI INTERACTION LOGIC
+    // 🎛️ UI & INTERACTION
     // ==========================================
     document.getElementById('toggleFilters').addEventListener('click', function() {
         const zone = document.getElementById('advancedFilterZone');
         zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'block' : 'none';
     });
 
-    // ค้นหาเมื่อกด Enter ในช่อง Search
     document.getElementById('globalSearch').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') applyFilters();
     });
 
-    // Toggle Pills (เวลาคลิกปุ่ม ให้เปลี่ยนสี และดึงข้อมูลใหม่)
     function togglePill(btn, type) {
-        // เช็กคลาสสีเพื่อเปิด/ปิด
         if (type === 'designer' || type === 'creative') btn.classList.toggle('active-role');
         if (type === 'progress') btn.classList.toggle('active-prog');
         if (type === 'done') btn.classList.toggle('active-done');
-        
         applyFilters();
     }
 
-    // กด Reset Dropdown
     function resetAdvanced() {
         document.getElementById('filterWork').value = "";
         document.getElementById('filterType').value = "";
@@ -251,9 +245,11 @@
         applyFilters();
     }
 
-    // จัดการ Datepicker (ถ้าเปลี่ยนวันที่ ให้โหลดข้อมูลใหม่)
+    // เมื่อเปลี่ยนวันที่ในปฏิทิน ให้โหลดข้อมูลใหม่ทันที
     document.getElementById('startDate').addEventListener('change', applyFilters);
     document.getElementById('endDate').addEventListener('change', applyFilters);
+    
+    // เมื่อเปลี่ยนค่า Dropdown ให้โหลดใหม่ทันที
     document.getElementById('filterWork').addEventListener('change', applyFilters);
     document.getElementById('filterType').addEventListener('change', applyFilters);
     document.getElementById('filterAssign').addEventListener('change', applyFilters);
@@ -261,14 +257,12 @@
 
 
     // ==========================================
-    // ⚙️ DATA LOGIC (Filter & Pagination)
+    // 🧠 DATA FETCHING (Supabase Integration)
     // ==========================================
-    
-    // ฟังก์ชันล้างหน้าจอเพื่อเตรียมโหลดข้อมูลเซ็ตใหม่
     function applyFilters() {
         currentPage = 0;
         hasMore = true;
-        document.getElementById("taskContainer").innerHTML = ''; // ล้าง Card เก่าทิ้ง
+        document.getElementById("taskContainer").innerHTML = ''; // ล้างกระดาน
         fetchQuests(false);
     }
 
@@ -297,29 +291,51 @@
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
         
-        // 1. เริ่มสร้างคำสั่ง (Query Builder)
         let query = supabaseClient.from('b-quest-list').select('*');
 
-        // 2. ดึงค่า Filter จาก Input ต่างๆ
+        // 1. Search Query
         const searchTerm = document.getElementById('globalSearch').value.trim();
-        
-        // 3. แนบคำสั่ง Search (วิ่งหาทุกคอลัมน์ที่กำหนดไว้ในตัวแปร)
         if (searchTerm) {
             const orQuery = SEARCH_COLUMNS.map(col => `${col}.ilike.%${searchTerm}%`).join(',');
             query = query.or(orQuery);
         }
 
-        // *** อนาคต: เราจะมาใส่ Logic ให้ Date, Pill และ Dropdown ทำงานจริงกับ Database ตรงนี้ครับ ***
+        // 2. Role Filter Logic (Designer / Creative)
+        const pDes = document.getElementById('pill-des').classList.contains('active-role');
+        const pCre = document.getElementById('pill-cre').classList.contains('active-role');
+        
+        if (pDes && !pCre) {
+            // เลือกแต่ Designer -> ไม่เอาที่ designer เป็น '-' และไม่เป็น null
+            query = query.neq('designer', '-').not('designer', 'is', null);
+        } else if (!pDes && pCre) {
+            // เลือกแต่ Creative -> ไม่เอาที่ creative เป็น '-' และไม่เป็น null
+            query = query.neq('creative', '-').not('creative', 'is', null);
+        } else if (!pDes && !pCre) {
+            // ถ้าปิดทั้งคู่ = ให้หา id ที่ติดลบ (คือการบังคับให้ Query ไม่เจอข้อมูล หน้าจอจะว่าง)
+            query = query.eq('id', -1); 
+        }
+        // ถ้าเปิดคู่ 2 อัน (pDes && pCre) ระบบจะข้ามเงื่อนไขนี้ไปเลย = ดึงมาทั้งหมด
 
-        // 4. สั่งแบ่งหน้า (Pagination)
+        // 3. Status Filter Logic (Progress / Done)
+        const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
+        const pDone = document.getElementById('pill-done').classList.contains('active-done');
+
+        if (pProg && !pDone) {
+            // โชว์เฉพาะ Progress: ก็คือใครสักคนที่ status ไม่เท่ากับ Done (ถ้ามีค่าในระบบเป็นแบบอื่น ลองเช็ก DB อีกทีนะครับ)
+            query = query.or('designer_status.neq.Done, creative_status.neq.Done');
+        } else if (!pProg && pDone) {
+            // โชว์เฉพาะ Done: ทั้งคู่ต้องเป็น Done 
+            query = query.eq('designer_status', 'Done').eq('creative_status', 'Done');
+        } else if (!pProg && !pDone) {
+            query = query.eq('id', -1); 
+        }
+
         query = query.range(from, to).order('id', { ascending: false });
 
         try {
             const { data, error } = await query;
             if (error) throw error;
-            
             if (data.length < itemsPerPage) hasMore = false;
-            
             renderCards(data);
             currentPage++;
         } catch (e) { 
@@ -332,9 +348,31 @@
     function renderCards(data) {
         const container = document.getElementById("taskContainer");
         data.forEach(task => {
-            const isDone = (task.designer_status === 'Done');
+            
+            // เช็กว่ามีใครรับงานบ้าง (ไม่ใช่ '-' และไม่เป็นค่าว่าง)
             const hasDes = !!task.designer && task.designer !== '-';
             const hasCre = !!task.creative && task.creative !== '-';
+            
+            // ----------------------------------------------------
+            // 🧠 CARD STATUS LOGIC: 
+            // ต้อง Done ทั้งคู่ถึงจะเป็น Status Done (ถ้ามีคนใดคนนึงยังทำงานอยู่ จะเป็นฟ้า)
+            // ----------------------------------------------------
+            let isCardDone = false;
+            
+            if (hasDes && hasCre) {
+                // มีทั้งคู่ทำ ต้องเสร็จทั้งคู่
+                isCardDone = (task.designer_status === 'Done' && task.creative_status === 'Done');
+            } else if (hasDes) {
+                // มีแค่ Designer
+                isCardDone = (task.designer_status === 'Done');
+            } else if (hasCre) {
+                // มีแค่ Creative
+                isCardDone = (task.creative_status === 'Done');
+            } else {
+                // ไม่มีใครเลย ให้เป็นฟ้าไปก่อนเพื่อรอคนรับงาน
+                isCardDone = false; 
+            }
+
             const collapseId = `collapse-${task.id}`;
             const dDL = formatDate(task.designer_deadline);
             const cDL = formatDate(task.creative_deadline);
@@ -345,7 +383,7 @@
             card.className = "col-12";
             
             card.innerHTML = `
-                <div class="bqc-card ${isDone ? 'bqc-status-done' : 'bqc-status-prog'}">
+                <div class="bqc-card ${isCardDone ? 'bqc-status-done' : 'bqc-status-prog'}">
                     
                     <div class="bqc-header">
                         <div class="bqc-info-zone" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
@@ -354,8 +392,8 @@
                         </div>
                         
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="bqc-dl-col">${task.designer_deadline ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${dDL}</span>` : ''}</div>
-                            <div class="bqc-dl-col">${task.creative_deadline ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${cDL}</span>` : ''}</div>
+                            <div class="bqc-dl-col">${task.designer_deadline && hasDes ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${dDL}</span>` : ''}</div>
+                            <div class="bqc-dl-col">${task.creative_deadline && hasCre ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${cDL}</span>` : ''}</div>
                         </div>
                         
                         <div class="bqc-actions">
@@ -388,7 +426,7 @@
                                     <div class="bqc-sec-title"><i class="bi bi-brush"></i> Designer</div>
                                     <div class="bqc-panel ${!hasDes ? 'is-empty' : ''}">
                                         ${hasDes ? `
-                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${isDone?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.designer_status}</span></div><div class="bqc-divider"></div>
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.designer_status}</span></div><div class="bqc-divider"></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val text-truncate" style="max-width:120px;">${task.designer}</span></div>
                                             <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.designer_assign}</span></div>
@@ -401,7 +439,7 @@
                                     <div class="bqc-sec-title"><i class="bi bi-rocket"></i> Creative</div>
                                     <div class="bqc-panel ${!hasCre ? 'is-empty' : ''}">
                                         ${hasCre ? `
-                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot bqc-dot-prog"></span>${task.creative_status}</span></div><div class="bqc-divider"></div>
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.creative_status}</span></div><div class="bqc-divider"></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val text-truncate" style="max-width:120px;">${task.creative}</span></div>
                                             <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.creative_assign}</span></div>
