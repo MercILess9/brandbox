@@ -167,12 +167,14 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     let currentPage = 0;
     const itemsPerPage = 12;
     let isFetching = false;
     let hasMore = true;
 
+    // ฟังก์ชันจัดรูปแบบวันที่ dd-mm-yyyy
     function formatDate(dateStr) {
         if (!dateStr || dateStr === '-') return '-';
         try {
@@ -186,10 +188,11 @@
     }
 
     async function initPage() {
+        // ตรวจสอบ Session และดึง Profile (อ้างอิงจากระบบเดิมของพี่)
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             const profile = await BQuest.getProfile(session.user.id);
-            if (profile) BQuest.setText("user-display", profile.nick_name || profile.full_name);
+            if (profile) document.getElementById("user-display").innerText = profile.nick_name || profile.full_name;
         }
         fetchQuests(true);
     }
@@ -197,16 +200,27 @@
     async function fetchQuests(isFirstLoad = false) {
         if (isFetching || (!hasMore && !isFirstLoad)) return;
         isFetching = true;
+        
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
+        
         try {
-            const { data, error } = await supabaseClient.from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
+            const { data, error } = await supabaseClient
+                .from('b-quest-list') // ชื่อ Table ของพี่
+                .select('*')
+                .range(from, to)
+                .order('id', { ascending: false });
+
             if (error) throw error;
             if (data.length < itemsPerPage) hasMore = false;
+            
             renderCards(data);
             currentPage++;
-        } catch (e) { console.error(e); }
-        finally { isFetching = false; }
+        } catch (e) {
+            console.error("Error fetching quests:", e);
+        } finally {
+            isFetching = false;
+        }
     }
 
     function renderCards(data) {
@@ -216,6 +230,8 @@
             const hasDes = !!task.designer && task.designer !== '-';
             const hasCre = !!task.creative && task.creative !== '-';
             const collapseId = `collapse-${task.id}`;
+            
+            // เตรียมวันที่
             const dDL = (task.designer_deadline && task.designer_deadline !== '-') ? formatDate(task.designer_deadline) : null;
             const cDL = (task.creative_deadline && task.creative_deadline !== '-') ? formatDate(task.creative_deadline) : null;
             const pubDate = formatDate(task.publish_date);
@@ -260,18 +276,34 @@
                                 <div class="col-30">
                                     <div class="section-title"><i class="bi bi-brush"></i> Designer</div>
                                     <div class="role-card shadow-sm ${!hasDes ? 'is-empty' : ''}">
-                                        ${hasDes ? `<div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div><div class="divider-status"></div><div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div><div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.designer}</span></div><div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign}</span></div><div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${dDL}</span></div>` : '<div class="no-assign-text">No Designer Assigned</div>'}
+                                        ${hasDes ? `
+                                            <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div>
+                                            <div class="divider-status"></div>
+                                            <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div>
+                                            <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.designer}</span></div>
+                                            <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${dDL}</span></div>
+                                        ` : '<div class="no-assign-text">No Designer Assigned</div>'}
                                     </div>
                                 </div>
                                 <div class="col-30">
                                     <div class="section-title"><i class="bi bi-rocket"></i> Creative</div>
                                     <div class="role-card shadow-sm ${!hasCre ? 'is-empty' : ''}">
-                                        ${hasCre ? `<div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div><div class="divider-status"></div><div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div><div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.creative}</span></div><div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign}</span></div><div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${cDL}</span></div>` : '<div class="no-assign-text">No Creative Assigned</div>'}
+                                        ${hasCre ? `
+                                            <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div>
+                                            <div class="divider-status"></div>
+                                            <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div>
+                                            <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.creative}</span></div>
+                                            <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${cDL}</span></div>
+                                        ` : '<div class="no-assign-text">No Creative Assigned</div>'}
                                     </div>
                                 </div>
                                 <div class="col-40">
                                     <div class="section-title"><i class="bi bi-justify-left"></i> Detail</div>
-                                    <div class="detail-box"><div style="white-space: pre-wrap;">${task.detail || '...'}</div></div>
+                                    <div class="detail-box">
+                                        <div style="white-space: pre-wrap;">${task.detail || '...'}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -282,11 +314,27 @@
         });
     }
 
+    // Infinite Scroll
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !isFetching && hasMore) fetchQuests();
     }, { rootMargin: '600px' });
-    observer.observe(document.getElementById('load-more-trigger'));
+    
+    const trigger = document.getElementById('load-more-trigger');
+    if(trigger) observer.observe(trigger);
+
+    // เริ่มทำงานเมื่อโหลดหน้า
     initPage();
+
+    // ตัวอย่าง Event สำหรับปุ่ม Today
+    document.getElementById("btnToday").addEventListener("click", () => {
+        const today = new Date();
+        const formatted = today.getDate().toString().padStart(2, '0') + '-' + 
+                          (today.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                          today.getFullYear();
+        document.getElementById("startDate").value = formatted;
+        document.getElementById("endDate").value = formatted;
+        // หลังจากนี้พี่เขียนเพิ่มให้ไป Filter ข้อมูลใหม่ได้เลยครับ
+    });
 </script>
 
 </body>
