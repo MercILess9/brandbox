@@ -39,15 +39,14 @@
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
 
+        /* Header Layout: ล็อคความกว้าง 50% */
         .card-clickable { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
-        .action-btns { opacity: 0; transition: 0.2s ease; width: 100px; display: flex; justify-content: flex-end; }
+        .project-info { width: 50%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
+        .deadline-group { display: flex; gap: 20px; flex-grow: 1; justify-content: center; }
+        .action-btns { width: 120px; display: flex; justify-content: flex-end; opacity: 0; transition: 0.2s; }
         .quest-card:hover .action-btns { opacity: 1; }
 
-        /* ล็อคตำแหน่ง Header ให้ตรงกันทุกการ์ด */
-        .project-info { flex: 1; min-width: 0; }
-        .deadline-group { display: flex; gap: 20px; width: 340px; justify-content: center; } /* ล็อคความกว้างเพื่อให้ตรงกัน */
-        
-        .header-dl-item { width: 150px; text-align: center; }
+        .header-dl-item { width: 140px; text-align: center; }
         .header-dl-label { font-size: 0.58rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         
         .dl-pill { 
@@ -57,22 +56,26 @@
         }
         .dl-active-des { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
         .dl-active-cre { background: #f1f5f9; color: #334155; border-color: #e2e8f0; }
-        .dl-none { color: #e2e8f0; font-weight: 400; border-color: transparent; background: transparent; }
+        .dl-none { color: #f1f5f9; font-weight: 400; border-color: transparent; background: transparent; }
 
         .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         .meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
         .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .meta-value { font-size: 0.85rem; font-weight: 600; }
 
-        .last-update-text { font-size: 0.72rem; color: #cbd5e1; font-weight: 400; display: flex; align-items: center; gap: 5px; }
+        /* Last Update: จางมากจนเกือบมองไม่เห็น */
+        .last-update-text { font-size: 0.65rem; color: #e2e8f0; font-weight: 300; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .last-update-text:hover { color: #cbd5e1; } /* โชว์นิดนึงถ้าเอาเมาส์ไปชี้ */
+        .last-update-text i { opacity: 0.5; }
+
         .section-title { font-size: 0.82rem; font-weight: 700; color: var(--section-title); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
         .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
         .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; word-break: break-word; }
         
-        /* Stealth Mode: จางมากเป็นพิเศษ */
-        .role-card.is-empty { opacity: 0.2; background-color: #fcfcfc; border-style: dashed; }
-        .no-assign-text { margin-top: 50px; color: #cbd5e1; font-weight: 300; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; }
+        /* No Assignment: Ghost Mode */
+        .role-card.is-empty { opacity: 0.1; background-color: #fcfcfc; border-style: dashed; border-color: #f1f5f9; }
+        .no-assign-text { margin-top: 50px; color: #e2e8f0; font-weight: 300; font-size: 0.7rem; text-transform: uppercase; }
 
         .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; }
         .role-label { color: var(--text-muted); font-weight: 400; }
@@ -149,7 +152,7 @@
             card.innerHTML = `
                 <div class="quest-card ${isDone ? 'status-done' : 'status-progress'}">
                     <div class="card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                        <div class="project-info">
+                        <div class="project-info text-truncate">
                             <h6 class="fw-bold mb-1" style="color: var(--text-dark);">${task.task_name || 'Untitled Project'}</h6>
                             <span class="text-muted small">${task.account_name} | ${task.opportunity_name}</span>
                         </div>
@@ -187,7 +190,7 @@
                             <div class="d-flex gap-4">
                                 <div class="col-30">
                                     <div class="section-title"><i class="bi bi-brush"></i> Designer</div>
-                                    <div class="role-card ${!hasDes ? 'is-empty' : ''}">
+                                    <div class="role-card shadow-sm ${!hasDes ? 'is-empty' : ''}">
                                         ${hasDes ? `
                                             <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div>
                                             <div class="divider-status"></div>
@@ -200,7 +203,7 @@
                                 </div>
                                 <div class="col-30">
                                     <div class="section-title"><i class="bi bi-rocket"></i> Creative</div>
-                                    <div class="role-card ${!hasCre ? 'is-empty' : ''}">
+                                    <div class="role-card shadow-sm ${!hasCre ? 'is-empty' : ''}">
                                         ${hasCre ? `
                                             <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div>
                                             <div class="divider-status"></div>
