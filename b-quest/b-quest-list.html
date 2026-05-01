@@ -28,8 +28,8 @@
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding-bottom: 50px; }
 
-        /* --- 1. Top Header --- */
-        .top-nav { background: #fff; padding: 12px 30px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+        /* --- Zone 1: Top Nav --- */
+        .top-nav { background: #fff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; }
         .logo-zone { display: flex; align-items: center; gap: 15px; }
         .logo-zone img { height: 28px; }
         .system-name { font-weight: 700; font-size: 1.1rem; color: var(--text-dark); border-left: 2px solid #e2e8f0; padding-left: 15px; }
@@ -37,40 +37,37 @@
         .user-info { display: flex; align-items: center; gap: 10px; color: var(--slate-main); font-weight: 500; font-size: 0.9rem; }
         .nav-icon { color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
 
+        /* --- Zone 2: Menu Bar --- */
         .menu-bar { background: var(--bquest-accent); padding: 0 30px; display: flex; gap: 30px; }
         .menu-item { padding: 12px 15px; font-size: 0.85rem; font-weight: 700; color: rgba(0,0,0,0.6); text-decoration: none; text-transform: uppercase; }
         .menu-item.active { color: #000; background: rgba(255,255,255,0.2); }
 
-        /* --- 2. Filter Zone (Scoped CSS: f-zone-) --- */
-        .f-zone-wrapper { background: #ffffff; padding: 20px 30px; border-bottom: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .f-zone-stack { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 30px; }
-        .f-zone-col { display: flex; flex-direction: column; gap: 8px; }
+        /* --- Zone 3: Filter (Scoped CSS f-z-) --- */
+        .f-z-container { background: #fff; padding: 20px 30px; border-bottom: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .f-z-flex { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 25px; }
+        .f-z-v-stack { display: flex; flex-direction: column; gap: 8px; }
 
-        /* Search & Date */
-        .f-zone-search-box { position: relative; width: 400px; }
-        .f-zone-search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .f-zone-search-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 15px 10px 45px; font-size: 0.9rem; width: 100%; outline: none; }
-        
-        .f-zone-date-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; padding: 0 12px; height: 42px; width: 330px; }
-        .f-zone-date-input { border: none; background: transparent; font-size: 0.85rem; width: 100px; text-align: center; color: var(--slate-main); outline: none; }
-        .f-zone-date-btn { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 15px; font-size: 0.8rem; font-weight: 700; color: var(--slate-main); height: 42px; }
+        .f-z-search-wrap { position: relative; width: 400px; }
+        .f-z-search-wrap i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .f-z-search-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 15px 10px 45px; font-size: 0.9rem; width: 100%; outline: none; }
 
-        /* Dropdowns */
-        .f-zone-select-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 42px; width: 185px; }
-        .f-zone-select-label { background: #f1f5f9; color: var(--text-muted); font-size: 0.62rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
-        .f-zone-select { border: none; font-size: 0.82rem; font-weight: 600; color: var(--slate-main); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; }
+        .f-z-date-wrap { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; padding: 0 12px; height: 42px; width: 330px; }
+        .f-z-date-input { border: none; background: transparent; font-size: 0.85rem; width: 100px; text-align: center; color: var(--slate-main); outline: none; }
+        .f-z-btn-today { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 15px; font-size: 0.8rem; font-weight: 700; color: var(--slate-main); height: 42px; }
 
-        /* Pills */
-        .f-zone-pill-row { display: flex; align-items: center; gap: 8px; }
-        .f-zone-pill-title { font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; width: 60px; }
-        .f-zone-pill-btn { border: 1px solid #e2e8f0; background: white; border-radius: 20px; padding: 4px 16px; font-size: 0.78rem; font-weight: 600; color: var(--slate-main); transition: 0.2s; min-width: 100px; border: 1px solid #e2e8f0; }
-        .f-zone-pill-btn.active-blue { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
-        .f-zone-pill-btn.active-progress { background: #eef2ff; color: var(--status-progress); border-color: #e0e7ff; }
-        .f-zone-pill-btn.active-done { background: #f1f5f9; color: var(--status-done); border-color: #e2e8f0; }
+        .f-z-select-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 42px; width: 185px; }
+        .f-z-select-label { background: #f1f5f9; color: var(--text-muted); font-size: 0.62rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
+        .f-z-select { border: none; font-size: 0.82rem; font-weight: 600; color: var(--slate-main); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; }
 
-        .f-zone-refresh { background: white; border: 1px solid #e2e8f0; border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; border: 1px solid #e2e8f0; }
+        .f-z-pill-row { display: flex; align-items: center; gap: 8px; }
+        .f-z-pill-title { font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; width: 60px; }
+        .f-z-pill-btn { border: 1px solid #e2e8f0; background: white; border-radius: 20px; padding: 4px 16px; font-size: 0.78rem; font-weight: 600; color: var(--slate-main); transition: 0.2s; min-width: 100px; }
+        .f-z-pill-btn.active-blue { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
+        .f-z-pill-btn.active-progress { background: #eef2ff; color: var(--status-progress); border-color: #e0e7ff; }
+        .f-z-pill-btn.active-done { background: #f1f5f9; color: var(--status-done); border-color: #e2e8f0; }
+        .f-z-refresh { background: white; border: 1px solid #e2e8f0; border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
 
-        /* --- 3. Card Styles (ล็อคเดิม 100% ห้ามเพี้ยน) --- */
+        /* --- Card Styles (Restored to Original 100%) --- */
         .quest-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--card-radius); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
@@ -83,12 +80,23 @@
         .tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
         .tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
 
-        /* Expanded Content */
+        /* Buttons in Card */
+        .action-btns { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
+        .quest-card:hover .action-btns { opacity: 1; }
+        .btn-more { color: var(--text-muted); padding: 8px; border-radius: 50%; transition: all 0.2s ease; border: none; background: transparent; cursor: pointer; display: inline-block; line-height: 1; }
+        .btn-more:hover { background-color: #f1f5f9; color: var(--text-dark); transform: scale(1.1); }
+
+        /* Expanded Area */
         .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
+        .meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
+        .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .meta-value { font-size: 0.85rem; font-weight: 600; color: var(--slate-main); }
+        .last-update-text { font-size: 0.72rem; color: var(--slate-main); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        .section-title { font-size: 0.82rem; font-weight: 700; color: var(--slate-main); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
         .col-30 { width: 30%; }
         .col-40 { width: 40%; }
-        .detail-box { overflow-y: auto; line-height: 1.7; font-size: 0.92rem; color: var(--slate-main); word-break: break-word; }
+        .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; color: var(--slate-main); word-break: break-word; }
         .detail-box::-webkit-scrollbar { width: 3px; }
         .detail-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
         .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--slate-main); }
@@ -97,9 +105,9 @@
         .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dot-progress { background-color: var(--status-progress); }
         .dot-done { background-color: var(--status-done); }
-        .section-title { font-size: 0.82rem; font-weight: 700; color: var(--slate-main); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .action-btns { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
-        .quest-card:hover .action-btns { opacity: 1; }
+        .btn-link-premium { background: var(--text-dark); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+        .role-card.is-empty { background-color: #fcfcfc; border: 2px dashed #f1f5f9; opacity: 1; }
+        .no-assign-text { margin-top: 50px; color: var(--slate-main); opacity: 0.5; font-weight: 400; font-size: 0.75rem; text-transform: uppercase; text-align: center; }
     </style>
 </head>
 <body>
@@ -116,69 +124,60 @@
             <i class="bi bi-box-arrow-right nav-icon ms-2" onclick="BQuest.logout()"></i>
         </div>
     </div>
-
     <nav class="menu-bar">
         <a href="#" class="menu-item active">List</a>
         <a href="#" class="menu-item">New Mission</a>
     </nav>
-
-    <div class="f-zone-wrapper">
-        <div class="f-zone-stack">
-            
-            <div class="f-zone-col">
-                <div class="f-zone-search-box">
+    <div class="f-z-container">
+        <div class="f-z-flex">
+            <div class="f-z-v-stack">
+                <div class="f-z-search-wrap">
                     <i class="bi bi-search"></i>
-                    <input type="text" class="f-zone-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
+                    <input type="text" class="f-z-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="f-zone-date-btn" id="btnToday">Today</button>
-                    <div class="f-zone-date-box">
-                        <input type="text" class="f-zone-date-input" id="startDate" placeholder="DD-MM-YYYY">
+                    <button class="f-z-btn-today" id="btnToday">Today</button>
+                    <div class="f-z-date-wrap">
+                        <input type="text" class="f-z-date-input" id="startDate" placeholder="DD-MM-YYYY">
                         <span class="date-sep">-</span>
-                        <input type="text" class="f-zone-date-input" id="endDate" placeholder="DD-MM-YYYY">
+                        <input type="text" class="f-z-date-input" id="endDate" placeholder="DD-MM-YYYY">
                         <i class="bi bi-calendar3 ms-auto text-muted" style="font-size: 0.8rem;"></i>
                     </div>
                 </div>
             </div>
-
-            <div class="f-zone-col">
-                <div class="f-zone-select-box">
-                    <span class="f-zone-select-label">Work</span>
-                    <select class="f-zone-select" id="filterWork"><option>All Work</option></select>
+            <div class="f-z-v-stack">
+                <div class="f-z-select-box">
+                    <span class="f-z-select-label">Work</span>
+                    <select class="f-z-select" id="filterWork"><option>All Work</option></select>
                 </div>
-                <div class="f-zone-select-box">
-                    <span class="f-zone-select-label">Type</span>
-                    <select class="f-zone-select" id="filterType"><option>All Type</option></select>
-                </div>
-            </div>
-
-            <div class="f-zone-col">
-                <div class="f-zone-select-box">
-                    <span class="f-zone-select-label">Assign</span>
-                    <select class="f-zone-select" id="filterAssign"><option>All Staff</option></select>
-                </div>
-                <div class="f-zone-select-box">
-                    <span class="f-zone-select-label">Owner</span>
-                    <select class="f-zone-select" id="filterOwner"><option>All Owner</option></select>
+                <div class="f-z-select-box">
+                    <span class="f-z-select-label">Type</span>
+                    <select class="f-z-select" id="filterType"><option>All Type</option></select>
                 </div>
             </div>
-
-            <div class="f-zone-col">
-                <div class="f-zone-pill-row">
-                    <span class="f-zone-pill-title">Role</span>
-                    <button class="f-zone-pill-btn active-blue">Designer</button>
-                    <button class="f-zone-pill-btn active-blue">Creative</button>
+            <div class="f-z-v-stack">
+                <div class="f-z-select-box">
+                    <span class="f-z-select-label">Assign</span>
+                    <select class="f-z-select" id="filterAssign"><option>All Staff</option></select>
                 </div>
-                <div class="f-zone-pill-row">
-                    <span class="f-zone-pill-title">Status</span>
-                    <button class="f-zone-pill-btn active-progress">Progress</button>
-                    <button class="f-zone-pill-btn active-done">Done</button>
+                <div class="f-z-select-box">
+                    <span class="f-z-select-label">Owner</span>
+                    <select class="f-z-select" id="filterOwner"><option>All Owner</option></select>
                 </div>
             </div>
-
-            <button class="f-zone-refresh" onclick="window.location.reload()">
-                <i class="bi bi-arrow-clockwise"></i>
-            </button>
+            <div class="f-z-v-stack">
+                <div class="f-z-pill-row">
+                    <span class="f-z-pill-title">Role</span>
+                    <button class="f-z-pill-btn active-blue">Designer</button>
+                    <button class="f-z-pill-btn active-blue">Creative</button>
+                </div>
+                <div class="f-z-pill-row">
+                    <span class="f-z-pill-title">Status</span>
+                    <button class="f-z-pill-btn active-progress">Progress</button>
+                    <button class="f-z-pill-btn active-done">Done</button>
+                </div>
+            </div>
+            <button class="f-z-refresh" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise"></i></button>
         </div>
     </div>
 </header>
