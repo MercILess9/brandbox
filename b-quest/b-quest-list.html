@@ -96,112 +96,119 @@
     }
 
     function renderCards(data) {
-        const container = document.getElementById("taskContainer");
-        data.forEach(task => {
-            const isDone = (task.designer_status === 'Done');
-            const collapseId = `collapse-${task.id}`;
-            
-            const cardWrapper = document.createElement("div");
-            cardWrapper.className = "col-12";
-            
-            cardWrapper.innerHTML = `
-                <div class="quest-card shadow-sm ${isDone ? 'status-done' : 'status-progress'}">
-                    <div class="p-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-5 card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                                <h5 class="fw-bold mb-1 text-dark">${task.task_name || 'Untitled'}</h5>
-                                <small class="text-muted">${task.account_name || '-'} | ${task.opportunity_name || '-'}</small>
+    const container = document.getElementById("taskContainer");
+    data.forEach(task => {
+        const isDone = (task.designer_status === 'Done');
+        const collapseId = `collapse-${task.id}`;
+        
+        const cardWrapper = document.createElement("div");
+        cardWrapper.className = "col-12";
+        
+        cardWrapper.innerHTML = `
+            <div class="quest-card shadow-sm ${isDone ? 'status-done' : 'status-progress'}">
+                <div class="p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-5 card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                            <h5 class="fw-bold mb-1 text-dark">${task.task_name || 'Untitled'}</h5>
+                            <small class="text-muted">${task.account_name || '-'} | ${task.opportunity_name || '-'}</small>
+                        </div>
+                        <div class="col-md-5 d-flex justify-content-center gap-3 card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                            <div class="deadline-container">
+                                <div class="deadline-label">Designer Deadline</div>
+                                <div class="deadline-value text-primary">${task.designer_deadline || '-'}</div>
                             </div>
-                            
-                            <div class="col-md-5 d-flex justify-content-center gap-3 card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                                <div class="deadline-container">
-                                    <div class="deadline-label">Designer Deadline</div>
-                                    <div class="deadline-value text-primary">${task.designer_deadline || '-'}</div>
-                                </div>
-                                <div class="deadline-container">
-                                    <div class="deadline-label">Creative Deadline</div>
-                                    <div class="deadline-value text-secondary">${task.creative_deadline || '-'}</div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2 text-end">
-                                <div class="d-flex align-items-center justify-content-end gap-2">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-600" onclick="alert('Edit id: ${task.id}')">
-                                        Edit
-                                    </button>
-                                    <div class="dropdown">
-                                        <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow">
-                                            <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i> View Profile</a></li>
-                                            <li><a class="dropdown-item" href="#"><i class="bi bi-share me-2"></i> Share Link</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete Mission</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
+                            <div class="deadline-container">
+                                <div class="deadline-label">Creative Deadline</div>
+                                <div class="deadline-value text-secondary">${task.creative_deadline || '-'}</div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="collapse" id="${collapseId}">
-                        <div class="expanded-content">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="info-box">
-                                        <div class="info-header"><i class="bi bi-link-45deg"></i> Link Reference</div>
-                                        <div class="small text-break">
-                                            ${task.link ? `<a href="${task.link}" target="_blank" class="text-primary text-decoration-none fw-600">${task.link}</a>` : 'ไม่มีลิงก์อ้างอิง'}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="info-box text-center">
-                                        <div class="info-header justify-content-center"><i class="bi bi-calendar3"></i> Publish Date</div>
-                                        <div class="fw-bold">${task.publish_date || '-'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="info-box text-center">
-                                        <div class="info-header justify-content-center"><i class="bi bi-person"></i> Owner</div>
-                                        <div class="fw-bold">${task.owner || '-'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="info-box">
-                                        <div class="info-header"><i class="bi bi-card-text"></i> Detailed Brief</div>
-                                        <div class="small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${task.detail || 'ไม่มีข้อมูลรายละเอียด'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-box">
-                                        <div class="info-header">🎨 Designer Role</div>
-                                        <table class="table-custom">
-                                            <tr><td>Type:</td><td>${task.designer_type || '-'}</td></tr>
-                                            <tr><td>Assign:</td><td>${task.designer || '-'}</td></tr>
-                                            <tr><td>Status:</td><td><span class="badge ${isDone?'bg-success':'bg-warning text-dark'}">${task.designer_status || '-'}</span></td></tr>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-box">
-                                        <div class="info-header">🚀 Creative Role</div>
-                                        <table class="table-custom">
-                                            <tr><td>Type:</td><td>${task.creative_type || '-'}</td></tr>
-                                            <tr><td>Assign:</td><td>${task.creative || '-'}</td></tr>
-                                            <tr><td>Status:</td><td><span class="badge bg-info text-white">${task.creative_status || '-'}</span></td></tr>
-                                        </table>
-                                    </div>
+                        <div class="col-md-2 text-end">
+                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-600">Edit</button>
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i> View Profile</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-share me-2"></i> Share Link</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            `;
-            container.appendChild(cardWrapper);
-        });
-    }
+
+                <div class="collapse" id="${collapseId}">
+                    <div class="expanded-content">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <div class="info-header"><i class="bi bi-link-45deg"></i> Link Reference</div>
+                                    <div class="small text-break">
+                                        ${task.link ? `<a href="${task.link}" target="_blank" class="text-primary text-decoration-none fw-600">${task.link}</a>` : 'ไม่มีลิงก์อ้างอิง'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-box text-center">
+                                    <div class="info-header justify-content-center"><i class="bi bi-calendar3"></i> Publish Date</div>
+                                    <div class="fw-bold">${task.publish_date || '-'}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-box text-center">
+                                    <div class="info-header justify-content-center"><i class="bi bi-person"></i> Owner</div>
+                                    <div class="fw-bold">${task.owner || '-'}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="info-box">
+                                    <div class="info-header"><i class="bi bi-card-text"></i> Detailed Brief</div>
+                                    <div class="small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${task.detail || 'ไม่มีข้อมูลรายละเอียด'}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box shadow-sm border-0" style="background-color: #fff;">
+                                    <div class="info-header" style="color: var(--bquest-dark); border-bottom: 2px solid var(--bquest-accent); padding-bottom: 5px;">
+                                        🎨 Designer Team
+                                    </div>
+                                    <table class="table-custom mt-2">
+                                        <tr><td>Type:</td><td>${task.designer_type || '-'}</td></tr>
+                                        <tr><td>Assign:</td><td>${task.designer || '-'}</td></tr>
+                                        <tr><td>Status:</td><td><span class="badge ${isDone?'bg-success':'bg-warning text-dark'}">${task.designer_status || 'Pending'}</span></td></tr>
+                                        <tr><td>Work:</td><td>${task.designer_work || '-'}</td></tr>
+                                        <tr><td>Deadline:</td><td>${task.designer_deadline || '-'}</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box shadow-sm border-0" style="background-color: #fff;">
+                                    <div class="info-header" style="color: var(--bquest-dark); border-bottom: 2px solid #555; padding-bottom: 5px;">
+                                        🚀 Creative Team
+                                    </div>
+                                    <table class="table-custom mt-2">
+                                        <tr><td>Type:</td><td>${task.creative_type || '-'}</td></tr>
+                                        <tr><td>Assign:</td><td>${task.creative || '-'}</td></tr>
+                                        <tr><td>Status:</td><td><span class="badge bg-info text-white">${task.creative_status || 'On Progress'}</span></td></tr>
+                                        <tr><td>Work:</td><td>${task.creative_work || '-'}</td></tr>
+                                        <tr><td>Deadline:</td><td>${task.creative_deadline || '-'}</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(cardWrapper);
+    });
+}
 
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !isFetching && hasMore) fetchQuests();
