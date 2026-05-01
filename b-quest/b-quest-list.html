@@ -11,6 +11,8 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="b-quest-config.js"></script>
     <script src="../config.js"></script>
     <script src="../system.js"></script>
 
@@ -278,20 +280,26 @@
     }
 
     // ==========================================
-    // ⚙️ FETCH DATA (SAFE QUERY BUILDER)
+    // ⚙️ FETCH DATA & RENDER
     // ==========================================
     async function loadMasterData() {
         try {
-            // 1. ดึง Master Work (อัปเดตชื่อ Table เป็น b_quest_work ตามที่พี่บอก)
+            // 1. ดึง Master Work (จาก Supabase)
             const { data: workData, error: workErr } = await supabaseClient.from('b_quest_work').select('*').order('work', { ascending: true });
-            if (workErr) console.error("Work Error:", workErr);
             MASTER_WORK_DATA = workData || [];
             renderWorkDropdown();
 
-            // 2. ดึง Assign, Owner, Type แยกออกมาใส่ Dropdown
-            const { data: listData, error: listErr } = await supabaseClient.from('b-quest-list').select('designer_assign, creative_assign, owner, designer_type, creative_type');
-            if (listErr) console.error("List Fetch Error:", listErr);
-            
+            // 2. ดึงข้อมูล Type จากไฟล์ b-quest-config.js ที่พี่ประกาศไว้
+            const typeSelect = document.getElementById('filterType');
+            typeSelect.innerHTML = '<option value="">All Type</option>';
+            if (typeof B_QUEST_LIST_TYPE !== 'undefined' && B_QUEST_LIST_TYPE.listTypes) {
+                B_QUEST_LIST_TYPE.listTypes.forEach(type => {
+                    typeSelect.appendChild(new Option(type, type));
+                });
+            }
+
+            // 3. ดึง Assign, Owner, Type (จากตารางบิล)
+            const { data: listData, error: listErr } = await supabaseClient.from('b-quest-list').select('designer_assign, creative_assign, owner');
             if (listData && listData.length > 0) {
                 const fillDropdown = (id, keys) => {
                     const set = new Set();
@@ -303,7 +311,6 @@
                 };
                 fillDropdown('filterAssign', ['designer_assign', 'creative_assign']);
                 fillDropdown('filterOwner', ['owner']);
-                fillDropdown('filterType', ['designer_type', 'creative_type']);
             }
         } catch (e) { 
             console.error("Master Load Failed:", e); 
@@ -326,7 +333,6 @@
         } catch (e) { return dateStr; }
     }
 
-    // สร้างข้อความเงื่อนไขแบบปลอดภัย 100% ไม่พังชัวร์
     function buildRoleCondition(rolePrefix, sd, ed) {
         let conds = [`${rolePrefix}.neq.-`, `${rolePrefix}.not.is.null`];
         if (sd) conds.push(`${rolePrefix}_deadline.gte.${sd}`);
@@ -343,21 +349,21 @@
         
         let query = supabaseClient.from('b-quest-list').select('*');
 
-        // 1. Search Query
+        // Search Query
         const searchTerm = document.getElementById('globalSearch').value.trim();
         if (searchTerm) {
             const orQuery = SEARCH_COLUMNS.map(col => `${col}.ilike.%${searchTerm}%`).join(',');
             query = query.or(orQuery);
         }
 
-        // 2. Role & Date Logic (Safe Builder)
+        // Role & Date Logic
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const sd = document.getElementById('startDate').value;
         const ed = document.getElementById('endDate').value;
 
         if (!pDes && !pCre) {
-            query = query.eq('id', -1); // ปิดหมด = ไม่แสดงอะไรเลย
+            query = query.eq('id', -1); 
         } else {
             let orParts = [];
             if (pDes) orParts.push(buildRoleCondition('designer', sd, ed));
@@ -365,7 +371,7 @@
             query = query.or(orParts.join(','));
         }
 
-        // 3. Status Filter Logic
+        // Status Filter Logic
         const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
         const pDone = document.getElementById('pill-done').classList.contains('active-done');
 
@@ -377,7 +383,7 @@
             query = query.eq('id', -1); 
         }
 
-        // 4. Advance Dropdown Filters
+        // Advance Dropdown Filters
         const val = (id) => document.getElementById(id).value;
         const workVal = val('filterWork');
         const typeVal = val('filterType');
@@ -394,7 +400,7 @@
         try {
             const { data, error } = await query;
             if (error) {
-                console.error("Supabase Error:", error);
+                console.error("Supabase Fetch Error:", error);
                 throw error;
             }
             if (data.length < itemsPerPage) hasMore = false;
@@ -427,7 +433,6 @@
             const card = document.createElement("div");
             card.className = "col-12";
             
-            // CARD ดั้งเดิม 100% ห้ามเพี้ยน
             card.innerHTML = `
                 <div class="bqc-card ${isCardDone ? 'bqc-status-done' : 'bqc-status-prog'}">
                     <div class="bqc-header">
