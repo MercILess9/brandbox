@@ -15,68 +15,47 @@
     <script src="../system.js"></script>
 
     <style>
-        :root { 
-            --bquest-accent: #bdc432; 
-            --bg-body: #f8f9fa;
-            --card-hover-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        }
-
+        :root { --bquest-accent: #bdc432; --bg-body: #f8f9fa; }
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: #333; }
         .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #eee; }
         .sub-header-line { background: var(--bquest-accent); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; }
 
-        /* Card Styles */
         .quest-card {
             background: white; border: 1px solid #f0f0f0; border-radius: 14px; margin-bottom: 12px;
             transition: all 0.3s ease; overflow: hidden; border-left: 5px solid #e0e0e0;
         }
-        .quest-card:hover { transform: translateY(-3px); box-shadow: var(--card-hover-shadow); }
+        .quest-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .status-done { border-left-color: #28a745; }
         .status-progress { border-left-color: var(--bquest-accent); }
 
-        /* Hover Actions */
         .action-btns { opacity: 0; transition: 0.2s; }
         .quest-card:hover .action-btns { opacity: 1; }
         .card-clickable { cursor: pointer; padding: 18px 24px; }
 
-        /* Deadline UI */
         .deadline-box { min-width: 140px; text-align: center; }
         .dl-label { font-size: 0.62rem; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 4px; }
         .dl-value { font-weight: 600; font-size: 0.85rem; color: #444; }
 
-        /* Expanded Detail */
         .expanded-content { background: #fafafa; border-top: 1px solid #f1f1f1; padding: 20px 24px; }
-        
         .meta-strip { 
             display: flex; justify-content: space-between; align-items: center; 
             background: #fff; padding: 10px 18px; border-radius: 10px; border: 1px solid #efefef; margin-bottom: 16px;
         }
 
-        .role-card {
-            background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; 
-            height: 190px;
-        }
-
-        .detail-box {
-            background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; 
-            height: 190px; overflow-y: scroll; position: relative;
-        }
-
-        /* Modern Slim Scrollbar */
+        .role-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; min-height: 210px; }
+        .detail-box { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; height: 210px; overflow-y: scroll; }
         .detail-box::-webkit-scrollbar { width: 4px; }
-        .detail-box::-webkit-scrollbar-track { background: transparent; }
         .detail-box::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
-        .detail-box::-webkit-scrollbar-thumb:hover { background: var(--bquest-accent); }
 
         .info-tag { font-size: 0.72rem; font-weight: 700; color: #999; text-transform: uppercase; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
-        .role-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem; }
-        .role-label { color: #888; }
-        .role-value { font-weight: 600; color: #333; }
+        .role-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.82rem; }
+        .role-label { color: #888; width: 60px; }
+        .role-value { font-weight: 600; color: #333; text-align: right; flex: 1; }
 
-        /* Status Dot */
         .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dot-progress { background-color: var(--bquest-accent); }
         .dot-done { background-color: #28a745; }
+        .divider { border-top: 1px dashed #eee; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -117,17 +96,14 @@
     async function fetchQuests(isFirstLoad = false) {
         if (isFetching || (!hasMore && !isFirstLoad)) return;
         isFetching = true;
-
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
 
         try {
             const { data, error } = await supabaseClient
                 .from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
-
             if (error) throw error;
             if (data.length < itemsPerPage) hasMore = false;
-
             allQuests = isFirstLoad ? data : [...allQuests, ...data];
             renderCards(data);
             currentPage++;
@@ -150,18 +126,10 @@
                             <h6 class="fw-bold mb-1">${task.task_name || 'Untitled'}</h6>
                             <span class="text-muted small">${task.account_name || '-'} | ${task.opportunity_name || '-'}</span>
                         </div>
-                        
                         <div class="d-flex gap-5 px-4" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="deadline-box">
-                                <div class="dl-label">Designer DL</div>
-                                <div class="dl-value">${task.designer_deadline || '-'}</div>
-                            </div>
-                            <div class="deadline-box border-start ps-4">
-                                <div class="dl-label">Creative DL</div>
-                                <div class="dl-value">${task.creative_deadline || '-'}</div>
-                            </div>
+                            <div class="deadline-box"><div class="dl-label">Designer DL</div><div class="dl-value">${task.designer_deadline || '-'}</div></div>
+                            <div class="deadline-box border-start ps-4"><div class="dl-label">Creative DL</div><div class="dl-value">${task.creative_deadline || '-'}</div></div>
                         </div>
-
                         <div class="action-btns d-flex align-items-center gap-2">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.72rem;">Edit</button>
                             <div class="dropdown">
@@ -173,45 +141,39 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="collapse" id="${collapseId}">
                         <div class="expanded-content">
                             <div class="meta-strip shadow-sm">
                                 <div class="d-flex align-items-center gap-4">
                                     <span class="small fw-600 text-muted">PUBLISH: <span class="text-dark">${task.publish_date || '-'}</span></span>
-                                    ${task.link ? `<a href="${task.link}" target="_blank" class="text-secondary" title="Link"><i class="bi bi-box-arrow-up-right"></i></a>` : ''}
+                                    ${task.link ? `<a href="${task.link}" target="_blank" class="text-secondary"><i class="bi bi-box-arrow-up-right"></i></a>` : ''}
                                 </div>
                                 <div class="d-flex align-items-center gap-3">
                                     <span class="small fw-600 text-muted">OWNER: <span class="text-dark">${task.owner || '-'}</span></span>
-                                    <span style="font-size: 0.65rem; color: #bbb;">Last Update: ${task.updated_at ? new Date(task.updated_at).toLocaleDateString() : '-'}</span>
+                                    <span style="font-size: 0.65rem; color: #bbb;">Update: ${task.updated_at ? new Date(task.updated_at).toLocaleDateString() : '-'}</span>
                                 </div>
                             </div>
-
                             <div class="row g-3">
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-success"><i class="bi bi-brush"></i> Designer</div>
-                                        <div class="role-item border-bottom pb-2 mb-2">
-                                            <span class="role-label">Status</span>
-                                            <span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status || 'Pending'}</span>
-                                        </div>
+                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status || 'Pending'}</span></div>
+                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer_work || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer || '-'}</span></div>
-                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type || '-'}</span></div>
-                                        <div class="role-item mt-1"><span class="role-label">Deadline</span><span class="role-value text-primary">${task.designer_deadline || '-'}</span></div>
+                                        <div class="divider"></div>
+                                        <div class="role-item"><span class="role-label">Deadline</span><span class="role-value text-primary fw-bold">${task.designer_deadline || '-'}</span></div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-dark"><i class="bi bi-rocket-takeoff"></i> Creative</div>
-                                        <div class="role-item border-bottom pb-2 mb-2">
-                                            <span class="role-label">Status</span>
-                                            <span class="role-value"><span class="dot dot-progress"></span>${task.creative_status || 'On Progress'}</span>
-                                        </div>
+                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status || 'On Progress'}</span></div>
+                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative_work || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative || '-'}</span></div>
-                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type || '-'}</span></div>
-                                        <div class="role-item mt-1"><span class="role-label">Deadline</span><span class="role-value text-secondary">${task.creative_deadline || '-'}</span></div>
+                                        <div class="divider"></div>
+                                        <div class="role-item"><span class="role-label">Deadline</span><span class="role-value text-secondary fw-bold">${task.creative_deadline || '-'}</span></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
