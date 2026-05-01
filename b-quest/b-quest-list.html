@@ -204,9 +204,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ==========================================
-    // ⚙️ SYSTEM & CONFIGURATION
-    // ==========================================
     const SEARCH_COLUMNS = [
         'task_name', 'account_name', 'opportunity_name', 
         'designer', 'creative', 'designer_assign', 'creative_assign', 
@@ -218,9 +215,6 @@
     let isFetching = false;
     let hasMore = true;
 
-    // ==========================================
-    // 🎛️ UI & INTERACTION
-    // ==========================================
     document.getElementById('toggleFilters').addEventListener('click', function() {
         const zone = document.getElementById('advancedFilterZone');
         zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'block' : 'none';
@@ -245,24 +239,17 @@
         applyFilters();
     }
 
-    // เมื่อเปลี่ยนวันที่ในปฏิทิน ให้โหลดข้อมูลใหม่ทันที
     document.getElementById('startDate').addEventListener('change', applyFilters);
     document.getElementById('endDate').addEventListener('change', applyFilters);
-    
-    // เมื่อเปลี่ยนค่า Dropdown ให้โหลดใหม่ทันที
     document.getElementById('filterWork').addEventListener('change', applyFilters);
     document.getElementById('filterType').addEventListener('change', applyFilters);
     document.getElementById('filterAssign').addEventListener('change', applyFilters);
     document.getElementById('filterOwner').addEventListener('change', applyFilters);
 
-
-    // ==========================================
-    // 🧠 DATA FETCHING (Supabase Integration)
-    // ==========================================
     function applyFilters() {
         currentPage = 0;
         hasMore = true;
-        document.getElementById("taskContainer").innerHTML = ''; // ล้างกระดาน
+        document.getElementById("taskContainer").innerHTML = ''; 
         fetchQuests(false);
     }
 
@@ -300,36 +287,65 @@
             query = query.or(orQuery);
         }
 
-        // 2. Role Filter Logic (Designer / Creative)
+        // 2. Role & Date Filter Combined
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         
+        const startD = document.getElementById('startDate').value; // คืนค่าเป็น YYYY-MM-DD
+        const endD = document.getElementById('endDate').value; // คืนค่าเป็น YYYY-MM-DD
+
         if (pDes && !pCre) {
-            // เลือกแต่ Designer -> ไม่เอาที่ designer เป็น '-' และไม่เป็น null
+            // เลือก Designer เท่านั้น -> กรองข้อมูล + กรองวันที่ของ Designer
             query = query.neq('designer', '-').not('designer', 'is', null);
+            if (startD) query = query.gte('designer_deadline', startD);
+            if (endD) query = query.lte('designer_deadline', endD);
+            
         } else if (!pDes && pCre) {
-            // เลือกแต่ Creative -> ไม่เอาที่ creative เป็น '-' และไม่เป็น null
+            // เลือก Creative เท่านั้น -> กรองข้อมูล + กรองวันที่ของ Creative
             query = query.neq('creative', '-').not('creative', 'is', null);
+            if (startD) query = query.gte('creative_deadline', startD);
+            if (endD) query = query.lte('creative_deadline', endD);
+            
         } else if (!pDes && !pCre) {
-            // ถ้าปิดทั้งคู่ = ให้หา id ที่ติดลบ (คือการบังคับให้ Query ไม่เจอข้อมูล หน้าจอจะว่าง)
+            // ปิดทั้งคู่ให้เป็นหน้าเปล่า
             query = query.eq('id', -1); 
+            
+        } else {
+            // กรณีเปิดทั้งคู่ (เอาทั้งหมด) -> ผูก Logic OR วันที่
+            if (startD || endD) {
+                let desQuery = [];
+                let creQuery = [];
+                
+                if (startD) {
+                    desQuery.push(`designer_deadline.gte.${startD}`);
+                    creQuery.push(`creative_deadline.gte.${startD}`);
+                }
+                if (endD) {
+                    desQuery.push(`designer_deadline.lte.${endD}`);
+                    creQuery.push(`creative_deadline.lte.${endD}`);
+                }
+                
+                // แปลงคำสั่งให้อยู่ในรูปของ Supabase OR + AND
+                const desStr = desQuery.length > 1 ? `and(${desQuery.join(',')})` : desQuery[0];
+                const creStr = creQuery.length > 1 ? `and(${creQuery.join(',')})` : creQuery[0];
+                
+                query = query.or(`${desStr},${creStr}`);
+            }
         }
-        // ถ้าเปิดคู่ 2 อัน (pDes && pCre) ระบบจะข้ามเงื่อนไขนี้ไปเลย = ดึงมาทั้งหมด
 
         // 3. Status Filter Logic (Progress / Done)
         const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
         const pDone = document.getElementById('pill-done').classList.contains('active-done');
 
         if (pProg && !pDone) {
-            // โชว์เฉพาะ Progress: ก็คือใครสักคนที่ status ไม่เท่ากับ Done (ถ้ามีค่าในระบบเป็นแบบอื่น ลองเช็ก DB อีกทีนะครับ)
             query = query.or('designer_status.neq.Done, creative_status.neq.Done');
         } else if (!pProg && pDone) {
-            // โชว์เฉพาะ Done: ทั้งคู่ต้องเป็น Done 
             query = query.eq('designer_status', 'Done').eq('creative_status', 'Done');
         } else if (!pProg && !pDone) {
             query = query.eq('id', -1); 
         }
 
+        // 4. Pagination
         query = query.range(from, to).order('id', { ascending: false });
 
         try {
@@ -349,30 +365,19 @@
         const container = document.getElementById("taskContainer");
         data.forEach(task => {
             
-            // เช็กว่ามีใครรับงานบ้าง (ไม่ใช่ '-' และไม่เป็นค่าว่าง)
             const hasDes = !!task.designer && task.designer !== '-';
             const hasCre = !!task.creative && task.creative !== '-';
             
-            // ----------------------------------------------------
-            // 🧠 CARD STATUS LOGIC: 
-            // ต้อง Done ทั้งคู่ถึงจะเป็น Status Done (ถ้ามีคนใดคนนึงยังทำงานอยู่ จะเป็นฟ้า)
-            // ----------------------------------------------------
+            // CARD STATUS: ต้อง Done ทั้งคู่ (คนที่มีชื่อ) ถึงจะเป็น Done
             let isCardDone = false;
-            
             if (hasDes && hasCre) {
-                // มีทั้งคู่ทำ ต้องเสร็จทั้งคู่
                 isCardDone = (task.designer_status === 'Done' && task.creative_status === 'Done');
             } else if (hasDes) {
-                // มีแค่ Designer
                 isCardDone = (task.designer_status === 'Done');
             } else if (hasCre) {
-                // มีแค่ Creative
                 isCardDone = (task.creative_status === 'Done');
-            } else {
-                // ไม่มีใครเลย ให้เป็นฟ้าไปก่อนเพื่อรอคนรับงาน
-                isCardDone = false; 
             }
-
+            
             const collapseId = `collapse-${task.id}`;
             const dDL = formatDate(task.designer_deadline);
             const cDL = formatDate(task.creative_deadline);
