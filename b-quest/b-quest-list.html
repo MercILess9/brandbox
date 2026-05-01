@@ -50,7 +50,7 @@
         /* =========================================
            2. FILTER ZONE (flt-)
         ========================================= */
-        .flt-wrapper { background: #fff; padding: 15px 30px; border-bottom: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .flt-wrapper { background: #fff; padding: 15px 30px; border-bottom: 1px solid #e2e8f0; }
         .flt-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         
         /* Search & Date */
@@ -67,12 +67,12 @@
         /* Pills & Labels */
         .flt-pill-group { display: flex; align-items: center; gap: 8px; padding: 0 15px; border-left: 1px solid #eee; }
         .flt-label { font-size: 0.7rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; margin-right: 5px; }
-        .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: 0.2s; }
+        .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; }
         
-        /* Pill Active States */
-        .flt-pill.active-role { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
-        .flt-pill.active-prog { background: #eef2ff; color: var(--c-progress); border-color: #e0e7ff; }
-        .flt-pill.active-done { background: #f1f5f9; color: var(--c-done); border-color: #e2e8f0; }
+        /* Pill Active States (อัปเดตสีเข้มขึ้น ชัดเจน) */
+        .flt-pill.active-role { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+        .flt-pill.active-prog { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
+        .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
 
         /* Expandable Advanced */
         .flt-advanced-zone { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
@@ -85,7 +85,7 @@
         .flt-btn-reset-adv:hover { color: var(--c-text-main); background: #f8fafc; }
 
         /* =========================================
-           3. B-QUEST CARD (bqc-) -> ล็อคห้ามเพี้ยน 100%
+           3. B-QUEST CARD (bqc-)
         ========================================= */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
@@ -140,7 +140,7 @@
 </head>
 <body>
 
-<header id="global-header" class="sticky-top shadow-sm">
+<header id="global-header" class="sticky-top shadow-sm" style="z-index: 1020;">
     <div class="sys-topnav">
         <div class="sys-brand">
             <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo" alt="Logo">
@@ -152,53 +152,54 @@
             <i class="bi bi-box-arrow-right sys-icon-btn ms-2" onclick="BQuest.logout()" title="Logout"></i>
         </div>
     </div>
+    
     <nav class="sys-menubar">
         <a href="#" class="sys-menu-link active">List</a>
         <a href="#" class="sys-menu-link">New Mission</a>
     </nav>
+
+    <section id="filter-zone" class="flt-wrapper">
+        <div class="flt-row">
+            <div class="flt-search">
+                <i class="bi bi-search"></i>
+                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
+            </div>
+            
+            <div class="flt-date-group">
+                <input type="text" class="flt-date-input" id="startDate" placeholder="DD-MM-YYYY">
+                <span style="color:#cbd5e1; padding: 0 5px;">-</span>
+                <input type="text" class="flt-date-input" id="endDate" placeholder="DD-MM-YYYY">
+            </div>
+            <button class="flt-btn-icon" id="btnToday" title="Set to Today"><i class="bi bi-calendar-check"></i></button>
+
+            <div class="flt-pill-group">
+                <span class="flt-label">Role</span>
+                <button class="flt-pill active-role" onclick="this.classList.toggle('active-role')">Designer</button>
+                <button class="flt-pill active-role" onclick="this.classList.toggle('active-role')">Creative</button>
+            </div>
+
+            <div class="flt-pill-group">
+                <span class="flt-label">Status</span>
+                <button class="flt-pill active-prog" onclick="this.classList.toggle('active-prog')">Progress</button>
+                <button class="flt-pill active-done" onclick="this.classList.toggle('active-done')">Done</button>
+            </div>
+
+            <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
+        </div>
+
+        <div class="flt-advanced-zone" id="advancedFilterZone">
+            <div class="flt-grid">
+                <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"><option>All Work</option></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"><option>All Type</option></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"><option>All Staff</option></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"><option>All Owner</option></select></div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                <button class="flt-btn-reset-adv" id="resetAdvanced"><i class="bi bi-arrow-counterclockwise"></i> Reset Advance</button>
+            </div>
+        </div>
+    </section>
 </header>
-
-<section id="filter-zone" class="flt-wrapper">
-    <div class="flt-row">
-        <div class="flt-search">
-            <i class="bi bi-search"></i>
-            <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search Project, Account, Opp...">
-        </div>
-        
-        <div class="flt-date-group">
-            <input type="text" class="flt-date-input" id="startDate" placeholder="DD-MM-YYYY">
-            <span style="color:#cbd5e1; padding: 0 5px;">-</span>
-            <input type="text" class="flt-date-input" id="endDate" placeholder="DD-MM-YYYY">
-        </div>
-        <button class="flt-btn-icon" id="btnToday" title="Set to Today"><i class="bi bi-calendar-check"></i></button>
-
-        <div class="flt-pill-group">
-            <span class="flt-label">Role</span>
-            <button class="flt-pill active-role" onclick="this.classList.toggle('active-role')">Designer</button>
-            <button class="flt-pill active-role" onclick="this.classList.toggle('active-role')">Creative</button>
-        </div>
-
-        <div class="flt-pill-group">
-            <span class="flt-label">Status</span>
-            <button class="flt-pill active-prog" onclick="this.classList.toggle('active-prog')">Progress</button>
-            <button class="flt-pill active-done" onclick="this.classList.toggle('active-done')">Done</button>
-        </div>
-
-        <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
-    </div>
-
-    <div class="flt-advanced-zone" id="advancedFilterZone">
-        <div class="flt-grid">
-            <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"><option>All Work</option></select></div>
-            <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"><option>All Type</option></select></div>
-            <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"><option>All Staff</option></select></div>
-            <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"><option>All Owner</option></select></div>
-        </div>
-        <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
-            <button class="flt-btn-reset-adv" id="resetAdvanced"><i class="bi bi-arrow-counterclockwise"></i> Reset Advance</button>
-        </div>
-    </div>
-</section>
 
 <main id="card-container" class="container-fluid px-5 mt-4">
     <div id="taskContainer" class="row"></div>
@@ -209,16 +210,13 @@
 
 <script>
     // ---------------------------------------------------------
-    // 1. UI Logic (Filters & Buttons)
+    // 1. UI Logic
     // ---------------------------------------------------------
-    
-    // Toggle Advance Zone
     document.getElementById('toggleFilters').addEventListener('click', function() {
         const zone = document.getElementById('advancedFilterZone');
         zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'block' : 'none';
     });
 
-    // Reset Advance Selects
     document.getElementById('resetAdvanced').addEventListener('click', function() {
         document.getElementById('filterWork').selectedIndex = 0;
         document.getElementById('filterType').selectedIndex = 0;
@@ -226,7 +224,6 @@
         document.getElementById('filterOwner').selectedIndex = 0;
     });
 
-    // Set Today's Date
     document.getElementById("btnToday").addEventListener("click", () => {
         const today = new Date();
         const formatted = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + today.getFullYear();
@@ -235,7 +232,7 @@
     });
 
     // ---------------------------------------------------------
-    // 2. Data Logic (Fetch & Render - Unchanged)
+    // 2. Data Logic (Fetch & Render)
     // ---------------------------------------------------------
     let currentPage = 0;
     const itemsPerPage = 12;
