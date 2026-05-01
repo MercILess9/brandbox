@@ -39,7 +39,6 @@
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
 
-        /* Header Layout */
         .card-clickable { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
         .project-info { width: 50%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
         .deadline-group { display: flex; gap: 15px; flex-grow: 1; justify-content: center; }
@@ -62,18 +61,18 @@
         .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .meta-value { font-size: 0.85rem; font-weight: 600; }
 
-        /* Last Update: ปรับให้ชัดขึ้นนิดนึงจากเดิม */
-        .last-update-text { font-size: 0.68rem; color: #cbd5e1; font-weight: 400; display: flex; align-items: center; gap: 5px; }
-        .last-update-text i { color: #dee2e6; }
+        /* Last Update สีตาม Selection Title */
+        .last-update-text { font-size: 0.72rem; color: var(--section-title); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        .last-update-text i { color: var(--section-title); opacity: 0.7; }
 
         .section-title { font-size: 0.82rem; font-weight: 700; color: var(--section-title); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
         .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
         .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; word-break: break-word; }
         
-        /* No Assignment: ปรับให้จางแบบยังอ่านออก */
-        .role-card.is-empty { opacity: 0.3; background-color: #fcfcfc; border-style: dashed; border-color: #f1f5f9; }
-        .no-assign-text { margin-top: 50px; color: #cbd5e1; font-weight: 400; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        /* Empty Card: No Opacity, just dashed border */
+        .role-card.is-empty { background-color: #fcfcfc; border: 2px dashed #f1f5f9; }
+        .no-assign-text { margin-top: 50px; color: #cbd5e1; font-weight: 400; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
 
         .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; }
         .role-label { color: var(--text-muted); font-weight: 400; }
@@ -111,6 +110,19 @@
     let isFetching = false;
     let hasMore = true;
 
+    // Helper Function: Format Date to dd-mm-yyyy
+    function formatDate(dateStr) {
+        if (!dateStr || dateStr === '-') return '-';
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr; // ถ้าไม่ใช่รูปแบบวันที่มาตรฐาน ให้คืนค่าเดิม
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${d}-${m}-${y}`;
+        } catch (e) { return dateStr; }
+    }
+
     async function initPage() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
@@ -143,9 +155,11 @@
             const hasCre = !!task.creative && task.creative !== '-';
             const collapseId = `collapse-${task.id}`;
             
-            // ตรวจสอบ Deadline เพื่อซ่อน/แสดง
-            const dDL = (task.designer_deadline && task.designer_deadline !== '-') ? task.designer_deadline : null;
-            const cDL = (task.creative_deadline && task.creative_deadline !== '-') ? task.creative_deadline : null;
+            // Format Dates
+            const dDL = (task.designer_deadline && task.designer_deadline !== '-') ? formatDate(task.designer_deadline) : null;
+            const cDL = (task.creative_deadline && task.creative_deadline !== '-') ? formatDate(task.creative_deadline) : null;
+            const pubDate = formatDate(task.publish_date);
+            const updateDate = formatDate(task.last_update);
 
             const card = document.createElement("div");
             card.className = "col-12";
@@ -183,11 +197,11 @@
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="d-flex gap-2">
                                     <div class="meta-pill shadow-sm"><span class="meta-label">Owner</span><span class="meta-value">${task.owner || '-'}</span></div>
-                                    <div class="meta-pill shadow-sm"><span class="meta-label">Publish</span><span class="meta-value">${task.publish_date || '-'}</span></div>
+                                    <div class="meta-pill shadow-sm"><span class="meta-label">Publish Date</span><span class="meta-value">${pubDate}</span></div>
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="btn-link-premium shadow-sm"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
                                 <div class="last-update-text">
-                                    <i class="bi bi-clock"></i> <span>Last Update : ${task.last_update ? new Date(task.last_update).toLocaleDateString() : '-'}</span>
+                                    <i class="bi bi-clock-history"></i> <span>Last Update : ${updateDate}</span>
                                 </div>
                             </div>
 
@@ -201,7 +215,7 @@
                                             <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div>
                                             <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.designer}</span></div>
                                             <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign}</span></div>
-                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${task.designer_deadline}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${dDL}</span></div>
                                         ` : '<div class="text-center no-assign-text">No Designer Assigned</div>'}
                                     </div>
                                 </div>
@@ -214,7 +228,7 @@
                                             <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div>
                                             <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.creative}</span></div>
                                             <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign}</span></div>
-                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${task.creative_deadline}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${cDL}</span></div>
                                         ` : '<div class="text-center no-assign-text">No Creative Assigned</div>'}
                                     </div>
                                 </div>
