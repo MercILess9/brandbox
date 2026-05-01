@@ -26,7 +26,7 @@
             --c-text-muted: #94a3b8;
             --c-slate: #626e7f;
             --c-accent: #bdc432;
-            --c-role: #50adba; /* สีใหม่สำหรับ Role */
+            --c-role: #50adba;
             --radius-card: 20px;
         }
 
@@ -54,30 +54,24 @@
         .flt-wrapper { background: #fff; padding: 15px 30px; border-bottom: 1px solid #e2e8f0; }
         .flt-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         
-        /* Search (ยาวขึ้น) */
         .flt-search { position: relative; width: 380px; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
         .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; }
         
-        /* Date Inputs (รองรับ Type Date) */
         .flt-date-group { display: flex; align-items: center; background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 0 12px; height: 38px; }
         .flt-date-input { border: none; background: transparent; font-size: 0.82rem; color: var(--c-slate); outline: none; font-family: inherit; }
         
-        .flt-btn-icon { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; height: 38px; width: 38px; display: flex; align-items: center; justify-content: center; color: var(--c-text-muted); cursor: pointer; }
-        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; }
+        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
         .flt-btn-adv:hover { background: #f1f5f9; }
 
-        /* Pills (แบ่ง Group ชัดเจน ไม่มี Text Label) */
         .flt-pill-group { display: flex; align-items: center; gap: 6px; }
         .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; }
         .flt-divider { width: 1px; height: 24px; background: #e2e8f0; margin: 0 5px; }
 
-        /* Pill Active States */
         .flt-pill.active-role { background: var(--c-role); color: #fff; border-color: var(--c-role); }
         .flt-pill.active-prog { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
         .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
 
-        /* Expandable Advanced (อยู่แถวเดียวกันหมด) */
         .flt-advanced-zone { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
         .flt-advanced-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         
@@ -89,7 +83,7 @@
         .flt-btn-reset-adv:hover { color: var(--c-text-main); background: #f8fafc; }
 
         /* =========================================
-           3. B-QUEST CARD (bqc-) -> ล็อคห้ามเพี้ยน 100%
+           3. B-QUEST CARD (bqc-) ห้ามเพี้ยน
         ========================================= */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
@@ -176,15 +170,15 @@
             </div>
 
             <div class="flt-pill-group">
-                <button class="flt-pill active-role" onclick="this.classList.toggle('active-role')">Designer</button>
-                <button class="flt-pill active-role" onclick="this.classList.toggle('active-role')">Creative</button>
+                <button class="flt-pill active-role" onclick="togglePill(this, 'designer')">Designer</button>
+                <button class="flt-pill active-role" onclick="togglePill(this, 'creative')">Creative</button>
             </div>
 
             <div class="flt-divider"></div>
 
             <div class="flt-pill-group">
-                <button class="flt-pill active-prog" onclick="this.classList.toggle('active-prog')">Progress</button>
-                <button class="flt-pill active-done" onclick="this.classList.toggle('active-done')">Done</button>
+                <button class="flt-pill active-prog" onclick="togglePill(this, 'progress')">Progress</button>
+                <button class="flt-pill active-done" onclick="togglePill(this, 'done')">Done</button>
             </div>
 
             <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
@@ -192,12 +186,11 @@
 
         <div class="flt-advanced-zone" id="advancedFilterZone">
             <div class="flt-advanced-row">
-                <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"><option>All Work</option></select></div>
-                <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"><option>All Type</option></select></div>
-                <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"><option>All Staff</option></select></div>
-                <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"><option>All Owner</option></select></div>
-                
-                <button class="flt-btn-reset-adv" id="resetAdvanced"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+                <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"><option value="">All Work</option></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"><option value="">All Type</option></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"><option value="">All Staff</option></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"><option value="">All Owner</option></select></div>
+                <button class="flt-btn-reset-adv" onclick="resetAdvanced()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
             </div>
         </div>
     </section>
@@ -211,28 +204,73 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ---------------------------------------------------------
-    // 1. UI Logic (Filters)
-    // ---------------------------------------------------------
+    // ==========================================
+    // 🧠 CONFIGURATION & DYNAMIC SETTINGS
+    // ==========================================
+    // อยากให้ค้นหาที่คอลัมน์ไหนบ้าง มาเพิ่ม/ลดตรงนี้ได้เลยครับ! อนาคตเพิ่มตารางก็มาเติมชื่อตรงนี้
+    const SEARCH_COLUMNS = [
+        'task_name', 'account_name', 'opportunity_name', 
+        'designer', 'creative', 'designer_assign', 'creative_assign', 
+        'owner', 'detail', 'designer_type', 'creative_type'
+    ];
+
+    let currentPage = 0;
+    const itemsPerPage = 12;
+    let isFetching = false;
+    let hasMore = true;
+
+    // ==========================================
+    // 🎛️ UI INTERACTION LOGIC
+    // ==========================================
     document.getElementById('toggleFilters').addEventListener('click', function() {
         const zone = document.getElementById('advancedFilterZone');
         zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'block' : 'none';
     });
 
-    document.getElementById('resetAdvanced').addEventListener('click', function() {
-        document.getElementById('filterWork').selectedIndex = 0;
-        document.getElementById('filterType').selectedIndex = 0;
-        document.getElementById('filterAssign').selectedIndex = 0;
-        document.getElementById('filterOwner').selectedIndex = 0;
+    // ค้นหาเมื่อกด Enter ในช่อง Search
+    document.getElementById('globalSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') applyFilters();
     });
 
-    // ---------------------------------------------------------
-    // 2. Data Logic (Fetch & Render)
-    // ---------------------------------------------------------
-    let currentPage = 0;
-    const itemsPerPage = 12;
-    let isFetching = false;
-    let hasMore = true;
+    // Toggle Pills (เวลาคลิกปุ่ม ให้เปลี่ยนสี และดึงข้อมูลใหม่)
+    function togglePill(btn, type) {
+        // เช็กคลาสสีเพื่อเปิด/ปิด
+        if (type === 'designer' || type === 'creative') btn.classList.toggle('active-role');
+        if (type === 'progress') btn.classList.toggle('active-prog');
+        if (type === 'done') btn.classList.toggle('active-done');
+        
+        applyFilters();
+    }
+
+    // กด Reset Dropdown
+    function resetAdvanced() {
+        document.getElementById('filterWork').value = "";
+        document.getElementById('filterType').value = "";
+        document.getElementById('filterAssign').value = "";
+        document.getElementById('filterOwner').value = "";
+        applyFilters();
+    }
+
+    // จัดการ Datepicker (ถ้าเปลี่ยนวันที่ ให้โหลดข้อมูลใหม่)
+    document.getElementById('startDate').addEventListener('change', applyFilters);
+    document.getElementById('endDate').addEventListener('change', applyFilters);
+    document.getElementById('filterWork').addEventListener('change', applyFilters);
+    document.getElementById('filterType').addEventListener('change', applyFilters);
+    document.getElementById('filterAssign').addEventListener('change', applyFilters);
+    document.getElementById('filterOwner').addEventListener('change', applyFilters);
+
+
+    // ==========================================
+    // ⚙️ DATA LOGIC (Filter & Pagination)
+    // ==========================================
+    
+    // ฟังก์ชันล้างหน้าจอเพื่อเตรียมโหลดข้อมูลเซ็ตใหม่
+    function applyFilters() {
+        currentPage = 0;
+        hasMore = true;
+        document.getElementById("taskContainer").innerHTML = ''; // ล้าง Card เก่าทิ้ง
+        fetchQuests(false);
+    }
 
     function formatDate(dateStr) {
         if (!dateStr || dateStr === '-') return '-';
@@ -255,16 +293,40 @@
     async function fetchQuests(isFirstLoad = false) {
         if (isFetching || (!hasMore && !isFirstLoad)) return;
         isFetching = true;
+        
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
+        
+        // 1. เริ่มสร้างคำสั่ง (Query Builder)
+        let query = supabaseClient.from('b-quest-list').select('*');
+
+        // 2. ดึงค่า Filter จาก Input ต่างๆ
+        const searchTerm = document.getElementById('globalSearch').value.trim();
+        
+        // 3. แนบคำสั่ง Search (วิ่งหาทุกคอลัมน์ที่กำหนดไว้ในตัวแปร)
+        if (searchTerm) {
+            const orQuery = SEARCH_COLUMNS.map(col => `${col}.ilike.%${searchTerm}%`).join(',');
+            query = query.or(orQuery);
+        }
+
+        // *** อนาคต: เราจะมาใส่ Logic ให้ Date, Pill และ Dropdown ทำงานจริงกับ Database ตรงนี้ครับ ***
+
+        // 4. สั่งแบ่งหน้า (Pagination)
+        query = query.range(from, to).order('id', { ascending: false });
+
         try {
-            const { data, error } = await supabaseClient.from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
+            const { data, error } = await query;
             if (error) throw error;
+            
             if (data.length < itemsPerPage) hasMore = false;
+            
             renderCards(data);
             currentPage++;
-        } catch (e) { console.error(e); }
-        finally { isFetching = false; }
+        } catch (e) { 
+            console.error(e); 
+        } finally { 
+            isFetching = false; 
+        }
     }
 
     function renderCards(data) {
