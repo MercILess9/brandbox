@@ -212,7 +212,7 @@
     // ==========================================
     const SEARCH_COLUMNS = ['task_name', 'account_name', 'opportunity_name', 'designer', 'creative', 'designer_assign', 'creative_assign', 'owner', 'detail'];
     
-    // ตัวแปรเก็บข้อมูล Master Work จากตาราง b_quset_work
+    // ตัวแปรเก็บข้อมูล Master Work จากตาราง b_quest_work
     let MASTER_WORK_DATA = []; 
 
     let currentPage = 0;
@@ -266,7 +266,7 @@
     async function loadMasterData() {
         try {
             // ดึงข้อมูล Work
-            const { data } = await supabaseClient.from('b_quset_work').select('*').order('work', { ascending: true });
+            const { data } = await supabaseClient.from('b_quest_work').select('*').order('work', { ascending: true });
             MASTER_WORK_DATA = data || [];
             renderWorkDropdown();
 
