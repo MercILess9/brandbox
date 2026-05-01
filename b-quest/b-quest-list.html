@@ -31,26 +31,26 @@
         .status-done { border-left-color: #28a745; }
         .status-progress { border-left-color: var(--bquest-accent); }
 
-        /* Card Header (ส่วนที่มองเห็นตลอด) */
+        /* Card Header */
         .card-clickable { cursor: pointer; padding: 20px; }
         
-        /* Deadline Boxes */
         .deadline-container { min-width: 170px; text-align: center; }
         .deadline-label { font-size: 0.65rem; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 4px; }
         .deadline-value { background: #f1f3f5; border-radius: 8px; padding: 5px 0; font-weight: 700; font-size: 0.85rem; border: 1px solid #e9ecef; width: 100%; display: block; }
 
-        /* Card Body (ส่วนที่ซ่อนอยู่ - จะโผล่ตอนกด) */
-        .expanded-content {
-            background: #fafafa;
-            border-top: 1px dashed #eee;
-            padding: 20px;
-        }
-
+        /* Card Body Expanded */
+        .expanded-content { background: #fafafa; border-top: 1px dashed #eee; padding: 25px; }
         .info-box { background: white; border-radius: 10px; padding: 15px; border: 1px solid #eee; height: 100%; }
         .info-header { font-weight: 700; font-size: 0.75rem; color: #666; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
         .table-custom { font-size: 0.85rem; width: 100%; }
         .table-custom td { padding: 4px 0; border-bottom: 1px solid #f8f8f8; }
         .table-custom td:last-child { text-align: right; font-weight: 700; color: #333; }
+
+        /* Dropdown Custom */
+        .dropdown-menu { border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; padding: 8px; }
+        .dropdown-item { border-radius: 8px; font-size: 0.9rem; padding: 8px 12px; transition: 0.2s; }
+        .dropdown-item:hover { background-color: var(--bquest-accent); color: #000; }
+        .dropdown-item.text-danger:hover { background-color: #ff4d4d; color: #fff; }
     </style>
 </head>
 <body>
@@ -64,8 +64,7 @@
 <div class="sub-header-line shadow-sm">B-QUEST MISSION BOARD</div>
 
 <div class="container mt-4">
-    <div id="taskContainer" class="row">
-        </div>
+    <div id="taskContainer" class="row"></div>
     <div id="load-more-trigger" style="height: 100px;"></div>
 </div>
 
@@ -85,10 +84,7 @@
 
         try {
             const { data, error } = await supabaseClient
-                .from('b-quest-list')
-                .select('*')
-                .range(from, to)
-                .order('id', { ascending: false });
+                .from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
 
             if (error) throw error;
             if (data.length < itemsPerPage) hasMore = false;
@@ -110,13 +106,14 @@
             
             cardWrapper.innerHTML = `
                 <div class="quest-card shadow-sm ${isDone ? 'status-done' : 'status-progress'}">
-                    <div class="card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false">
+                    <div class="p-4">
                         <div class="row align-items-center">
-                            <div class="col-md-5">
+                            <div class="col-md-5 card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                                 <h5 class="fw-bold mb-1 text-dark">${task.task_name || 'Untitled'}</h5>
                                 <small class="text-muted">${task.account_name || '-'} | ${task.opportunity_name || '-'}</small>
                             </div>
-                            <div class="col-md-5 d-flex justify-content-center gap-3">
+                            
+                            <div class="col-md-5 d-flex justify-content-center gap-3 card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                                 <div class="deadline-container">
                                     <div class="deadline-label">Designer Deadline</div>
                                     <div class="deadline-value text-primary">${task.designer_deadline || '-'}</div>
@@ -126,44 +123,60 @@
                                     <div class="deadline-value text-secondary">${task.creative_deadline || '-'}</div>
                                 </div>
                             </div>
+
                             <div class="col-md-2 text-end">
-                                <i class="bi bi-chevron-down text-muted fs-5"></i>
+                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-600" onclick="alert('Edit id: ${task.id}')">
+                                        Edit
+                                    </button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                                            <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i> View Profile</a></li>
+                                            <li><a class="dropdown-item" href="#"><i class="bi bi-share me-2"></i> Share Link</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete Mission</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="collapse" id="${collapseId}">
                         <div class="expanded-content">
-                            <div class="row g-3">
+                            <div class="row g-4">
                                 <div class="col-md-6">
                                     <div class="info-box">
                                         <div class="info-header"><i class="bi bi-link-45deg"></i> Link Reference</div>
                                         <div class="small text-break">
-                                            ${task.link ? `<a href="${task.link}" target="_blank" class="text-decoration-none">${task.link}</a>` : 'ไม่มีลิงก์'}
+                                            ${task.link ? `<a href="${task.link}" target="_blank" class="text-primary text-decoration-none fw-600">${task.link}</a>` : 'ไม่มีลิงก์อ้างอิง'}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="info-box">
-                                        <div class="info-header"><i class="bi bi-calendar3"></i> Publish Date</div>
-                                        <div class="fw-bold small">${task.publish_date || '-'}</div>
+                                    <div class="info-box text-center">
+                                        <div class="info-header justify-content-center"><i class="bi bi-calendar3"></i> Publish Date</div>
+                                        <div class="fw-bold">${task.publish_date || '-'}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="info-box">
-                                        <div class="info-header"><i class="bi bi-person"></i> Project Owner</div>
-                                        <div class="fw-bold small">${task.owner || '-'}</div>
+                                    <div class="info-box text-center">
+                                        <div class="info-header justify-content-center"><i class="bi bi-person"></i> Owner</div>
+                                        <div class="fw-bold">${task.owner || '-'}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="info-box">
                                         <div class="info-header"><i class="bi bi-card-text"></i> Detailed Brief</div>
-                                        <div class="small text-secondary" style="white-space: pre-wrap;">${task.detail || 'ไม่มีข้อมูลรายละเอียด'}</div>
+                                        <div class="small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${task.detail || 'ไม่มีข้อมูลรายละเอียด'}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="info-box">
-                                        <div class="info-header">🎨 Designer Team</div>
+                                        <div class="info-header">🎨 Designer Role</div>
                                         <table class="table-custom">
                                             <tr><td>Type:</td><td>${task.designer_type || '-'}</td></tr>
                                             <tr><td>Assign:</td><td>${task.designer || '-'}</td></tr>
@@ -173,18 +186,13 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="info-box">
-                                        <div class="info-header">🚀 Creative Team</div>
+                                        <div class="info-header">🚀 Creative Role</div>
                                         <table class="table-custom">
                                             <tr><td>Type:</td><td>${task.creative_type || '-'}</td></tr>
                                             <tr><td>Assign:</td><td>${task.creative || '-'}</td></tr>
                                             <tr><td>Status:</td><td><span class="badge bg-info text-white">${task.creative_status || '-'}</span></td></tr>
                                         </table>
                                     </div>
-                                </div>
-                                <div class="col-12 text-end">
-                                    <button class="btn btn-primary btn-sm px-4 rounded-pill" onclick="alert('Edit id: ${task.id}')">
-                                        <i class="bi bi-pencil-square me-1"></i> Edit Mission
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -195,13 +203,11 @@
         });
     }
 
-    // Infinite Scroll
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !isFetching && hasMore) fetchQuests();
     }, { rootMargin: '600px' });
     observer.observe(document.getElementById('load-more-trigger'));
 
-    // Init
     fetchQuests(true);
 </script>
 
