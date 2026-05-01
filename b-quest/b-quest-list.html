@@ -16,11 +16,12 @@
 
     <style>
         :root { 
-            --status-progress: #0a4da2; /* Deep Blue หรู */
-            --status-done: #475569;     /* Slate Grey หรู */
+            --status-progress: #0a4da2; 
+            --status-done: #475569;     
             --bg-body: #f8fafc;
             --text-dark: #1e293b;
             --text-muted: #94a3b8;
+            --section-title: #626e7f; /* สีใหม่ตามสั่ง */
             --card-radius: 20px;
         }
 
@@ -35,7 +36,6 @@
         }
         .quest-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.05); }
         
-        /* สีกรอบสถานะใหม่ */
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
 
@@ -50,7 +50,6 @@
         .dl-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .dl-value { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
 
-        /* Expanded UI */
         .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         
         .meta-pill { 
@@ -60,37 +59,46 @@
         .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .meta-value { font-size: 0.85rem; font-weight: 600; }
 
-        /* Last Update บางลง */
-        .last-update-text { font-size: 0.68rem; color: #cbd5e1; font-weight: 300; letter-spacing: 0.02em; }
+        /* Last Update ปรับให้ชัดขึ้นพร้อม Icon */
+        .last-update-text { font-size: 0.72rem; color: #94a3b8; font-weight: 400; display: flex; align-items: center; gap: 5px; }
+        .last-update-text i { font-size: 0.8rem; color: #cbd5e1; }
 
-        /* หัวข้อ Label & Icon สีเดียวกับข้อความ */
+        /* Section Title สี #626e7f */
         .section-title { 
-            font-size: 0.8rem; font-weight: 700; color: var(--text-muted); 
+            font-size: 0.82rem; font-weight: 700; color: var(--section-title); 
             text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+            letter-spacing: 0.02em;
         }
-        .section-title i { color: var(--text-muted); font-size: 0.9rem; }
 
-        /* กล่อง Detail & Role ความสูง 200px */
         .role-card, .detail-box { 
             background: white; border-radius: var(--card-radius); padding: 20px; 
             border: 1px solid #eef2f6; height: 200px; transition: 0.2s;
         }
-        .detail-box { 
-            overflow-y: auto; line-height: 1.7; font-size: 0.92rem;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01); /* เงาจางๆ ในกล่องให้ชัดขึ้น */
-        }
-        .role-card.is-empty { opacity: 0.3; background-color: #fcfcfc; border-style: dashed; }
-        
-        .detail-box::-webkit-scrollbar { width: 3px; }
-        .detail-box::-webkit-scrollbar-thumb { background: #f1f5f9; border-radius: 10px; }
 
+        /* กล่อง Detail เน้น Vertical Scroll และ Word Wrap */
+        .detail-box { 
+            overflow-y: auto; 
+            overflow-x: hidden; /* ไม่เอาแนวนอน */
+            line-height: 1.7; 
+            font-size: 0.92rem;
+            word-break: break-word; /* ตัดคำเมื่อยาวเกิน */
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.01);
+        }
+
+        /* Modern Small Scrollbar */
+        .detail-box::-webkit-scrollbar { width: 3px; }
+        .detail-box::-webkit-scrollbar-track { background: transparent; }
+        .detail-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .detail-box::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        .role-card.is-empty { opacity: 0.3; border-style: dashed; }
+        
         .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; }
         .role-label { color: var(--text-muted); font-weight: 400; }
         .role-value { font-weight: 600; }
 
-        /* จุดสถานะสีใหม่ */
         .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        .dot-progress { background-color: var(--status-progress); box-shadow: 0 0 6px rgba(10,77,162,0.3); }
+        .dot-progress { background-color: var(--status-progress); }
         .dot-done { background-color: var(--status-done); }
         
         .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
@@ -166,7 +174,7 @@
                 <div class="quest-card ${isDone ? 'status-done' : 'status-progress'}">
                     <div class="card-clickable d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                         <div class="flex-grow-1">
-                            <h6 class="fw-bold mb-1" style="color: var(--text-dark);">${task.task_name || 'Untitled'}</h6>
+                            <h6 class="fw-bold mb-1" style="color: var(--text-dark);">${task.task_name || 'Untitled Project'}</h6>
                             <span class="text-muted small">${task.account_name} | ${task.opportunity_name}</span>
                         </div>
                         <div class="d-flex gap-5 px-4">
@@ -188,7 +196,7 @@
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="btn-link-premium shadow-sm"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
                                 <div class="last-update-text">
-                                    Last Update : ${task.last_update ? new Date(task.last_update).toLocaleDateString() : '-'}
+                                    <i class="bi bi-clock"></i> <span>Last Update : ${task.last_update ? new Date(task.last_update).toLocaleDateString() : '-'}</span>
                                 </div>
                             </div>
 
