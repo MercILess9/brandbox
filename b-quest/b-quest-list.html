@@ -25,7 +25,7 @@
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-bottom: 50px; }
 
-        /* --- Micro-Interactions & Animations --- */
+        /* --- Micro-Interactions --- */
         .collapse { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         
         .quest-card {
@@ -45,14 +45,14 @@
         .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #eee; }
         .sub-header-line { background: var(--bquest-accent); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; }
 
-        .deadline-box { min-width: 140px; text-align: center; }
+        .deadline-box { min-width: 160px; text-align: center; }
         .dl-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .dl-value { font-weight: 600; font-size: 0.9rem; color: #334155; }
 
         /* --- Expanded Content --- */
         .expanded-content { background: #fafafa; border-top: 1px solid #f1f5f9; padding: 25px; }
         
-        /* Meta Row (Modern Strip) */
+        /* Meta Row */
         .meta-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .meta-pill { 
             background: white; border: 1px solid #e2e8f0; padding: 6px 16px; border-radius: 100px;
@@ -69,12 +69,15 @@
         }
         .btn-link-premium:hover { background: var(--bquest-accent); color: #000; border-color: var(--bquest-accent); transform: scale(1.05); }
 
-        /* --- Balanced 3-Zone (4:4:4) --- */
+        /* --- Custom Balanced Layout 30/30/40 --- */
+        .col-30 { width: 30%; }
+        .col-40 { width: 40%; }
+
         .role-card { background: white; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; height: 240px; transition: 0.3s; }
         .detail-box { 
             background: white; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; 
             height: 240px; overflow-y: auto; overflow-x: hidden;
-            line-height: 1.7; font-size: 0.92rem; color: #475569; /* Markdown Style */
+            line-height: 1.7; font-size: 0.92rem; color: #475569;
         }
         .detail-box::-webkit-scrollbar { width: 4px; }
         .detail-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -157,8 +160,8 @@
                             <span class="text-muted small fw-500">${task.account_name} <i class="bi bi-dot"></i> ${task.opportunity_name}</span>
                         </div>
                         <div class="d-flex gap-5 px-4">
-                            <div class="deadline-box"><div class="dl-label">Designer DL</div><div class="dl-value">${task.designer_deadline || '-'}</div></div>
-                            <div class="deadline-box border-start ps-4"><div class="dl-label">Creative DL</div><div class="dl-value">${task.creative_deadline || '-'}</div></div>
+                            <div class="deadline-box"><div class="dl-label">Designer Deadline</div><div class="dl-value">${task.designer_deadline || '-'}</div></div>
+                            <div class="deadline-box border-start ps-4"><div class="dl-label">Creative Deadline</div><div class="dl-value">${task.creative_deadline || '-'}</div></div>
                         </div>
                         <div class="action-btns d-flex align-items-center gap-2" onclick="event.stopPropagation()">
                             <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold border shadow-sm">Edit</button>
@@ -175,7 +178,7 @@
                             <div class="meta-row">
                                 <div class="d-flex gap-3 align-items-center">
                                     <div class="meta-pill"><span class="meta-label">Owner</span><span class="meta-value">${task.owner || '-'}</span></div>
-                                    <div class="meta-pill"><span class="meta-label">Publish</span><span class="meta-value">${task.publish_date || '-'}</span></div>
+                                    <div class="meta-pill"><span class="meta-label">Publish Date</span><span class="meta-value">${task.publish_date || '-'}</span></div>
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="btn-link-premium shadow-sm"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
                                 <div class="last-update-text">
@@ -183,8 +186,8 @@
                                 </div>
                             </div>
 
-                            <div class="row g-4">
-                                <div class="col-md-4">
+                            <div class="d-flex gap-4">
+                                <div class="col-30">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag" style="color: #10b981;"><i class="bi bi-brush"></i> Designer</div>
                                         <div class="role-item">
@@ -193,13 +196,13 @@
                                         </div>
                                         <div class="divider-status"></div>
                                         <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type || '-'}</span></div>
-                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate" style="max-width: 150px;">${task.designer || '-'}</span></div>
+                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.designer || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign || '-'}</span></div>
                                         <div class="role-item mt-3 pt-2 border-top"><span class="role-label">Deadline</span><span class="role-value text-primary fw-bold">${task.designer_deadline || '-'}</span></div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-30">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-primary"><i class="bi bi-rocket-takeoff"></i> Creative</div>
                                         <div class="role-item">
@@ -208,14 +211,13 @@
                                         </div>
                                         <div class="divider-status"></div>
                                         <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type || '-'}</span></div>
-                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate" style="max-width: 150px;">${task.creative || '-'}</span></div>
+                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value text-truncate">${task.creative || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign || '-'}</span></div>
-                                        <div class="divider-status" style="border-style: none; border-top: 1px solid #f1f5f9; margin-top: 11px;"></div>
-                                        <div class="role-item"><span class="role-label">Deadline</span><span class="role-value text-secondary fw-bold">${task.creative_deadline || '-'}</span></div>
+                                        <div class="role-item mt-3 pt-2 border-top"><span class="role-label">Deadline</span><span class="role-value text-secondary fw-bold">${task.creative_deadline || '-'}</span></div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-40">
                                     <div class="detail-box shadow-sm">
                                         <div class="info-tag sticky-top bg-white pb-2"><i class="bi bi-text-left"></i> Detail</div>
                                         <div style="white-space: pre-wrap;">${task.detail || 'ไม่มีรายละเอียดเพิ่มเติม'}</div>
