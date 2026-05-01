@@ -28,6 +28,7 @@
             --c-text-muted: #94a3b8;
             --c-slate: #626e7f;
             --c-accent: #bdc432;
+            --c-accent-light: #f4f7a1; /* สีไฮไลต์ */
             --c-role: #50adba;
             --radius-card: 20px;
         }
@@ -74,18 +75,23 @@
         .flt-pill.active-prog { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
         .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
 
+        /* Advanced Zone - อัปเดต UI */
         .flt-advanced-zone { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
         .flt-advanced-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         
-        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; }
-        .flt-select-tag { background: #f1f5f9; color: var(--c-text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
-        .flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; min-width: 140px; }
+        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; transition: 0.2s; }
+        .flt-select-tag { background: #f1f5f9; color: var(--c-text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; justify-content: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; text-align: center; }
+        .flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; text-align: center; text-align-last: center; }
         
+        /* Highlight Class */
+        .flt-select-box.active-filter { background: var(--c-accent-light); border-color: var(--c-accent); }
+        .flt-select-box.active-filter .flt-select-tag { background: var(--c-accent); color: #000; border-right-color: var(--c-accent); }
+
         .flt-btn-reset-adv { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
         .flt-btn-reset-adv:hover { color: var(--c-text-main); background: #f8fafc; }
 
         /* =========================================
-           3. B-QUEST CARD (bqc-) ดั้งเดิม 100% ห้ามเพี้ยน
+           3. B-QUEST CARD (LOCKED) ห้ามแก้ไข!
         ========================================= */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
@@ -187,10 +193,10 @@
 
         <div class="flt-advanced-zone" id="advancedFilterZone">
             <div class="flt-advanced-row">
-                <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"><option value="">All Work</option></select></div>
-                <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"><option value="">All Type</option></select></div>
-                <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"><option value="">All Staff</option></select></div>
-                <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"><option value="">All Owner</option></select></div>
+                <div class="flt-select-box" style="min-width: 140px;"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
+                <div class="flt-select-box" style="min-width: 140px;"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
+                <div class="flt-select-box" style="min-width: 180px;"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"></select></div>
+                <div class="flt-select-box" style="min-width: 180px;"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"></select></div>
                 <button class="flt-btn-reset-adv" onclick="resetAdvanced()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
             </div>
         </div>
@@ -236,16 +242,40 @@
         applyFilters();
     }
 
+    // ฟังก์ชันสร้างตัวเลือก All และเส้นคั่น
+    function setupDefaultOptions(selectEl, label) {
+        selectEl.innerHTML = '';
+        selectEl.add(new Option(`All ${label}`, ""));
+        const divider = new Option("----------", "");
+        divider.disabled = true;
+        selectEl.add(divider);
+    }
+
+    // ฟังก์ชันจัดการไฮไลต์
+    function updateHighlight(id) {
+        const el = document.getElementById(id);
+        const box = el.closest('.flt-select-box');
+        if (el.value !== "") {
+            box.classList.add('active-filter');
+        } else {
+            box.classList.remove('active-filter');
+        }
+    }
+
     function resetAdvanced() {
-        document.getElementById('filterWork').value = "";
-        document.getElementById('filterType').value = "";
-        document.getElementById('filterAssign').value = "";
-        document.getElementById('filterOwner').value = "";
+        ['filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
+            document.getElementById(id).value = "";
+            updateHighlight(id);
+        });
         applyFilters();
     }
 
+    // จัดการ Event Change
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
-        document.getElementById(id).addEventListener('change', applyFilters);
+        document.getElementById(id).addEventListener('change', function() {
+            if(id.startsWith('filter')) updateHighlight(id);
+            applyFilters();
+        });
     });
 
     function renderWorkDropdown() {
@@ -254,7 +284,7 @@
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const currentVal = select.value;
         
-        select.innerHTML = '<option value="">All Work</option>';
+        setupDefaultOptions(select, "Work");
 
         const designerWorks = MASTER_WORK_DATA.filter(i => i.role === 'Designer');
         const creativeWorks = MASTER_WORK_DATA.filter(i => i.role === 'Creative');
@@ -277,40 +307,42 @@
         }
 
         select.value = currentVal;
+        updateHighlight('filterWork');
     }
 
     // ==========================================
-    // ⚙️ FETCH DATA & RENDER
+    // ⚙️ FETCH DATA 
     // ==========================================
     async function loadMasterData() {
         try {
-            // 1. ดึง Master Work (จาก Supabase)
-            const { data: workData, error: workErr } = await supabaseClient.from('b_quest_work').select('*').order('work', { ascending: true });
+            // 1. ดึง Master Work
+            const { data: workData } = await supabaseClient.from('b_quest_work').select('*').order('work', { ascending: true });
             MASTER_WORK_DATA = workData || [];
             renderWorkDropdown();
 
-            // 2. ดึงข้อมูล Type จากไฟล์ b-quest-config.js ที่พี่ประกาศไว้
+            // 2. ดึง Type จาก b-quest-config.js
             const typeSelect = document.getElementById('filterType');
-            typeSelect.innerHTML = '<option value="">All Type</option>';
+            setupDefaultOptions(typeSelect, "Type");
             if (typeof B_QUEST_LIST_TYPE !== 'undefined' && B_QUEST_LIST_TYPE.listTypes) {
                 B_QUEST_LIST_TYPE.listTypes.forEach(type => {
                     typeSelect.appendChild(new Option(type, type));
                 });
             }
 
-            // 3. ดึง Assign, Owner, Type (จากตารางบิล)
-            const { data: listData, error: listErr } = await supabaseClient.from('b-quest-list').select('designer_assign, creative_assign, owner');
+            // 3. ดึง Assign, Owner 
+            const { data: listData } = await supabaseClient.from('b-quest-list').select('designer_assign, creative_assign, owner');
             if (listData && listData.length > 0) {
-                const fillDropdown = (id, keys) => {
+                const fillDropdown = (id, label, keys) => {
                     const set = new Set();
                     listData.forEach(item => {
                         keys.forEach(k => { if (item[k] && item[k] !== '-') set.add(item[k]); });
                     });
                     const el = document.getElementById(id);
+                    setupDefaultOptions(el, label);
                     [...set].sort().forEach(v => el.appendChild(new Option(v, v)));
                 };
-                fillDropdown('filterAssign', ['designer_assign', 'creative_assign']);
-                fillDropdown('filterOwner', ['owner']);
+                fillDropdown('filterAssign', "Staff", ['designer_assign', 'creative_assign']);
+                fillDropdown('filterOwner', "Owner", ['owner']);
             }
         } catch (e) { 
             console.error("Master Load Failed:", e); 
@@ -349,14 +381,14 @@
         
         let query = supabaseClient.from('b-quest-list').select('*');
 
-        // Search Query
+        // 1. Search Query
         const searchTerm = document.getElementById('globalSearch').value.trim();
         if (searchTerm) {
             const orQuery = SEARCH_COLUMNS.map(col => `${col}.ilike.%${searchTerm}%`).join(',');
             query = query.or(orQuery);
         }
 
-        // Role & Date Logic
+        // 2. Role & Date Logic
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const sd = document.getElementById('startDate').value;
@@ -371,7 +403,7 @@
             query = query.or(orParts.join(','));
         }
 
-        // Status Filter Logic
+        // 3. Status Filter Logic
         const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
         const pDone = document.getElementById('pill-done').classList.contains('active-done');
 
@@ -383,7 +415,7 @@
             query = query.eq('id', -1); 
         }
 
-        // Advance Dropdown Filters
+        // 4. Advance Dropdown Filters
         const val = (id) => document.getElementById(id).value;
         const workVal = val('filterWork');
         const typeVal = val('filterType');
@@ -399,10 +431,8 @@
 
         try {
             const { data, error } = await query;
-            if (error) {
-                console.error("Supabase Fetch Error:", error);
-                throw error;
-            }
+            if (error) throw error;
+            
             if (data.length < itemsPerPage) hasMore = false;
             renderCards(data);
             currentPage++;
@@ -433,17 +463,21 @@
             const card = document.createElement("div");
             card.className = "col-12";
             
+            // ใช้โครงสร้าง Card ฉบับสมบูรณ์ดั้งเดิม ห้ามเพี้ยน
             card.innerHTML = `
                 <div class="bqc-card ${isCardDone ? 'bqc-status-done' : 'bqc-status-prog'}">
+                    
                     <div class="bqc-header">
                         <div class="bqc-info-zone" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                             <div class="bqc-title">${task.task_name || 'Untitled Project'}</div>
                             <div class="bqc-subtitle">${task.account_name} | ${task.opportunity_name}</div>
                         </div>
+                        
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                             <div class="bqc-dl-col">${task.designer_deadline && hasDes ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${dDL}</span>` : ''}</div>
                             <div class="bqc-dl-col">${task.creative_deadline && hasCre ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${cDL}</span>` : ''}</div>
                         </div>
+                        
                         <div class="bqc-actions">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Edit</button>
                             <div class="dropdown">
@@ -456,8 +490,10 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="collapse" id="${collapseId}">
                         <div class="bqc-body">
+                            
                             <div class="bqc-meta-row">
                                 <div class="d-flex gap-2">
                                     <div class="bqc-meta-pill"><span class="bqc-meta-label">Owner</span><span class="bqc-meta-val">${task.owner || '-'}</span></div>
@@ -466,6 +502,7 @@
                                 </div>
                                 <div class="bqc-last-update"><i class="bi bi-clock-history"></i> Last Update : ${updateDate}</div>
                             </div>
+
                             <div class="bqc-layout-row">
                                 <div class="bqc-col-30">
                                     <div class="bqc-sec-title"><i class="bi bi-brush"></i> Designer</div>
@@ -479,6 +516,7 @@
                                         ` : '<div class="bqc-empty-text">No Designer</div>'}
                                     </div>
                                 </div>
+                                
                                 <div class="bqc-col-30">
                                     <div class="bqc-sec-title"><i class="bi bi-rocket"></i> Creative</div>
                                     <div class="bqc-panel ${!hasCre ? 'is-empty' : ''}">
@@ -491,6 +529,7 @@
                                         ` : '<div class="bqc-empty-text">No Creative</div>'}
                                     </div>
                                 </div>
+                                
                                 <div class="bqc-col-40">
                                     <div class="bqc-sec-title"><i class="bi bi-justify-left"></i> Detail</div>
                                     <div class="bqc-panel bqc-detail-box">${task.detail || '...'}</div>
