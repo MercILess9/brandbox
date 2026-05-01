@@ -157,8 +157,8 @@
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-success"><i class="bi bi-brush"></i> Designer</div>
-                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div>
-                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div>
+                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status || '-'}</span></div>
+                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign || '-'}</span></div>
                                         <div class="divider"></div>
@@ -168,8 +168,8 @@
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-dark"><i class="bi bi-rocket-takeoff"></i> Creative</div>
-                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div>
-                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div>
+                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status || '-'}</span></div>
+                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative || '-'}</span></div>
                                         <div class="divider"></div>
