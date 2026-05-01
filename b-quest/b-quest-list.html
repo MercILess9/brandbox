@@ -18,16 +18,14 @@
         :root { --bquest-accent: #bdc432; --bg-body: #f8f9fa; }
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: #333; }
         
-        /* Header & Nav */
         .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #eee; }
         .sub-header-line { background: var(--bquest-accent); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; }
 
-        /* Premium Card */
         .quest-card {
             background: white; border: 1px solid #f0f0f0; border-radius: 14px; margin-bottom: 12px;
             transition: 0.3s; overflow: hidden; border-left: 5px solid #e0e0e0;
         }
-        .quest-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .quest-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
         .status-done { border-left-color: #28a745; }
         .status-progress { border-left-color: var(--bquest-accent); }
 
@@ -39,24 +37,24 @@
         .dl-label { font-size: 0.62rem; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 4px; }
         .dl-value { font-weight: 600; font-size: 0.85rem; color: #444; }
 
-        /* Expanded Content */
         .expanded-content { background: #fafafa; border-top: 1px solid #f1f1f1; padding: 20px 24px; }
         
-        /* New Separated Meta Boxes */
-        .meta-item-box {
-            background: #fff; border: 1px solid #eee; border-radius: 10px;
-            padding: 8px 15px; flex: 1; display: flex; flex-direction: column; justify-content: center;
+        /* New Meta Row Layout */
+        .meta-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .meta-left-group { 
+            display: flex; align-items: center; gap: 10px; 
+            background: #fff; padding: 6px 15px; border-radius: 10px; border: 1px solid #eee;
         }
-        .meta-label { font-size: 0.62rem; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
-        .meta-value { font-size: 0.82rem; font-weight: 600; color: #333; }
+        .meta-sub-item { display: flex; flex-direction: column; line-height: 1.2; padding: 0 10px; border-right: 1px solid #eee; }
+        .meta-sub-item:last-child { border-right: none; }
+        
+        .last-update-text { font-size: 0.7rem; color: #bbb; font-weight: 400; }
 
         /* Role & Detail Layout */
         .role-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; min-height: 220px; }
         .detail-box { 
             background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; 
-            height: 220px; 
-            overflow-y: auto; overflow-x: hidden; /* ล็อคแนวตั้งเท่านั้น */
-            word-wrap: break-word;
+            height: 220px; overflow-y: auto; overflow-x: hidden; word-wrap: break-word;
         }
 
         .detail-box::-webkit-scrollbar { width: 4px; }
@@ -97,32 +95,18 @@
     const itemsPerPage = 12;
     let isFetching = false;
     let hasMore = true;
-    let allQuests = [];
-
-    async function initPage() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            const profile = await BQuest.getProfile(session.user.id);
-            if (profile) BQuest.setText("user-display", profile.nick_name || profile.full_name);
-        }
-        fetchQuests(true);
-    }
 
     async function fetchQuests(isFirstLoad = false) {
         if (isFetching || (!hasMore && !isFirstLoad)) return;
         isFetching = true;
-
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
 
         try {
             const { data, error } = await supabaseClient
                 .from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
-
             if (error) throw error;
             if (data.length < itemsPerPage) hasMore = false;
-
-            allQuests = isFirstLoad ? data : [...allQuests, ...data];
             renderCards(data);
             currentPage++;
         } catch (e) { console.error(e); }
@@ -162,22 +146,22 @@
 
                     <div class="collapse" id="${collapseId}">
                         <div class="expanded-content">
-                            <div class="d-flex gap-2 mb-3">
-                                <div class="meta-item-box">
-                                    <span class="meta-label">Publish Date</span>
-                                    <span class="meta-value">${task.publish_date || '-'}</span>
+                            <div class="meta-row">
+                                <div class="meta-left-group shadow-sm">
+                                    <div class="meta-sub-item">
+                                        <span class="meta-label">Owner</span>
+                                        <span class="meta-value">${task.owner || '-'}</span>
+                                    </div>
+                                    <div class="meta-sub-item">
+                                        <span class="meta-label">Publish Date</span>
+                                        <span class="meta-value">${task.publish_date || '-'}</span>
+                                    </div>
+                                    <div class="meta-sub-item pe-0">
+                                        ${task.link ? `<a href="${task.link}" target="_blank" class="text-secondary"><i class="bi bi-box-arrow-up-right"></i></a>` : '<span class="meta-label">No Link</span>'}
+                                    </div>
                                 </div>
-                                <div class="meta-item-box">
-                                    <span class="meta-label">Project Owner</span>
-                                    <span class="meta-value">${task.owner || '-'}</span>
-                                </div>
-                                <div class="meta-item-box">
-                                    <span class="meta-label">Last Update</span>
-                                    <span class="meta-value">${task.last_update}</span>
-                                </div>
-                                <div class="meta-item-box" style="flex: 0 0 60px; align-items: center;">
-                                    <span class="meta-label">Link</span>
-                                    ${task.link ? `<a href="${task.link}" target="_blank" class="text-secondary mt-1"><i class="bi bi-box-arrow-up-right fs-5"></i></a>` : '-'}
+                                <div class="last-update-text">
+                                    Last Update : ${task.updated_at ? new Date(task.updated_at).toLocaleDateString() : '-'}
                                 </div>
                             </div>
 
@@ -224,7 +208,7 @@
     }, { rootMargin: '600px' });
     observer.observe(document.getElementById('load-more-trigger'));
 
-    initPage();
+    fetchQuests(true);
 </script>
 
 </body>
