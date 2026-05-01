@@ -21,7 +21,7 @@
             --bg-body: #f8fafc;
             --text-dark: #1e293b;
             --text-muted: #94a3b8;
-            --section-title: #626e7f; /* สีใหม่ตามสั่ง */
+            --section-title: #626e7f;
             --card-radius: 20px;
         }
 
@@ -39,16 +39,27 @@
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
 
-        .card-clickable { cursor: pointer; padding: 22px 28px; }
+        .card-clickable { cursor: pointer; padding: 20px 28px; }
         .action-btns { opacity: 0; transition: 0.2s ease; }
         .quest-card:hover .action-btns { opacity: 1; }
 
+        /* --- Header Deadline Styles --- */
+        .deadline-group { display: flex; gap: 30px; margin: 0 40px; } /* ขยับเข้าหากลางมากขึ้น */
+        .header-dl-item { text-align: center; }
+        .header-dl-label { font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        
+        /* กล่อง Deadline ใน Header */
+        .dl-pill { 
+            background: #f8fafc; border-radius: 8px; padding: 4px 12px; 
+            font-size: 0.82rem; font-weight: 700; color: var(--text-dark);
+            border: 1px solid #edf2f7; transition: 0.2s;
+        }
+        .dl-active-des { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; } /* เมื่อมี Deadline Designer */
+        .dl-active-cre { background: #f1f5f9; color: #334155; border-color: #e2e8f0; } /* เมื่อมี Deadline Creative */
+        .dl-none { color: #cbd5e1; font-weight: 400; border-color: transparent; background: transparent; }
+
         .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
         .sub-header-line { background: var(--status-progress); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; color: #fff; }
-
-        .deadline-box { min-width: 150px; text-align: center; }
-        .dl-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        .dl-value { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
 
         .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         
@@ -59,40 +70,14 @@
         .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .meta-value { font-size: 0.85rem; font-weight: 600; }
 
-        /* Last Update ปรับให้ชัดขึ้นพร้อม Icon */
         .last-update-text { font-size: 0.72rem; color: #94a3b8; font-weight: 400; display: flex; align-items: center; gap: 5px; }
-        .last-update-text i { font-size: 0.8rem; color: #cbd5e1; }
+        .section-title { font-size: 0.82rem; font-weight: 700; color: var(--section-title); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
-        /* Section Title สี #626e7f */
-        .section-title { 
-            font-size: 0.82rem; font-weight: 700; color: var(--section-title); 
-            text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
-            letter-spacing: 0.02em;
-        }
-
-        .role-card, .detail-box { 
-            background: white; border-radius: var(--card-radius); padding: 20px; 
-            border: 1px solid #eef2f6; height: 200px; transition: 0.2s;
-        }
-
-        /* กล่อง Detail เน้น Vertical Scroll และ Word Wrap */
-        .detail-box { 
-            overflow-y: auto; 
-            overflow-x: hidden; /* ไม่เอาแนวนอน */
-            line-height: 1.7; 
-            font-size: 0.92rem;
-            word-break: break-word; /* ตัดคำเมื่อยาวเกิน */
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.01);
-        }
-
-        /* Modern Small Scrollbar */
+        .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
+        .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; word-break: break-word; }
         .detail-box::-webkit-scrollbar { width: 3px; }
-        .detail-box::-webkit-scrollbar-track { background: transparent; }
         .detail-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .detail-box::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
-        .role-card.is-empty { opacity: 0.3; border-style: dashed; }
-        
         .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; }
         .role-label { color: var(--text-muted); font-weight: 400; }
         .role-value { font-weight: 600; }
@@ -100,14 +85,9 @@
         .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dot-progress { background-color: var(--status-progress); }
         .dot-done { background-color: var(--status-done); }
-        
         .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
         
-        .btn-link-premium {
-            background: var(--text-dark); border: none; border-radius: 10px;
-            padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff;
-            transition: 0.3s; text-decoration: none; display: flex; align-items: center; gap: 6px;
-        }
+        .btn-link-premium { background: var(--text-dark); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
 
         .col-30 { width: 30%; }
         .col-40 { width: 40%; }
@@ -168,6 +148,10 @@
             const hasCreative = !!task.creative;
             const collapseId = `collapse-${task.id}`;
             
+            // Logic เช็ค Deadline เพื่อใส่สี
+            const dDL = task.designer_deadline && task.designer_deadline !== '-' ? task.designer_deadline : null;
+            const cDL = task.creative_deadline && task.creative_deadline !== '-' ? task.creative_deadline : null;
+
             const card = document.createElement("div");
             card.className = "col-12";
             card.innerHTML = `
@@ -177,10 +161,18 @@
                             <h6 class="fw-bold mb-1" style="color: var(--text-dark);">${task.task_name || 'Untitled Project'}</h6>
                             <span class="text-muted small">${task.account_name} | ${task.opportunity_name}</span>
                         </div>
-                        <div class="d-flex gap-5 px-4">
-                            <div class="deadline-box"><div class="dl-label">Designer Deadline</div><div class="dl-value">${task.designer_deadline || '-'}</div></div>
-                            <div class="deadline-box border-start ps-4"><div class="dl-label">Creative Deadline</div><div class="dl-value">${task.creative_deadline || '-'}</div></div>
+                        
+                        <div class="deadline-group">
+                            <div class="header-dl-item">
+                                <div class="header-dl-label">Designer</div>
+                                <div class="dl-pill ${dDL ? 'dl-active-des' : 'dl-none'}">${dDL || '-'}</div>
+                            </div>
+                            <div class="header-dl-item">
+                                <div class="header-dl-label">Creative</div>
+                                <div class="dl-pill ${cDL ? 'dl-active-cre' : 'dl-none'}">${cDL || '-'}</div>
+                            </div>
                         </div>
+
                         <div class="action-btns d-flex align-items-center gap-2" onclick="event.stopPropagation()">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.75rem;">Edit</button>
                             <button class="btn btn-light btn-sm rounded-circle border shadow-sm" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
