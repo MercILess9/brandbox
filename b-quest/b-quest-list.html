@@ -25,7 +25,7 @@
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding-bottom: 50px; }
 
-        /* --- 1. Top Header (Logo & User) --- */
+        /* --- Top Header --- */
         .top-nav { background: #fff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; }
         .logo-zone { display: flex; align-items: center; gap: 15px; }
         .logo-zone img { height: 28px; }
@@ -35,54 +35,45 @@
         .nav-icon { color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
         .nav-icon:hover { color: var(--text-dark); }
 
-        /* --- 2. Menu Bar (Accent Color) --- */
+        /* --- Menu Bar --- */
         .menu-bar { background: var(--bquest-accent); padding: 0 30px; display: flex; gap: 30px; }
         .menu-item { padding: 12px 15px; font-size: 0.85rem; font-weight: 700; color: rgba(0,0,0,0.6); text-decoration: none; text-transform: uppercase; transition: 0.2s; }
         .menu-item:hover { color: #000; }
         .menu-item.active { color: #000; background: rgba(255,255,255,0.2); }
 
-        /* --- 3. Filter Zone (2-Row Layout) --- */
+        /* --- Filter Zone --- */
         .filter-container { background: var(--filter-bg); padding: 20px 30px; border-bottom: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        
-        /* Row 1: Search & Date */
-        .search-wrapper { position: relative; flex-grow: 1; }
+        .search-wrapper { position: relative; }
         .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .f-input-search { background: var(--input-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 15px 10px 45px; font-size: 0.9rem; width: 100%; transition: 0.2s; }
+        .f-input-search { background: var(--input-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 15px 10px 45px; font-size: 0.9rem; width: 100%; }
         
-        .btn-today { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 15px; font-size: 0.85rem; font-weight: 600; color: var(--slate-main); transition: 0.2s; height: 42px; }
-        .btn-today:hover { background: var(--input-bg); }
-        
+        .btn-today { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 15px; font-size: 0.85rem; font-weight: 600; color: var(--slate-main); height: 42px; }
         .date-group-box { background: var(--input-bg); border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; padding: 0 12px; height: 42px; }
         .date-input { border: none; background: transparent; font-size: 0.85rem; width: 110px; text-align: center; color: var(--slate-main); }
         .date-sep { color: #cbd5e1; padding: 0 5px; }
-        
-        .btn-refresh { background: white; border: 1px solid #e2e8f0; border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: 0.2s; }
-        .btn-refresh:hover { color: var(--text-dark); border-color: #cbd5e1; }
+        .btn-refresh { background: white; border: 1px solid #e2e8f0; border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
 
-        /* Row 2: Dropdowns & Pills */
         .custom-select-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 40px; min-width: 160px; }
         .cs-label { background: #f1f5f9; color: var(--text-muted); font-size: 0.7rem; font-weight: 800; padding: 0 12px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; }
-        .cs-select { border: none; font-size: 0.85rem; font-weight: 600; color: var(--slate-main); padding: 0 10px; width: 100%; outline: none; cursor: pointer; }
+        .cs-select { border: none; font-size: 0.85rem; font-weight: 600; color: var(--slate-main); padding: 0 10px; width: 100%; outline: none; }
 
         .pill-group { display: flex; align-items: center; gap: 8px; }
         .pill-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 5px; }
-        .pill-btn { border: 1px solid #e2e8f0; background: white; border-radius: 20px; padding: 5px 15px; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); transition: 0.2s; }
-        .pill-btn:hover { background: #f8fafc; }
+        .pill-btn { border: 1px solid #e2e8f0; background: white; border-radius: 20px; padding: 5px 15px; font-size: 0.8rem; font-weight: 600; color: var(--slate-main); }
         .pill-btn.active { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
         .pill-btn.active-progress { background: #eef2ff; color: var(--status-progress); border-color: #e0e7ff; }
         .pill-btn.active-done { background: #f1f5f9; color: var(--status-done); border-color: #e2e8f0; }
-
         .v-divider { width: 1px; height: 24px; background: #e2e8f0; margin: 0 10px; }
 
-        /* --- 4. Card Layout (ยึดตามเดิมเป๊ะ) --- */
+        /* --- Card Styles --- */
         .quest-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--card-radius); margin-bottom: 15px; transition: 0.3s ease; border-left: 6px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
-
         .card-clickable { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
         .project-info { width: 50%; flex-shrink: 0; min-width: 0; padding-right: 20px; }
         .deadline-grid { display: grid; grid-template-columns: 140px 140px; gap: 20px; flex-grow: 1; justify-content: center; }
-        
+        .action-btns { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
+        .quest-card:hover .action-btns { opacity: 1; }
         .header-dl-item { text-align: center; height: 42px; display: flex; flex-direction: column; justify-content: center; }
         .header-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         .dl-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; display: inline-block; border: 1px solid transparent; }
@@ -92,21 +83,21 @@
         .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         .col-30 { width: 30%; }
         .col-40 { width: 40%; }
-
-        .meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
-        .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .meta-value { font-size: 0.85rem; font-weight: 600; color: var(--slate-main); }
-
         .section-title { font-size: 0.82rem; font-weight: 700; color: var(--slate-main); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
-        .detail-box { overflow-y: auto; line-height: 1.7; font-size: 0.92rem; color: var(--slate-main); }
-        
+        .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; word-break: break-word; color: var(--slate-main); }
+        .detail-box::-webkit-scrollbar { width: 3px; }
+        .detail-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .role-card.is-empty { background-color: #fcfcfc; border: 2px dashed #f1f5f9; }
+        .no-assign-text { margin-top: 50px; color: var(--slate-main); opacity: 0.5; font-weight: 400; font-size: 0.75rem; text-transform: uppercase; text-align: center; }
         .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--slate-main); }
         .role-value { font-weight: 600; }
         .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
         .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dot-progress { background-color: var(--status-progress); }
         .dot-done { background-color: var(--status-done); }
+        .btn-more { color: var(--text-muted); padding: 8px; border-radius: 50%; transition: all 0.2s ease; border: none; background: transparent; }
+        .btn-more:hover { background-color: #f1f5f9; color: var(--text-dark); transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -118,59 +109,23 @@
             <span class="system-name">B-QUEST</span>
         </div>
         <div class="user-zone">
-            <div class="user-info"><i class="bi bi-person-circle"></i> <span id="user-display">Loading...</span></div>
+            <div class="user-info"><i class="bi bi-person-circle"></i> <span id="user-display">...</span></div>
             <i class="bi bi-gear nav-icon"></i>
             <i class="bi bi-box-arrow-right nav-icon ms-2" id="logout-btn"></i>
         </div>
     </div>
-
     <nav class="menu-bar">
         <a href="#" class="menu-item active">List</a>
         <a href="#" class="menu-item">New Mission</a>
     </nav>
-
     <div class="filter-container">
-        <div class="row g-3 mb-3">
-            <div class="col-lg-7">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+            <div style="width: 400px;">
                 <div class="search-wrapper">
                     <i class="bi bi-search"></i>
-                    <input type="text" class="f-input-search" id="globalSearch" placeholder="Search by Project, Account, or Opportunity...">
+                    <input type="text" class="f-input-search" id="globalSearch" placeholder="Search Project, Account, Opp...">
                 </div>
             </div>
-            <div class="col-lg-5">
-                <div class="d-flex gap-2">
-                    <button class="btn-today" id="btnToday">Today</button>
-                    <div class="date-group-box flex-grow-1">
-                        <input type="text" class="date-input" id="startDate" placeholder="DD-MM-YYYY">
-                        <span class="date-sep">-</span>
-                        <input type="text" class="date-input" id="endDate" placeholder="DD-MM-YYYY">
-                        <i class="bi bi-calendar3 ms-2 text-muted" style="font-size: 0.8rem;"></i>
-                    </div>
-                    <button class="btn-refresh"><i class="bi bi-arrow-clockwise"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div class="d-flex gap-2 flex-wrap">
-                <div class="custom-select-box">
-                    <span class="cs-label">Work</span>
-                    <select class="cs-select" id="filterWork"><option>All Work</option></select>
-                </div>
-                <div class="custom-select-box">
-                    <span class="cs-label">Type</span>
-                    <select class="cs-select" id="filterType"><option>All Type</option></select>
-                </div>
-                <div class="custom-select-box">
-                    <span class="cs-label">Assign</span>
-                    <select class="cs-select" id="filterAssign"><option>All Staff</option></select>
-                </div>
-                <div class="custom-select-box">
-                    <span class="cs-label">Owner</span>
-                    <select class="cs-select" id="filterOwner"><option>All Owner</option></select>
-                </div>
-            </div>
-
             <div class="d-flex align-items-center flex-wrap gap-2">
                 <div class="pill-group">
                     <span class="pill-title">Role</span>
@@ -185,6 +140,24 @@
                 </div>
             </div>
         </div>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex gap-2 flex-wrap">
+                <div class="custom-select-box"><span class="cs-label">Work</span><select class="cs-select" id="filterWork"><option>All Work</option></select></div>
+                <div class="custom-select-box"><span class="cs-label">Type</span><select class="cs-select" id="filterType"><option>All Type</option></select></div>
+                <div class="custom-select-box"><span class="cs-label">Assign</span><select class="cs-select" id="filterAssign"><option>All Staff</option></select></div>
+                <div class="custom-select-box"><span class="cs-label">Owner</span><select class="cs-select" id="filterOwner"><option>All Owner</option></select></div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn-today" id="btnToday">Today</button>
+                <div class="date-group-box">
+                    <input type="text" class="date-input" id="startDate" placeholder="DD-MM-YYYY">
+                    <span class="date-sep">-</span>
+                    <input type="text" class="date-input" id="endDate" placeholder="DD-MM-YYYY">
+                    <i class="bi bi-calendar3 ms-2 text-muted" style="font-size: 0.8rem;"></i>
+                </div>
+                <button class="btn-refresh"><i class="bi bi-arrow-clockwise"></i></button>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -192,7 +165,6 @@
     <div id="taskContainer" class="row"></div>
     <div id="load-more-trigger" style="height: 100px;"></div>
 </main>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
