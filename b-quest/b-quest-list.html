@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-QUEST | Premium Mission Control</title>
+    <title>B-QUEST | Mission Control</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,48 +15,57 @@
     <script src="../system.js"></script>
 
     <style>
-        :root { --bquest-accent: #bdc432; --bg-body: #f8f9fa; }
-        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: #333; }
-        
-        .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .sub-header-line { background: var(--bquest-accent); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; }
+        :root { 
+            --bquest-accent: #bdc432; 
+            --bg-body: #f8f9fa;
+        }
 
+        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: #333; padding-bottom: 50px; }
+
+        /* --- Header Section --- */
+        .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .sub-header-line { background: var(--bquest-accent); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; color: #000; }
+
+        /* --- Quest Card Styling --- */
         .quest-card {
             background: white; border: 1px solid #f0f0f0; border-radius: 14px; margin-bottom: 12px;
-            transition: 0.3s; overflow: hidden; border-left: 5px solid #e0e0e0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; border-left: 5px solid #e0e0e0;
         }
-        .quest-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+        .quest-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .status-done { border-left-color: #28a745; }
         .status-progress { border-left-color: var(--bquest-accent); }
 
-        .action-btns { opacity: 0; transition: 0.2s; }
+        /* Action Buttons Hover Logic */
+        .action-btns { opacity: 0; transition: 0.2s ease; }
         .quest-card:hover .action-btns { opacity: 1; }
         .card-clickable { cursor: pointer; padding: 18px 24px; }
 
+        /* Deadline Header */
         .deadline-box { min-width: 140px; text-align: center; }
         .dl-label { font-size: 0.62rem; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 4px; }
         .dl-value { font-weight: 600; font-size: 0.85rem; color: #444; }
 
+        /* --- Expanded Detail Layout --- */
         .expanded-content { background: #fafafa; border-top: 1px solid #f1f1f1; padding: 20px 24px; }
         
-        /* New Meta Row Layout */
+        /* Meta Row: Separated Boxes */
         .meta-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .meta-left-group { 
-            display: flex; align-items: center; gap: 10px; 
-            background: #fff; padding: 6px 15px; border-radius: 10px; border: 1px solid #eee;
+            display: flex; align-items: center; gap: 8px; 
+            background: #fff; border: 1px solid #eee; border-radius: 8px;
+            padding: 6px 14px; transition: 0.2s;
         }
-        .meta-sub-item { display: flex; flex-direction: column; line-height: 1.2; padding: 0 10px; border-right: 1px solid #eee; }
-        .meta-sub-item:last-child { border-right: none; }
-        
+        .meta-left-group:hover { border-color: var(--bquest-accent); }
+        .meta-label { font-size: 0.65rem; font-weight: 700; color: #aaa; text-transform: uppercase; margin-right: 4px; }
+        .meta-value { font-size: 0.82rem; font-weight: 600; color: #333; }
         .last-update-text { font-size: 0.7rem; color: #bbb; font-weight: 400; }
 
-        /* Role & Detail Layout */
-        .role-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; min-height: 220px; }
+        /* Role & Detail Box Styling */
+        .role-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; min-height: 225px; }
         .detail-box { 
             background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; 
-            height: 220px; overflow-y: auto; overflow-x: hidden; word-wrap: break-word;
+            height: 225px; overflow-y: auto; overflow-x: hidden; word-wrap: break-word;
         }
-
         .detail-box::-webkit-scrollbar { width: 4px; }
         .detail-box::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
 
@@ -65,10 +74,11 @@
         .role-label { color: #888; width: 65px; }
         .role-value { font-weight: 600; color: #333; text-align: right; flex: 1; }
 
+        /* Status Dot & Divider */
         .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dot-progress { background-color: var(--bquest-accent); }
         .dot-done { background-color: #28a745; }
-        .divider { border-top: 1px dashed #eee; margin: 10px 0; }
+        .divider-status { border-bottom: 1px dashed #eee; margin: 8px 0 12px 0; }
     </style>
 </head>
 <body>
@@ -82,10 +92,12 @@
         </div>
     </div>
 </nav>
+
 <div class="sub-header-line shadow-sm">B-QUEST MISSION CONTROL</div>
 
 <div class="container mt-4">
     <div id="taskContainer"></div>
+    
     <div id="load-more-trigger" style="height: 100px;"></div>
 </div>
 
@@ -96,20 +108,32 @@
     let isFetching = false;
     let hasMore = true;
 
+    async function initPage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            const profile = await BQuest.getProfile(session.user.id);
+            if (profile) BQuest.setText("user-display", profile.nick_name || profile.full_name);
+        }
+        fetchQuests(true);
+    }
+
     async function fetchQuests(isFirstLoad = false) {
         if (isFetching || (!hasMore && !isFirstLoad)) return;
         isFetching = true;
+
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
 
         try {
             const { data, error } = await supabaseClient
                 .from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
+
             if (error) throw error;
             if (data.length < itemsPerPage) hasMore = false;
+
             renderCards(data);
             currentPage++;
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Fetch Error:", e); }
         finally { isFetching = false; }
     }
 
@@ -120,24 +144,32 @@
             const collapseId = `collapse-${task.id}`;
             
             const card = document.createElement("div");
-            card.className = "col-12";
+            card.className = "col-12 mb-3";
             card.innerHTML = `
                 <div class="quest-card ${isDone ? 'status-done' : 'status-progress'}">
-                    <div class="card-clickable d-flex align-items-center">
-                        <div class="flex-grow-1" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <h6 class="fw-bold mb-1">${task.task_name || 'Untitled'}</h6>
+                    <div class="card-clickable d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-1">${task.task_name || 'Untitled Mission'}</h6>
                             <span class="text-muted small">${task.account_name || '-'} | ${task.opportunity_name || '-'}</span>
                         </div>
-                        <div class="d-flex gap-5 px-4" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="deadline-box"><div class="dl-label">Designer DL</div><div class="dl-value">${task.designer_deadline || '-'}</div></div>
-                            <div class="deadline-box border-start ps-4"><div class="dl-label">Creative DL</div><div class="dl-value">${task.creative_deadline || '-'}</div></div>
+                        
+                        <div class="d-flex gap-5 px-4">
+                            <div class="deadline-box">
+                                <div class="dl-label">Designer DL</div>
+                                <div class="dl-value">${task.designer_deadline || '-'}</div>
+                            </div>
+                            <div class="deadline-box border-start ps-4">
+                                <div class="dl-label">Creative DL</div>
+                                <div class="dl-value">${task.creative_deadline || '-'}</div>
+                            </div>
                         </div>
-                        <div class="action-btns d-flex align-items-center gap-2">
+
+                        <div class="action-btns d-flex align-items-center gap-2" onclick="event.stopPropagation()">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.72rem;">Edit</button>
                             <div class="dropdown">
                                 <button class="btn btn-light btn-sm rounded-circle shadow-sm" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
-                                    <li><a class="dropdown-item small" href="#"><i class="bi bi-share me-2"></i> Share</a></li>
+                                    <li><a class="dropdown-item small" href="#"><i class="bi bi-share me-2"></i> Share Link</a></li>
                                     <li><a class="dropdown-item small text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete</a></li>
                                 </ul>
                             </div>
@@ -146,22 +178,25 @@
 
                     <div class="collapse" id="${collapseId}">
                         <div class="expanded-content">
+                            
                             <div class="meta-row">
-                                <div class="meta-left-group shadow-sm">
-                                    <div class="meta-sub-item">
-                                        <span class="meta-label">Owner</span>
-                                        <span class="meta-value">${task.owner || '-'}</span>
+                                <div class="d-flex gap-2">
+                                    <div class="meta-left-group shadow-sm">
+                                        <div class="small"><i class="bi bi-person-circle text-muted me-1"></i> <span class="meta-label">Owner:</span> <span class="meta-value">${task.owner || '-'}</span></div>
                                     </div>
-                                    <div class="meta-sub-item">
-                                        <span class="meta-label">Publish Date</span>
-                                        <span class="meta-value">${task.publish_date || '-'}</span>
+                                    <div class="meta-left-group shadow-sm">
+                                        <div class="small"><i class="bi bi-calendar3 text-muted me-1"></i> <span class="meta-label">Publish:</span> <span class="meta-value">${task.publish_date || '-'}</span></div>
                                     </div>
-                                    <div class="meta-sub-item pe-0">
-                                        ${task.link ? `<a href="${task.link}" target="_blank" class="text-secondary"><i class="bi bi-box-arrow-up-right"></i></a>` : '<span class="meta-label">No Link</span>'}
+                                    <div class="meta-left-group shadow-sm">
+                                        <div class="small">
+                                            <i class="bi bi-link-45deg text-muted me-1"></i> 
+                                            <span class="meta-label">Link:</span> 
+                                            <span class="meta-value">${task.link ? `<a href="${task.link}" target="_blank" class="text-primary text-decoration-none fw-bold">Open Link</a>` : '-'}</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="last-update-text">
-                                    Last Update : ${task.updated_at ? new Date(task.updated_at).toLocaleDateString() : '-'}
+                                    Last Update : ${task.last_update ? new Date(task.last_update).toLocaleDateString() : '-'}
                                 </div>
                             </div>
 
@@ -169,29 +204,37 @@
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-success"><i class="bi bi-brush"></i> Designer</div>
-                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status || '-'}</span></div>
+                                        <div class="role-item">
+                                            <span class="role-label">Status</span>
+                                            <span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status || '-'}</span>
+                                        </div>
+                                        <div class="divider-status"></div>
                                         <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign || '-'}</span></div>
-                                        <div class="divider"></div>
-                                        <div class="role-item"><span class="role-label">Deadline</span><span class="role-value text-primary fw-bold">${task.designer_deadline || '-'}</span></div>
+                                        <div class="role-item mt-3"><span class="role-label">Deadline</span><span class="role-value text-primary fw-bold">${task.designer_deadline || '-'}</span></div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-dark"><i class="bi bi-rocket-takeoff"></i> Creative</div>
-                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status || '-'}</span></div>
+                                        <div class="role-item">
+                                            <span class="role-label">Status</span>
+                                            <span class="role-value"><span class="dot dot-progress"></span>${task.creative_status || '-'}</span>
+                                        </div>
+                                        <div class="divider-status"></div>
                                         <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign || '-'}</span></div>
-                                        <div class="divider"></div>
-                                        <div class="role-item"><span class="role-label">Deadline</span><span class="role-value text-secondary fw-bold">${task.creative_deadline || '-'}</span></div>
+                                        <div class="role-item mt-3"><span class="role-label">Deadline</span><span class="role-value text-secondary fw-bold">${task.creative_deadline || '-'}</span></div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-6">
                                     <div class="detail-box shadow-sm">
                                         <div class="info-tag sticky-top bg-white pb-1"><i class="bi bi-text-left"></i> Detail</div>
-                                        <div class="small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${task.detail || 'ไม่มีรายละเอียด...'}</div>
+                                        <div class="small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${task.detail || 'ไม่มีรายละเอียดเพิ่มเติม'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -203,12 +246,15 @@
         });
     }
 
+    // --- Seamless Scroll Logic (Pre-fetching) ---
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !isFetching && hasMore) fetchQuests();
     }, { rootMargin: '600px' });
+
     observer.observe(document.getElementById('load-more-trigger'));
 
-    fetchQuests(true);
+    // Start Init
+    initPage();
 </script>
 
 </body>
