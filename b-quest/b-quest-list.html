@@ -39,44 +39,40 @@
         .status-done { border-left-color: var(--status-done); }
         .status-progress { border-left-color: var(--status-progress); }
 
-        .card-clickable { cursor: pointer; padding: 20px 28px; }
-        .action-btns { opacity: 0; transition: 0.2s ease; }
+        .card-clickable { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
+        .action-btns { opacity: 0; transition: 0.2s ease; width: 100px; display: flex; justify-content: flex-end; }
         .quest-card:hover .action-btns { opacity: 1; }
 
-        /* --- Header Deadline Styles --- */
-        .deadline-group { display: flex; gap: 30px; margin: 0 40px; } /* ขยับเข้าหากลางมากขึ้น */
-        .header-dl-item { text-align: center; }
-        .header-dl-label { font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        /* ล็อคตำแหน่ง Header ให้ตรงกันทุกการ์ด */
+        .project-info { flex: 1; min-width: 0; }
+        .deadline-group { display: flex; gap: 20px; width: 340px; justify-content: center; } /* ล็อคความกว้างเพื่อให้ตรงกัน */
         
-        /* กล่อง Deadline ใน Header */
+        .header-dl-item { width: 150px; text-align: center; }
+        .header-dl-label { font-size: 0.58rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        
         .dl-pill { 
-            background: #f8fafc; border-radius: 8px; padding: 4px 12px; 
-            font-size: 0.82rem; font-weight: 700; color: var(--text-dark);
-            border: 1px solid #edf2f7; transition: 0.2s;
+            background: #f8fafc; border-radius: 8px; padding: 4px 10px; 
+            font-size: 0.8rem; font-weight: 700; color: var(--text-dark);
+            border: 1px solid #edf2f7;
         }
-        .dl-active-des { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; } /* เมื่อมี Deadline Designer */
-        .dl-active-cre { background: #f1f5f9; color: #334155; border-color: #e2e8f0; } /* เมื่อมี Deadline Creative */
-        .dl-none { color: #cbd5e1; font-weight: 400; border-color: transparent; background: transparent; }
-
-        .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
-        .sub-header-line { background: var(--status-progress); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; color: #fff; }
+        .dl-active-des { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
+        .dl-active-cre { background: #f1f5f9; color: #334155; border-color: #e2e8f0; }
+        .dl-none { color: #e2e8f0; font-weight: 400; border-color: transparent; background: transparent; }
 
         .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
-        
-        .meta-pill { 
-            background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
         .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .meta-value { font-size: 0.85rem; font-weight: 600; }
 
-        .last-update-text { font-size: 0.72rem; color: #94a3b8; font-weight: 400; display: flex; align-items: center; gap: 5px; }
+        .last-update-text { font-size: 0.72rem; color: #cbd5e1; font-weight: 400; display: flex; align-items: center; gap: 5px; }
         .section-title { font-size: 0.82rem; font-weight: 700; color: var(--section-title); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
         .role-card, .detail-box { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
         .detail-box { overflow-y: auto; overflow-x: hidden; line-height: 1.7; font-size: 0.92rem; word-break: break-word; }
-        .detail-box::-webkit-scrollbar { width: 3px; }
-        .detail-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        
+        /* Stealth Mode: จางมากเป็นพิเศษ */
+        .role-card.is-empty { opacity: 0.2; background-color: #fcfcfc; border-style: dashed; }
+        .no-assign-text { margin-top: 50px; color: #cbd5e1; font-weight: 300; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; }
 
         .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; }
         .role-label { color: var(--text-muted); font-weight: 400; }
@@ -88,7 +84,6 @@
         .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
         
         .btn-link-premium { background: var(--text-dark); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
-
         .col-30 { width: 30%; }
         .col-40 { width: 40%; }
     </style>
@@ -130,8 +125,7 @@
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
         try {
-            const { data, error } = await supabaseClient
-                .from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
+            const { data, error } = await supabaseClient.from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
             if (error) throw error;
             if (data.length < itemsPerPage) hasMore = false;
             renderCards(data);
@@ -144,11 +138,9 @@
         const container = document.getElementById("taskContainer");
         data.forEach(task => {
             const isDone = (task.designer_status === 'Done');
-            const hasDesigner = !!task.designer;
-            const hasCreative = !!task.creative;
+            const hasDes = !!task.designer && task.designer !== '-';
+            const hasCre = !!task.creative && task.creative !== '-';
             const collapseId = `collapse-${task.id}`;
-            
-            // Logic เช็ค Deadline เพื่อใส่สี
             const dDL = task.designer_deadline && task.designer_deadline !== '-' ? task.designer_deadline : null;
             const cDL = task.creative_deadline && task.creative_deadline !== '-' ? task.creative_deadline : null;
 
@@ -156,8 +148,8 @@
             card.className = "col-12";
             card.innerHTML = `
                 <div class="quest-card ${isDone ? 'status-done' : 'status-progress'}">
-                    <div class="card-clickable d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                        <div class="flex-grow-1">
+                    <div class="card-clickable" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                        <div class="project-info">
                             <h6 class="fw-bold mb-1" style="color: var(--text-dark);">${task.task_name || 'Untitled Project'}</h6>
                             <span class="text-muted small">${task.account_name} | ${task.opportunity_name}</span>
                         </div>
@@ -173,9 +165,9 @@
                             </div>
                         </div>
 
-                        <div class="action-btns d-flex align-items-center gap-2" onclick="event.stopPropagation()">
-                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.75rem;">Edit</button>
-                            <button class="btn btn-light btn-sm rounded-circle border shadow-sm" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                        <div class="action-btns" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Edit</button>
+                            <button class="btn btn-link btn-sm text-muted py-0" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                         </div>
                     </div>
 
@@ -195,28 +187,28 @@
                             <div class="d-flex gap-4">
                                 <div class="col-30">
                                     <div class="section-title"><i class="bi bi-brush"></i> Designer</div>
-                                    <div class="role-card ${!hasDesigner ? 'is-empty' : ''}">
-                                        ${hasDesigner ? `
+                                    <div class="role-card ${!hasDes ? 'is-empty' : ''}">
+                                        ${hasDes ? `
                                             <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div>
                                             <div class="divider-status"></div>
                                             <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div>
                                             <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer}</span></div>
                                             <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign}</span></div>
-                                            <div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${task.designer_deadline}</span></div>
-                                        ` : '<div class="text-center mt-5 text-muted small">No Assignment</div>'}
+                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${task.designer_deadline}</span></div>
+                                        ` : '<div class="text-center no-assign-text">No Assignment</div>'}
                                     </div>
                                 </div>
                                 <div class="col-30">
                                     <div class="section-title"><i class="bi bi-rocket"></i> Creative</div>
-                                    <div class="role-card ${!hasCreative ? 'is-empty' : ''}">
-                                        ${hasCreative ? `
+                                    <div class="role-card ${!hasCre ? 'is-empty' : ''}">
+                                        ${hasCre ? `
                                             <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div>
                                             <div class="divider-status"></div>
                                             <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div>
                                             <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative}</span></div>
                                             <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign}</span></div>
-                                            <div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${task.creative_deadline}</span></div>
-                                        ` : '<div class="text-center mt-5 text-muted small">No Assignment</div>'}
+                                            <div class="role-item mt-2"><span class="role-label text-dark">Deadline</span><span class="role-value fw-bold">${task.creative_deadline}</span></div>
+                                        ` : '<div class="text-center no-assign-text">No Assignment</div>'}
                                     </div>
                                 </div>
                                 <div class="col-40">
