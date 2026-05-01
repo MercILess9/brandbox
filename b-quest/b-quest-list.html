@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B-QUEST | Master Dashboard</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
@@ -16,80 +16,90 @@
 
     <style>
         :root { 
-            --bquest-accent: #bdc432; 
-            --bg-body: #f4f7f6;
+            --status-progress: #0a4da2; /* Deep Blue หรู */
+            --status-done: #475569;     /* Slate Grey หรู */
+            --bg-body: #f8fafc;
             --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --card-radius: 20px; /* เพิ่มความมนให้ดูนุ่มนวล */
+            --text-muted: #94a3b8;
+            --card-radius: 20px;
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding-bottom: 50px; }
 
-        /* --- Transitions & Effects --- */
         .collapse { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        
         .quest-card {
-            background: white; border: 1px solid #edf2f7; border-radius: var(--card-radius); margin-bottom: 15px;
-            transition: 0.3s ease; border-left: 6px solid #cbd5e1;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            background: white; border: 1px solid #f1f5f9; border-radius: var(--card-radius); margin-bottom: 15px;
+            transition: 0.3s ease; border-left: 6px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         }
-        .quest-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
-        .status-done { border-left-color: #10b981; }
-        .status-progress { border-left-color: var(--bquest-accent); }
+        .quest-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.05); }
+        
+        /* สีกรอบสถานะใหม่ */
+        .status-done { border-left-color: var(--status-done); }
+        .status-progress { border-left-color: var(--status-progress); }
 
         .card-clickable { cursor: pointer; padding: 22px 28px; }
         .action-btns { opacity: 0; transition: 0.2s ease; }
         .quest-card:hover .action-btns { opacity: 1; }
 
-        /* --- Header UI --- */
         .main-header { background: #fff; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
-        .sub-header-line { background: var(--bquest-accent); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; }
+        .sub-header-line { background: var(--status-progress); height: 38px; display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 0.85rem; color: #fff; }
 
         .deadline-box { min-width: 150px; text-align: center; }
         .dl-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .dl-value { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
 
-        /* --- Expanded UI --- */
-        .expanded-content { background: #fcfcfc; border-top: 1px solid #f1f5f9; padding: 25px; }
+        /* Expanded UI */
+        .expanded-content { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         
         .meta-pill { 
-            background: white; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 14px;
+            background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px;
             display: flex; align-items: center; gap: 8px;
         }
         .meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .meta-value { font-size: 0.85rem; font-weight: 600; }
 
+        /* Last Update บางลง */
+        .last-update-text { font-size: 0.68rem; color: #cbd5e1; font-weight: 300; letter-spacing: 0.02em; }
+
+        /* หัวข้อ Label & Icon สีเดียวกับข้อความ */
         .section-title { 
-            font-size: 0.85rem; font-weight: 700; color: var(--text-dark); 
+            font-size: 0.8rem; font-weight: 700; color: var(--text-muted); 
             text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
         }
+        .section-title i { color: var(--text-muted); font-size: 0.9rem; }
 
-        .role-card { background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #f1f5f9; height: 240px; }
-        .role-card.is-empty { opacity: 0.4; background-color: #f8fafc; border-style: dashed; }
-        
-        .detail-box { 
-            background: white; border-radius: var(--card-radius); padding: 20px; border: 1px solid #f1f5f9; 
-            height: 240px; overflow-y: auto; line-height: 1.7; font-size: 0.95rem;
+        /* กล่อง Detail & Role ความสูง 200px */
+        .role-card, .detail-box { 
+            background: white; border-radius: var(--card-radius); padding: 20px; 
+            border: 1px solid #eef2f6; height: 200px; transition: 0.2s;
         }
-        .detail-box::-webkit-scrollbar { width: 4px; }
-        .detail-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .detail-box { 
+            overflow-y: auto; line-height: 1.7; font-size: 0.92rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01); /* เงาจางๆ ในกล่องให้ชัดขึ้น */
+        }
+        .role-card.is-empty { opacity: 0.3; background-color: #fcfcfc; border-style: dashed; }
+        
+        .detail-box::-webkit-scrollbar { width: 3px; }
+        .detail-box::-webkit-scrollbar-thumb { background: #f1f5f9; border-radius: 10px; }
 
-        .role-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
-        .role-label { color: var(--text-muted); font-weight: 500; }
+        .role-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; }
+        .role-label { color: var(--text-muted); font-weight: 400; }
         .role-value { font-weight: 600; }
 
-        .dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        .dot-progress { background-color: var(--bquest-accent); }
-        .dot-done { background-color: #10b981; }
+        /* จุดสถานะสีใหม่ */
+        .dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .dot-progress { background-color: var(--status-progress); box-shadow: 0 0 6px rgba(10,77,162,0.3); }
+        .dot-done { background-color: var(--status-done); }
         
-        /* ขีดเส้นใต้ Status จางๆ */
-        .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 8px 0 12px 0; }
+        .divider-status { border-bottom: 1px dashed #f1f5f9; margin: 6px 0 10px 0; }
         
         .btn-link-premium {
-            background: #334155; border: none; border-radius: 12px;
-            padding: 8px 18px; font-size: 0.8rem; font-weight: 600; color: #fff;
+            background: var(--text-dark); border: none; border-radius: 10px;
+            padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff;
             transition: 0.3s; text-decoration: none; display: flex; align-items: center; gap: 6px;
         }
-        .btn-link-premium:hover { background: #000; color: #fff; }
 
         .col-30 { width: 30%; }
         .col-40 { width: 40%; }
@@ -101,7 +111,7 @@
     <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
         <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" style="height: 32px;">
         <div class="d-flex align-items-center gap-4">
-            <span id="user-display" class="small fw-600">...</span>
+            <span id="user-display" class="small fw-600 text-muted">...</span>
             <button class="btn btn-dark btn-sm rounded-pill px-4" onclick="BQuest.logout()">Logout</button>
         </div>
     </div>
@@ -131,7 +141,6 @@
         isFetching = true;
         const from = currentPage * itemsPerPage;
         const to = from + itemsPerPage - 1;
-
         try {
             const { data, error } = await supabaseClient
                 .from('b-quest-list').select('*').range(from, to).order('id', { ascending: false });
@@ -157,87 +166,63 @@
                 <div class="quest-card ${isDone ? 'status-done' : 'status-progress'}">
                     <div class="card-clickable d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                         <div class="flex-grow-1">
-                            <h6 class="fw-bold mb-1">${task.task_name || 'Untitled Project'}</h6>
+                            <h6 class="fw-bold mb-1" style="color: var(--text-dark);">${task.task_name || 'Untitled'}</h6>
                             <span class="text-muted small">${task.account_name} | ${task.opportunity_name}</span>
                         </div>
                         <div class="d-flex gap-5 px-4">
-                            <div class="deadline-box">
-                                <div class="dl-label">Designer Deadline</div>
-                                <div class="dl-value">${task.designer_deadline || '-'}</div>
-                            </div>
-                            <div class="deadline-box border-start ps-4">
-                                <div class="dl-label">Creative Deadline</div>
-                                <div class="dl-value">${task.creative_deadline || '-'}</div>
-                            </div>
+                            <div class="deadline-box"><div class="dl-label">Designer Deadline</div><div class="dl-value">${task.designer_deadline || '-'}</div></div>
+                            <div class="deadline-box border-start ps-4"><div class="dl-label">Creative Deadline</div><div class="dl-value">${task.creative_deadline || '-'}</div></div>
                         </div>
                         <div class="action-btns d-flex align-items-center gap-2" onclick="event.stopPropagation()">
-                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3">Edit</button>
+                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.75rem;">Edit</button>
                             <button class="btn btn-light btn-sm rounded-circle border shadow-sm" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius:15px;">
-                                <li><a class="dropdown-item small fw-600" href="#"><i class="bi bi-share me-2"></i> Share</a></li>
-                                <li><a class="dropdown-item small fw-600 text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete</a></li>
-                            </ul>
                         </div>
                     </div>
 
                     <div class="collapse" id="${collapseId}">
                         <div class="expanded-content">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div class="d-flex gap-3">
-                                    <div class="meta-pill shadow-sm">
-                                        <span class="meta-label">Owner</span>
-                                        <span class="meta-value">${task.owner || '-'}</span>
-                                    </div>
-                                    <div class="meta-pill shadow-sm">
-                                        <span class="meta-label">Publish Date</span>
-                                        <span class="meta-value">${task.publish_date || '-'}</span>
-                                    </div>
+                                <div class="d-flex gap-2">
+                                    <div class="meta-pill shadow-sm"><span class="meta-label">Owner</span><span class="meta-value">${task.owner || '-'}</span></div>
+                                    <div class="meta-pill shadow-sm"><span class="meta-label">Publish</span><span class="meta-value">${task.publish_date || '-'}</span></div>
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="btn-link-premium shadow-sm"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
                                 <div class="last-update-text">
-                                    <i class="bi bi-clock-history me-1"></i> Update: ${task.last_update ? new Date(task.last_update).toLocaleDateString() : '-'}
+                                    Last Update : ${task.last_update ? new Date(task.last_update).toLocaleDateString() : '-'}
                                 </div>
                             </div>
 
                             <div class="d-flex gap-4">
                                 <div class="col-30">
-                                    <div class="section-title"><i class="bi bi-brush text-success"></i> Designer Role</div>
+                                    <div class="section-title"><i class="bi bi-brush"></i> Designer</div>
                                     <div class="role-card ${!hasDesigner ? 'is-empty' : ''}">
                                         ${hasDesigner ? `
-                                            <div class="role-item">
-                                                <span class="role-label">Status</span>
-                                                <span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status || '-'}</span>
-                                            </div>
+                                            <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div>
                                             <div class="divider-status"></div>
-                                            <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type || '-'}</span></div>
-                                            <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer || '-'}</span></div>
-                                            <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign || '-'}</span></div>
-                                            <div class="role-item mt-3"><span class="role-label">Deadline</span><span class="role-value fw-bold">${task.designer_deadline || '-'}</span></div>
+                                            <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div>
+                                            <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer}</span></div>
+                                            <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${task.designer_deadline}</span></div>
                                         ` : '<div class="text-center mt-5 text-muted small">No Assignment</div>'}
                                     </div>
                                 </div>
-
                                 <div class="col-30">
-                                    <div class="section-title"><i class="bi bi-rocket text-primary"></i> Creative Role</div>
+                                    <div class="section-title"><i class="bi bi-rocket"></i> Creative</div>
                                     <div class="role-card ${!hasCreative ? 'is-empty' : ''}">
                                         ${hasCreative ? `
-                                            <div class="role-item">
-                                                <span class="role-label">Status</span>
-                                                <span class="role-value"><span class="dot dot-progress"></span>${task.creative_status || '-'}</span>
-                                            </div>
+                                            <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div>
                                             <div class="divider-status"></div>
-                                            <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type || '-'}</span></div>
-                                            <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative || '-'}</span></div>
-                                            <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign || '-'}</span></div>
-                                            <div class="role-item mt-3"><span class="role-label">Deadline</span><span class="role-value fw-bold">${task.creative_deadline || '-'}</span></div>
+                                            <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div>
+                                            <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative}</span></div>
+                                            <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative_assign}</span></div>
+                                            <div class="role-item mt-2"><span class="role-label">Deadline</span><span class="role-value fw-bold">${task.creative_deadline}</span></div>
                                         ` : '<div class="text-center mt-5 text-muted small">No Assignment</div>'}
                                     </div>
                                 </div>
-
                                 <div class="col-40">
-                                    <div class="section-title"><i class="bi bi-file-earmark-text text-secondary"></i> Detailed Brief</div>
+                                    <div class="section-title"><i class="bi bi-justify-left"></i> Detail</div>
                                     <div class="detail-box">
-                                        <div style="white-space: pre-wrap;">${task.detail || 'ไม่มีรายละเอียดเพิ่มเติม'}</div>
+                                        <div style="white-space: pre-wrap;">${task.detail || '...'}</div>
                                     </div>
                                 </div>
                             </div>
