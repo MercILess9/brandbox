@@ -149,7 +149,7 @@
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="text-secondary"><i class="bi bi-box-arrow-up-right"></i></a>` : ''}
                                 </div>
                                 <div class="d-flex align-items-center gap-3">
-                                    <span class="small fw-600 text-muted">OWNER: <span class="text-dark">${task.owner || '-'}</span></span>
+                                    <span class="small fw-600 text-muted">OWNER: <span class="text-dark">${task.owner}</span></span>
                                     <span style="font-size: 0.65rem; color: #bbb;">Update: ${task.updated_at ? new Date(task.updated_at).toLocaleDateString() : '-'}</span>
                                 </div>
                             </div>
@@ -157,10 +157,10 @@
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-success"><i class="bi bi-brush"></i> Designer</div>
-                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status || 'Pending'}</span></div>
-                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type || '-'}</span></div>
-                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer_work || '-'}</span></div>
-                                        <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer || '-'}</span></div>
+                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot ${isDone?'dot-done':'dot-progress'}"></span>${task.designer_status}</span></div>
+                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.designer_type}</span></div>
+                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.designer || '-'}</span></div>
+                                        <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.designer_assign || '-'}</span></div>
                                         <div class="divider"></div>
                                         <div class="role-item"><span class="role-label">Deadline</span><span class="role-value text-primary fw-bold">${task.designer_deadline || '-'}</span></div>
                                     </div>
@@ -168,9 +168,9 @@
                                 <div class="col-md-3">
                                     <div class="role-card shadow-sm">
                                         <div class="info-tag text-dark"><i class="bi bi-rocket-takeoff"></i> Creative</div>
-                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status || 'On Progress'}</span></div>
-                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type || '-'}</span></div>
-                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative_work || '-'}</span></div>
+                                        <div class="role-item"><span class="role-label">Status</span><span class="role-value"><span class="dot dot-progress"></span>${task.creative_status}</span></div>
+                                        <div class="role-item"><span class="role-label">Type</span><span class="role-value">${task.creative_type}</span></div>
+                                        <div class="role-item"><span class="role-label">Work</span><span class="role-value">${task.creative || '-'}</span></div>
                                         <div class="role-item"><span class="role-label">Assign</span><span class="role-value">${task.creative || '-'}</span></div>
                                         <div class="divider"></div>
                                         <div class="role-item"><span class="role-label">Deadline</span><span class="role-value text-secondary fw-bold">${task.creative_deadline || '-'}</span></div>
@@ -179,7 +179,7 @@
                                 <div class="col-md-6">
                                     <div class="detail-box shadow-sm">
                                         <div class="info-tag sticky-top bg-white pb-1"><i class="bi bi-text-left"></i> Detail</div>
-                                        <div class="small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${task.detail || 'ไม่มีรายละเอียด...'}</div>
+                                        <div class="small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${task.detail}</div>
                                     </div>
                                 </div>
                             </div>
