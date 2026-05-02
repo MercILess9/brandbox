@@ -127,35 +127,58 @@
 </div>
 
 <script>
-    // สคริปต์จัดการตัวเองภายใน Modal
-    (function autoInitModal() {
-        // ใช้ setInterval เพื่อเช็กว่า Element พร้อมหรือยัง (กรณี DOM Render ช้า)
+    (function debugModalInit() {
+        console.log("--- 🕵️ Start Debugging Modal Init ---");
+
+        // 1. เช็กตัวแปร Config
+        if (typeof B_QUEST_CONFIG === 'undefined') {
+            console.error("❌ Error: B_QUEST_CONFIG is not defined! (ไฟล์ config.js อาจจะโหลดไม่เข้า)");
+        } else {
+            console.log("✅ Config Found:", B_QUEST_CONFIG);
+            console.log("📋 ListTypes in Config:", B_QUEST_CONFIG.listTypes);
+        }
+
+        let attempts = 0;
+        const maxAttempts = 20; // ลอง 20 ครั้ง (2 วินาที)
+
         const checkExist = setInterval(() => {
+            attempts++;
             const desType = document.getElementById('designer_type');
             const creType = document.getElementById('creative_type');
 
+            // 2. เช็กว่าเจอ Element ไหม
             if (desType && creType) {
-                console.log("Modal Elements Ready! Injecting Types...");
+                console.log(`✅ Elements Found at attempt #${attempts}`);
                 
                 const types = (typeof B_QUEST_CONFIG !== 'undefined') ? B_QUEST_CONFIG.listTypes : [];
                 
-                [desType, creType].forEach(el => {
-                    if (el.options.length <= 1) { // ป้องกันการหยอดซ้ำ
-                        el.innerHTML = '<option value="">- Select Type -</option>';
-                        types.forEach(t => {
-                            const opt = document.createElement('option');
-                            opt.value = t;
-                            opt.textContent = t;
-                            el.appendChild(opt);
-                        });
-                    }
-                });
-                
-                clearInterval(checkExist); // หยอดเสร็จแล้วเลิกเช็ก
-            }
-        }, 100); // เช็กทุก 100ms
+                if (!types || types.length === 0) {
+                    console.warn("⚠️ Warning: types array is empty or undefined!");
+                }
 
-        // เผื่อไว้อีกชั้น: ถ้า 3 วินาทียังไม่มาให้หยุดเช็ก (ป้องกันลูปนรก)
-        setTimeout(() => clearInterval(checkExist), 3000);
+                [desType, creType].forEach(el => {
+                    console.log(`💉 Injecting into: ${el.id}`);
+                    el.innerHTML = '<option value="">- Select Type -</option>';
+                    types.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t;
+                        opt.textContent = t;
+                        el.appendChild(opt);
+                    });
+                });
+
+                console.log("✨ Injection Completed!");
+                clearInterval(checkExist);
+            } else {
+                if (attempts >= maxAttempts) {
+                    console.error("❌ Error: Modal Elements NOT FOUND after 2 seconds!");
+                    console.log("DOM State:", { 
+                        body: document.body.innerHTML.substring(0, 500) + "...",
+                        hasTaskModal: !!document.getElementById('taskModal') 
+                    });
+                    clearInterval(checkExist);
+                }
+            }
+        }, 100);
     })();
 </script>
