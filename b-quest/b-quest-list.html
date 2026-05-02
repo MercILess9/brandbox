@@ -440,11 +440,16 @@
     }
 
     async function initPage() {
-        await System.initLayout(B_QUEST_CONFIG);
-        await System.loadModal('./b-quest-modal.html'); // Updated path
-        await loadMasterData();
-        fetchQuests(true);
-    }
+    // 1. โหลด Layout และ Navbar
+    await System.initLayout(B_QUEST_CONFIG);
+    
+    // 2. โหลดไฟล์ Modal เข้ามาใน DOM (รอให้เสร็จก่อนไปต่อ)
+    await System.loadModal('./b-quest-modal.html'); 
+    
+    // 3. เมื่อ Modal มาแล้วค่อยดึงข้อมูลมาแสดง
+    await loadMasterData();
+    fetchQuests(true);
+}
 
     // Filters event listeners
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
