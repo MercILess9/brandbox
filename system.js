@@ -10,31 +10,40 @@ function getCorrectPath(target) {
 }
 
 function getCurrentPage() {
-    return window.location.pathname.split("/").pop() || "index.html";
+    // ปรับให้รองรับ Vercel ที่บางทีไม่มี .html
+    let page = window.location.pathname.split("/").pop() || "index.html";
+    if (!page.includes(".")) page += ".html"; 
+    return page;
 }
 
 function safeRedirect(to) {
     const targetUrl = getCorrectPath(to);
+    // เช็กจาก URL เต็มๆ เพื่อหยุด Loop
     if (window.location.href !== targetUrl) {
         window.location.href = targetUrl;
     }
 }
 
 async function initAuthGuard() {
-    const currentPage = getCurrentPage();
     const { data: { session } } = await supabaseClient.auth.getSession();
+    const page = getCurrentPage();
+    const isPublic = publicPages.includes(page);
 
-    if (!session && !publicPages.includes(currentPage) && currentPage !== "index.html") {
+    // ❌ ไม่มี session + อยู่หน้าทำงาน -> ไป Login
+    if (!session && !isPublic && page !== "index.html") {
         safeRedirect("login.html");
-    } else if (session && publicPages.includes(currentPage)) {
+    } 
+    // ✔ มี session + อยู่หน้า Login -> ไปหน้า Dashboard
+    else if (session && isPublic) {
         safeRedirect("index.html");
     }
 
+    // ดักฟังการเปลี่ยนสถานะ (เช่น Logout)
     supabaseClient.auth.onAuthStateChange((event, session) => {
-        const page = getCurrentPage();
-        if (!session && !publicPages.includes(page) && page !== "index.html") {
+        const currPage = getCurrentPage();
+        if (event === 'SIGNED_OUT') {
             safeRedirect("login.html");
-        } else if (session && publicPages.includes(page)) {
+        } else if (event === 'SIGNED_IN' && publicPages.includes(currPage)) {
             safeRedirect("index.html");
         }
     });
@@ -45,15 +54,10 @@ const BQuest = {
         await supabaseClient.auth.signOut();
         localStorage.clear();
         sessionStorage.clear();
-        safeRedirect("login.html");
+        // ไม่ต้องสั่ง redirect ตรงนี้ เดี๋ยว onAuthStateChange จัดการให้เอง
     },
-
     async getProfile(userId) {
-        const { data, error } = await supabaseClient
-            .from("profiles")
-            .select("*")
-            .eq("id", userId)
-            .single();
+        const { data, error } = await supabaseClient.from("profiles").select("*").eq("id", userId).single();
         return error ? null : data;
     }
 };
