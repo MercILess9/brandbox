@@ -128,6 +128,7 @@ const System = {
         console.error("Load Modal Fail:", e);
     }
 }
+};
 
 // ==========================================
 // 4. AUTH GUARD & STATE WATCHER
