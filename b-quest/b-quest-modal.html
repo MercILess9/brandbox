@@ -1,52 +1,53 @@
 <style>
-    /* ปรับความกว้างให้เหมาะสม (ประมาณ 800px) ไม่กว้างจนหลุดสายตา */
-    .bq-modal-custom { max-width: 850px !important; }
-    .bq-form-container { border-radius: 24px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    /* กว้าง 1000px ตามสั่ง */
+    .bq-modal-1000 { max-width: 1000px !important; }
+    .bq-form-container { border-radius: 28px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
     
-    .bq-form-header { padding: 20px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
-    .bq-form-body { padding: 25px 30px; background: #f8fafc; }
-    .bq-form-footer { padding: 18px 30px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 12px; }
+    .bq-form-header { padding: 25px 35px; background: #fff; border-bottom: 1px solid #f1f5f9; }
+    .bq-form-body { padding: 35px; background: #f8fafc; }
+    .bq-form-footer { padding: 20px 35px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 15px; }
 
-    /* Card Layout */
+    /* Left Side Card Only */
     .bq-card-section { 
-        background: #ffffff; border-radius: 20px; padding: 22px; 
+        background: #ffffff; border-radius: 24px; padding: 28px; 
         border: 1px solid #eef2f6; height: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
-    .bq-card-dark { background: #fcfcfc; border: 1px solid #e2e8f0; }
 
-    /* Label & Input */
+    /* Form Elements */
     .bq-label { 
-        font-size: 0.7rem; font-weight: 800; color: #64748b; 
-        display: flex; align-items: center; gap: 8px;
-        margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+        font-size: 0.72rem; font-weight: 800; color: #64748b; 
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.8px;
     }
-    .bq-label i { font-size: 0.9rem; color: #bdc432; }
+    .bq-label i { font-size: 1rem; color: #bdc432; }
 
     .bq-input { 
-        width: 100%; border-radius: 12px; border: 1px solid #e2e8f0; 
-        padding: 9px 14px; font-size: 0.9rem; background: #ffffff;
-        transition: all 0.2s; margin-bottom: 15px; color: #1e293b;
+        width: 100%; border-radius: 14px; border: 1px solid #e2e8f0; 
+        padding: 12px 16px; font-size: 0.95rem; background: #ffffff;
+        transition: all 0.2s; margin-bottom: 22px; color: #1e293b;
     }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.15); }
-    
-    /* ปรับช่องสุดท้ายของกลุ่มไม่ให้มี margin */
     .bq-input:last-child { margin-bottom: 0; }
 
+    /* Special style for floating elements */
+    .bq-input-floating { background: transparent; border-color: #cbd5e1; }
+    .bq-input-floating:focus { background: #fff; }
+
     /* Button Styles */
-    .btn-bq-save { background: #1e293b; color: #bdc432; border-radius: 12px; padding: 10px 30px; font-weight: 700; border: none; transition: 0.2s; }
-    .btn-bq-save:hover { background: #0f172a; transform: translateY(-1px); }
-    .btn-bq-cancel { color: #64748b; font-weight: 600; text-decoration: none; font-size: 0.9rem; padding: 10px 15px; }
+    .btn-bq-save { background: #1e293b; color: #bdc432; border-radius: 14px; padding: 12px 40px; font-weight: 700; border: none; transition: 0.2s; }
+    .btn-bq-save:hover { background: #000; transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .btn-bq-cancel { color: #64748b; font-weight: 600; text-decoration: none; font-size: 0.95rem; padding: 12px 20px; }
 
     .edit-only { display: none !important; }
     .is-edit .edit-only { display: flex !important; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog bq-modal-custom modal-dialog-centered">
+    <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content bq-form-container" id="b-quest-modal-content">
             
             <div class="bq-form-header d-flex justify-content-between align-items-center">
-                <h4 class="fw-800 m-0" id="b-quest-modal-label">New <span style="color: #bdc432;">Task</span></h4>
+                <h4 class="fw-800 m-0" id="b-quest-modal-label" style="font-size: 1.5rem; letter-spacing: -0.5px;">New <span style="color: #bdc432;">Task</span></h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -54,46 +55,44 @@
                 <div class="bq-form-body">
                     <input type="hidden" id="b-quest-modal-id" name="id">
                     
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-7">
+                    <div class="row g-5 mb-5">
+                        <div class="col-md-6">
                             <div class="bq-card-section">
                                 <label class="bq-label"><i class="bi bi-building"></i> Account Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name" placeholder="...">
+                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name" placeholder="ชื่อลูกค้า">
 
                                 <label class="bq-label"><i class="bi bi-gem"></i> Opportunity Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="...">
+                                <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="ชื่อโปรเจกต์">
 
                                 <label class="bq-label"><i class="bi bi-card-checklist"></i> Task Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" placeholder="...">
+                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" placeholder="ชื่อภารกิจ">
 
                                 <label class="bq-label"><i class="bi bi-link-45deg"></i> Reference Link</label>
                                 <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link" placeholder="https://...">
                             </div>
                         </div>
 
-                        <div class="col-md-5">
-                            <div class="bq-card-section bq-card-dark">
-                                <label class="bq-label"><i class="bi bi-calendar-check"></i> Publish Date</label>
-                                <input type="date" class="bq-input" id="b-quest-modal-publish-date" name="publish_date">
+                        <div class="col-md-6 py-2">
+                            <label class="bq-label" style="color: #1e293b;"><i class="bi bi-calendar-check"></i> Publish Date</label>
+                            <input type="date" class="bq-input bq-input-floating" id="b-quest-modal-publish-date" name="publish_date">
 
-                                <label class="bq-label"><i class="bi bi-body-text"></i> Description</label>
-                                <textarea class="bq-input m-0" id="b-quest-modal-detail" name="detail" rows="7" 
-                                    style="resize: none; height: 153px;" placeholder="..."></textarea>
-                            </div>
+                            <label class="bq-label" style="color: #1e293b;"><i class="bi bi-body-text"></i> Description & Detail</label>
+                            <textarea class="bq-input bq-input-floating m-0" id="b-quest-modal-detail" name="detail" rows="9" 
+                                style="resize: none; height: 215px;" placeholder="ระบุรายละเอียดงานที่นี่..."></textarea>
                         </div>
                     </div>
 
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="bq-card-section">
-                                <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.8rem; border-bottom: 2px solid #bdc432; padding-bottom: 5px;">
-                                    <i class="bi bi-brush"></i> Designer
+                                <div class="bq-label mb-4" style="color: #1e293b; font-size: 0.9rem; border-bottom: 3px solid #bdc432; padding-bottom: 8px; width: fit-content;">
+                                    <i class="bi bi-brush"></i> Designer Assignment
                                 </div>
                                 
                                 <label class="bq-label">Work Type</label>
                                 <select class="bq-input" id="b-quest-modal-designer-type" name="designer_type"></select>
 
-                                <label class="bq-label">Work List</label>
+                                <label class="bq-label">Staff Name</label>
                                 <select class="bq-input" id="b-quest-modal-designer-work" name="designer"></select>
 
                                 <label class="bq-label">Deadline</label>
@@ -103,14 +102,14 @@
 
                         <div class="col-md-6">
                             <div class="bq-card-section">
-                                <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.8rem; border-bottom: 2px solid #bdc432; padding-bottom: 5px;">
-                                    <i class="bi bi-rocket-takeoff"></i> Creative
+                                <div class="bq-label mb-4" style="color: #1e293b; font-size: 0.9rem; border-bottom: 3px solid #bdc432; padding-bottom: 8px; width: fit-content;">
+                                    <i class="bi bi-rocket-takeoff"></i> Creative Assignment
                                 </div>
 
                                 <label class="bq-label">Work Type</label>
                                 <select class="bq-input" id="b-quest-modal-creative-type" name="creative_type"></select>
 
-                                <label class="bq-label">Work List</label>
+                                <label class="bq-label">Staff Name</label>
                                 <select class="bq-input" id="b-quest-modal-creative-work" name="creative"></select>
 
                                 <label class="bq-label">Deadline</label>
@@ -123,7 +122,7 @@
                 <div class="bq-form-footer">
                     <button type="button" class="btn btn-link text-danger fw-bold edit-only me-auto text-decoration-none" 
                         onclick="BQuestService.deleteQuest(document.getElementById('b-quest-modal-id').value)">
-                        <i class="bi bi-trash3 me-1"></i> Delete
+                        <i class="bi bi-trash3 me-1"></i> Delete Task
                     </button>
                     <a href="#" class="btn-bq-cancel" data-bs-dismiss="modal">Cancel</a>
                     <button type="submit" class="btn-bq-save shadow-sm">Save Mission</button>
