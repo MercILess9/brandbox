@@ -394,7 +394,7 @@
         try {
             await System.initLayout(B_QUEST_CONFIG);
             
-            // ส่งแค่ชื่อไฟล์ .html ไปครับ system.js จะไปประกอบร่างกับ origin ให้เอง
+            // แก้เป็นแบบนี้ครับ (ตัด ./ ออก และใส่ .html ให้ชัด)
             await System.loadModal('b-quest-modal.html'); 
             
             console.log("✅ Modal HTML Loaded");
