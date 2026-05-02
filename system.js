@@ -1,14 +1,17 @@
-// ==========================================
-// B-QUEST SYSTEM ENGINE (MODULAR VERSION)
-// ==========================================
-
-// 1. Supabase Client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// 2. รายชื่อหน้าเว็บที่เข้าได้โดยไม่ต้อง Login
 const publicPages = ["login.html", "register.html", "forgot-password.html"];
 
-// --- INTERNAL HELPERS ---
+// --- GLOBAL UTILITIES ---
+function formatDate(dateStr) {
+    if (!dateStr || dateStr === '-' || dateStr === 'null') return '-';
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        return `${d}-${m}-${date.getFullYear()}`;
+    } catch (e) { return dateStr; }
+}
 
 function getCorrectPath(target) {
     const root = window.location.origin;
@@ -24,44 +27,35 @@ function getCurrentPage() {
 }
 
 function safeRedirect(to) {
-    const targetUrl = getCorrectPath(to);
-    if (window.location.href !== targetUrl) {
-        window.location.href = targetUrl;
-    }
+    const url = getCorrectPath(to);
+    if (window.location.href !== url) window.location.href = url;
 }
 
-// --- B-QUEST CORE UTILITIES ---
-
+// --- SYSTEM ENGINE ---
 const BQuest = {
-    // ฉีด Assets (CSS/Meta) เข้าไปใน Head อัตโนมัติ
     injectAssets() {
         if (!document.querySelector('meta[name="viewport"]')) {
             const meta = document.createElement('meta');
             meta.name = "viewport"; meta.content = "width=device-width, initial-scale=1.0";
             document.head.appendChild(meta);
         }
-
-        const assets = [
-            { type: 'css', url: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" },
-            { type: 'css', url: "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" },
-            { type: 'css', url: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" }
+        const links = [
+            "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap",
+            "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
+            "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
         ];
-
-        assets.forEach(as => {
-            if (!document.querySelector(`link[href="${as.url}"]`)) {
-                const el = document.createElement('link');
-                el.rel = 'stylesheet'; el.href = as.url;
-                document.head.appendChild(el);
+        links.forEach(url => {
+            if (!document.querySelector(`link[href="${url}"]`)) {
+                const l = document.createElement('link');
+                l.rel = 'stylesheet'; l.href = url;
+                document.head.appendChild(l);
             }
         });
     },
 
-    // ระบบจัดการ Layout (Header / Menu / User)
     async initLayout(config) {
-        this.injectAssets(); // โหลด CSS พื้นฐาน
-
+        this.injectAssets();
         try {
-            // 1. ดึง Header กลางมาแปะ
             const resp = await fetch(getCorrectPath('header.html'));
             const html = await resp.text();
             const header = document.createElement('header');
@@ -69,93 +63,64 @@ const BQuest = {
             header.innerHTML = html;
             document.body.prepend(header);
 
-            // 2. ตั้งชื่อโปรเจกต์ (B-QUEST / B-ACCOUNT)
             const titleEl = document.getElementById("project-title");
             if (titleEl) titleEl.innerText = config.projectName;
 
-            // 3. พ่นเมนูสีเขียว
             const menuBar = document.getElementById("sys-menu-bar");
-            const currentPage = getCurrentPage();
+            const curr = getCurrentPage();
             if (menuBar && config.menus) {
                 menuBar.innerHTML = "";
                 config.menus.forEach(m => {
                     const a = document.createElement('a');
                     a.href = m.link;
-                    // เช็ก Active จากชื่อไฟล์
-                    const isActive = currentPage === m.link;
-                    a.className = `sys-menu-link ${isActive ? 'active' : ''}`;
+                    a.className = `sys-menu-link ${curr === m.link ? 'active' : ''}`;
                     a.innerText = m.name;
                     menuBar.appendChild(a);
                 });
             }
 
-            // 4. แสดงชื่อ User
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 const profile = await this.getProfile(session.user.id);
-                const displayEl = document.getElementById("user-display");
-                if (displayEl) {
-                    displayEl.innerText = profile?.nick_name || profile?.full_name || session.user.email.split('@')[0];
-                }
+                const el = document.getElementById("user-display");
+                if (el) el.innerText = profile?.nick_name || profile?.full_name || session.user.email.split('@')[0];
             }
-        } catch (e) {
-            console.error("Layout Init Fail:", e);
-        }
+        } catch (e) { console.error("Init Layout Fail:", e); }
     },
 
     async logout() {
         await supabaseClient.auth.signOut();
         localStorage.clear();
         sessionStorage.clear();
-        // safeRedirect จะถูกเรียกโดยอัตโนมัติจาก onAuthStateChange
     },
 
     async getProfile(userId) {
-        const { data, error } = await supabaseClient
-            .from("profiles")
-            .select("*")
-            .eq("id", userId)
-            .single();
+        const { data, error } = await supabaseClient.from("profiles").select("*").eq("id", userId).single();
         return error ? null : data;
     },
 
     notify(title, type = "success") {
-        Swal.fire({
-            title, icon: type, timer: 2000,
-            showConfirmButton: false, toast: true, position: "top-end"
-        });
+        Swal.fire({ title, icon: type, timer: 2000, showConfirmButton: false, toast: true, position: "top-end" });
     }
 };
 
-// --- AUTH GUARD LOGIC ---
-
+// --- AUTH GUARD ---
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const page = getCurrentPage();
     const isPublic = publicPages.includes(page);
 
-    // ป้องกันหน้า index.html ที่ root (Traffic Control)
     if (page === "index.html") {
         session ? safeRedirect("index.html") : safeRedirect("login.html");
         return;
     }
+    if (!session && !isPublic) safeRedirect("login.html");
+    else if (session && isPublic) safeRedirect("index.html");
 
-    if (!session && !isPublic) {
-        safeRedirect("login.html");
-    } else if (session && isPublic) {
-        safeRedirect("index.html");
-    }
-
-    // เฝ้าดูการเปลี่ยนแปลง (Login/Logout)
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-        const currPage = getCurrentPage();
-        if (event === 'SIGNED_OUT') {
-            safeRedirect("login.html");
-        } else if (event === 'SIGNED_IN' && publicPages.includes(currPage)) {
-            safeRedirect("index.html");
-        }
+    supabaseClient.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') safeRedirect("login.html");
+        else if (event === 'SIGNED_IN' && publicPages.includes(getCurrentPage())) safeRedirect("index.html");
     });
 }
 
-// รันระบบ Guard ทันที
 initAuthGuard();
