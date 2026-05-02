@@ -38,84 +38,38 @@
     .is-edit .edit-only { display: flex !important; }
 </style>
 
-<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
-        <div class="modal-content bq-form-container" id="b-quest-modal-content">
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="bq-card-section bq-card-highlight">
+            <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.75rem;">DESIGNER</div>
             
-            <div class="bq-form-header d-flex justify-content-between align-items-center">
-                <h5 class="fw-800 m-0" id="b-quest-modal-label">New <span style="color: #bdc432;">Task</span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 0.8rem;"></button>
-            </div>
+            <label class="bq-label">Type</label>
+            <input type="text" class="bq-input" id="b-quest-modal-designer-type" name="designer_type" readonly style="background: #f1f5f9;">
 
-            <form id="b-quest-modal-form">
-                <div class="bq-form-body">
-                    <input type="hidden" id="b-quest-modal-id" name="id">
-                    
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <div class="bq-card-section">
-                                <label class="bq-label">Account Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name">
+            <label class="bq-label">Work</label>
+            <select class="bq-input" id="b-quest-modal-designer-work" name="designer">
+                <option value="">Loading...</option>
+            </select>
 
-                                <label class="bq-label">Opportunity Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name">
+            <label class="bq-label">Deadline</label>
+            <input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline">
+        </div>
+    </div>
 
-                                <label class="bq-label">Task Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name">
+    <div class="col-md-6">
+        <div class="bq-card-section bq-card-highlight">
+            <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.75rem;">CREATIVE</div>
+            
+            <label class="bq-label">Type</label>
+            <input type="text" class="bq-input" id="b-quest-modal-creative-type" name="creative_type" readonly style="background: #f1f5f9;">
 
-                                <label class="bq-label">Link</label>
-                                <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link">
-                            </div>
-                        </div>
+            <label class="bq-label">Work</label>
+            <select class="bq-input" id="b-quest-modal-creative-work" name="creative">
+                <option value="">Loading...</option>
+            </select>
 
-                        <div class="col-md-6">
-                            <div class="bq-card-section">
-                                <label class="bq-label">Publish Date</label>
-                                <input type="date" class="bq-input" id="b-quest-modal-publish-date" name="publish_date">
-
-                                <label class="bq-label">Detail</label>
-                                <textarea class="bq-input m-0" id="b-quest-modal-detail" name="detail" rows="7" 
-                                    style="resize: none; height: 135px;"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="bq-card-section bq-card-highlight">
-                                <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.75rem;">DESIGNER</div>
-                                <label class="bq-label">Type</label>
-                                <select class="bq-input" id="b-quest-modal-designer-type" name="designer_type"></select>
-                                <label class="bq-label">Work</label>
-                                <select class="bq-input" id="b-quest-modal-designer-work" name="designer"></select>
-                                <label class="bq-label">Deadline</label>
-                                <input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="bq-card-section bq-card-highlight">
-                                <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.75rem;">CREATIVE</div>
-                                <label class="bq-label">Type</label>
-                                <select class="bq-input" id="b-quest-modal-creative-type" name="creative_type"></select>
-                                <label class="bq-label">Work</label>
-                                <select class="bq-input" id="b-quest-modal-creative-work" name="creative"></select>
-                                <label class="bq-label">Deadline</label>
-                                <input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bq-form-footer">
-                    <button type="button" class="btn btn-link text-danger fw-bold edit-only me-auto text-decoration-none" 
-                        onclick="BQuestService.deleteQuest(document.getElementById('b-quest-modal-id').value)" style="font-size: 0.8rem;">
-                        Delete Task
-                    </button>
-                    <a href="#" class="btn-bq-cancel" data-bs-dismiss="modal">Cancel</a>
-                    <button type="submit" class="btn-bq-save">Save Mission</button>
-                </div>
-            </form>
+            <label class="bq-label">Deadline</label>
+            <input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline">
         </div>
     </div>
 </div>
