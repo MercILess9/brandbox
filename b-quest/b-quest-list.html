@@ -129,7 +129,7 @@
 
 <main id="card-container" class="container-fluid px-5 mt-4">
     <div id="taskContainer" class="row"></div>
-    <div id="load-more-trigger" style="height: 100px;"></div>
+    <div id="load-more-trigger" style="height: 50px;"></div>
 </main>
 
 <button class="fab-add" onclick="openTaskModal()" title="New Mission"><i class="bi bi-plus-lg"></i></button>
@@ -143,7 +143,7 @@
     let isFetching = false;
     let hasMore = true;
 
-    // --- UI Logic ---
+    // --- UI Helpers ---
     document.getElementById('toggleFilters').addEventListener('click', () => {
         const zone = document.getElementById('advancedFilterZone');
         zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'flex' : 'none';
@@ -168,7 +168,7 @@
     function resetAdvanced() {
         ['filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
             const el = document.getElementById(id);
-            el.value = "";
+            if(el) el.value = "";
             updateHighlight(id);
         });
         applyFilters();
@@ -243,11 +243,14 @@
     async function fetchQuests(isFirst = false) {
         if (isFetching || (!hasMore && !isFirst)) return;
         isFetching = true;
-        const limit = B_QUEST_CONFIG.itemsPerPage;
+        
+        const limit = B_QUEST_CONFIG.itemsPerPage || 20;
         const from = currentPage * limit;
         const to = from + limit - 1;
         
         let query = supabaseClient.from('b-quest-list').select('*');
+        
+        // Search
         const search = document.getElementById('globalSearch').value.trim();
         if (search) query = query.or(SEARCH_COLUMNS.map(col => `${col}.ilike.%${search}%`).join(','));
 
@@ -256,6 +259,7 @@
         const sd = document.getElementById('startDate').value;
         const ed = document.getElementById('endDate').value;
 
+        // Role & Date
         if (!pDes && !pCre) query = query.eq('id', -1);
         else {
             const build = (r) => `and(${r}.neq.-,${r}.not.is.null${sd?`,${r}_deadline.gte.${sd}`:''}${ed?`,${r}_deadline.lte.${ed}`:''})`;
@@ -265,12 +269,14 @@
             query = query.or(parts.join(','));
         }
 
+        // Status
         const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
         const pDone = document.getElementById('pill-done').classList.contains('active-done');
         if (pProg && !pDone) query = query.or('designer_status.neq.Done, creative_status.neq.Done');
         else if (!pProg && pDone) query = query.eq('designer_status', 'Done').eq('creative_status', 'Done');
         else if (!pProg && !pDone) query = query.eq('id', -1);
 
+        // Advanced Filters
         const val = (id) => document.getElementById(id).value;
         if (val('filterWork')) query = query.or(`designer.eq."${val('filterWork')}",creative.eq."${val('filterWork')}"`);
         if (val('filterType')) query = query.or(`designer_type.eq."${val('filterType')}",creative_type.eq."${val('filterType')}"`);
@@ -280,11 +286,16 @@
         query = query.range(from, to).order('id', { ascending: false });
 
         try {
-            const { data } = await query;
+            const { data, error } = await query;
+            if (error) throw error;
             if (data.length < limit) hasMore = false;
             renderCards(data);
             currentPage++;
-        } catch (e) { console.error(e); } finally { isFetching = false; }
+        } catch (e) { 
+            console.error(e); 
+        } finally { 
+            isFetching = false; 
+        }
     }
 
     function renderCards(data) {
@@ -305,8 +316,8 @@
                             <div class="bqc-subtitle">${task.account_name} | ${task.opportunity_name}</div>
                         </div>
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="bqc-dl-col">${hasD ? `<span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}</div>
-                            <div class="bqc-dl-col">${hasC ? `<span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
+                            <div class="bqc-dl-col">${hasD ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}</div>
+                            <div class="bqc-dl-col">${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
                         </div>
                         <div class="bqc-actions">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}')">Edit</button>
@@ -376,6 +387,7 @@
         fetchQuests(true);
     }
 
+    // Filters event listeners
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('change', () => {
@@ -384,7 +396,13 @@
         });
     });
 
-    const obs = new IntersectionObserver(e => { if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests() }, { rootMargin: '600px' });
+    document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
+
+    // ปรับลด rootMargin ให้โหลด Page ถัดไปเฉพาะเมื่อเลื่อนถึงล่างจริงๆ
+    const obs = new IntersectionObserver(e => { 
+        if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
+    }, { rootMargin: '100px' });
+    
     obs.observe(document.getElementById('load-more-trigger'));
 
     initPage();
