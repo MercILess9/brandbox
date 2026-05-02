@@ -176,46 +176,7 @@
         applyFilters();
     }
 
-    // --- Modal Logic (Updated for b-quest-modal IDs) ---
-    async function openTaskModal(taskId = null) {
-        const modalEl = document.getElementById('b-quest-modal');
-        const form = document.getElementById('b-quest-modal-form');
-        
-        if (!modalEl || !form) {
-            console.error("Modal/Form not found in DOM");
-            return;
-        }
-
-        form.reset();
-        
-        // Populate dropdowns from b-quest.js
-        if (typeof setupTypeDropdowns === 'function') {
-            setupTypeDropdowns();
-        }
-
-        const label = document.getElementById('b-quest-modal-label');
-        const modalContent = document.getElementById('b-quest-modal-content');
-
-        if (taskId) {
-            label.innerHTML = 'Edit <span style="color: #bdc432;">Task</span>';
-            if (modalContent) modalContent.classList.add('is-edit');
-            
-            // Get data from service (BQuestService is in b-quest.js)
-            if (typeof BQuestService !== 'undefined') {
-                const data = await BQuestService.getQuestById(taskId);
-                if (data) fillFormData(data);
-            }
-        } else {
-            label.innerHTML = 'New <span style="color: #bdc432;">Task</span>';
-            if (modalContent) modalContent.classList.remove('is-edit');
-            const idInput = document.getElementById('b-quest-modal-id');
-            if (idInput) idInput.value = '';
-        }
-
-        const myModal = new bootstrap.Modal(modalEl);
-        myModal.show();
-    }
-
+    // --- Data Mapping สำหรับ Modal ใหม่ ---
     function fillFormData(data) {
         const mapping = {
             'b-quest-modal-id': data.id,
@@ -343,11 +304,7 @@
             if (data.length < limit) hasMore = false;
             renderCards(data);
             currentPage++;
-        } catch (e) { 
-            console.error(e); 
-        } finally { 
-            isFetching = false; 
-        }
+        } catch (e) { console.error(e); } finally { isFetching = false; }
     }
 
     function renderCards(data) {
@@ -378,7 +335,7 @@
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px;">
                                     <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}')">Edit Mission</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
-                                    <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="handleDeleteTask('${task.id}')">Delete</a></li>
+                                    <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="BQuestService.deleteQuest('${task.id}')">Delete</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -432,36 +389,21 @@
         });
     }
 
-    async function handleDeleteTask(id) {
-        if (typeof BQuestService !== 'undefined') {
-            const success = await BQuestService.deleteQuest(id);
-            if (success) applyFilters();
+    // --- จังหวะการโหลดที่ถูกต้อง (แก้ปัญหา Modal ไม่มา) ---
+    async function initPage() {
+        try {
+            await System.initLayout(B_QUEST_CONFIG);
+            // ระบุ .html ให้ชัดเจนเพื่อกัน 404 บน Vercel
+            await System.loadModal('./b-quest-modal.html'); 
+            console.log("✅ Modal HTML Loaded");
+            
+            await loadMasterData();
+            fetchQuests(true);
+        } catch (e) {
+            console.error("Init failed:", e);
         }
     }
 
-    async function initPage() {
-    try {
-        // 1. ตรวจสอบว่า System พร้อมไหม
-        if (typeof System === 'undefined') throw new Error("System.js not loaded");
-
-        await System.initLayout(B_QUEST_CONFIG);
-        
-        // 2. โหลด Modal (ใส่ .html ให้ชัดเจน)
-        // ถ้าไฟล์อยู่ในโฟลเดอร์ /b-quest/ ให้เช็คว่าเรียกถูกไหม
-       await System.loadModal('./b-quest-modal.html');
-        
-        console.log("✅ Modal Loaded Successfully");
-
-        // 3. โหลดข้อมูลอื่นๆ
-        if (typeof loadMasterData === 'function') await loadMasterData();
-        if (typeof fetchQuests === 'function') fetchQuests(true);
-
-    } catch (error) {
-        console.error("❌ Init Error:", error);
-    }
-}
-
-    // Filters event listeners
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('change', () => {
