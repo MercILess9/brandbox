@@ -79,6 +79,36 @@
         .bqc-dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .bqc-dot-prog { background-color: var(--c-progress); }
         .bqc-dot-done { background-color: var(--c-done); }
+
+        .fab-add {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 65px;
+    height: 65px;
+    background: #1e293b;
+    color: #bdc432;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    z-index: 1000;
+}
+
+.fab-add:hover {
+    transform: scale(1.1) rotate(90deg);
+    background: #0f172a;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+}
+
+.fab-add i {
+    transition: 0.3s;
+}
     </style>
 </head>
 <body>
@@ -115,6 +145,10 @@
             <button class="flt-btn-reset-adv" onclick="resetAdvanced()">Reset</button>
         </div>
     </div>
+
+    <button class="fab-add" onclick="openTaskModal()" title="New Mission">
+        <i class="bi bi-plus-lg"></i>
+    </button>
 </section>
 
 <main id="card-container" class="container-fluid px-5 mt-4">
@@ -356,6 +390,36 @@
     obs.observe(document.getElementById('load-more-trigger'));
 
     initPage();
+
+    // ฟังก์ชันกลางสำหรับเปิด Modal (เรียกใช้ได้ทั้งหน้า)
+async function openTaskModal(taskId = null) {
+    const modalEl = document.getElementById('taskModal');
+    const modalMain = document.getElementById('modalMainContent');
+    const form = document.getElementById('taskForm');
+    
+    form.reset(); // ล้างค่าเดิมออกก่อนเสมอ
+    
+    if (taskId) {
+        // --- MODE: EDIT ---
+        modalMain.classList.add('is-edit');
+        document.getElementById('taskModalLabel').innerHTML = 'Edit <span>Mission</span>';
+        document.getElementById('modalSubtitle').innerText = 'Update task details and assignments';
+        
+        // ดึงข้อมูลมาเติม (เดี๋ยวเราไปเขียนต่อใน BQuestService)
+        const taskData = await BQuestService.getQuestById(taskId);
+        if (taskData) fillFormData(taskData); 
+        
+    } else {
+        // --- MODE: NEW ---
+        modalMain.classList.remove('is-edit');
+        document.getElementById('taskModalLabel').innerHTML = 'New <span>Mission</span>';
+        document.getElementById('modalSubtitle').innerText = 'Create a new task for the production team';
+        document.getElementById('task-id').value = '';
+    }
+    
+    const myModal = new bootstrap.Modal(modalEl);
+    myModal.show();
+}
 </script>
 </body>
 </html>

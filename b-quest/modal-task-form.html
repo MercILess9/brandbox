@@ -1,29 +1,144 @@
+<style>
+    .bq-modal-content { border-radius: 28px; border: none; background: #f8fafc; overflow: hidden; }
+    .bq-modal-header { border: none; padding: 35px 45px 15px 45px; background: white; }
+    .bq-modal-body { padding: 0 45px 35px 45px; }
+    
+    /* Card Styling */
+    .bq-card { 
+        background: #ffffff; 
+        border-radius: 24px; 
+        padding: 30px; 
+        border: 1px solid #edf2f7;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02);
+        height: 100%;
+    }
+    
+    /* Input & Label Styling */
+    .bq-group { margin-bottom: 20px; display: flex; align-items: center; }
+    .bq-label { 
+        font-size: 0.75rem; 
+        font-weight: 700; 
+        color: #94a3b8; 
+        text-transform: uppercase; 
+        width: 110px; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px;
+    }
+    .bq-input { 
+        flex: 1; 
+        border-radius: 14px; 
+        border: 1px solid #e2e8f0; 
+        padding: 10px 16px; 
+        font-size: 0.95rem; 
+        background: #fdfdfd;
+        transition: all 0.2s ease;
+    }
+    .bq-input:focus { 
+        border-color: #bdc432; 
+        outline: none; 
+        box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1);
+        background: white;
+    }
+
+    /* Logic: Hide Edit Fields by default */
+    .edit-mode-only { display: none !important; }
+    .is-edit .edit-mode-only { display: flex !important; }
+    
+    /* Button Styling */
+    .btn-save { background: #1e293b; color: white; border-radius: 14px; padding: 12px 40px; font-weight: 600; border: none; transition: 0.2s; }
+    .btn-save:hover { background: #0f172a; transform: translateY(-1px); }
+    .btn-delete { background: #fee2e2; color: #ef4444; border-radius: 14px; padding: 12px 25px; font-weight: 600; border: none; }
+</style>
+
 <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-0 px-4 pt-4">
-                <h5 class="modal-title fw-bold" id="taskModalLabel">Mission Form</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-4 pb-4">
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label small fw-bold">Task Name</label>
-                        <input type="text" class="form-control rounded-3" placeholder="Enter task name...">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold">Account</label>
-                        <input type="text" class="form-control rounded-3" placeholder="Account name...">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold">Deadline</label>
-                        <input type="date" class="form-control rounded-3">
-                    </div>
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bq-modal-content shadow-2xl" id="modalMainContent">
+            
+            <div class="bq-modal-header d-flex justify-content-between align-items-end">
+                <div>
+                    <h2 class="fw-bold m-0" style="letter-spacing: -1px;">Mission <span style="color: #bdc432;">Details</span></h2>
+                    <p class="text-muted small m-0 mt-1" id="modalSubtitle">Create a new task for the production team</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="bq-label" style="width: auto;">Publish Date 📅</span>
+                    <input type="date" class="bq-input" style="width: 180px;" id="publish_date" name="publish_date">
                 </div>
             </div>
-            <div class="modal-footer border-0 px-4 pb-4">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-dark rounded-pill px-4">Confirm Action</button>
+            
+            <div class="bq-modal-body">
+                <form id="taskForm">
+                    <input type="hidden" id="task-id" name="id">
+                    
+                    <div class="bq-card mb-4" style="padding: 25px 35px;">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="bq-group m-0">
+                                    <span class="bq-label">Account 🏢</span>
+                                    <input type="text" class="bq-input" id="account_name" name="account_name" placeholder="Client / Brand Name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="bq-group m-0">
+                                    <span class="bq-label">Opp 💎</span>
+                                    <input type="text" class="bq-input" id="opportunity_name" name="opportunity_name" placeholder="Opportunity Name">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="bq-group m-0">
+                                    <span class="bq-label">Task 📝</span>
+                                    <input type="text" class="bq-input" id="task_name" name="task_name" placeholder="Task Subject / Title">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="bq-card">
+                                <h5 class="fw-bold mb-4 text-center">Designer 🎨</h5>
+                                <div class="bq-group"><span class="bq-label">Type ✨</span><select class="bq-input" id="designer_type" name="designer_type"></select></div>
+                                <div class="bq-group edit-mode-only"><span class="bq-label">Assign 👤</span><select class="bq-input" id="designer_assign" name="designer_assign"></select></div>
+                                <div class="bq-group edit-mode-only"><span class="bq-label">Status ℹ️</span><select class="bq-input" id="designer_status" name="designer_status"></select></div>
+                                <div class="bq-group"><span class="bq-label">Work 🛠️</span><select class="bq-input" id="designer_work" name="designer_work"></select></div>
+                                <div class="bq-group">
+                                    <span class="bq-label">Deadline ⏰</span>
+                                    <div class="flex-grow-1">
+                                        <input type="date" class="bq-input w-100" id="designer_deadline" name="designer_deadline">
+                                        <div id="des-capacity-info" class="mt-2 small fw-bold"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="bq-card">
+                                <h5 class="fw-bold mb-4 text-center">Creative 🖋️</h5>
+                                <div class="bq-group"><span class="bq-label">Type ✨</span><select class="bq-input" id="creative_type" name="creative_type"></select></div>
+                                <div class="bq-group edit-mode-only"><span class="bq-label">Assign 👤</span><select class="bq-input" id="creative_assign" name="creative_assign"></select></div>
+                                <div class="bq-group edit-mode-only"><span class="bq-label">Status ℹ️</span><select class="bq-input" id="creative_status" name="creative_status"></select></div>
+                                <div class="bq-group"><span class="bq-label">Work 🛠️</span><select class="bq-input" id="creative_work" name="creative_work"></select></div>
+                                <div class="bq-group">
+                                    <span class="bq-label">Deadline ⏰</span>
+                                    <div class="flex-grow-1">
+                                        <input type="date" class="bq-input w-100" id="creative_deadline" name="creative_deadline">
+                                        <div id="cre-capacity-info" class="mt-2 small fw-bold"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer border-0 p-4 px-5 d-flex justify-content-between">
+                <div>
+                    <button type="button" class="btn-delete edit-mode-only" id="btnDeleteTask">Delete Mission</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-link text-decoration-none text-muted fw-bold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="taskForm" class="btn-save">Save Mission</button>
+                </div>
             </div>
         </div>
     </div>
