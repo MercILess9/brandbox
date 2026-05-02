@@ -176,36 +176,68 @@
         applyFilters();
     }
 
-    // --- Modal Logic ---
+    // --- Modal Logic (Updated for b-quest-modal IDs) ---
     async function openTaskModal(taskId = null) {
-    console.log("Button clicked! Task ID:", taskId); // เช็กว่าปุ่มถูกกดจริงไหม
+        const modalEl = document.getElementById('b-quest-modal');
+        const form = document.getElementById('b-quest-modal-form');
+        
+        if (!modalEl || !form) {
+            console.error("Modal/Form not found in DOM");
+            return;
+        }
 
-    const modalEl = document.getElementById('taskModal');
-    if (!modalEl) {
-        console.error("Error: Modal element 'taskModal' not found in DOM!");
-        // ถ้าไม่เจอ ลองสั่งโหลดใหม่อีกรอบเผื่อยังโหลดไม่เสร็จ
-        await System.loadModal('b-quest-form.html');
-        return;
+        form.reset();
+        
+        // Populate dropdowns from b-quest.js
+        if (typeof setupTypeDropdowns === 'function') {
+            setupTypeDropdowns();
+        }
+
+        const label = document.getElementById('b-quest-modal-label');
+        const modalContent = document.getElementById('b-quest-modal-content');
+
+        if (taskId) {
+            label.innerHTML = 'Edit <span style="color: #bdc432;">Task</span>';
+            if (modalContent) modalContent.classList.add('is-edit');
+            
+            // Get data from service (BQuestService is in b-quest.js)
+            if (typeof BQuestService !== 'undefined') {
+                const data = await BQuestService.getQuestById(taskId);
+                if (data) fillFormData(data);
+            }
+        } else {
+            label.innerHTML = 'New <span style="color: #bdc432;">Task</span>';
+            if (modalContent) modalContent.classList.remove('is-edit');
+            const idInput = document.getElementById('b-quest-modal-id');
+            if (idInput) idInput.value = '';
+        }
+
+        const myModal = new bootstrap.Modal(modalEl);
+        myModal.show();
     }
 
-    const form = document.getElementById('taskForm');
-    const modalMain = document.getElementById('modalMainContent');
-    
-    if (form) form.reset();
-    
-    if (taskId && modalMain) {
-        console.log("Opening in EDIT mode...");
-        modalMain.classList.add('is-edit');
-        // Logic ดึงข้อมูลจาก Supabase ใส่ที่นี่
-    } else if (modalMain) {
-        console.log("Opening in NEW mode...");
-        modalMain.classList.remove('is-edit');
+    function fillFormData(data) {
+        const mapping = {
+            'b-quest-modal-id': data.id,
+            'b-quest-modal-account': data.account_name,
+            'b-quest-modal-opportunity': data.opportunity_name,
+            'b-quest-modal-taskname': data.task_name,
+            'b-quest-modal-link': data.link,
+            'b-quest-modal-publish-date': data.publish_date,
+            'b-quest-modal-detail': data.detail,
+            'b-quest-modal-designer-type': data.designer_type,
+            'b-quest-modal-creative-type': data.creative_type,
+            'b-quest-modal-designer-deadline': data.designer_deadline,
+            'b-quest-modal-creative-deadline': data.creative_deadline,
+            'b-quest-modal-designer-work': data.designer,
+            'b-quest-modal-creative-work': data.creative
+        };
+        
+        for (let id in mapping) {
+            const el = document.getElementById(id);
+            if (el) el.value = mapping[id] || '';
+        }
     }
-
-    console.log("Triggering Bootstrap Modal show...");
-    const myModal = new bootstrap.Modal(modalEl);
-    myModal.show();
-}
 
     // --- Data Logic ---
     async function loadMasterData() {
@@ -346,7 +378,7 @@
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px;">
                                     <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}')">Edit Mission</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
-                                    <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="BQuestService.deleteQuest('${task.id}')">Delete</a></li>
+                                    <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="handleDeleteTask('${task.id}')">Delete</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -400,9 +432,16 @@
         });
     }
 
+    async function handleDeleteTask(id) {
+        if (typeof BQuestService !== 'undefined') {
+            const success = await BQuestService.deleteQuest(id);
+            if (success) applyFilters();
+        }
+    }
+
     async function initPage() {
         await System.initLayout(B_QUEST_CONFIG);
-        await System.loadModal('./b-quest-form.html'); 
+        await System.loadModal('./b-quest-modal.html'); // Updated path
         await loadMasterData();
         fetchQuests(true);
     }
@@ -418,7 +457,6 @@
 
     document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
 
-    // ปรับลด rootMargin ให้โหลด Page ถัดไปเฉพาะเมื่อเลื่อนถึงล่างจริงๆ
     const obs = new IntersectionObserver(e => { 
         if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
     }, { rootMargin: '100px' });

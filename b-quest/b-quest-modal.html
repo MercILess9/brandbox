@@ -1,0 +1,103 @@
+<style>
+    .bq-modal-1000 { max-width: 1000px !important; }
+    .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; }
+    .bq-form-header { padding: 18px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
+    .bq-form-body { padding: 25px 30px; background: #f8fafc; }
+    .bq-form-footer { padding: 18px 30px; background: #fff; border-top: 1px solid #f1f5f9; }
+
+    .bq-section-card { 
+        background: #fcfcfc; border-radius: 18px; padding: 22px; 
+        border: 1px solid #eef2f6; height: 100%;
+    }
+
+    .bq-label { 
+        font-size: 0.72rem; font-weight: 800; color: #626e7f; 
+        display: flex; align-items: center; gap: 8px;
+        margin-bottom: 6px; text-transform: uppercase;
+    }
+    .bq-label i { font-size: 0.9rem; color: #94a3b8; }
+
+    .bq-input { 
+        width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; 
+        padding: 8px 14px; font-size: 0.9rem; background: #ffffff;
+        transition: 0.2s; margin-bottom: 14px;
+    }
+    .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
+
+    .btn-create-task { background: #1e293b; color: #bdc432; border-radius: 12px; padding: 10px 40px; font-weight: 700; border: none; }
+    .btn-cancel-task { color: #94a3b8; font-weight: 600; text-decoration: none; font-size: 0.85rem; }
+
+    .edit-mode-only { display: none !important; }
+    .is-edit .edit-mode-only { display: block !important; }
+</style>
+
+<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
+        <div class="modal-content bq-form-container" id="b-quest-modal-content">
+            <div class="bq-form-header d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold m-0" id="b-quest-modal-label">New <span style="color: #bdc432;">Task</span></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="b-quest-modal-form">
+                <div class="bq-form-body">
+                    <input type="hidden" id="b-quest-modal-id" name="id">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-7">
+                            <div class="bq-section-card" style="background: white;">
+                                <label class="bq-label"><i class="bi bi-building"></i> Account Name</label>
+                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name" placeholder="...">
+                                
+                                <label class="bq-label"><i class="bi bi-gem"></i> Opportunity Name</label>
+                                <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="...">
+                                
+                                <label class="bq-label"><i class="bi bi-card-text"></i> Task Name</label>
+                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" placeholder="...">
+                                
+                                <label class="bq-label"><i class="bi bi-link-45deg"></i> Link</label>
+                                <input type="text" class="bq-input m-0" id="b-quest-modal-link" name="link" placeholder="URL">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="bq-section-card">
+                                <label class="bq-label"><i class="bi bi-calendar-event"></i> Publish Date</label>
+                                <input type="date" class="bq-input" id="b-quest-modal-publish-date" name="publish_date">
+                                
+                                <label class="bq-label"><i class="bi bi-justify-left"></i> Detail</label>
+                                <textarea class="bq-input m-0" id="b-quest-modal-detail" name="detail" rows="7" style="resize: none; height: 162px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="bq-section-card">
+                                <div class="bq-label mb-2" style="color: #1e293b;"><i class="bi bi-brush"></i> Designer Assignment</div>
+                                <div class="row g-2">
+                                    <div class="col-6"><label class="bq-label">Type</label><select class="bq-input" id="b-quest-modal-designer-type" name="designer_type"></select></div>
+                                    <div class="col-6"><label class="bq-label">Work</label><select class="bq-input" id="b-quest-modal-designer-work" name="designer_work"></select></div>
+                                    <div class="col-12"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bq-section-card">
+                                <div class="bq-label mb-2" style="color: #1e293b;"><i class="bi bi-rocket"></i> Creative Assignment</div>
+                                <div class="row g-2">
+                                    <div class="col-6"><label class="bq-label">Type</label><select class="bq-input" id="b-quest-modal-creative-type" name="creative_type"></select></div>
+                                    <div class="col-6"><label class="bq-label">Work</label><select class="bq-input" id="b-quest-modal-creative-work" name="creative_work"></select></div>
+                                    <div class="col-12"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bq-form-footer d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none fw-bold edit-mode-only" id="b-quest-modal-btn-delete">Delete Task</button>
+                    <div class="d-flex align-items-center gap-4">
+                        <a href="#" class="btn-cancel-task" data-bs-dismiss="modal">Cancel</a>
+                        <button type="submit" class="btn-create-task shadow-sm">Create</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
