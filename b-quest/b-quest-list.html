@@ -34,14 +34,18 @@
         .flt-pill.active-role { background: var(--c-role); color: #fff; border-color: var(--c-role); }
         .flt-pill.active-prog { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
         .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
+
+        /* Advance Filter แถวเดียว */
         .flt-advanced-zone { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
-        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; transition: 0.2s; }
+        .flt-advanced-row { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; transition: 0.2s; flex: 1; min-width: 150px; }
         .flt-select-tag { background: #f1f5f9; color: var(--c-text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; justify-content: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
         .flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; text-align-last: center; }
         .flt-select-box.active-filter { background: var(--c-accent-light); border-color: var(--c-accent); }
         .flt-select-box.active-filter .flt-select-tag { background: var(--c-accent); color: #000; border-right-color: var(--c-accent); }
+        .flt-btn-reset-adv { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-text-muted); cursor: pointer; transition: 0.2s; }
 
-        /* --- Card Styles (Locked 100%) --- */
+        /* --- Card Styles --- */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-status-done { border-left-color: var(--c-done); }
         .bqc-status-prog { border-left-color: var(--c-progress); }
@@ -55,18 +59,25 @@
         .bqc-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; display: inline-block; border: 1px solid transparent; }
         .bqc-tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
         .bqc-tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
-        .bqc-actions { width: 120px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
+        
+        .bqc-actions { width: 140px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; opacity: 0; transition: 0.2s; }
         .bqc-card:hover .bqc-actions { opacity: 1; }
+        .bqc-btn-more { color: var(--c-text-muted); padding: 5px; border: none; background: transparent; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; }
+
         .bqc-body { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         .bqc-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .bqc-meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
         .bqc-meta-label { font-size: 0.7rem; font-weight: 700; color: var(--c-text-muted); text-transform: uppercase; }
         .bqc-meta-val { font-size: 0.85rem; font-weight: 600; color: var(--c-slate); }
         .bqc-btn-link { background: var(--c-text-main); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+        
+        /* Last Update สีตามสั่ง */
+        .bqc-last-update { font-size: 0.72rem; color: #626e7f; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        
         .bqc-layout-row { display: flex; gap: 20px; }
         .bqc-col-30 { width: 30%; }
         .bqc-col-40 { width: 40%; }
-        .bqc-panel { background: white; border-radius: var(--radius-card); padding: 20px; border: 1px solid #eef2f6; height: 160px; } /* ปรับเหลือ 160px */
+        .bqc-panel { background: white; border-radius: var(--radius-card); padding: 20px; border: 1px solid #eef2f6; height: 160px; } /* ปรับ 160px */
         .bqc-detail-box { overflow-y: auto; line-height: 1.7; font-size: 0.92rem; color: var(--c-slate); }
         .bqc-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--c-slate); }
         .bqc-val { font-weight: 600; }
@@ -102,11 +113,11 @@
 
     <div class="flt-advanced-zone" id="advancedFilterZone">
         <div class="flt-advanced-row">
-            <div class="flt-select-box" style="min-width: 140px;"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
-            <div class="flt-select-box" style="min-width: 140px;"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
-            <div class="flt-select-box" style="min-width: 180px;"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"></select></div>
-            <div class="flt-select-box" style="min-width: 180px;"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"></select></div>
-            <button class="btn btn-sm text-muted fw-bold" onclick="resetAdvanced()">Reset</button>
+            <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
+            <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
+            <div class="flt-select-box"><span class="flt-select-tag">Staff</span><select class="flt-select-input" id="filterAssign"></select></div>
+            <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"></select></div>
+            <button class="flt-btn-reset-adv" onclick="resetAdvanced()">Reset</button>
         </div>
     </div>
 </section>
@@ -128,7 +139,7 @@
     // --- UI Logic ---
     document.getElementById('toggleFilters').addEventListener('click', () => {
         const zone = document.getElementById('advancedFilterZone');
-        zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'block' : 'none';
+        zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'flex' : 'none';
     });
 
     function togglePill(btn, type) {
@@ -146,7 +157,7 @@
     function updateHighlight(id) {
         const el = document.getElementById(id);
         const box = el.closest('.flt-select-box');
-        el.value !== "" ? box.classList.add('active-filter') : box.classList.remove('active-filter');
+        if (box) el.value !== "" ? box.classList.add('active-filter') : box.classList.remove('active-filter');
     }
 
     function resetAdvanced() {
@@ -202,7 +213,6 @@
             select.appendChild(g2);
         } else if (pDes) dW.forEach(w => select.appendChild(new Option(w.work, w.work)));
         else if (pCre) cW.forEach(w => select.appendChild(new Option(w.work, w.work)));
-
         select.value = currentVal;
         updateHighlight('filterWork');
     }
@@ -221,7 +231,6 @@
         const to = from + limit - 1;
         
         let query = supabaseClient.from('b-quest-list').select('*');
-
         const search = document.getElementById('globalSearch').value.trim();
         if (search) query = query.or(SEARCH_COLUMNS.map(col => `${col}.ilike.%${search}%`).join(','));
 
@@ -282,7 +291,17 @@
                             <div class="bqc-dl-col">${hasDes ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}</div>
                             <div class="bqc-dl-col">${hasCre ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
                         </div>
-                        <div class="bqc-actions"><button class="btn btn-outline-dark btn-sm rounded-pill px-3">Edit</button></div>
+                        <div class="bqc-actions">
+                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Edit</button>
+                            <div class="dropdown">
+                                <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px; font-size: 0.85rem;">
+                                    <li><a class="dropdown-item py-2" href="#"><i class="bi bi-eye me-2"></i> View Project</a></li>
+                                    <li><hr class="dropdown-divider opacity-50"></li>
+                                    <li><a class="dropdown-item py-2 text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="collapse" id="${collapseId}">
                         <div class="bqc-body">
@@ -324,7 +343,6 @@
         });
     }
 
-    // --- Init ---
     async function initPage() {
         await BQuest.initLayout(B_QUEST_CONFIG);
         await loadMasterData();
