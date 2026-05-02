@@ -401,8 +401,10 @@
     }
 
     async function initPage() {
+        console.log("Initializing Page...");
         await System.initLayout(B_QUEST_CONFIG);
-        await System.loadModal('b-quest-form.html');
+        console.log("Loading Modal...");
+        await System.loadModal('./b-quest-form.html'); 
         await loadMasterData();
         fetchQuests(true);
     }
