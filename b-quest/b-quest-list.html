@@ -394,13 +394,14 @@
         try {
             await System.initLayout(B_QUEST_CONFIG);
             
-            // แก้เป็นแบบนี้ครับ (ตัด ./ ออก และใส่ .html ให้ชัด)
-            await System.loadModal('b-quest-modal.html'); 
+            // 🔥 เปลี่ยนตรงนี้
+            await UILoader.loadModal('b-quest-modal.html'); 
             
             console.log("✅ Modal HTML Loaded");
             
             await loadMasterData();
             fetchQuests(true);
+
         } catch (e) {
             console.error("Init failed:", e);
         }
