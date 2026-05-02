@@ -109,25 +109,25 @@ const System = {
     },
 
     async loadModal(fileName) {
-        console.log("📦 loadModal called with:", fileName);
+    console.log("📦 loadModal called with:", fileName);
 
-        try {
-            // 🔥 FIX ตรงนี้: ใส่ path ตรง ๆ
-            const url = `${window.location.origin}/b-quest/${fileName}`;
+    try {
+        // 🔥 FIX ตรงนี้: ใส่ path ตรง ๆ
+        const url = `${window.location.origin}/b-quest/${fileName}`;
 
-            console.log("📡 Fetching:", url);
+        console.log("📡 Fetching:", url);
 
-            const resp = await fetch(url);
-            const html = await resp.text();
+        const resp = await fetch(url);
+        const html = await resp.text();
 
-            const div = document.createElement('div');
-            div.innerHTML = html;
-            document.body.appendChild(div);
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        document.body.appendChild(div);
 
-        } catch (e) {
-            console.error("Load Modal Fail:", e);
-        }
+    } catch (e) {
+        console.error("Load Modal Fail:", e);
     }
+}
 
 // ==========================================
 // 4. AUTH GUARD & STATE WATCHER
