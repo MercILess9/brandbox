@@ -549,14 +549,24 @@
     observer.observe(document.getElementById('load-more-trigger'));
 
     async function initPage() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            const profile = await BQuest.getProfile(session.user.id);
-            if (profile) document.getElementById("user-display").innerText = profile.nick_name || profile.full_name;
+    // 1. เช็ก Session
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    if (session) {
+        const profile = await BQuest.getProfile(session.user.id);
+        
+        if (profile) {
+            const displayName = profile.nick_name || profile.full_name || "User";
+            document.getElementById("user-display").innerText = displayName;
+        } else {
+            document.getElementById("user-display").innerText = session.user.email.split('@')[0];
         }
-        await loadMasterData();
-        fetchQuests(true);
     }
+
+    // โหลดข้อมูลอื่นต่อ
+    await loadMasterData();
+    fetchQuests(true);
+}
 
     initPage();
 </script>
