@@ -401,10 +401,11 @@
     }
 
     async function initPage() {
-        console.log("Initializing Page...");
         await System.initLayout(B_QUEST_CONFIG);
-        console.log("Loading Modal...");
+        
+        // ใส่ชื่อไฟล์พร้อมนามสกุล .html ให้ชัดเจน
         await System.loadModal('./b-quest-form.html'); 
+        
         await loadMasterData();
         fetchQuests(true);
     }

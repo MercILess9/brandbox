@@ -111,11 +111,15 @@ const System = {
     async loadModal(fileName) {
         if (document.getElementById('taskModal')) return;
         try {
-            const resp = await fetch(getCorrectPath(fileName));
+            // เปลี่ยนจาก getCorrectPath(fileName) เป็น fileName เฉยๆ 
+            // เพื่อให้มันใช้ Path ที่เราส่งมาจากหน้า List ตรงๆ
+            const resp = await fetch(fileName); 
+            if (!resp.ok) throw new Error("File not found");
             const html = await resp.text();
             const div = document.createElement('div');
             div.innerHTML = html;
             document.body.appendChild(div);
+            console.log("Modal Loaded Successfully");
         } catch (e) { console.error("Load Modal Fail:", e); }
     },
 
