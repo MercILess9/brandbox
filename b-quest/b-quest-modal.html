@@ -1,5 +1,5 @@
 <style>
-    /* กว้าง 1000px ตามสั่ง แต่บีบ Padding ให้กระชับ (Compact) */
+    /* กว้าง 1000px แบบกระชับ */
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     
@@ -7,14 +7,14 @@
     .bq-form-body { padding: 25px 30px; background: #f8fafc; }
     .bq-form-footer { padding: 15px 30px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; }
 
-    /* Compact Card Section */
+    /* Section Card */
     .bq-card-section { 
         background: #ffffff; border-radius: 16px; padding: 20px; 
         border: 1px solid #eef2f6; height: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
     .bq-card-highlight { border-top: 3px solid #bdc432; }
 
-    /* Label & Input Styles */
+    /* Labels & Inputs */
     .bq-label { 
         font-size: 0.68rem; font-weight: 800; color: #64748b; 
         display: flex; align-items: center; gap: 8px;
@@ -27,7 +27,7 @@
         transition: 0.2s; margin-bottom: 15px; color: #1e293b;
     }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
-    .bq-input[readonly] { background-color: #f1f5f9; cursor: default; }
+    .bq-input[readonly] { background-color: #f1f5f9; cursor: not-allowed; }
     .bq-input:last-child { margin-bottom: 0; }
 
     /* Buttons */
@@ -124,7 +124,7 @@
                         Delete Task
                     </button>
                     <a href="#" class="btn-bq-cancel" data-bs-dismiss="modal">Cancel</a>
-                    <button type="submit" class="btn-bq-save shadow-sm">Save Mission</button>
+                    <button type="submit" class="btn-bq-save">Save Mission</button>
                 </div>
             </form>
         </div>
