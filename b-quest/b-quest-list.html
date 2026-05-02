@@ -17,6 +17,7 @@
             --c-text-main: #1e293b; --c-text-muted: #94a3b8; --c-slate: #626e7f;
             --c-accent: #bdc432; --c-accent-light: #f4f7a1;
             --c-role: #50adba; --radius-card: 20px;
+            --c-panel-bg: #fcfcfc;
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--c-bg); color: var(--c-text-main); padding-bottom: 120px; margin: 0; }
@@ -28,18 +29,19 @@
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
         .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; }
         .flt-date-group { display: flex; align-items: center; background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 0 12px; height: 38px; }
-        .flt-date-input { border: none; background: transparent; font-size: 0.82rem; color: var(--c-slate); outline: none; }
-        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; display: flex; align-items: center; gap: 6px; }
-        .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: 0.2s; }
+        .flt-date-input { border: none; background: transparent; font-size: 0.82rem; color: var(--c-slate); outline: none; font-family: inherit; }
+        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        
+        .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; }
         .flt-pill.active-role { background: var(--c-role); color: #fff; border-color: var(--c-role); }
         .flt-pill.active-prog { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
         .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
 
         .flt-advanced-zone { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
         .flt-advanced-row { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
-        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; flex: 1; min-width: 150px; }
-        .flt-select-tag { background: #f1f5f9; color: var(--c-text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
-        .flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; text-align-last: center; }
+        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; transition: 0.2s; flex: 1; min-width: 150px; }
+        .flt-select-tag { background: #f1f5f9; color: var(--c-text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; justify-content: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
+        .flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; text-align-last: center; }
         .flt-select-box.active-filter { background: var(--c-accent-light); border-color: var(--c-accent); }
         .flt-select-box.active-filter .flt-select-tag { background: var(--c-accent); color: #000; border-right-color: var(--c-accent); }
 
@@ -60,34 +62,32 @@
         
         .bqc-actions { width: 140px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; opacity: 0; transition: 0.2s; }
         .bqc-card:hover .bqc-actions { opacity: 1; }
-        .bqc-btn-more { color: var(--c-text-muted); padding: 5px; border: none; background: transparent; cursor: pointer; font-size: 1.2rem; }
+        .bqc-btn-more { color: var(--c-text-muted); padding: 5px; border: none; background: transparent; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; }
 
         .bqc-body { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
         .bqc-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .bqc-meta-pill { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
         .bqc-meta-label { font-size: 0.7rem; font-weight: 700; color: var(--c-text-muted); text-transform: uppercase; }
-        .bq-meta-val { font-size: 0.85rem; font-weight: 600; color: var(--c-slate); }
-        .bqc-last-update { font-size: 0.72rem; color: #626e7f; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        .bqc-meta-val { font-size: 0.85rem; font-weight: 600; color: var(--c-slate); }
+        .bqc-last-update { font-size: 0.72rem; color: var(--c-slate); font-weight: 500; display: flex; align-items: center; gap: 5px; }
         .bqc-btn-link { background: var(--c-text-main); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
         
         .bqc-layout-row { display: flex; gap: 20px; }
         .bqc-col-30 { width: 30%; }
         .bqc-col-40 { width: 40%; }
-        .bqc-panel { background: white; border-radius: var(--radius-card); padding: 20px; border: 1px solid #eef2f6; height: 160px; }
+        .bqc-panel-label { font-size: 0.85rem; font-weight: 700; color: var(--c-slate); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        
+        .bqc-panel { background: var(--c-panel-bg); border: 1px solid #f1f5f9; border-radius: 24px; padding: 20px; height: 160px; }
+        .bqc-panel-empty { border: 2px dashed #f1f5f9; background: transparent; border-radius: 24px; height: 160px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-weight: 600; letter-spacing: 1px; }
+
         .bqc-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--c-slate); }
         .bqc-val { font-weight: 600; }
         .bqc-dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .bqc-dot-prog { background-color: var(--c-progress); }
         .bqc-dot-done { background-color: var(--c-done); }
 
-        /* --- Floating Action Button (FAB) --- */
-        .fab-add {
-            position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px;
-            background: #1e293b; color: #bdc432; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            cursor: pointer; transition: 0.3s; border: none; z-index: 1000;
-        }
+        /* FAB */
+        .fab-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1e293b; color: #bdc432; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; border: none; z-index: 1000; transition: 0.3s; }
         .fab-add:hover { transform: scale(1.1) rotate(90deg); background: #0f172a; }
     </style>
 </head>
@@ -132,9 +132,7 @@
     <div id="load-more-trigger" style="height: 100px;"></div>
 </main>
 
-<button class="fab-add" onclick="openTaskModal()" title="New Mission">
-    <i class="bi bi-plus-lg"></i>
-</button>
+<button class="fab-add" onclick="openTaskModal()" title="New Mission"><i class="bi bi-plus-lg"></i></button>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -152,9 +150,7 @@
     });
 
     function togglePill(btn, type) {
-        if (type === 'designer' || type === 'creative') btn.classList.toggle('active-role');
-        if (type === 'progress') btn.classList.toggle('active-prog');
-        if (type === 'done') btn.classList.toggle('active-done');
+        btn.classList.toggle('active-' + (type === 'designer' || type === 'creative' ? 'role' : type));
         if (type === 'designer' || type === 'creative') renderWorkDropdown();
         applyFilters();
     }
@@ -178,33 +174,17 @@
         applyFilters();
     }
 
-    // --- Modal Control (New / Edit) ---
+    // --- Modal Logic ---
     async function openTaskModal(taskId = null) {
-        const modalEl = document.getElementById('taskModal');
-        const form = document.getElementById('taskForm');
-        const modalMain = document.getElementById('modalMainContent');
-        
-        if (!modalEl || !form) {
-            console.error("Modal files not loaded yet");
-            return;
-        }
-        
-        form.reset();
-        
-        if (taskId) {
-            modalMain.classList.add('is-edit');
-            const data = await BQuestService.getQuestById(taskId);
-            if (data) {
-                // Logic หยอดข้อมูลจะมาเขียนที่นี่
-                document.getElementById('task-id').value = data.id;
-            }
+        if (typeof openTaskModalLogic === 'function') {
+            openTaskModalLogic(taskId);
         } else {
-            modalMain.classList.remove('is-edit');
-            document.getElementById('task-id').value = '';
+            const modalEl = document.getElementById('taskModal');
+            if (modalEl) {
+                const myModal = new bootstrap.Modal(modalEl);
+                myModal.show();
+            }
         }
-        
-        const myModal = new bootstrap.Modal(modalEl);
-        myModal.show();
     }
 
     // --- Data Logic ---
@@ -312,9 +292,9 @@
         data.forEach(task => {
             const hasD = !!task.designer && task.designer !== '-';
             const hasC = !!task.creative && task.creative !== '-';
-            let isDone = (hasD || hasC) && (!hasD || task.designer_status === 'Done') && (!hasC || task.creative_status === 'Done');
-            
+            const isDone = (hasD || hasC) && (!hasD || task.designer_status === 'Done') && (!hasC || task.creative_status === 'Done');
             const collapseId = `collapse-${task.id}`;
+            
             const card = document.createElement("div");
             card.className = "col-12";
             card.innerHTML = `
@@ -325,8 +305,8 @@
                             <div class="bqc-subtitle">${task.account_name} | ${task.opportunity_name}</div>
                         </div>
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="bqc-dl-col">${hasD ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}</div>
-                            <div class="bqc-dl-col">${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
+                            <div class="bqc-dl-col">${hasD ? `<span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}</div>
+                            <div class="bqc-dl-col">${hasC ? `<span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
                         </div>
                         <div class="bqc-actions">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}')">Edit</button>
@@ -344,40 +324,40 @@
                         <div class="bqc-body">
                             <div class="bqc-meta-row">
                                 <div class="d-flex gap-2">
-                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Owner</span><span class="bq-meta-val">${task.owner || '-'}</span></div>
-                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Publish</span><span class="bq-meta-val">${formatDate(task.publish_date)}</span></div>
+                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Owner</span><span class="bqc-meta-val ms-2">${task.owner || '-'}</span></div>
+                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Publish</span><span class="bqc-meta-val ms-2">${formatDate(task.publish_date)}</span></div>
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="bqc-btn-link"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
                                 <div class="bqc-last-update"><i class="bi bi-clock-history"></i> Last Update : ${formatDate(task.last_update)}</div>
                             </div>
                             <div class="bqc-layout-row">
                                 <div class="bqc-col-30">
-                                    <h6 class="fw-bold mb-2 small text-primary">DESIGNER 🎨</h6>
-                                    <div class="bqc-panel ${!hasD ? 'opacity-25' : ''}">
-                                        ${hasD ? `
+                                    <div class="bqc-panel-label"><i class="bi bi-brush"></i> DESIGNER</div>
+                                    ${hasD ? `
+                                        <div class="bqc-panel">
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.designer_status}</span></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer}</span></div>
                                             <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.designer_assign}</span></div>
                                             <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div>
-                                        ` : '<div class="text-center mt-5 text-muted small">No Designer Task</div>'}
-                                    </div>
+                                        </div>
+                                    ` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
                                 </div>
                                 <div class="bqc-col-30">
-                                    <h6 class="fw-bold mb-2 small text-danger">CREATIVE 🖋️</h6>
-                                    <div class="bqc-panel ${!hasC ? 'opacity-25' : ''}">
-                                        ${hasC ? `
+                                    <div class="bqc-panel-label"><i class="bi bi-rocket"></i> CREATIVE</div>
+                                    ${hasC ? `
+                                        <div class="bqc-panel">
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.creative_status}</span></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative}</span></div>
                                             <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.creative_assign}</span></div>
                                             <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div>
-                                        ` : '<div class="text-center mt-5 text-muted small">No Creative Task</div>'}
-                                    </div>
+                                        </div>
+                                    ` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
                                 </div>
                                 <div class="bqc-col-40">
-                                    <h6 class="fw-bold mb-2 small text-secondary">DETAILS 📝</h6>
-                                    <div class="bqc-panel" style="overflow-y: auto; font-size: 0.9rem; line-height: 1.6; color: #64748b;">
+                                    <div class="bqc-panel-label"><i class="bi bi-justify-left"></i> DETAIL</div>
+                                    <div class="bqc-panel" style="overflow-y: auto; color: #64748b; font-size: 0.9rem;">
                                         ${task.detail || 'No details provided.'}
                                     </div>
                                 </div>
@@ -397,12 +377,12 @@
     }
 
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
-        document.getElementById(id).addEventListener('change', () => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('change', () => {
             if(id.startsWith('filter')) updateHighlight(id);
             applyFilters();
         });
     });
-    document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
 
     const obs = new IntersectionObserver(e => { if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests() }, { rootMargin: '600px' });
     obs.observe(document.getElementById('load-more-trigger'));
