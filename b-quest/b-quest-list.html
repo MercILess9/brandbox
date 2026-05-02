@@ -402,10 +402,7 @@
 
     async function initPage() {
         await System.initLayout(B_QUEST_CONFIG);
-        
-        // ใส่ชื่อไฟล์พร้อมนามสกุล .html ให้ชัดเจน
         await System.loadModal('./b-quest-form.html'); 
-        
         await loadMasterData();
         fetchQuests(true);
     }

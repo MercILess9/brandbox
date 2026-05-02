@@ -1,93 +1,116 @@
 <style>
-    .bq-modal-content { border-radius: 28px; border: none; background: #f8fafc; overflow: hidden; }
-    .bq-modal-header { border: none; padding: 35px 45px 15px 45px; background: white; }
-    .bq-modal-body { padding: 0 45px 35px 45px; }
+    /* Modal Size Control */
+    .bq-modal-1000 { max-width: 1000px !important; margin: 1.75rem auto; }
     
-    /* Card Styling */
-    .bq-card { 
-        background: #ffffff; 
+    /* Container & Body */
+    .bq-form-container { border-radius: 32px; border: none; background: #ffffff; overflow: hidden; }
+    .bq-form-header { padding: 35px 45px; background: white; border-bottom: 1px solid #f1f5f9; }
+    .bq-form-body { padding: 40px 45px; background: #f8fafc; }
+    
+    /* Card Styling #fcfcfc */
+    .bq-input-card { 
+        background: #fcfcfc; 
         border-radius: 24px; 
         padding: 30px; 
-        border: 1px solid #edf2f7;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02);
+        border: 1px solid #eef2f6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.01);
         height: 100%;
     }
-    
-    /* Input & Label Styling */
-    .bq-group { margin-bottom: 20px; display: flex; align-items: center; }
-    .bq-label { 
-        font-size: 0.75rem; 
+
+    /* Label & Icon Styling #626e7f */
+    .bq-field-label { 
+        font-size: 0.85rem; 
         font-weight: 700; 
-        color: #94a3b8; 
-        text-transform: uppercase; 
-        width: 110px; 
+        color: #626e7f; 
         display: flex; 
         align-items: center; 
-        gap: 8px;
+        gap: 10px;
+        margin-bottom: 10px;
+        white-space: nowrap;
     }
-    .bq-input { 
-        flex: 1; 
+    .bq-field-label i { color: #626e7f; font-size: 1.1rem; }
+
+    /* Input Field Styling */
+    .bq-form-input { 
+        width: 100%;
         border-radius: 14px; 
         border: 1px solid #e2e8f0; 
-        padding: 10px 16px; 
+        padding: 12px 18px; 
         font-size: 0.95rem; 
-        background: #fdfdfd;
-        transition: all 0.2s ease;
-    }
-    .bq-input:focus { 
-        border-color: #bdc432; 
-        outline: none; 
-        box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1);
         background: white;
+        transition: 0.2s;
+        margin-bottom: 20px;
+    }
+    .bq-form-input:focus { outline: none; border-color: #bdc432; box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1); }
+
+    /* Section Headers */
+    .bq-section-header {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #626e7f;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    /* Logic: Hide Edit Fields by default */
+    /* Status Control */
     .edit-mode-only { display: none !important; }
-    .is-edit .edit-mode-only { display: flex !important; }
+    .is-edit .edit-mode-only { display: block !important; }
     
-    /* Button Styling */
-    .btn-save { background: #1e293b; color: white; border-radius: 14px; padding: 12px 40px; font-weight: 600; border: none; transition: 0.2s; }
-    .btn-save:hover { background: #0f172a; transform: translateY(-1px); }
-    .btn-delete { background: #fee2e2; color: #ef4444; border-radius: 14px; padding: 12px 25px; font-weight: 600; border: none; }
+    /* Footer Buttons */
+    .btn-save { background: #1e293b; color: #bdc432; border-radius: 16px; padding: 12px 45px; font-weight: 700; border: none; transition: 0.3s; }
+    .btn-save:hover { background: #0f172a; transform: translateY(-2px); }
 </style>
 
 <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bq-modal-content shadow-2xl" id="modalMainContent">
+    <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
+        <div class="modal-content bq-form-container shadow-2xl" id="modalMainContent">
             
-            <div class="bq-modal-header d-flex justify-content-between align-items-end">
+            <div class="bq-form-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="fw-bold m-0" style="letter-spacing: -1px;">Mission <span style="color: #bdc432;">Details</span></h2>
-                    <p class="text-muted small m-0 mt-1" id="modalSubtitle">Create a new task for the production team</p>
+                    <h2 class="fw-bold m-0" id="taskModalLabel" style="letter-spacing: -1.5px; font-family: 'Poppins'; font-size: 2rem;">Mission <span style="color:#bdc432">Details</span></h2>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="bq-label" style="width: auto;">Publish Date 📅</span>
-                    <input type="date" class="bq-input" style="width: 180px;" id="publish_date" name="publish_date">
-                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <div class="bq-modal-body">
+            <div class="bq-form-body">
                 <form id="taskForm">
                     <input type="hidden" id="task-id" name="id">
                     
-                    <div class="bq-card mb-4" style="padding: 25px 35px;">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="bq-group m-0">
-                                    <span class="bq-label">Account 🏢</span>
-                                    <input type="text" class="bq-input" id="account_name" name="account_name" placeholder="Client / Brand Name">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-7">
+                            <div class="bq-input-card">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label class="bq-field-label"><i class="bi bi-building"></i> Account Name</label>
+                                        <input type="text" class="bq-form-input" id="account_name" name="account_name" placeholder="Brand / Client Full Name">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="bq-field-label"><i class="bi bi-gem"></i> Opportunity Name</label>
+                                        <input type="text" class="bq-form-input" id="opportunity_name" name="opportunity_name" placeholder="Opportunity Reference">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="bq-field-label"><i class="bi bi-card-text"></i> Task Name</label>
+                                        <input type="text" class="bq-form-input" id="task_name" name="task_name" placeholder="Specific Task Subject">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="bq-field-label"><i class="bi bi-link-45deg"></i> Link</label>
+                                        <input type="text" class="bq-form-input m-0" id="task_link" name="link" placeholder="External URL / Documentation Link">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="bq-group m-0">
-                                    <span class="bq-label">Opp 💎</span>
-                                    <input type="text" class="bq-input" id="opportunity_name" name="opportunity_name" placeholder="Opportunity Name">
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="bq-input-card">
+                                <div class="col-12">
+                                    <label class="bq-field-label"><i class="bi bi-calendar-date"></i> Publish Date</label>
+                                    <input type="date" class="bq-form-input" id="publish_date" name="publish_date">
                                 </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="bq-group m-0">
-                                    <span class="bq-label">Task 📝</span>
-                                    <input type="text" class="bq-input" id="task_name" name="task_name" placeholder="Task Subject / Title">
+                                <div class="col-12">
+                                    <label class="bq-field-label"><i class="bi bi-justify-left"></i> Detail</label>
+                                    <textarea class="bq-form-input m-0" id="detail" name="detail" rows="10" style="resize: none; height: 198px;" placeholder="Full project brief and instructions..."></textarea>
                                 </div>
                             </div>
                         </div>
@@ -95,34 +118,42 @@
 
                     <div class="row g-4">
                         <div class="col-md-6">
-                            <div class="bq-card">
-                                <h5 class="fw-bold mb-4 text-center">Designer 🎨</h5>
-                                <div class="bq-group"><span class="bq-label">Type ✨</span><select class="bq-input" id="designer_type" name="designer_type"></select></div>
-                                <div class="bq-group edit-mode-only"><span class="bq-label">Assign 👤</span><select class="bq-input" id="designer_assign" name="designer_assign"></select></div>
-                                <div class="bq-group edit-mode-only"><span class="bq-label">Status ℹ️</span><select class="bq-input" id="designer_status" name="designer_status"></select></div>
-                                <div class="bq-group"><span class="bq-label">Work 🛠️</span><select class="bq-input" id="designer_work" name="designer_work"></select></div>
-                                <div class="bq-group">
-                                    <span class="bq-label">Deadline ⏰</span>
-                                    <div class="flex-grow-1">
-                                        <input type="date" class="bq-input w-100" id="designer_deadline" name="designer_deadline">
-                                        <div id="des-capacity-info" class="mt-2 small fw-bold"></div>
+                            <div class="bq-input-card">
+                                <div class="bq-section-header"><i class="bi bi-brush"></i> DESIGNER ASSIGNMENT</div>
+                                <div class="row">
+                                    <div class="col-6"><label class="bq-field-label">Type</label><select class="bq-form-input" id="designer_type" name="designer_type"></select></div>
+                                    <div class="col-6"><label class="bq-field-label">Work</label><select class="bq-form-input" id="designer_work" name="designer_work"></select></div>
+                                    <div class="col-12 edit-mode-only">
+                                        <div class="row">
+                                            <div class="col-6"><label class="bq-field-label">Assign</label><select class="bq-form-input" id="designer_assign" name="designer_assign"></select></div>
+                                            <div class="col-6"><label class="bq-field-label">Status</label><select class="bq-form-input" id="designer_status" name="designer_status"></select></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="bq-field-label">Deadline</label>
+                                        <input type="date" class="bq-form-input m-0" id="designer_deadline" name="designer_deadline">
+                                        <div id="des-capacity-info" class="mt-2 small fw-bold" style="font-size: 10px; color: #626e7f;"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="bq-card">
-                                <h5 class="fw-bold mb-4 text-center">Creative 🖋️</h5>
-                                <div class="bq-group"><span class="bq-label">Type ✨</span><select class="bq-input" id="creative_type" name="creative_type"></select></div>
-                                <div class="bq-group edit-mode-only"><span class="bq-label">Assign 👤</span><select class="bq-input" id="creative_assign" name="creative_assign"></select></div>
-                                <div class="bq-group edit-mode-only"><span class="bq-label">Status ℹ️</span><select class="bq-input" id="creative_status" name="creative_status"></select></div>
-                                <div class="bq-group"><span class="bq-label">Work 🛠️</span><select class="bq-input" id="creative_work" name="creative_work"></select></div>
-                                <div class="bq-group">
-                                    <span class="bq-label">Deadline ⏰</span>
-                                    <div class="flex-grow-1">
-                                        <input type="date" class="bq-input w-100" id="creative_deadline" name="creative_deadline">
-                                        <div id="cre-capacity-info" class="mt-2 small fw-bold"></div>
+                            <div class="bq-input-card">
+                                <div class="bq-section-header"><i class="bi bi-rocket"></i> CREATIVE ASSIGNMENT</div>
+                                <div class="row">
+                                    <div class="col-6"><label class="bq-field-label">Type</label><select class="bq-form-input" id="creative_type" name="creative_type"></select></div>
+                                    <div class="col-6"><label class="bq-field-label">Work</label><select class="bq-form-input" id="creative_work" name="creative_work"></select></div>
+                                    <div class="col-12 edit-mode-only">
+                                        <div class="row">
+                                            <div class="col-6"><label class="bq-field-label">Assign</label><select class="bq-form-input" id="creative_assign" name="creative_assign"></select></div>
+                                            <div class="col-6"><label class="bq-field-label">Status</label><select class="bq-form-input" id="creative_status" name="creative_status"></select></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="bq-field-label">Deadline</label>
+                                        <input type="date" class="bq-form-input m-0" id="creative_deadline" name="creative_deadline">
+                                        <div id="cre-capacity-info" class="mt-2 small fw-bold" style="font-size: 10px; color: #626e7f;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -131,13 +162,13 @@
                 </form>
             </div>
             
-            <div class="modal-footer border-0 p-4 px-5 d-flex justify-content-between">
+            <div class="modal-footer border-0 p-4 px-5 d-flex justify-content-between" style="background: white;">
                 <div>
-                    <button type="button" class="btn-delete edit-mode-only" id="btnDeleteTask">Delete Mission</button>
+                    <button type="button" class="btn btn-light text-danger fw-bold edit-mode-only" id="btnDeleteTask" style="border-radius: 12px; padding: 10px 20px;">Delete Mission</button>
                 </div>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-link text-decoration-none text-muted fw-bold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" form="taskForm" class="btn-save">Save Mission</button>
+                    <button type="submit" form="taskForm" class="btn btn-save">Save Mission</button>
                 </div>
             </div>
         </div>
