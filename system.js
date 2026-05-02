@@ -21,11 +21,17 @@ function formatDate(dateStr) {
 
 function getCorrectPath(target) {
     const root = window.location.origin;
+
     if (target === "login.html") return `${root}/login/login.html`;
     if (target === "index.html") return `${root}/b-quest/b-quest-list.html`;
+
+    // 🔥 FIX: ให้ modal โหลดจาก folder b-quest
+    if (target.includes('b-quest-modal')) {
+        return `${root}/b-quest/${target}`;
+    }
+
     return `${root}/${target}`;
 }
-
 function getCurrentPage() {
     let page = window.location.pathname.split("/").pop() || "index.html";
     if (!page.includes(".")) page += ".html"; 
