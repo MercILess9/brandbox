@@ -43,13 +43,29 @@
         .flt-select-box.active-filter .flt-select-tag { background: var(--c-accent); color: #000; border-right-color: var(--c-accent); }
 
         /* Card Styles */
-        .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s; }
-        .bqc-header { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
-        .bqc-title { font-weight: 700; font-size: 1rem; color: var(--c-text-main); }
-        .bqc-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid transparent; }
-        .bqc-tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
-        .bqc-tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
-        .bqc-panel { background: white; border-radius: var(--radius-card); padding: 20px; border: 1px solid #eef2f6; height: 200px; }
+        /* --- Card Locked Layout --- */
+.bqc-card { 
+    background: white; border: 1px solid #f1f5f9; border-radius: 20px; 
+    margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s; width: 100%; 
+}
+.bqc-status-done { border-left-color: var(--c-done); }
+.bqc-status-prog { border-left-color: var(--c-progress); }
+
+.bqc-header { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; width: 100%; }
+.bqc-info-zone { width: 50%; flex-shrink: 0; padding-right: 20px; text-align: left; }
+.bqc-title { font-weight: 700; font-size: 1rem; color: var(--c-text-main); margin: 0; }
+
+.bqc-dl-grid { display: grid; grid-template-columns: 140px 140px; gap: 20px; flex-grow: 1; justify-content: center; }
+.bqc-dl-col { text-align: center; }
+.bqc-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid transparent; display: inline-block; }
+.bqc-tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
+.bqc-tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
+
+.bqc-body { background: #fdfdfd; border-top: 1px solid #f1f5f9; padding: 25px; }
+.bqc-layout-row { display: flex; gap: 20px; width: 100%; }
+.bqc-col-30 { width: 30%; flex-shrink: 0; }
+.bqc-col-40 { width: 40%; flex-grow: 1; }
+.bqc-panel { background: white; border-radius: 20px; padding: 20px; border: 1px solid #eef2f6; height: 200px; overflow-y: auto; }
     </style>
 </head>
 <body>
