@@ -1,7 +1,13 @@
+// ==========================================
+// 1. GLOBAL CONFIG & CLIENT
+// ==========================================
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const publicPages = ["login.html", "register.html", "forgot-password.html"];
 
-// --- GLOBAL UTILITIES ---
+// ==========================================
+// 2. GLOBAL UTILITIES (เรียกใช้ได้ทุกที่)
+// ==========================================
+
 function formatDate(dateStr) {
     if (!dateStr || dateStr === '-' || dateStr === 'null') return '-';
     try {
@@ -31,8 +37,11 @@ function safeRedirect(to) {
     if (window.location.href !== url) window.location.href = url;
 }
 
-// --- SYSTEM ENGINE ---
-const BQuest = {
+// ==========================================
+// 3. SYSTEM ENGINE (Core Management)
+// ==========================================
+
+const System = {
     injectAssets() {
         if (!document.querySelector('meta[name="viewport"]')) {
             const meta = document.createElement('meta');
@@ -63,8 +72,8 @@ const BQuest = {
             header.innerHTML = html;
             document.body.prepend(header);
 
-            const titleEl = document.getElementById("project-title");
-            if (titleEl) titleEl.innerText = config.projectName;
+            if (document.getElementById("project-title")) 
+                document.getElementById("project-title").innerText = config.projectName;
 
             const menuBar = document.getElementById("sys-menu-bar");
             const curr = getCurrentPage();
@@ -88,15 +97,26 @@ const BQuest = {
         } catch (e) { console.error("Init Layout Fail:", e); }
     },
 
+    async getProfile(userId) {
+        const { data, error } = await supabaseClient.from("profiles").select("*").eq("id", userId).single();
+        return error ? null : data;
+    },
+
     async logout() {
         await supabaseClient.auth.signOut();
         localStorage.clear();
         sessionStorage.clear();
     },
 
-    async getProfile(userId) {
-        const { data, error } = await supabaseClient.from("profiles").select("*").eq("id", userId).single();
-        return error ? null : data;
+    async loadModal(fileName) {
+        if (document.getElementById('taskModal')) return;
+        try {
+            const resp = await fetch(getCorrectPath(fileName));
+            const html = await resp.text();
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            document.body.appendChild(div);
+        } catch (e) { console.error("Load Modal Fail:", e); }
     },
 
     notify(title, type = "success") {
@@ -104,7 +124,10 @@ const BQuest = {
     }
 };
 
-// --- AUTH GUARD ---
+// ==========================================
+// 4. AUTH GUARD & STATE WATCHER
+// ==========================================
+
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const page = getCurrentPage();
@@ -114,6 +137,7 @@ async function initAuthGuard() {
         session ? safeRedirect("index.html") : safeRedirect("login.html");
         return;
     }
+    
     if (!session && !isPublic) safeRedirect("login.html");
     else if (session && isPublic) safeRedirect("index.html");
 
