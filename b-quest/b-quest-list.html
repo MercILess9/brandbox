@@ -440,15 +440,25 @@
     }
 
     async function initPage() {
-    // 1. โหลด Layout และ Navbar
-    await System.initLayout(B_QUEST_CONFIG);
-    
-    // 2. โหลดไฟล์ Modal เข้ามาใน DOM (รอให้เสร็จก่อนไปต่อ)
-    await System.loadModal('./b-quest-modal.html'); 
-    
-    // 3. เมื่อ Modal มาแล้วค่อยดึงข้อมูลมาแสดง
-    await loadMasterData();
-    fetchQuests(true);
+    try {
+        // 1. ตรวจสอบว่า System พร้อมไหม
+        if (typeof System === 'undefined') throw new Error("System.js not loaded");
+
+        await System.initLayout(B_QUEST_CONFIG);
+        
+        // 2. โหลด Modal (ใส่ .html ให้ชัดเจน)
+        // ถ้าไฟล์อยู่ในโฟลเดอร์ /b-quest/ ให้เช็คว่าเรียกถูกไหม
+        await System.loadModal('b-quest-modal.html'); 
+        
+        console.log("✅ Modal Loaded Successfully");
+
+        // 3. โหลดข้อมูลอื่นๆ
+        if (typeof loadMasterData === 'function') await loadMasterData();
+        if (typeof fetchQuests === 'function') fetchQuests(true);
+
+    } catch (error) {
+        console.error("❌ Init Error:", error);
+    }
 }
 
     // Filters event listeners
