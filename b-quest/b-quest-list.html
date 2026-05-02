@@ -333,7 +333,7 @@
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px;">
-                                    <li><a class="dropdown-item py-2" href="#">View Project</a></li>
+                                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}')">Edit Mission</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
                                     <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="BQuestService.deleteQuest('${task.id}')">Delete</a></li>
                                 </ul>
@@ -352,6 +352,7 @@
                             </div>
                             <div class="bqc-layout-row">
                                 <div class="bqc-col-30">
+                                    <h6 class="fw-bold mb-2 small text-primary">DESIGNER 🎨</h6>
                                     <div class="bqc-panel ${!hasD ? 'opacity-25' : ''}">
                                         ${hasD ? `
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.designer_status}</span></div>
@@ -363,6 +364,7 @@
                                     </div>
                                 </div>
                                 <div class="bqc-col-30">
+                                    <h6 class="fw-bold mb-2 small text-danger">CREATIVE 🖋️</h6>
                                     <div class="bqc-panel ${!hasC ? 'opacity-25' : ''}">
                                         ${hasC ? `
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.creative_status}</span></div>
@@ -374,6 +376,7 @@
                                     </div>
                                 </div>
                                 <div class="bqc-col-40">
+                                    <h6 class="fw-bold mb-2 small text-secondary">DETAILS 📝</h6>
                                     <div class="bqc-panel" style="overflow-y: auto; font-size: 0.9rem; line-height: 1.6; color: #64748b;">
                                         ${task.detail || 'No details provided.'}
                                     </div>
