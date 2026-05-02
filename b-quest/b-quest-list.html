@@ -393,8 +393,10 @@
     async function initPage() {
         try {
             await System.initLayout(B_QUEST_CONFIG);
-            // ระบุ .html ให้ชัดเจนเพื่อกัน 404 บน Vercel
-            await System.loadModal('./b-quest-modal.html'); 
+            
+            // ส่งแค่ชื่อไฟล์ .html ไปครับ system.js จะไปประกอบร่างกับ origin ให้เอง
+            await System.loadModal('b-quest-modal.html'); 
+            
             console.log("✅ Modal HTML Loaded");
             
             await loadMasterData();

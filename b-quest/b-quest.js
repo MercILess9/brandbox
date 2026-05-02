@@ -88,47 +88,34 @@ const BQuestService = {
     }
 };
 
-// ==========================================
-// 4. MODAL CONTROL
-// ==========================================
 async function openTaskModal(taskId = null) {
+    // ดึง Element โดยใช้ ID ที่อยู่ใน b-quest-modal.html
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
     
     if (!modalEl || !form) {
-        console.error("❌ Modal/Form not found in DOM!");
+        console.error("❌ หา Modal ไม่เจอในหน้าจอ (DOM)");
         return;
     }
 
     form.reset();
-    
-    // โหลดข้อมูล Work จาก DB
-    await setupWorkDropdowns();
+    await setupWorkDropdowns(); // ดึง Work จาก DB มาหยอด
 
-    // หยอดค่า Type เริ่มต้น (ใช้ Input Read-only)
+    // หยอด Type เริ่มต้นลงใน Input
     const desType = document.getElementById('b-quest-modal-designer-type');
     const creType = document.getElementById('b-quest-modal-creative-type');
     if (desType) desType.value = "New Task";
     if (creType) creType.value = "New Task";
 
-    const label = document.getElementById('b-quest-modal-label');
-    const modalContent = document.getElementById('b-quest-modal-content');
-
     if (taskId) {
-        label.innerHTML = 'Edit <span style="color: #bdc432;">Task</span>';
-        if (modalContent) modalContent.classList.add('is-edit');
-        
         const data = await BQuestService.getQuestById(taskId);
-        if (data && typeof fillFormData === 'function') {
-            fillFormData(data); 
-        }
+        if (data && typeof fillFormData === 'function') fillFormData(data);
     } else {
-        label.innerHTML = 'New <span style="color: #bdc432;">Task</span>';
-        if (modalContent) modalContent.classList.remove('is-edit');
-        const idInput = document.getElementById('b-quest-modal-id');
-        if (idInput) idInput.value = '';
+        const idInp = document.getElementById('b-quest-modal-id');
+        if (idInp) idInp.value = '';
     }
 
+    // เปิด Modal
     const myModal = bootstrap.Modal.getOrCreateInstance(modalEl);
     myModal.show();
 }
