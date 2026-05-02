@@ -1,7 +1,7 @@
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
     
-    itemsPerPage: 20, 
+    itemsPerPage: 10, 
 
     menus: [
         { name: "List", link: "b-quest-list.html" },
