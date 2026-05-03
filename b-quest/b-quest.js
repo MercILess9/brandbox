@@ -11,12 +11,7 @@ const B_QUEST_CONFIG = {
     ]
 };
 
-// ==========================================
-// 2. MASTER DATA LOGIC (Dropdowns)
-// ==========================================
-/**
- * ดึงข้อมูล Work จาก Database มาหยอดใส่ Select ใน Modal
- */
+// --- 1. หยอด Work (เอาคำว่า Select ออก เหลือแต่ช่องว่าง) ---
 async function setupWorkDropdowns() {
     try {
         const { data, error } = await supabaseClient
@@ -26,103 +21,21 @@ async function setupWorkDropdowns() {
 
         if (error) throw error;
 
-        const desSelect = document.getElementById('b-quest-modal-designer-work');
-        const creSelect = document.getElementById('b-quest-modal-creative-work');
-
-        if (desSelect && creSelect) {
-            desSelect.innerHTML = '<option value="">- Select Work -</option>';
-            creSelect.innerHTML = '<option value="">- Select Work -</option>';
-
-            data.forEach(item => {
-                const opt = new Option(item.work, item.work);
-                if (item.role === 'Designer') {
-                    desSelect.add(opt);
-                } else if (item.role === 'Creative') {
-                    creSelect.add(opt);
-                }
-            });
-        }
-    } catch (e) {
-        console.error("❌ Error loading work dropdowns:", e);
-    }
-}
-
-// ==========================================
-// 3. DATABASE SERVICE
-// ==========================================
-const BQuestService = {
-    async getQuestById(id) {
-        const { data, error } = await supabaseClient
-            .from('b-quest-list')
-            .select('*')
-            .eq('id', id)
-            .single();
-        return error ? null : data;
-    },
-
-    async deleteQuest(id) {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: "ต้องการลบภารกิจนี้ใช่หรือไม่?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#1e293b',
-            confirmButtonText: 'Yes, Delete it!'
-        });
-
-        if (result.isConfirmed) {
-            const { error } = await supabaseClient
-                .from('b-quest-list')
-                .delete()
-                .eq('id', id);
-
-            if (!error) {
-                // เรียกใช้ applyFilters ในหน้า List เพื่อวาด Card ใหม่
-                if (typeof applyFilters === 'function') {
-                    applyFilters();
-                } else {
-                    location.reload();
-                }
+        const targetIds = ['b-quest-modal-designer-work', 'b-quest-modal-creative-work'];
+        targetIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerHTML = '<option value=""></option>'; // เริ่มด้วยช่องว่าง
+                const role = id.includes('designer') ? 'Designer' : 'Creative';
+                data.filter(item => item.role === role).forEach(item => {
+                    el.add(new Option(item.work, item.work));
+                });
             }
-        }
-    }
-};
-
-async function openTaskModal(taskId = null) {
-    // ดึง Element โดยใช้ ID ที่อยู่ใน b-quest-modal.html
-    const modalEl = document.getElementById('b-quest-modal');
-    const form = document.getElementById('b-quest-modal-form');
-    
-    if (!modalEl || !form) {
-        console.error("❌ หา Modal ไม่เจอในหน้าจอ (DOM)");
-        return;
-    }
-
-    form.reset();
-    await setupWorkDropdowns(); // ดึง Work จาก DB มาหยอด
-    setupTypeDropdowns();
-
-    // หยอด Type เริ่มต้นลงใน Input
-    const desType = document.getElementById('b-quest-modal-designer-type');
-    const creType = document.getElementById('b-quest-modal-creative-type');
-    if (desType) desType.value = "New Task";
-    if (creType) creType.value = "New Task";
-
-    if (taskId) {
-        const data = await BQuestService.getQuestById(taskId);
-        if (data && typeof fillFormData === 'function') fillFormData(data);
-    } else {
-        const idInp = document.getElementById('b-quest-modal-id');
-        if (idInp) idInp.value = '';
-    }
-
-    // เปิด Modal
-    const myModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    myModal.show();
+        });
+    } catch (e) { console.error("❌ Work Error:", e); }
 }
 
-
-
+// --- 2. หยอด Type (เริ่มด้วยช่องว่าง) ---
 function setupTypeDropdowns() {
     const types = B_QUEST_CONFIG.listTypes;
     const targetIds = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
@@ -130,11 +43,38 @@ function setupTypeDropdowns() {
     targetIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            el.innerHTML = ''; // ล้างค่าเก่า
-            types.forEach(t => {
-                const opt = new Option(t, t);
-                el.add(opt);
-            });
+            el.innerHTML = '<option value=""></option>'; // เริ่มด้วยช่องว่าง
+            types.forEach(t => el.add(new Option(t, t)));
         }
     });
+}
+
+// --- 3. ฟังก์ชันเปิด Modal ---
+async function openTaskModal(taskId = null) {
+    const modalEl = document.getElementById('b-quest-modal');
+    const form = document.getElementById('b-quest-modal-form');
+    if (!modalEl || !form) return;
+
+    form.reset();
+    
+    // โหลด Master Data ทั้งหมด
+    await setupWorkDropdowns(); 
+    setupTypeDropdowns();
+
+    if (taskId) {
+        document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Task</span>';
+        const data = await BQuestService.getQuestById(taskId);
+        if (data && typeof fillFormData === 'function') fillFormData(data);
+    } else {
+        document.getElementById('b-quest-modal-label').innerHTML = 'New <span style="color: #bdc432;">Task</span>';
+        document.getElementById('b-quest-modal-id').value = '';
+        
+        // บังคับให้เป็นค่าว่าง (Index 0 คือ <option value=""></option>)
+        document.getElementById('b-quest-modal-designer-type').selectedIndex = 0;
+        document.getElementById('b-quest-modal-creative-type').selectedIndex = 0;
+        document.getElementById('b-quest-modal-designer-work').selectedIndex = 0;
+        document.getElementById('b-quest-modal-creative-work').selectedIndex = 0;
+    }
+
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
