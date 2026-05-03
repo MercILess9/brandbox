@@ -30,24 +30,41 @@
         .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; }
         .flt-date-group { display: flex; align-items: center; background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 0 12px; height: 38px; }
         .flt-date-input { border: none; background: transparent; font-size: 0.82rem; color: var(--c-slate); outline: none; font-family: inherit; }
-        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
         
         .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; }
         .flt-pill.active-role { background: var(--c-role); color: #fff; border-color: var(--c-role); }
         .flt-pill.active-prog { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
         .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
 
-        /* ปรับ Advance Zone ให้อยู่กึ่งกลาง */
-        .flt-advanced-zone { display: none; padding-top: 15px; border-top: 1px dashed #eee; margin-top: 15px; }
-        .flt-advanced-row { display: flex; align-items: center; gap: 12px; justify-content: center; overflow-x: auto; padding-bottom: 5px; }
+        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+
+        /* Smooth Slide Advance Zone */
+        .flt-advanced-zone { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.4s ease-out, opacity 0.3s ease; 
+            opacity: 0;
+            border-top: 1px dashed transparent;
+        }
+        .flt-advanced-zone.show { 
+            max-height: 200px; 
+            opacity: 1;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #eee;
+        }
+        .flt-advanced-row { display: flex; align-items: center; gap: 12px; justify-content: center; flex-wrap: nowrap; }
         
-        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; transition: 0.2s; flex: 0 1 180px; min-width: 150px; }
+        .flt-select-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; transition: 0.2s; flex: 0 1 200px; }
         .flt-select-tag { background: #f1f5f9; color: var(--c-text-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; justify-content: center; text-transform: uppercase; border-right: 1px solid #e2e8f0; min-width: 65px; }
         .flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; text-align-last: center; }
         .flt-select-box.active-filter { background: var(--c-accent-light); border-color: var(--c-accent); }
         .flt-select-box.active-filter .flt-select-tag { background: var(--c-accent); color: #000; border-right-color: var(--c-accent); }
 
-        /* --- Card Styles --- */
+        .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; }
+        .btn-reset:hover { background: #f8fafc; color: var(--c-text-main); border-color: #cbd5e1; }
+
+        /* --- Card Styles (คงเดิมจากพี่) --- */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-status-done { border-left-color: var(--c-done); }
         .bqc-status-prog { border-left-color: var(--c-progress); }
@@ -90,10 +107,6 @@
 
         .fab-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1e293b; color: #bdc432; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; border: none; z-index: 1000; transition: 0.3s; }
         .fab-add:hover { transform: scale(1.1) rotate(90deg); background: #0f172a; }
-
-        /* ปุ่ม Reset ใหม่ */
-        .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.75rem; font-weight: 700; border-radius: 8px; padding: 5px 12px; cursor: pointer; transition: 0.2s; }
-        .btn-reset:hover { background: #f8fafc; color: var(--c-text-main); border-color: #cbd5e1; }
     </style>
 </head>
 <body>
@@ -116,7 +129,7 @@
         <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 5px;"></div>
         <div class="flt-pill-group">
             <button id="pill-prog" class="flt-pill active-prog" onclick="togglePill(this, 'prog')">Progress</button>
-            <button id="pill-done" class="flt-pill" onclick="togglePill(this, 'done')">Done</button>
+            <button id="pill-done" class="flt-pill active-done" onclick="togglePill(this, 'done')">Done</button>
         </div>
         <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
     </div>
@@ -153,26 +166,18 @@
     // --- UI Helpers ---
     document.getElementById('toggleFilters').addEventListener('click', () => {
         const zone = document.getElementById('advancedFilterZone');
-        zone.style.display = (window.getComputedStyle(zone).display === 'none') ? 'flex' : 'none';
+        zone.classList.toggle('show');
     });
 
     function togglePill(btn, type) {
-        // จัดการการสลับสีของปุ่มกลุ่ม Status (Progress / Done)
-        if (type === 'prog' || type === 'done') {
-            document.getElementById('pill-prog').classList.remove('active-prog');
-            document.getElementById('pill-done').classList.remove('active-done');
-            btn.classList.add('active-' + type);
-        } else {
-            // จัดการ Designer / Creative แบบปกติ
-            btn.classList.toggle('active-' + (type === 'designer' || type === 'creative' ? 'role' : type));
-        }
+        // Toggle Class ของตัวเองอิสระ (Progress / Done ก็แยกกันได้)
+        btn.classList.toggle('active-' + (type === 'designer' || type === 'creative' ? 'role' : type));
         
         if (type === 'designer' || type === 'creative') renderWorkDropdown();
         applyFilters();
     }
 
     function setupDefaultOptions(el, label) {
-        // ตัดเส้นประออกตามสั่ง
         el.innerHTML = `<option value="">All ${label}</option>`;
     }
 
@@ -227,7 +232,6 @@
             caps.forEach(c => c.innerText = 'Select Date...');
         }
         
-        // ใช้ Vanilla JS เปิด Modal แทน jQuery ($) เพื่อกัน Error
         const modalEl = document.getElementById('b-quest-modal');
         if(modalEl) {
             const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -297,7 +301,6 @@
         const dW = MASTER_WORK_DATA.filter(i => i.role === 'Designer');
         const cW = MASTER_WORK_DATA.filter(i => i.role === 'Creative');
         
-        // ตัดเส้นประออกและเปลี่ยนชื่อกลุ่มตามสั่ง
         if (pDes) {
             const g1 = document.createElement('optgroup'); g1.label = "-- Designer --";
             dW.forEach(w => g1.appendChild(new Option(w.work, w.work)));
@@ -342,9 +345,12 @@
         }
         const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
         const pDone = document.getElementById('pill-done').classList.contains('active-done');
-        if (pProg && !pDone) query = query.or('designer_status.neq.Done, creative_status.neq.Done');
-        else if (!pProg && pDone) query = query.eq('designer_status', 'Done').eq('creative_status', 'Done');
-        else if (!pProg && !pDone) query = query.eq('id', -1);
+        
+        if (pProg && pDone) { /* All */ }
+        else if (pProg) query = query.or('designer_status.neq.Done,creative_status.neq.Done');
+        else if (pDone) query = query.eq('designer_status','Done').eq('creative_status','Done');
+        else query = query.eq('id', -1);
+
         const val = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
         if (val('filterWork')) query = query.or(`designer.eq."${val('filterWork')}",creative.eq."${val('filterWork')}"`);
         if (val('filterType')) query = query.or(`designer_type.eq."${val('filterType')}",creative_type.eq."${val('filterType')}"`);
