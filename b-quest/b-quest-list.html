@@ -140,7 +140,7 @@
 
 <script>
     const SEARCH_COLUMNS = ['task_name', 'account_name', 'opportunity_name', 'designer', 'creative', 'designer_assign', 'creative_assign', 'owner', 'detail', 'designer_type', 'creative_type'];
-    let MASTER_WORK_DATA = []; 
+    let MASTER_WORK_DATA = []; // ตัวแปรนี้พี่มีอยู่แล้ว เราจะใช้ตัวนี้ส่งต่อให้ Modal
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
@@ -176,7 +176,61 @@
         applyFilters();
     }
 
-    // --- Data Mapping สำหรับ Modal ใหม่ ---
+    // --- [เพิ่มฟังก์ชันนี้] เพื่อกระจายข้อมูล Work ไปยัง Dropdown ใน Modal ---
+    function setupModalWorkDropdowns() {
+        const configs = [
+            { id: 'b-quest-modal-designer-work', role: 'Designer' },
+            { id: 'b-quest-modal-creative-work', role: 'Creative' }
+        ];
+
+        configs.forEach(config => {
+            const el = document.getElementById(config.id);
+            if (!el) return;
+
+            el.innerHTML = '<option value="" disabled selected hidden>Select...</option>';
+            // ใช้ MASTER_WORK_DATA ที่โหลดมาแล้วจากหน้า List มากรองใช้เลย
+            const filtered = MASTER_WORK_DATA.filter(item => item.role === config.role);
+            
+            filtered.forEach(item => {
+                const opt = new Option(item.work, item.work);
+                // เก็บ Weight ไว้ใน dataset เผื่อใช้คำนวณ Capacity
+                opt.dataset.weight = item.weight || 0; 
+                el.add(opt);
+            });
+        });
+    }
+
+    // --- Data Mapping สำหรับ Modal (แก้ไขให้รองรับข้อมูลจาก MASTER_WORK_DATA) ---
+    async function openTaskModal(taskId = null) {
+        // 1. เตรียม Dropdown ใน Modal ก่อน (ใช้ข้อมูลที่มีอยู่แล้ว)
+        setupModalWorkDropdowns();
+
+        const form = document.getElementById('b-quest-modal-form');
+        form.reset();
+        
+        if (taskId) {
+            try {
+                // ดึงข้อมูล Row ที่ต้องการแก้ไข
+                const { data, error } = await supabaseClient
+                    .from('b-quest-list')
+                    .select('*')
+                    .eq('id', taskId)
+                    .single();
+
+                if (error) throw error;
+                fillFormData(data);
+            } catch (e) { console.error(e); }
+        } else {
+            // New Task
+            document.getElementById('b-quest-modal-id').value = '';
+            // Reset ข้อความ Capacity
+            const caps = document.querySelectorAll('.capacity-info');
+            caps.forEach(c => c.innerText = 'Select Date...');
+        }
+        
+        $('#b-quest-modal').modal('show');
+    }
+
     function fillFormData(data) {
         const mapping = {
             'b-quest-modal-id': data.id,
@@ -186,6 +240,8 @@
             'b-quest-modal-link': data.link,
             'b-quest-modal-publish-date': data.publish_date,
             'b-quest-modal-detail': data.detail,
+            'b-quest-modal-designer-status': data.designer_status, // เพิ่ม Status
+            'b-quest-modal-creative-status': data.creative_status, // เพิ่ม Status
             'b-quest-modal-designer-type': data.designer_type,
             'b-quest-modal-creative-type': data.creative_type,
             'b-quest-modal-designer-deadline': data.designer_deadline,
@@ -203,8 +259,11 @@
     // --- Data Logic ---
     async function loadMasterData() {
         try {
+            // โหลดครั้งเดียวตอนเปิดหน้าเว็บ
             const { data } = await supabaseClient.from('b-quest-work').select('*').order('work');
             MASTER_WORK_DATA = data || [];
+            
+            // ใช้ Render Filter หน้าหลัก
             renderWorkDropdown();
 
             const tSel = document.getElementById('filterType');
@@ -217,6 +276,7 @@
                     const set = new Set();
                     list.forEach(i => keys.forEach(k => { if(i[k] && i[k] !== '-') set.add(i[k]); }));
                     const el = document.getElementById(id);
+                    if(!el) return;
                     setupDefaultOptions(el, lbl);
                     [...set].sort().forEach(v => el.add(new Option(v, v)));
                 };
@@ -228,6 +288,7 @@
 
     function renderWorkDropdown() {
         const select = document.getElementById('filterWork');
+        if(!select) return;
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const cur = select.value;
@@ -264,7 +325,8 @@
         let query = supabaseClient.from('b-quest-list').select('*');
         
         // Search
-        const search = document.getElementById('globalSearch').value.trim();
+        const searchInput = document.getElementById('globalSearch');
+        const search = searchInput ? searchInput.value.trim() : "";
         if (search) query = query.or(SEARCH_COLUMNS.map(col => `${col}.ilike.%${search}%`).join(','));
 
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
@@ -290,7 +352,7 @@
         else if (!pProg && !pDone) query = query.eq('id', -1);
 
         // Advanced Filters
-        const val = (id) => document.getElementById(id).value;
+        const val = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
         if (val('filterWork')) query = query.or(`designer.eq."${val('filterWork')}",creative.eq."${val('filterWork')}"`);
         if (val('filterType')) query = query.or(`designer_type.eq."${val('filterType')}",creative_type.eq."${val('filterType')}"`);
         if (val('filterAssign')) query = query.or(`designer_assign.eq."${val('filterAssign')}",creative_assign.eq."${val('filterAssign')}"`);
@@ -408,13 +470,16 @@
         });
     });
 
-    document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
+    const gs = document.getElementById('globalSearch');
+    if(gs) gs.addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
 
-    const obs = new IntersectionObserver(e => { 
-        if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
-    }, { rootMargin: '100px' });
-    
-    obs.observe(document.getElementById('load-more-trigger'));
+    const loadTrigger = document.getElementById('load-more-trigger');
+    if(loadTrigger) {
+        const obs = new IntersectionObserver(e => { 
+            if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
+        }, { rootMargin: '100px' });
+        obs.observe(loadTrigger);
+    }
 
     initPage();
 </script>

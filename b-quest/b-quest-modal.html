@@ -1,35 +1,24 @@
 <style>
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-    
     .bq-form-header { padding: 18px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
     .bq-form-body { padding: 25px 30px; background: #f8fafc; }
     .bq-form-footer { padding: 15px 30px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; }
 
-    .bq-card-section { 
-        background: #ffffff; border-radius: 16px; padding: 20px; 
-        border: 1px solid #eef2f6; height: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    }
+    .bq-card-section { background: #ffffff; border-radius: 16px; padding: 20px; border: 1px solid #eef2f6; height: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02); }
     .bq-card-highlight { border-top: 3px solid #bdc432; }
 
-    /* Header ภายใน Card */
     .bq-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
     .bq-section-title { font-size: 0.75rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; }
     .bq-owner-tag { background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; border: 1px solid #e2e8f0; }
 
-    /* Status Dropdown (มุมขวาบน - ปรับให้กว้างขึ้น) */
     .bq-status-select { 
         border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; 
         padding: 6px 15px; color: #1e293b; outline: none; cursor: pointer; background: #fff;
         min-width: 120px; text-align: center; text-align-last: center;
     }
-    .bq-status-select:focus { border-color: #bdc432; }
 
-    .bq-label { 
-        font-size: 0.68rem; font-weight: 800; color: #64748b; 
-        display: flex; align-items: center; gap: 8px;
-        margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
-    }
+    .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
 
     .bq-input { 
         width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; 
@@ -38,25 +27,16 @@
         text-align: center; text-align-last: center; 
     }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
-    .bq-input:last-child { margin-bottom: 0; }
     
-    select.bq-input:invalid { color: #94a3b8 !important; }
-
-    .btn-bq-save { background: #1e293b; color: #bdc432; border-radius: 10px; padding: 8px 35px; font-weight: 700; border: none; font-size: 0.9rem; }
-    .btn-bq-save:hover { background: #000; }
-    .btn-bq-cancel { color: #64748b; font-weight: 600; text-decoration: none; font-size: 0.85rem; padding: 8px 15px; }
-
-    .edit-only { display: none !important; }
-    .is-edit .edit-only { display: flex !important; }
+    .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
-        <div class="modal-content bq-form-container" id="b-quest-modal-content">
-            
+        <div class="modal-content bq-form-container">
             <div class="bq-form-header d-flex justify-content-between align-items-center">
-                <h5 class="fw-800 m-0" id="b-quest-modal-label">New <span style="color: #bdc432;">Task</span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 0.8rem;"></button>
+                <h5 class="fw-800 m-0">Mission <span style="color: #bdc432;">Control</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <form id="b-quest-modal-form">
@@ -79,15 +59,12 @@
                                 <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link">
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="bq-card-section">
                                 <label class="bq-label">Publish Date</label>
                                 <input type="date" class="bq-input" id="b-quest-modal-publish-date" name="publish_date">
-
                                 <label class="bq-label">Detail</label>
-                                <textarea class="bq-input m-0" id="b-quest-modal-detail" name="detail" rows="7" 
-                                    style="resize: none; height: 135px; text-align: left;"></textarea>
+                                <textarea class="bq-input m-0" id="b-quest-modal-detail" name="detail" rows="7" style="resize: none; height: 135px; text-align: left;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -96,38 +73,34 @@
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title">
-                                        DESIGNER 
-                                        <span class="bq-owner-tag">Admin (999)</span>
-                                    </div>
+                                    <div class="bq-section-title">DESIGNER <span class="bq-owner-tag">Admin (999)</span></div>
                                     <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status">
                                         <option value="Progress">Progress</option>
                                         <option value="Done">Done</option>
                                     </select>
                                 </div>
-                                
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="bq-label">Type</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-designer-type" name="designer_type" required>
-                                            <option value="" disabled selected hidden>Select...</option>
+                                        <select class="bq-input m-0" id="b-quest-modal-designer-type" name="designer_type">
+                                            <option value="Graphic">Graphic</option>
+                                            <option value="Video">Video</option>
                                         </select>
                                     </div>
                                     <div class="col-6">
                                         <label class="bq-label">Work</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-designer-work" name="designer" required>
-                                            <option value="" disabled selected hidden>Select...</option>
-                                        </select>
+                                        <select class="bq-input m-0" id="b-quest-modal-designer-work" name="designer_work" required></select>
                                     </div>
                                 </div>
-
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <label class="bq-label">Deadline</label>
                                         <input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline">
                                     </div>
                                     <div class="col-6">
-                                        </div>
+                                        <label class="bq-label">Daily Capacity</label>
+                                        <div id="designer-capacity-info" class="capacity-info">Select Date...</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -135,38 +108,34 @@
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title">
-                                        CREATIVE 
-                                        <span class="bq-owner-tag">Admin (999)</span>
-                                    </div>
+                                    <div class="bq-section-title">CREATIVE <span class="bq-owner-tag">Admin (999)</span></div>
                                     <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status">
                                         <option value="Progress">Progress</option>
                                         <option value="Done">Done</option>
                                     </select>
                                 </div>
-                                
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="bq-label">Type</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-creative-type" name="creative_type" required>
-                                            <option value="" disabled selected hidden>Select...</option>
+                                        <select class="bq-input m-0" id="b-quest-modal-creative-type" name="creative_type">
+                                            <option value="Content">Content</option>
+                                            <option value="Ads">Ads</option>
                                         </select>
                                     </div>
                                     <div class="col-6">
                                         <label class="bq-label">Work</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-creative-work" name="creative" required>
-                                            <option value="" disabled selected hidden>Select...</option>
-                                        </select>
+                                        <select class="bq-input m-0" id="b-quest-modal-creative-work" name="creative_work" required></select>
                                     </div>
                                 </div>
-
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <label class="bq-label">Deadline</label>
                                         <input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline">
                                     </div>
                                     <div class="col-6">
-                                        </div>
+                                        <label class="bq-label">Daily Capacity</label>
+                                        <div id="creative-capacity-info" class="capacity-info">Select Date...</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -174,11 +143,6 @@
                 </div>
 
                 <div class="bq-form-footer">
-                    <button type="button" class="btn btn-link text-danger fw-bold edit-only me-auto text-decoration-none" 
-                        onclick="BQuestService.deleteQuest(document.getElementById('b-quest-modal-id').value)" style="font-size: 0.85rem;">
-                        Delete Task
-                    </button>
-                    <a href="#" class="btn-bq-cancel" data-bs-dismiss="modal">Cancel</a>
                     <button type="submit" class="btn-bq-save">Save Mission</button>
                 </div>
             </form>

@@ -76,3 +76,34 @@ async function openTaskModal(taskId = null) {
 
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
+
+
+function setupModalDropdowns() {
+    // รายชื่อ ID ของ Dropdown ใน Modal
+    const configs = [
+        { id: 'b-quest-modal-designer-work', role: 'Designer' },
+        { id: 'b-quest-modal-creative-work', role: 'Creative' }
+    ];
+
+    configs.forEach(config => {
+        const el = document.getElementById(config.id);
+        if (!el) return;
+
+        // Reset ค่าเริ่มต้นก่อนเติมใหม่
+        el.innerHTML = '<option value="" disabled selected hidden>Select...</option>';
+
+        // กรองข้อมูลจากตัวแปร MASTER_WORKS (ที่ดึงมาจากหน้า List) ตาม Role
+        const filteredWorks = MASTER_WORKS.filter(item => item.role === config.role);
+
+        filteredWorks.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.work;
+            option.textContent = item.work;
+            
+            // ฝาก Weight ไว้ใน Dataset เผื่อใช้คำนวณ Capacity ในอนาคต
+            option.dataset.weight = item.weight; 
+            
+            el.appendChild(option);
+        });
+    });
+}
