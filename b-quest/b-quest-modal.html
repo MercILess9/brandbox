@@ -12,9 +12,18 @@
     }
     .bq-card-highlight { border-top: 3px solid #bdc432; }
 
-    .bq-section-header { display: flex; align-items: center; margin-bottom: 15px; }
+    /* Header ภายใน Card */
+    .bq-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
     .bq-section-title { font-size: 0.75rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; }
     .bq-owner-tag { background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; border: 1px solid #e2e8f0; }
+
+    /* Status Dropdown (มุมขวาบน - ปรับให้กว้างขึ้น) */
+    .bq-status-select { 
+        border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; 
+        padding: 6px 15px; color: #1e293b; outline: none; cursor: pointer; background: #fff;
+        min-width: 120px; text-align: center; text-align-last: center;
+    }
+    .bq-status-select:focus { border-color: #bdc432; }
 
     .bq-label { 
         font-size: 0.68rem; font-weight: 800; color: #64748b; 
@@ -26,8 +35,7 @@
         width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; 
         padding: 8px 12px; font-size: 0.88rem; background: #ffffff;
         transition: 0.2s; margin-bottom: 15px; color: #1e293b;
-        text-align: center;
-        text-align-last: center; 
+        text-align: center; text-align-last: center; 
     }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     .bq-input:last-child { margin-bottom: 0; }
@@ -40,10 +48,6 @@
 
     .edit-only { display: none !important; }
     .is-edit .edit-only { display: flex !important; }
-
-    /* คุมช่องให้เท่ากัน */
-    .bq-grid-row { display: flex; gap: 10px; margin-bottom: 15px; }
-    .bq-grid-col { flex: 1; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
@@ -92,7 +96,14 @@
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title">DESIGNER <span class="bq-owner-tag">Admin (999)</span></div>
+                                    <div class="bq-section-title">
+                                        DESIGNER 
+                                        <span class="bq-owner-tag">Admin (999)</span>
+                                    </div>
+                                    <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status">
+                                        <option value="Progress">Progress</option>
+                                        <option value="Done">Done</option>
+                                    </select>
                                 </div>
                                 
                                 <div class="row g-2 mb-3">
@@ -116,12 +127,7 @@
                                         <input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline">
                                     </div>
                                     <div class="col-6">
-                                        <label class="bq-label">Status</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-designer-status" name="designer_status">
-                                            <option value="Progress">Progress</option>
-                                            <option value="Done">Done</option>
-                                        </select>
-                                    </div>
+                                        </div>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +135,14 @@
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title">CREATIVE <span class="bq-owner-tag">Admin (999)</span></div>
+                                    <div class="bq-section-title">
+                                        CREATIVE 
+                                        <span class="bq-owner-tag">Admin (999)</span>
+                                    </div>
+                                    <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status">
+                                        <option value="Progress">Progress</option>
+                                        <option value="Done">Done</option>
+                                    </select>
                                 </div>
                                 
                                 <div class="row g-2 mb-3">
@@ -153,12 +166,7 @@
                                         <input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline">
                                     </div>
                                     <div class="col-6">
-                                        <label class="bq-label">Status</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-creative-status" name="creative_status">
-                                            <option value="Progress">Progress</option>
-                                            <option value="Done">Done</option>
-                                        </select>
-                                    </div>
+                                        </div>
                                 </div>
                             </div>
                         </div>
