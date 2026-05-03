@@ -389,19 +389,12 @@
         });
     }
 
-    // --- จังหวะการโหลดที่ถูกต้อง (แก้ปัญหา Modal ไม่มา) ---
     async function initPage() {
         try {
             await System.initLayout(B_QUEST_CONFIG);
-            
-            // 🔥 เปลี่ยนตรงนี้
             await UILoader.loadModal('b-quest-modal.html'); 
-            
-            console.log("✅ Modal HTML Loaded");
-            
             await loadMasterData();
             fetchQuests(true);
-
         } catch (e) {
             console.error("Init failed:", e);
         }

@@ -100,6 +100,7 @@ async function openTaskModal(taskId = null) {
 
     form.reset();
     await setupWorkDropdowns(); // ดึง Work จาก DB มาหยอด
+    setupTypeDropdowns();
 
     // หยอด Type เริ่มต้นลงใน Input
     const desType = document.getElementById('b-quest-modal-designer-type');
@@ -118,4 +119,22 @@ async function openTaskModal(taskId = null) {
     // เปิด Modal
     const myModal = bootstrap.Modal.getOrCreateInstance(modalEl);
     myModal.show();
+}
+
+
+
+function setupTypeDropdowns() {
+    const types = B_QUEST_CONFIG.listTypes;
+    const targetIds = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
+    
+    targetIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.innerHTML = ''; // ล้างค่าเก่า
+            types.forEach(t => {
+                const opt = new Option(t, t);
+                el.add(opt);
+            });
+        }
+    });
 }
