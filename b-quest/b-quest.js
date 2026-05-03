@@ -15,7 +15,7 @@ const B_QUEST_CONFIG = {
 async function setupWorkDropdowns() {
     try {
         const { data, error } = await supabaseClient
-            .from('b_quest_work')
+            .from('b-quest-work')
             .select('*')
             .order('work', { ascending: true });
 

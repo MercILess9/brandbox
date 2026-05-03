@@ -203,7 +203,7 @@
     // --- Data Logic ---
     async function loadMasterData() {
         try {
-            const { data } = await supabaseClient.from('b_quest_work').select('*').order('work');
+            const { data } = await supabaseClient.from('b-quest-work').select('*').order('work');
             MASTER_WORK_DATA = data || [];
             renderWorkDropdown();
 
