@@ -12,6 +12,17 @@
     }
     .bq-card-highlight { border-top: 3px solid #bdc432; }
 
+    /* Header ภายใน Card */
+    .bq-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+    .bq-section-title { font-size: 0.75rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    
+    /* Owner Tag */
+    .bq-owner-tag { background: #f1f5f9; color: #64748b; padding: 2px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 600; border: 1px solid #e2e8f0; }
+
+    /* Status Dropdown เล็กๆ มุมขวา */
+    .bq-status-select { border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; color: #64748b; outline: none; cursor: pointer; background: #fff; }
+    .bq-status-select:focus { border-color: #bdc432; }
+
     .bq-label { 
         font-size: 0.68rem; font-weight: 800; color: #64748b; 
         display: flex; align-items: center; gap: 8px;
@@ -22,17 +33,13 @@
         width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; 
         padding: 8px 12px; font-size: 0.88rem; background: #ffffff;
         transition: 0.2s; margin-bottom: 15px; color: #1e293b;
-        /* จัดข้อความตรงกลาง */
         text-align: center;
         text-align-last: center; 
     }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     .bq-input:last-child { margin-bottom: 0; }
     
-    /* Logic สีเทาสำหรับ Placeholder (Select ที่ยังไม่ได้เลือกค่า) */
     select.bq-input:invalid { color: #94a3b8 !important; }
-    select.bq-input option { color: #1e293b; }
-    select.bq-input option:first-child { color: #94a3b8; }
 
     .btn-bq-save { background: #1e293b; color: #bdc432; border-radius: 10px; padding: 8px 35px; font-weight: 700; border: none; font-size: 0.9rem; }
     .btn-bq-save:hover { background: #000; }
@@ -87,7 +94,16 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
-                                <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.75rem;">DESIGNER</div>
+                                <div class="bq-section-header">
+                                    <div class="bq-section-title">
+                                        DESIGNER 
+                                        <span class="bq-owner-tag">Admin (999)</span>
+                                    </div>
+                                    <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status">
+                                        <option value="Progress">Progress</option>
+                                        <option value="Done">Done</option>
+                                    </select>
+                                </div>
                                 
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
@@ -111,7 +127,16 @@
 
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
-                                <div class="bq-label mb-3" style="color: #1e293b; font-size: 0.75rem;">CREATIVE</div>
+                                <div class="bq-section-header">
+                                    <div class="bq-section-title">
+                                        CREATIVE 
+                                        <span class="bq-owner-tag">Admin (999)</span>
+                                    </div>
+                                    <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status">
+                                        <option value="Progress">Progress</option>
+                                        <option value="Done">Done</option>
+                                    </select>
+                                </div>
                                 
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
