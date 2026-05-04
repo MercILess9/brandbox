@@ -46,8 +46,13 @@ async function openTaskModal(taskId = null, workData = []) {
 /**
  * คำนวณ Capacity โดยดึง Max จากตาราง b_quest_capacity
  */
+/**
+ * คำนวณ Capacity แบบละเอียด: โหลดปัจจุบัน / Max (งานที่กำลังเลือก)
+ */
 async function checkCapacity(role) {
     const dateInput = document.getElementById(`b-quest-modal-${role}-deadline`);
+    const workInput = document.getElementById(`b-quest-modal-${role}-work`);
+    const weightInput = document.getElementById(`b-quest-modal-${role}-weight`);
     const infoEl = document.getElementById(`${role}-capacity-info`);
     
     if (!infoEl || !dateInput || !dateInput.value) {
@@ -56,32 +61,43 @@ async function checkCapacity(role) {
     }
 
     const date = dateInput.value;
+    const currentWeight = Number(weightInput.value) || 0; // Weight ของงานที่กำลังเลือก
+    
     infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
 
     try {
-        // 1. ดึงข้อมูลขนานกัน: ผลรวม Weight ในวันนั้น และ Max Capacity จากตารางใหม่
-        const roleKey = role.charAt(0).toUpperCase() + role.slice(1); // เปลี่ยน designer เป็น Designer
-        
+        const roleKey = role.charAt(0).toUpperCase() + role.slice(1);
+        const taskId = document.getElementById('b-quest-modal-id').value;
+
+        // 1. ดึงโหลดงานที่มีอยู่แล้วในเบส (ไม่นับรวมงานตัวเองถ้าเป็นการ Edit)
+        let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
+        if (taskId) query = query.neq('id', taskId); // ถ้า Edit อยู่ ไม่เอาโหลดเดิมตัวเองมาบวกซ้ำ
+
         const [loadRes, capRes] = await Promise.all([
-            supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date),
+            query,
             supabaseClient.from('b_quest_capacity').select('max_capacity').eq('role', roleKey).single()
         ]);
 
         if (loadRes.error) throw loadRes.error;
         
-        const totalLoad = loadRes.data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
-        const maxCapacity = capRes.data ? capRes.data.max_capacity : 10; // ถ้าไม่เจอในเบส ให้ default เป็น 10
+        // โหลดสะสมของคนอื่น/งานอื่นในวันนั้น
+        const existingLoad = loadRes.data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
+        const maxCapacity = capRes.data ? capRes.data.max_capacity : 10;
+        
+        // โหลดทั้งหมดถ้าเราเซฟงานนี้ลงไป
+        const totalAfterSave = existingLoad + currentWeight;
 
-        // 2. แสดงผล
-        infoEl.innerHTML = `Load: <strong>${totalLoad}</strong> / ${maxCapacity}`;
+        // 2. แสดงผลรูปแบบ: Capacity 8/10 (+2)
+        // existingLoad = งานอื่น, totalAfterSave = รวมงานนี้แล้ว
+        infoEl.innerHTML = `Capacity <strong>${totalAfterSave} / ${maxCapacity}</strong> <span style="font-size: 0.6rem; opacity: 0.8;">(+${currentWeight})</span>`;
         
         // 3. ปรับสีตามความโหลด
-        if (totalLoad > maxCapacity) {
-            infoEl.style.color = "#ef4444"; // แดง (Overload)
-        } else if (totalLoad >= maxCapacity * 0.8) {
-            infoEl.style.color = "#f59e0b"; // ส้ม (Warning)
+        if (totalAfterSave > maxCapacity) {
+            infoEl.style.color = "#ef4444"; // แดง (เกิน)
+        } else if (totalAfterSave === maxCapacity) {
+            infoEl.style.color = "#f59e0b"; // ส้ม (เต็มพอดี)
         } else {
-            infoEl.style.color = "#bdc432"; // เขียว (OK)
+            infoEl.style.color = "#bdc432"; // เขียว (เหลือที่)
         }
 
     } catch (e) {
