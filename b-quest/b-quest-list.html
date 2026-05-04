@@ -382,7 +382,7 @@
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.designer_status}</span></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type || '-'}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer || '-'}</span></div>
-                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val text-primary">${(task.designer_assign && task.designer_assign !== '-') ? task.designer_assign : '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.designer_assign && task.designer_assign !== '-') ? task.designer_assign : '-'}</span></div>
                                             <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div>
                                         </div>
                                     ` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
@@ -395,7 +395,7 @@
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.creative_status}</span></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type || '-'}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative || '-'}</span></div>
-                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val text-primary">${(task.creative_assign && task.creative_assign !== '-') ? task.creative_assign : '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.creative_assign && task.creative_assign !== '-') ? task.creative_assign : '-'}</span></div>
                                             <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div>
                                         </div>
                                     ` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
