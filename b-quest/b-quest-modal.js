@@ -365,30 +365,57 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
         return;
     }
 
-    if (currentCapacities.designer > 10 || currentCapacities.creative > 10) {
-        alert('Capacity Exceeded (Max 10/10). Cannot save task.');
-        return;
-    }
+    const formData = new FormData(form);
+    let payload = Object.fromEntries(formData.entries());
 
-    const payload = Object.fromEntries(new FormData(form).entries());
-    if (!payload.id) {
+    // --- [DEBUG LOG] ส่องข้อมูลก่อนยิง ---
+    console.log("🚀 Payload to send:", payload);
+
+    // จัดการ IDs และ Data Types ให้ชัวร์ 100%
+    const isEdit = payload.id && payload.id.length > 5;
+    const currentId = payload.id;
+    
+    if (!isEdit) {
         delete payload.id;
         payload.owner = "Test (BX001)";
-        payload.designer_assign = document.getElementById('check-designer').checked ? "Test (BX001)" : null;
-        payload.creative_assign = document.getElementById('check-creative').checked ? "Test (BX001)" : null;
-        payload.designer_status = "Progress"; payload.creative_status = "Progress";
     }
 
-    if (!document.getElementById('check-designer').checked) { payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; }
-    if (!document.getElementById('check-creative').checked) { payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; }
-    
-    payload.last_update = new Date().toISOString();
+    // แปลง Weight เป็น Number เสมอ (ถ้าเป็น "" จะพัง Integer ใน DB)
+    payload.designer_weight = payload.designer_weight ? parseInt(payload.designer_weight) : 0;
+    payload.creative_weight = payload.creative_weight ? parseInt(payload.creative_weight) : 0;
 
-    const { error } = payload.id 
-        ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
-        : await supabaseClient.from('b-quest-list').insert([payload]);
+    // ล้างค่าว่างให้เป็น null สำหรับ Date และ Text อื่นๆ
+    const fieldsToClean = ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'];
+    fieldsToClean.forEach(f => {
+        if (payload[f] === "") payload[f] = null;
+    });
 
-    if (!error) location.reload(); else alert(error.message);
+    try {
+        let result;
+        if (!isEdit) {
+            console.log("📡 Mode: INSERT");
+            result = await supabaseClient.from('b-quest-list').insert([payload]).select();
+        } else {
+            console.log("📡 Mode: UPDATE");
+            delete payload.id;
+            result = await supabaseClient.from('b-quest-list').update(payload).eq('id', currentId).select();
+        }
+
+        // --- [DEBUG CHECK] เช็คผลลัพธ์ ---
+        if (result.error) {
+            console.error("❌ Supabase Error Detail:", result.error);
+            // โชว์ Alert รายละเอียดสูง
+            alert(`ไม่สำเร็จ!\nCode: ${result.error.code}\nMessage: ${result.error.message}\nHint: ${result.error.hint}`);
+        } else {
+            console.log("✅ Success Result:", result.data);
+            alert("บันทึกสำเร็จเรียบร้อย!");
+            location.reload();
+        }
+
+    } catch (err) {
+        console.error("💥 Critical System Error:", err);
+        alert("ระบบขัดข้อง: " + err.message);
+    }
 });
 
 const BQuestService = { async getQuestById(id) { const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single(); return error ? null : data; } };
