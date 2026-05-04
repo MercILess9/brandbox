@@ -39,7 +39,7 @@ const B_QUEST_MODAL_HTML = `
     input:checked + .bq-slider:before { transform: translateX(16px); }
 
     .bq-search-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.35); z-index: 10001; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: 0.3s; }
-    .bq-search-card { background: #fff; width: 450px; max-height: 70vh; border-radius: 30px; padding: 25px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); }
+    .bq-search-card { background: #fff; width: 500px; max-height: 80vh; border-radius: 30px; padding: 25px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); }
     .uni-item-modern { border: none; background: #fff; border-radius: 15px; margin-bottom: 6px; padding: 14px 20px; font-size: 0.9rem; font-weight: 600; text-align: left; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; color: #334155; }
     .uni-item-modern:hover { background: #f8fafc; border-color: #bdc432; color: #bdc432; transform: scale(1.02); }
 
