@@ -1,17 +1,17 @@
 /**
- * B-QUEST MODAL COMPONENT (Fixed Backdrop & Functional Search)
+ * B-QUEST MODAL COMPONENT (Fixed: Ultimate Backdrop Killer)
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
-    /* ตั้งค่า Modal หลัก */
-    #b-quest-modal { z-index: 1050 !important; }
+    /* บังคับให้หน้า Modal หลักคลิกได้เสมอ */
+    #b-quest-modal { z-index: 1050 !important; overflow-y: auto !important; }
     
-    /* ตั้งค่า Modal ค้นหา ให้สูงกว่า และจัดการพื้นหลังเอง */
+    /* บังคับให้ Modal ค้นหา ลอยอยู่บนสุดจริงๆ */
     #universal-search-modal { 
-        z-index: 1060 !important; 
-        background: rgba(0, 0, 0, 0.2); /* ใส่สีเข้มบางๆ เอง ไม่พึ่งระบบ Backdrop */
+        z-index: 9999 !important; 
+        background: rgba(0,0,0,0.5) !important; 
     }
 
     .bq-modal-1000 { max-width: 1000px !important; }
@@ -38,20 +38,15 @@ const B_QUEST_MODAL_HTML = `
     .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 800; transition: 0.2s; cursor: pointer; }
 
-    .uni-list-item { 
-        border: none; border-radius: 12px !important; margin-bottom: 5px; 
-        font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; 
-        text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-        display: block; width: 100%; padding: 12px 15px; background: #fff;
-    }
+    .uni-list-item { border: none; border-radius: 12px !important; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; padding: 12px 15px; background: #fff; }
     .uni-list-item:hover { background: #bdc432 !important; color: #fff !important; }
 </style>
 
-<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content bq-form-container">
             <div class="bq-form-header d-flex justify-content-between align-items-center">
-                <h5 class="fw-800 m-0" id="b-quest-modal-label">Mission Control</h5>
+                <h5 class="fw-800 m-0" id="b-quest-modal-label">Mission 2 Control</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="b-quest-modal-form">
@@ -140,7 +135,7 @@ const B_QUEST_MODAL_HTML = `
 
 <div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content shadow-lg" style="border: 1px solid #ddd;">
+        <div class="modal-content shadow-lg">
             <div class="modal-header border-0 pb-0">
                 <h6 class="modal-title fw-800" id="search-modal-title">Select</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -160,9 +155,14 @@ document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
-    const form = document.getElementById('b-quest-modal-form');
-    if (!modalEl || !form) return;
+    if (!modalEl) return;
 
+    // เคลียร์ Backdrop ที่อาจค้างอยู่จากการเปิดครั้งก่อน
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    document.body.classList.remove('modal-open');
+    document.body.style = "";
+
+    const form = document.getElementById('b-quest-modal-form');
     form.reset();
     if(document.getElementById('b-quest-modal-id')) document.getElementById('b-quest-modal-id').value = '';
 
@@ -180,10 +180,13 @@ async function openTaskModal(taskId = null, workData = []) {
         }
     } else {
         document.getElementById('b-quest-modal-label').innerHTML = 'New Mission';
+        document.getElementById('designer-owner-tag').innerText = 'Admin';
+        document.getElementById('creative-owner-tag').innerText = 'Admin';
     }
 
     initModalEventListeners();
-    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalInstance.show();
 }
 
 async function openGeneralSearchModal(fieldName, targetInputId) {
@@ -193,9 +196,16 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
     
     container.innerHTML = '<div class="text-center p-3">Loading...</div>';
     
-    // สำคัญ: ปิด backdrop ผ่าน JS อีกชั้น
-    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl, { backdrop: false });
+    // บังคับเปิดแบบไม่มี Backdrop 100%
+    const searchModal = new bootstrap.Modal(searchModalEl, { backdrop: false });
     searchModal.show();
+
+    // ล้าง Backdrop ที่อาจจะแอบโผล่มา
+    setTimeout(() => {
+        document.querySelectorAll('.modal-backdrop').forEach((el, index) => {
+            if (index > 0) el.remove(); // เก็บไว้อันเดียวคือของ Modal หลัก
+        });
+    }, 50);
 
     try {
         const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
@@ -218,7 +228,7 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
         searchInput.oninput = (e) => render(e.target.value);
         render();
         searchInput.value = '';
-        setTimeout(() => searchInput.focus(), 400);
+        setTimeout(() => searchInput.focus(), 300);
     } catch (e) { console.error(e); }
 }
 
@@ -282,7 +292,8 @@ function setupModalWorkDropdowns(workData) {
 }
 
 function setupModalTypeDropdowns() {
-    ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'].forEach(id => {
+    const types = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
+    types.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.innerHTML = '<option value="" selected>Select Type...</option>';
