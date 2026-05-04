@@ -134,3 +134,70 @@ document.getElementById('b-quest-modal-form')?.addEventListener('submit', async 
         Swal.fire('Error!', error.message, 'error');
     }
 });
+
+// b-quest.js (เพิ่มเติม)
+
+/**
+ * ฟังก์ชันดึงค่า Weight รวมจากฐานข้อมูลมาโชว์ที่ Capacity Info
+ * @param {string} date - วันที่ Deadline
+ * @param {string} role - 'designer' หรือ 'creative'
+ */
+async function checkCapacity(date, role) {
+    const infoEl = document.getElementById(`${role}-capacity-info`);
+    if (!date) {
+        infoEl.innerText = "Select Date...";
+        return;
+    }
+
+    infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
+
+    try {
+        // ดึงผลรวม Weight ของงานทั้งหมดในวันที่เลือกของ Role นั้นๆ
+        const { data, error } = await supabaseClient
+            .from('b-quest-list')
+            .select(`${role}_weight`)
+            .eq(`${role}_deadline`, date);
+
+        if (error) throw error;
+
+        // คำนวณผลรวม
+        const totalWeight = data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
+        
+        // แสดงผล
+        infoEl.innerHTML = `Total Load: <strong>${totalWeight}</strong> Weight`;
+        
+        // ใส่สีเตือนถ้าโหลดเยอะเกิน (ตัวอย่างเช่น เกิน 10 ให้เป็นสีแดง)
+        if (totalWeight >= 10) {
+            infoEl.style.color = "#ef4444"; // Red
+        } else {
+            infoEl.style.color = "#bdc432"; // B-Quest Green
+        }
+    } catch (e) {
+        console.error("Capacity Error:", e);
+        infoEl.innerText = "Error loading data";
+    }
+}
+
+// --- เพิ่ม Event Listeners ในฟังก์ชัน openTaskModal หรือท้ายไฟล์ ---
+function initCapacityListeners() {
+    const dDate = document.getElementById('b-quest-modal-designer-deadline');
+    const cDate = document.getElementById('b-quest-modal-creative-deadline');
+    const dWork = document.getElementById('b-quest-modal-designer-work');
+    const cWork = document.getElementById('b-quest-modal-creative-work');
+
+    // เมื่อเปลี่ยนวันที่ Deadline
+    if(dDate) dDate.addEventListener('change', (e) => checkCapacity(e.target.value, 'designer'));
+    if(cDate) cDate.addEventListener('change', (e) => checkCapacity(e.target.value, 'creative'));
+
+    // เมื่อเปลี่ยนประเภทงาน (เพราะ Weight เปลี่ยน)
+    if(dWork) dWork.addEventListener('change', () => {
+        const date = document.getElementById('b-quest-modal-designer-deadline').value;
+        checkCapacity(date, 'designer');
+    });
+    if(cWork) cWork.addEventListener('change', () => {
+        const date = document.getElementById('b-quest-modal-creative-deadline').value;
+        checkCapacity(date, 'creative');
+    });
+}
+
+// เรียกใช้ Listener หลังจาก Modal ถูกโหลด (หรือเรียกท้าย openTaskModal)
