@@ -121,8 +121,8 @@
             <input type="date" class="flt-date-input" id="endDate">
         </div>
         <div class="flt-pill-group">
-            <button id="pill-des" class="flt-pill active-role" onclick="togglePill(this, 'designer')">Designer</button>
-            <button id="pill-cre" class="flt-pill active-role" onclick="togglePill(this, 'creative')">Creative</button>
+            <button id="pill-designer" class="flt-pill active-role" onclick="togglePill(this, 'designer')">Designer</button>
+            <button id="pill-creative" class="flt-pill active-role" onclick="togglePill(this, 'creative')">Creative</button>
         </div>
         <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 5px;"></div>
         <div class="flt-pill-group">
@@ -227,67 +227,67 @@
         } catch (e) { console.error("Error Loading Master Data:", e); }
     }
 
-    // เปลี่ยนชื่อจาก renderWorkDropdown เป็น renderWorkFilter ตามสั่งครับพี่
     function renderWorkFilter() {
-        const select = document.getElementById('filterWork');
-        if(!select) return;
-        const pDes = document.getElementById('pill-des').classList.contains('active-role');
-        const pCre = document.getElementById('pill-cre').classList.contains('active-role');
+        const select = document.getElementById('filterWork');        
+        const designer = document.getElementById('pill-designer').classList.contains('active-role');
+        const creative = document.getElementById('pill-creative').classList.contains('active-role');
         const cur = select.value;
+        
         setupDefaultOptions(select, "Work");
-        
-        // กรองจาก dataList (ใช้ .work และ .role ตามที่พี่แจ้งว่า console log แล้วเจอ)
-        const dW = dataList.filter(i => i.role === 'Designer');
-        const cW = dataList.filter(i => i.role === 'Creative');
-        
-        if (pDes) {
-            const g1 = document.createElement('optgroup'); g1.label = "-- Designer --";
-            dW.forEach(w => g1.appendChild(new Option(w.work, w.work)));
-            select.appendChild(g1);
+
+        if (designer) {
+            const group = document.createElement('optgroup'); 
+            group.label = "── Designer ──";
+            dataList.filter(i => i.role === 'Designer').forEach(w => {
+                group.appendChild(new Option(w.work, w.work));
+            });
+            select.appendChild(group);
         }
-        if (pCre) {
-            const g2 = document.createElement('optgroup'); g2.label = "-- Creative --";
-            cW.forEach(w => g2.appendChild(new Option(w.work, w.work)));
-            select.appendChild(g2);
+        
+        if (creative) {
+            const group = document.createElement('optgroup'); 
+            group.label = "── Creative ──";
+            dataList.filter(i => i.role === 'Creative').forEach(w => {
+                group.appendChild(new Option(w.work, w.work));
+            });
+            select.appendChild(group);
         }
+        
         select.value = cur;
         updateHighlight('filterWork');
     }
 
-    // ฟังก์ชัน Render สำหรับช่อง Assign
     function renderAssignFilter(profiles) {
         const el = document.getElementById('filterAssign');
         if (!el) return;
+        
+        const pDes = document.getElementById('pill-designer').classList.contains('active-role');
+        const pCre = document.getElementById('pill-creative').classList.contains('active-role');
+        const cur = el.value;
+
         setupDefaultOptions(el, "Assign");
 
-        // ตรวจสอบว่ามีข้อมูลไหลมาไหม
-        if (!profiles || profiles.length === 0) {
-            console.warn("No profiles found in b-quest-profiles table.");
-            return;
+        if (pDes) {
+            const designers = profiles.filter(p => p.role_designer === true);
+            if (designers.length > 0) {
+                const g = document.createElement('optgroup'); 
+                g.label = "── Designers ──";
+                designers.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
+                el.appendChild(g);
+            }
+        }
+        if (pCre) {
+            const creatives = profiles.filter(p => p.role_creative === true);
+            if (creatives.length > 0) {
+                const g = document.createElement('optgroup'); 
+                g.label = "── Creatives ──";
+                creatives.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
+                el.appendChild(g);
+            }
         }
 
-        // กรองตามบทบาท (เช็ค boolean)
-        const designers = profiles.filter(p => p.role_designer === true);
-        const creatives = profiles.filter(p => p.role_creative === true);
-
-        if (designers.length > 0) {
-            const g = document.createElement('optgroup'); 
-            g.label = "── Designers ──";
-            designers.forEach(p => {
-                // ใช้ codename ตามโครงสร้างตาราง b-quest-profiles
-                g.appendChild(new Option(p.codename, p.codename));
-            });
-            el.appendChild(g);
-        }
-
-        if (creatives.length > 0) {
-            const g = document.createElement('optgroup'); 
-            g.label = "── Creatives ──";
-            creatives.forEach(p => {
-                g.appendChild(new Option(p.codename, p.codename));
-            });
-            el.appendChild(g);
-        }
+        el.value = cur;
+        updateHighlight('filterAssign');
     }
 
     // --- Search & Fetch Logic ---
