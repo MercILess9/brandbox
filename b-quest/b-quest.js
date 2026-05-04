@@ -1,6 +1,7 @@
 // ==========================================
-// 1. CONFIGURATION
+// b-quest.js (Full Updated with Dynamic Capacity)
 // ==========================================
+
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
     itemsPerPage: 10,
@@ -11,60 +12,94 @@ const B_QUEST_CONFIG = {
     ]
 };
 
-// ==========================================
-// 2. MODAL CORE LOGIC
-// ==========================================
-
-/**
- * ฟังก์ชันหลักเปิด Modal
- * @param {string|null} taskId - ID งาน (null = สร้างใหม่)
- * @param {Array} workData - dataList (Master Work) ที่ส่งมาจากหน้าหลัก
- */
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
-    if (!modalEl || !form) {
-        console.error("Critical: Modal or Form element not found!");
-        return;
-    }
+    if (!modalEl || !form) return;
 
-    // 1. Reset ฟอร์ม
     form.reset();
-    if(document.getElementById('b-quest-modal-id')) {
-        document.getElementById('b-quest-modal-id').value = '';
-    }
+    if(document.getElementById('b-quest-modal-id')) document.getElementById('b-quest-modal-id').value = '';
 
-    // 2. เติมข้อมูล Dropdown (สำคัญ: ต้องส่ง workData เข้าไป)
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
 
-    // 3. เช็คโหมด New หรือ Edit
     if (taskId) {
         document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Mission</span>';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
             document.getElementById('b-quest-modal-id').value = taskId;
             fillFormData(data);
-            
-            // คำนวณ Capacity ทันทีหลังโหลดข้อมูล Edit
-            if(data.designer_deadline) checkCapacity(data.designer_deadline, 'designer');
-            if(data.creative_deadline) checkCapacity(data.creative_deadline, 'creative');
+            // โหลด Capacity ทันทีหลังหยอดข้อมูล
+            checkCapacity('designer');
+            checkCapacity('creative');
         }
     } else {
         document.getElementById('b-quest-modal-label').innerHTML = 'New <span style="color: #bdc432;">Mission</span>';
     }
 
-    // 4. ผูก Event Listener สำหรับ Capacity (เรียกใช้ครั้งเดียวตอนเปิด)
-    initCapacityListeners();
+    initModalEventListeners();
 
-    // 5. แสดง Modal
     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
     modalInstance.show();
 }
 
 /**
- * วาด Dropdown งาน และผูก Logic Auto-fill
+ * คำนวณ Capacity โดยดึง Max จากตาราง b_quest_capacity
  */
+async function checkCapacity(role) {
+    const dateInput = document.getElementById(`b-quest-modal-${role}-deadline`);
+    const infoEl = document.getElementById(`${role}-capacity-info`);
+    
+    if (!infoEl || !dateInput || !dateInput.value) {
+        if (infoEl) infoEl.innerText = "Select Date...";
+        return;
+    }
+
+    const date = dateInput.value;
+    infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
+
+    try {
+        // 1. ดึงข้อมูลขนานกัน: ผลรวม Weight ในวันนั้น และ Max Capacity จากตารางใหม่
+        const roleKey = role.charAt(0).toUpperCase() + role.slice(1); // เปลี่ยน designer เป็น Designer
+        
+        const [loadRes, capRes] = await Promise.all([
+            supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date),
+            supabaseClient.from('b_quest_capacity').select('max_capacity').eq('role', roleKey).single()
+        ]);
+
+        if (loadRes.error) throw loadRes.error;
+        
+        const totalLoad = loadRes.data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
+        const maxCapacity = capRes.data ? capRes.data.max_capacity : 10; // ถ้าไม่เจอในเบส ให้ default เป็น 10
+
+        // 2. แสดงผล
+        infoEl.innerHTML = `Load: <strong>${totalLoad}</strong> / ${maxCapacity}`;
+        
+        // 3. ปรับสีตามความโหลด
+        if (totalLoad > maxCapacity) {
+            infoEl.style.color = "#ef4444"; // แดง (Overload)
+        } else if (totalLoad >= maxCapacity * 0.8) {
+            infoEl.style.color = "#f59e0b"; // ส้ม (Warning)
+        } else {
+            infoEl.style.color = "#bdc432"; // เขียว (OK)
+        }
+
+    } catch (e) {
+        console.error("Capacity Error:", e);
+        infoEl.innerText = "Error Loading Data";
+    }
+}
+
+function initModalEventListeners() {
+    const roles = ['designer', 'creative'];
+    roles.forEach(role => {
+        // ดักเปลี่ยนวันที่
+        document.getElementById(`b-quest-modal-${role}-deadline`)?.addEventListener('change', () => checkCapacity(role));
+        // ดักเปลี่ยนงาน (เพราะ Weight เปลี่ยน)
+        document.getElementById(`b-quest-modal-${role}-work`)?.addEventListener('change', () => checkCapacity(role));
+    });
+}
+
 function setupModalWorkDropdowns(workData) {
     const configs = [
         { id: 'b-quest-modal-designer-work', role: 'Designer', weightId: 'b-quest-modal-designer-weight' },
@@ -79,38 +114,27 @@ function setupModalWorkDropdowns(workData) {
         const filtered = workData.filter(item => item.role === config.role);
         
         filtered.forEach(item => {
-            const opt = document.createElement('option');
-            opt.value = item.work;
-            opt.textContent = item.work;
+            const opt = new Option(item.work, item.work);
             opt.dataset.weight = item.weight || 0;
-            opt.dataset.task = item.task || ''; // ข้อมูล fill เข้าช่อง detail
+            opt.dataset.task = item.task || '';
             el.appendChild(opt);
         });
 
-        // Event: เมื่อเปลี่ยนงาน -> อัปเดต Weight และ Auto-fill Detail
         el.onchange = () => {
             const selectedOpt = el.options[el.selectedIndex];
-            const weightVal = selectedOpt.dataset.weight || 0;
-            document.getElementById(config.weightId).value = weightVal;
+            document.getElementById(config.weightId).value = selectedOpt.dataset.weight || 0;
 
-            // Auto-fill Detail เฉพาะกรณีเป็นงานใหม่ (New Task) และมีข้อมูล Task Template
             const taskId = document.getElementById('b-quest-modal-id').value;
             if (!taskId && selectedOpt.dataset.task) {
                 document.getElementById('b-quest-modal-detail').value = selectedOpt.dataset.task;
             }
-
-            // คำนวณ Capacity ใหม่เพราะ Weight เปลี่ยน
-            const deadlineInput = document.getElementById(`b-quest-modal-${config.role.toLowerCase()}-deadline`);
-            if(deadlineInput && deadlineInput.value) {
-                checkCapacity(deadlineInput.value, config.role.toLowerCase());
-            }
+            checkCapacity(config.role.toLowerCase());
         };
     });
 }
 
 function setupModalTypeDropdowns() {
-    const typeIds = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
-    typeIds.forEach(id => {
+    ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.innerHTML = '<option value="" selected>Select Type...</option>';
@@ -118,75 +142,29 @@ function setupModalTypeDropdowns() {
     });
 }
 
-// ==========================================
-// 3. CAPACITY LOGIC
-// ==========================================
-
-async function checkCapacity(date, role) {
-    const infoEl = document.getElementById(`${role}-capacity-info`);
-    if (!infoEl) return;
-    if (!date) {
-        infoEl.innerText = "Select Date...";
-        return;
-    }
-
-    infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
-
-    try {
-        const { data, error } = await supabaseClient
-            .from('b-quest-list')
-            .select(`${role}_weight`)
-            .eq(`${role}_deadline`, date);
-
-        if (error) throw error;
-
-        const totalWeight = data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
-        
-        infoEl.innerHTML = `Total Load: <strong>${totalWeight}</strong> Weight`;
-        infoEl.style.color = totalWeight >= 10 ? "#ef4444" : "#bdc432";
-    } catch (e) {
-        console.error("Capacity Error:", e);
-        infoEl.innerText = "Error Loading";
-    }
-}
-
-function initCapacityListeners() {
-    // Designer Side
-    document.getElementById('b-quest-modal-designer-deadline')?.addEventListener('change', (e) => {
-        checkCapacity(e.target.value, 'designer');
-    });
-    // Creative Side
-    document.getElementById('b-quest-modal-creative-deadline')?.addEventListener('change', (e) => {
-        checkCapacity(e.target.value, 'creative');
-    });
-}
-
-// ==========================================
-// 4. DATA HANDLING (FILL / SAVE)
-// ==========================================
-
 function fillFormData(data) {
-    // พื้นฐาน
-    document.getElementById('b-quest-modal-account').value = data.account_name || '';
-    document.getElementById('b-quest-modal-opportunity').value = data.opportunity_name || '';
-    document.getElementById('b-quest-modal-taskname').value = data.task_name || '';
-    document.getElementById('b-quest-modal-link').value = data.link || '';
-    document.getElementById('b-quest-modal-publish-date').value = data.publish_date || '';
-    document.getElementById('b-quest-modal-detail').value = data.detail || '';
-
-    // Designer
-    document.getElementById('b-quest-modal-designer-status').value = data.designer_status || 'Progress';
-    document.getElementById('b-quest-modal-designer-type').value = data.designer_type || '';
-    document.getElementById('b-quest-modal-designer-work').value = data.designer || '';
-    document.getElementById('b-quest-modal-designer-deadline').value = data.designer_deadline || '';
-    document.getElementById('b-quest-modal-designer-weight').value = data.designer_weight || 0;
-
-    // Creative
-    document.getElementById('b-quest-modal-creative-status').value = data.creative_status || 'Progress';
-    document.getElementById('b-quest-modal-creative-type').value = data.creative_type || '';
-    document.getElementById('b-quest-modal-creative-work').value = data.creative || '';
-    document.getElementById('b-quest-modal-creative-deadline').value = data.creative_deadline || '';
-    document.getElementById('b-quest-modal-creative-weight').value = data.creative_weight || 0;
+    const mapping = {
+        'b-quest-modal-account': data.account_name,
+        'b-quest-modal-opportunity': data.opportunity_name,
+        'b-quest-modal-taskname': data.task_name,
+        'b-quest-modal-link': data.link,
+        'b-quest-modal-publish-date': data.publish_date,
+        'b-quest-modal-detail': data.detail,
+        'b-quest-modal-designer-status': data.designer_status,
+        'b-quest-modal-designer-type': data.designer_type,
+        'b-quest-modal-designer-work': data.designer,
+        'b-quest-modal-designer-deadline': data.designer_deadline,
+        'b-quest-modal-designer-weight': data.designer_weight,
+        'b-quest-modal-creative-status': data.creative_status,
+        'b-quest-modal-creative-type': data.creative_type,
+        'b-quest-modal-creative-work': data.creative,
+        'b-quest-modal-creative-deadline': data.creative_deadline,
+        'b-quest-modal-creative-weight': data.creative_weight
+    };
+    for (let id in mapping) {
+        const el = document.getElementById(id);
+        if (el) el.value = mapping[id] || (el.tagName === 'SELECT' ? '' : '');
+    }
 }
 
 const BQuestService = {
@@ -209,16 +187,11 @@ const BQuestService = {
     }
 };
 
-// Form Submit Handling
 document.getElementById('b-quest-modal-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
-    
-    // Mapping ชื่อฟิลด์ให้ตรงกับ Database (เนื่องจากในฟอร์มใช้ชื่อ designer/creative แต่เบสใช้ designer/creative)
-    payload.designer = payload.designer; 
-    payload.creative = payload.creative;
-    payload.owner = 'Admin'; // หรือดึงจาก Auth
+    payload.owner = 'Admin'; 
     payload.last_update = new Date().toISOString();
 
     const { error } = payload.id 
