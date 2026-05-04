@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>B-QUEST | Master Dashboard</title>
     
+    <!-- Frameworks & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
+    <!-- Project Scripts -->
     <script src="../config.js"></script>
     <script src="../system.js"></script>
     <script src="b-quest.js"></script>
@@ -158,7 +160,8 @@
 
 <script>
     const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'designer_assign', 'creative_assign', 'owner'];
-    let dataList = []; // Global: เก็บ work, weight, role
+    let dataList = [];     // ประเภทงาน
+    let assignList = [];   // รายชื่อพนักงาน (Global เพื่อใช้กรอง Assign แบบ Real-time)
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
@@ -193,22 +196,17 @@
             ]);
 
             dataList = workRes.data || [];
-            const tempProfiles = profileRes.data || [];
+            assignList = profileRes.data || [];
 
             renderWorkFilter();
-            
-            // Assign Filter: ใช้ tempProfiles ทันที ไม่เก็บ Global
-            const assignEl = document.getElementById('filterAssign');
-            setupDefaultOptions(assignEl, "Assign");
-            appendRoleGroup(assignEl, "Designers", tempProfiles, 'role_designer', true, 'codename', 'codename');
-            appendRoleGroup(assignEl, "Creatives", tempProfiles, 'role_creative', true, 'codename', 'codename');
+            renderAssignFilter();
 
-            // Type Dropdown จาก Config
+            // Type Dropdown
             const typeEl = document.getElementById('filterType');
             setupDefaultOptions(typeEl, "Type");
             B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            // Owner Dropdown จาก DB จริง
+            // Owner Dropdown
             const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
             const ownerEl = document.getElementById('filterOwner');
             setupDefaultOptions(ownerEl, "Owner");
@@ -220,25 +218,46 @@
     }
 
     function renderWorkFilter() {
-        const select = document.getElementById('filterWork');
-        if (!select) return;
-        const cur = select.value;
-        setupDefaultOptions(select, "Work");
+        const filterWork = document.getElementById('filterWork');
+        if (!filterWork) return;
+        const currentSelection = filterWork.value;
+        setupDefaultOptions(filterWork, "Work");
 
         if (document.getElementById('pill-designer').classList.contains('active-role')) {
-            appendRoleGroup(select, "Designer", dataList, 'role', 'Designer', 'work', 'work');
+            appendRoleGroup(filterWork, "Designer Work", dataList, 'role', 'Designer', 'work', 'work');
         }
         if (document.getElementById('pill-creative').classList.contains('active-role')) {
-            appendRoleGroup(select, "Creative", dataList, 'role', 'Creative', 'work', 'work');
+            appendRoleGroup(filterWork, "Creative Work", dataList, 'role', 'Creative', 'work', 'work');
         }
-        select.value = cur;
+        filterWork.value = currentSelection;
         updateHighlight('filterWork');
+    }
+
+    function renderAssignFilter() {
+        const filterAssign = document.getElementById('filterAssign'); 
+        if (!filterAssign) return;
+        const currentSelection = filterAssign.value;
+        setupDefaultOptions(filterAssign, "Assign");
+
+        if (document.getElementById('pill-designer').classList.contains('active-role')) {
+            appendRoleGroup(filterAssign, "Designers", assignList, 'role_designer', true, 'codename', 'codename');
+        }
+
+        if (document.getElementById('pill-creative').classList.contains('active-role')) {
+            appendRoleGroup(filterAssign, "Creatives", assignList, 'role_creative', true, 'codename', 'codename');
+        }
+
+        filterAssign.value = currentSelection;
+        updateHighlight('filterAssign');
     }
 
     function togglePill(btn, type) {
         const className = 'active-' + (type === 'designer' || type === 'creative' ? 'role' : type);
         btn.classList.toggle(className);
-        if (type === 'designer' || type === 'creative') renderWorkFilter();
+        if (type === 'designer' || type === 'creative') {
+            renderWorkFilter();
+            renderAssignFilter();
+        }
         applyFilters();
     }
 
@@ -371,7 +390,6 @@
         applyFilters();
     }
 
-    // --- Init ---
     async function initPage() {
         try {
             await System.initLayout(B_QUEST_CONFIG);
