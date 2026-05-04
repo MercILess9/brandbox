@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>B-QUEST | LIST</title>
+    <title>B-QUEST | Master Dashboard</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -64,7 +64,7 @@
         .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; }
         .btn-reset:hover { background: #f8fafc; color: var(--c-text-main); border-color: #cbd5e1; }
 
-        /* --- Card Styles (คงเดิมจากพี่) --- */
+        /* --- Card Styles --- */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-status-done { border-left-color: var(--c-done); }
         .bqc-status-prog { border-left-color: var(--c-progress); }
@@ -150,7 +150,7 @@
     <div id="load-more-trigger" style="height: 50px;"></div>
 </main>
 
-<button class="fab-add" onclick="openTaskModal()" title="New Mission">
+<button class="fab-add" onclick="openTaskModal(null, MASTER_WORK_DATA)" title="New Mission">
     <i class="bi bi-plus-lg"></i>
 </button>
 
@@ -158,21 +158,17 @@
 
 <script>
     const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'publish_date', 'designer', 'designer_assign', 'designer_type', 'creative', 'creative_assign', 'creative_type', 'owner'];
-    let MASTER_WORK_DATA = []; 
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
 
     // --- UI Helpers ---
     document.getElementById('toggleFilters').addEventListener('click', () => {
-        const zone = document.getElementById('advancedFilterZone');
-        zone.classList.toggle('show');
+        document.getElementById('advancedFilterZone').classList.toggle('show');
     });
 
     function togglePill(btn, type) {
-        // Toggle Class ของตัวเองอิสระ (Progress / Done ก็แยกกันได้)
         btn.classList.toggle('active-' + (type === 'designer' || type === 'creative' ? 'role' : type));
-        
         if (type === 'designer' || type === 'creative') renderWorkDropdown();
         applyFilters();
     }
@@ -196,85 +192,18 @@
         applyFilters();
     }
 
-    function setupModalWorkDropdowns() {
-        const configs = [
-            { id: 'b-quest-modal-designer-work', role: 'Designer' },
-            { id: 'b-quest-modal-creative-work', role: 'Creative' }
-        ];
-        configs.forEach(config => {
-            const el = document.getElementById(config.id);
-            if (!el) return;
-            el.innerHTML = '<option value="" disabled selected hidden>Select...</option>';
-            const filtered = MASTER_WORK_DATA.filter(item => item.role === config.role);
-            filtered.forEach(item => {
-                const opt = new Option(item.work, item.work);
-                opt.dataset.weight = item.weight || 0; 
-                el.add(opt);
-            });
-        });
-    }
-
-    async function openTaskModal(taskId = null) {
-        setupModalWorkDropdowns();
-        const form = document.getElementById('b-quest-modal-form');
-        if(form) form.reset();
-        
-        if (taskId) {
-            try {
-                const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', taskId).single();
-                if (error) throw error;
-                fillFormData(data);
-            } catch (e) { console.error(e); }
-        } else {
-            const idField = document.getElementById('b-quest-modal-id');
-            if(idField) idField.value = '';
-            const caps = document.querySelectorAll('.capacity-info');
-            caps.forEach(c => c.innerText = 'Select Date...');
-        }
-        
-        const modalEl = document.getElementById('b-quest-modal');
-        if(modalEl) {
-            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modalInstance.show();
-        }
-    }
-
-    function fillFormData(data) {
-        const mapping = {
-            'b-quest-modal-id': data.id,
-            'b-quest-modal-account': data.account_name,
-            'b-quest-modal-opportunity': data.opportunity_name,
-            'b-quest-modal-taskname': data.task_name,
-            'b-quest-modal-link': data.link,
-            'b-quest-modal-publish-date': data.publish_date,
-            'b-quest-modal-detail': data.detail,
-            'b-quest-modal-designer-status': data.designer_status,
-            'b-quest-modal-creative-status': data.creative_status,
-            'b-quest-modal-designer-type': data.designer_type,
-            'b-quest-modal-creative-type': data.creative_type,
-            'b-quest-modal-designer-deadline': data.designer_deadline,
-            'b-quest-modal-creative-deadline': data.creative_deadline,
-            'b-quest-modal-designer-work': data.designer,
-            'b-quest-modal-creative-work': data.creative
-        };
-        for (let id in mapping) {
-            const el = document.getElementById(id);
-            if (el) el.value = mapping[id] || '';
-        }
-    }
-
+    // --- Data Loading ---
     async function loadMasterData() {
         try {
+            // โหลดข้อมูลงานหลัก
             const { data } = await supabaseClient.from('b-quest-work').select('*').order('work');
             MASTER_WORK_DATA = data || [];
             renderWorkDropdown();
 
-            const tSel = document.getElementById('filterType');
-            if(tSel) {
-                setupDefaultOptions(tSel, "Type");
-                B_QUEST_CONFIG.listTypes.forEach(t => tSel.add(new Option(t, t)));
-            }
+            // หยอด Type Dropdown จาก Config
+            setupTypeDropdowns(['filterType']);
 
+            // ดึงรายชื่อพนักงาน/Owner จากตารางงาน
             const { data: list } = await supabaseClient.from('b-quest-list').select('designer_assign, creative_assign, owner');
             if (list) {
                 const fill = (id, lbl, keys) => {
@@ -298,6 +227,7 @@
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const cur = select.value;
         setupDefaultOptions(select, "Work");
+        
         const dW = MASTER_WORK_DATA.filter(i => i.role === 'Designer');
         const cW = MASTER_WORK_DATA.filter(i => i.role === 'Creative');
         
@@ -315,6 +245,17 @@
         updateHighlight('filterWork');
     }
 
+    function setupTypeDropdowns(targetIds = []) {
+        targetIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                setupDefaultOptions(el, id.includes('filter') ? 'Type' : '');
+                B_QUEST_CONFIG.listTypes.forEach(t => el.add(new Option(t, t)));
+            }
+        });
+    }
+
+    // --- Search & Fetch Logic ---
     function applyFilters() {
         currentPage = 0; hasMore = true;
         document.getElementById("taskContainer").innerHTML = ''; 
@@ -328,13 +269,15 @@
         const from = currentPage * limit;
         const to = from + limit - 1;
         let query = supabaseClient.from('b-quest-list').select('*');
-        const searchInput = document.getElementById('globalSearch');
-        const search = searchInput ? searchInput.value.trim() : "";
+
+        const search = document.getElementById('globalSearch').value.trim();
         if (search) query = query.or(SEARCH_COLUMNS.map(col => `${col}.ilike.%${search}%`).join(','));
+
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const sd = document.getElementById('startDate').value;
         const ed = document.getElementById('endDate').value;
+
         if (!pDes && !pCre) query = query.eq('id', -1);
         else {
             const build = (r) => `and(${r}.neq.-,${r}.not.is.null${sd?`,${r}_deadline.gte.${sd}`:''}${ed?`,${r}_deadline.lte.${ed}`:''})`;
@@ -343,6 +286,7 @@
             if (pCre) parts.push(build('creative'));
             query = query.or(parts.join(','));
         }
+
         const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
         const pDone = document.getElementById('pill-done').classList.contains('active-done');
         
@@ -356,7 +300,9 @@
         if (val('filterType')) query = query.or(`designer_type.eq."${val('filterType')}",creative_type.eq."${val('filterType')}"`);
         if (val('filterAssign')) query = query.or(`designer_assign.eq."${val('filterAssign')}",creative_assign.eq."${val('filterAssign')}"`);
         if (val('filterOwner')) query = query.eq('owner', val('filterOwner'));
+
         query = query.range(from, to).order('id', { ascending: false });
+
         try {
             const { data, error } = await query;
             if (error) throw error;
@@ -387,11 +333,11 @@
                             <div class="bqc-dl-col">${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
                         </div>
                         <div class="bqc-actions">
-                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}')">Edit</button>
+                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}', MASTER_WORK_DATA)">Edit</button>
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px;">
-                                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}')">Edit Mission</a></li>
+                                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}', MASTER_WORK_DATA)">Edit Mission</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
                                     <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="BQuestService.deleteQuest('${task.id}')">Delete</a></li>
                                 </ul>
@@ -438,6 +384,7 @@
         } catch (e) { console.error("Init failed:", e); }
     }
 
+    // Event Listeners
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('change', () => {
@@ -446,16 +393,13 @@
         });
     });
 
-    const gs = document.getElementById('globalSearch');
-    if(gs) gs.addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
+    document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
 
-    const loadTrigger = document.getElementById('load-more-trigger');
-    if(loadTrigger) {
-        const obs = new IntersectionObserver(e => { 
-            if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
-        }, { rootMargin: '100px' });
-        obs.observe(loadTrigger);
-    }
+    const obs = new IntersectionObserver(e => { 
+        if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
+    }, { rootMargin: '100px' });
+    obs.observe(document.getElementById('load-more-trigger'));
+
     initPage();
 </script>
 </body>

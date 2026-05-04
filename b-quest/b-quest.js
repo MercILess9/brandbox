@@ -1,6 +1,3 @@
-// ==========================================
-// 1. CONFIGURATION
-// ==========================================
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
     itemsPerPage: 10,
