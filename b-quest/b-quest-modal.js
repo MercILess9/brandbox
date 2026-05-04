@@ -17,7 +17,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-input-detail { flex-grow: 1; min-height: 140px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
     .role-card { background: #fff; border-radius: 22px; border: 1px solid #e2e8f0; margin-bottom: 12px; transition: all 0.4s ease; overflow: hidden; }
-    .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
+    .role-card.disabled { opacity: 0.7; background: #f1f5f9; }
     .role-card-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
     .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
     .role-card-title i { color: #64748b; font-size: 1rem; vertical-align: middle; }
