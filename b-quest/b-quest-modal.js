@@ -377,8 +377,12 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     if (!isEdit) {
         delete payload.id;
         payload.owner = "Test (BX001)";
-        if (isDesActive) { payload.designer_assign = "Test (BX001)"; payload.designer_status = "Progress"; }
-        if (isCreActive) { payload.creative_assign = "Test (BX001)"; payload.creative_status = "Progress"; }
+        
+        payload.designer_assign = null; 
+        payload.creative_assign = null;
+        
+        if (isDesActive) { payload.designer_status = "Progress"; }
+        if (isCreActive) { payload.creative_status = "Progress"; }
     }
 
     // Null Safety & Data Cleanup
