@@ -1,5 +1,5 @@
 // ==========================================
-// b-quest.js (Full Version - รวมระบบ Searchable Dropdown)
+// b-quest.js (Full Version)
 // ==========================================
 
 const B_QUEST_CONFIG = {
@@ -12,6 +12,7 @@ const B_QUEST_CONFIG = {
     ]
 };
 
+/** --- 1. ระบบจัดการ Modal หลัก --- **/
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
@@ -22,7 +23,6 @@ async function openTaskModal(taskId = null, workData = []) {
 
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
-    setupAccountDropdown(); // เรียกใช้ระบบ Dropdown Search
 
     if (taskId) {
         document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Mission</span>';
@@ -38,65 +38,52 @@ async function openTaskModal(taskId = null, workData = []) {
     }
 
     initModalEventListeners();
-
-    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modalInstance.show();
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-/**
- * ระบบ Searchable Dropdown สำหรับ Account
- */
-async function setupAccountDropdown() {
-    const container = document.getElementById('account-items-container');
-    const accountInput = document.getElementById('b-quest-modal-account');
-    const searchInput = document.getElementById('account-search-input');
+/** --- 2. ระบบค้นหา Account (Modal แยก) --- **/
+async function openAccountSearchModal() {
+    const searchModalEl = document.getElementById('account-search-modal');
+    const container = document.getElementById('acc-list-container');
+    const searchInput = document.getElementById('acc-search-input');
+    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl);
     
-    if (!container || !searchInput) return;
-
-    // ล้างค่าในช่องค้นหาก่อน
-    searchInput.value = '';
+    container.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-secondary"></div></div>';
+    searchModal.show();
 
     try {
         const { data } = await supabaseClient.from('b-quest-list').select('account_name');
-        if (data) {
-            const uniqueAccounts = [...new Set(data.map(item => item.account_name))]
-                .filter(n => n && n !== '-')
-                .sort();
+        const uniqueAccounts = [...new Set(data?.map(i => i.account_name))].filter(n => n && n !== '-').sort();
 
-            const renderList = (filter = '') => {
-                container.innerHTML = '';
-                const filtered = uniqueAccounts.filter(name => name.toLowerCase().includes(filter.toLowerCase()));
-                
-                if (filtered.length === 0) {
-                    container.innerHTML = '<li><span class="dropdown-item-text text-muted">No account found</span></li>';
-                    return;
-                }
-
-                filtered.forEach(name => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.className = "dropdown-item py-2 account-item";
-                    a.href = "#";
-                    a.innerText = name;
-                    a.onclick = (e) => {
-                        e.preventDefault();
-                        accountInput.value = name;
-                        bootstrap.Dropdown.getInstance(document.querySelector('.dropdown-toggle')).hide();
-                    };
-                    li.appendChild(a);
-                    container.appendChild(li);
-                });
-            };
-
-            // ดักฟังการพิมพ์ในช่อง Search
-            searchInput.oninput = (e) => renderList(e.target.value);
+        const renderItems = (filter = '') => {
+            container.innerHTML = '';
+            const filtered = uniqueAccounts.filter(name => name.toLowerCase().includes(filter.toLowerCase()));
             
-            // แสดงรายการเริ่มต้น
-            renderList();
-        }
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="p-4 text-center text-muted">No accounts found.</div>';
+                return;
+            }
+
+            filtered.forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = "list-group-item list-group-item-action acc-list-item";
+                btn.innerText = name;
+                btn.onclick = () => {
+                    document.getElementById('b-quest-modal-account').value = name;
+                    searchModal.hide();
+                };
+                container.appendChild(btn);
+            });
+        };
+
+        searchInput.oninput = (e) => renderItems(e.target.value);
+        renderItems();
+        setTimeout(() => searchInput.focus(), 500);
+
     } catch (e) { console.error(e); }
 }
 
+/** --- 3. ระบบ Capacity Calculation --- **/
 async function checkCapacity(role) {
     const dateInput = document.getElementById(`b-quest-modal-${role}-deadline`);
     const weightInput = document.getElementById(`b-quest-modal-${role}-weight`);
@@ -107,12 +94,12 @@ async function checkCapacity(role) {
         return;
     }
 
-    const date = dateInput.value;
-    const currentWeight = Number(weightInput.value) || 0; 
-    const taskId = document.getElementById('b-quest-modal-id').value;
-
     try {
+        const date = dateInput.value;
+        const currentWeight = Number(weightInput.value) || 0;
+        const taskId = document.getElementById('b-quest-modal-id').value;
         const roleKey = role.charAt(0).toUpperCase() + role.slice(1);
+
         let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
         if (taskId) query = query.neq('id', taskId);
 
@@ -121,18 +108,20 @@ async function checkCapacity(role) {
             supabaseClient.from('b_quest_capacity').select('max_capacity').eq('role', roleKey).single()
         ]);
 
-        const existingLoad = loadRes.data ? loadRes.data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0) : 0;
+        const existingLoad = loadRes.data?.reduce((sum, i) => sum + (Number(i[`${role}_weight`]) || 0), 0) || 0;
         const maxCapacity = capRes.data ? capRes.data.max_capacity : 10;
         const totalAfterSave = existingLoad + currentWeight;
 
         infoEl.innerHTML = `Use : ${currentWeight} | Capacity <strong>${totalAfterSave} / ${maxCapacity}</strong>`;
         infoEl.style.color = totalAfterSave > maxCapacity ? "#ef4444" : (totalAfterSave === maxCapacity ? "#f59e0b" : "#bdc432");
-    } catch (e) { infoEl.innerText = "Error Loading Data"; }
+    } catch (e) { infoEl.innerText = "Error"; }
 }
 
+/** --- 4. Helpers & Dropdowns --- **/
 function initModalEventListeners() {
     ['designer', 'creative'].forEach(role => {
-        document.getElementById(`b-quest-modal-${role}-deadline`)?.addEventListener('change', () => checkCapacity(role));
+        const el = document.getElementById(`b-quest-modal-${role}-deadline`);
+        if (el) el.addEventListener('change', () => checkCapacity(role));
     });
 }
 
@@ -146,20 +135,18 @@ function setupModalWorkDropdowns(workData) {
         const el = document.getElementById(config.id);
         if (!el) return;
         el.innerHTML = '<option value="" selected>None</option>';
-        const filtered = workData.filter(item => item.role === config.role);
-        filtered.forEach(item => {
-            const opt = new Option(item.work, item.work);
-            opt.dataset.weight = item.weight || 0;
-            opt.dataset.task = item.task || '';
+        workData.filter(i => i.role === config.role).forEach(i => {
+            const opt = new Option(i.work, i.work);
+            opt.dataset.weight = i.weight || 0;
+            opt.dataset.task = i.task || '';
             el.appendChild(opt);
         });
 
         el.onchange = () => {
-            const selectedOpt = el.options[el.selectedIndex];
-            document.getElementById(config.weightId).value = selectedOpt.dataset.weight || 0;
-            const taskId = document.getElementById('b-quest-modal-id').value;
-            if (!taskId && selectedOpt.dataset.task) {
-                document.getElementById('b-quest-modal-detail').value = selectedOpt.dataset.task;
+            const selected = el.options[el.selectedIndex];
+            document.getElementById(config.weightId).value = selected.dataset.weight || 0;
+            if (!document.getElementById('b-quest-modal-id').value && selected.dataset.task) {
+                document.getElementById('b-quest-modal-detail').value = selected.dataset.task;
             }
             checkCapacity(config.role.toLowerCase());
         };
@@ -176,7 +163,7 @@ function setupModalTypeDropdowns() {
 }
 
 function fillFormData(data) {
-    const mapping = {
+    const map = {
         'b-quest-modal-account': data.account_name,
         'b-quest-modal-opportunity': data.opportunity_name,
         'b-quest-modal-taskname': data.task_name,
@@ -194,9 +181,9 @@ function fillFormData(data) {
         'b-quest-modal-creative-deadline': data.creative_deadline,
         'b-quest-modal-creative-weight': data.creative_weight
     };
-    for (let id in mapping) {
+    for (let id in map) {
         const el = document.getElementById(id);
-        if (el) el.value = mapping[id] || (el.tagName === 'SELECT' ? '' : '');
+        if (el) el.value = map[id] || (el.tagName === 'SELECT' ? '' : '');
     }
 }
 
@@ -204,35 +191,19 @@ const BQuestService = {
     async getQuestById(id) {
         const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single();
         return error ? null : data;
-    },
-    async deleteQuest(id) {
-        const { isConfirmed } = await Swal.fire({
-            title: 'Delete Mission?',
-            text: "This cannot be undone!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#1e293b'
-        });
-        if (result.isConfirmed) {
-            const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
-            if(!error) location.reload();
-        }
     }
 };
 
 document.getElementById('b-quest-modal-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const payload = Object.fromEntries(formData.entries());
-    payload.owner = 'Admin'; 
+    const payload = Object.fromEntries(new FormData(e.target).entries());
+    payload.owner = 'Admin';
     payload.last_update = new Date().toISOString();
+
     const { error } = payload.id 
         ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
         : await supabaseClient.from('b-quest-list').insert([payload]);
 
-    if (!error) {
-        Swal.fire('Success!', 'Mission Saved.', 'success').then(() => location.reload());
-    } else {
-        Swal.fire('Error!', error.message, 'error');
-    }
+    if (!error) Swal.fire('Success!', 'Mission Saved.', 'success').then(() => location.reload());
+    else Swal.fire('Error!', error.message, 'error');
 });
