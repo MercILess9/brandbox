@@ -1,6 +1,6 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Final Refinement: Task New Header, 50/50 Balanced, Center Inputs & Complete Logic
+ * Final Refinement: Task New Header, 50/50 Balanced, No Cancel Button, Fixed Padding
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
@@ -20,6 +20,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-modern-body { padding: 20px 35px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
+    /* Main Card */
     .bq-glass-card { 
         background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; 
         height: 100%; display: flex; flex-direction: column; 
@@ -27,6 +28,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
     .text-left-label { text-align: left !important; display: block; width: 100%; }
 
+    /* Inputs */
     .bq-input-modern { 
         width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; 
         padding: 5px 12px; font-size: 0.85rem; color: #334155; margin-bottom: 10px; 
@@ -37,12 +39,16 @@ const B_QUEST_MODAL_HTML = `
 
     .bq-input-detail { flex-grow: 1; min-height: 120px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
+    /* Role Card - แก้เรื่องเส้นชิด */
     .role-card {
         background: #fff; border-radius: 22px; border: 1px solid #e2e8f0;
         margin-bottom: 12px; transition: all 0.4s ease; overflow: hidden;
     }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
-    .role-card-header { padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+    
+    /* เพิ่ม padding-bottom เล็กน้อยไม่ให้คำขาดตอนปิด */
+    .role-card-header { padding: 16px 20px 18px 20px; display: flex; align-items: center; gap: 12px; }
+    
     .role-header-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
     .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
     .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 3px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; }
@@ -63,6 +69,7 @@ const B_QUEST_MODAL_HTML = `
 
     .bq-cap-text { font-size: 0.72rem; font-weight: 700; color: #64748b; margin-top: 5px; display: block; }
 
+    /* Toggle Switch */
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider {
@@ -81,10 +88,12 @@ const B_QUEST_MODAL_HTML = `
         padding: 2px 6px; background: #fff; min-width: 90px; text-align-last: center; height: 28px;
     }
 
-    .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 10px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
-    .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 0 20px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; height: 38px; }
-    .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 0 28px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; height: 38px; }
+    /* Footer - ปุ่มเดียวชิดขวา */
+    .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
+    .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; height: 42px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.15); transition: 0.2s; }
+    .btn-bq-create:hover { background: #2563eb; transform: translateY(-1px); }
 
+    /* Overlay Search */
     .bq-search-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
@@ -233,7 +242,6 @@ const B_QUEST_MODAL_HTML = `
                 </div>
 
                 <div class="bq-footer-actions">
-                    <button type="button" class="btn-bq-cancel" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-bq-create" id="btn-submit-text">Create Task</button>
                 </div>
             </form>
