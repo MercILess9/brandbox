@@ -316,13 +316,23 @@
 
     function renderCards(data) {
         const container = document.getElementById("taskContainer");
+        // ไม่ต้องล้าง container ตรงนี้ เพราะเราใช้ระบบ Infinite Scroll (append ข้อมูลต่อท้าย)
+        
         data.forEach(task => {
-            const hasD = !!task.designer && task.designer !== '-';
-            const hasC = !!task.creative && task.creative !== '-';
-            const isDone = (hasD || hasC) && (!hasD || task.designer_status === 'Done') && (!hasC || task.creative_status === 'Done');
+            // --- 1. เช็คสถานะการเปิด Card (Designer / Creative) ---
+            const hasD = !!task.designer && task.designer !== '-' && task.designer !== '';
+            const hasC = !!task.creative && task.creative !== '-' && task.creative !== '';
+            
+            // --- 2. เช็ค Status รวม (ถ้าเปิด Card ไหน ต้อง Done ทุก Card ที่เปิดถึงจะเป็นสีเทา) ---
+            // ถ้าไม่เปิดเลย หรือที่เปิดอยู่ยังไม่ Done จะเป็นสีน้ำเงิน (Progress)
+            const isDone = (hasD || hasC) && 
+                        (!hasD || task.designer_status === 'Done') && 
+                        (!hasC || task.creative_status === 'Done');
+
             const collapseId = `collapse-${task.id}`;
             const card = document.createElement("div");
             card.className = "col-12";
+            
             card.innerHTML = `
                 <div class="bqc-card ${isDone ? 'bqc-status-done' : 'bqc-status-progress'}">
                     <div class="bqc-header">
@@ -330,22 +340,29 @@
                             <div class="bqc-title">${task.task_name || 'Untitled'}</div>
                             <div class="bqc-subtitle">${task.account_name} | ${task.opportunity_name}</div>
                         </div>
+
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="bqc-dl-col">${hasD ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}</div>
-                            <div class="bqc-dl-col">${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
+                            <div class="bqc-dl-col">
+                                ${hasD ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}
+                            </div>
+                            <div class="bqc-dl-col">
+                                ${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}
+                            </div>
                         </div>
+
                         <div class="bqc-actions">
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}', dataList)">Edit</button>
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
-                                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}', dataList)">Edit Mission</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 15px;">
+                                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}', dataList)"><i class="bi bi-pencil-square me-2"></i> Edit Mission</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
-                                    <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="BQuestService.deleteQuest('${task.id}')">Delete</a></li>
+                                    <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="handleDeleteTaskFromList('${task.id}')"><i class="bi bi-trash3 me-2"></i> Delete</a></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
+
                     <div class="collapse" id="${collapseId}">
                         <div class="bqc-body">
                             <div class="bqc-meta-row">
@@ -356,23 +373,45 @@
                                 </div>
                                 <div class="bqc-last-update"><i class="bi bi-clock-history"></i> Last Update : ${formatDate(task.last_update)}</div>
                             </div>
+
                             <div class="bqc-layout-row">
                                 <div class="bqc-col-30">
                                     <div class="bqc-panel-label"><i class="bi bi-brush"></i> DESIGNER</div>
-                                    ${hasD ? `<div class="bqc-panel"><div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status==='Done'?'bqc-dot-done':'bqc-dot-progress'}"></span>${task.designer_status}</span></div><div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type}</span></div><div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer}</span></div><div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.designer_assign}</span></div><div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div></div>` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
+                                    ${hasD ? `
+                                        <div class="bqc-panel">
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.designer_status}</span></div>
+                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type || '-'}</span></div>
+                                            <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer || '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val text-primary">${(task.designer_assign && task.designer_assign !== '-') ? task.designer_assign : '-'}</span></div>
+                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div>
+                                        </div>
+                                    ` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
                                 </div>
+
                                 <div class="bqc-col-30">
                                     <div class="bqc-panel-label"><i class="bi bi-rocket"></i> CREATIVE</div>
-                                    ${hasC ? `<div class="bqc-panel"><div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status==='Done'?'bqc-dot-done':'bqc-dot-progress'}"></span>${task.creative_status}</span></div><div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type}</span></div><div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative}</span></div><div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.creative_assign}</span></div><div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div></div>` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
+                                    ${hasC ? `
+                                        <div class="bqc-panel">
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.creative_status}</span></div>
+                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type || '-'}</span></div>
+                                            <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative || '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val text-primary">${(task.creative_assign && task.creative_assign !== '-') ? task.creative_assign : '-'}</span></div>
+                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div>
+                                        </div>
+                                    ` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
                                 </div>
+
                                 <div class="bqc-col-40">
                                     <div class="bqc-panel-label"><i class="bi bi-justify-left"></i> DETAIL</div>
-                                    <div class="bqc-panel" style="overflow-y: auto; color: #64748b; font-size: 0.9rem;">${task.detail || 'No details provided.'}</div>
+                                    <div class="bqc-panel" style="overflow-y: auto; color: #64748b; font-size: 0.85rem; line-height: 1.5;">
+                                        ${task.detail ? task.detail.replace(/\n/g, '<br>') : 'No details provided.'}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>`;
+                
             container.appendChild(card);
         });
     }
