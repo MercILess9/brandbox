@@ -198,8 +198,8 @@
             dataList = workRes.data || [];
             assignList = profileRes.data || [];
 
-            renderWorkFilter();
-            renderAssignFilter();
+            renderFilterWork();
+            renderFilterAssign();
 
             // Type Dropdown
             const typeEl = document.getElementById('filterType');
@@ -217,7 +217,7 @@
         } catch (e) { console.error(e); }
     }
 
-    function renderWorkFilter() {
+    function renderFilterWork() {
         const filterWork = document.getElementById('filterWork');
         if (!filterWork) return;
         const currentSelection = filterWork.value;
@@ -233,7 +233,7 @@
         updateHighlight('filterWork');
     }
 
-    function renderAssignFilter() {
+    function renderFilterAssign() {
         const filterAssign = document.getElementById('filterAssign'); 
         if (!filterAssign) return;
         const currentSelection = filterAssign.value;
@@ -255,8 +255,8 @@
         const className = 'active-' + (type === 'designer' || type === 'creative' ? 'role' : type);
         btn.classList.toggle(className);
         if (type === 'designer' || type === 'creative') {
-            renderWorkFilter();
-            renderAssignFilter();
+            renderFilterWork();
+            renderFilterAssign();
         }
         applyFilters();
     }
