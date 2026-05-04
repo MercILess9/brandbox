@@ -63,7 +63,8 @@ const B_QUEST_MODAL_HTML = `
         padding: 10px; /* ลด padding รอบนอกเพื่อความแคบ */
         overflow-y: auto; 
         flex-grow: 1; 
-        background: #fff; 
+        background: #fff;
+        overscroll-behavior: contain; 
     }
 
     /* แก้ไขสไตล์รายการให้อ่านง่ายขึ้น ไม่ซ้อนกัน */
