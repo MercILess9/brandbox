@@ -1,11 +1,10 @@
 /**
- * B-QUEST MODAL COMPONENT - MASTER FINAL V2
+ * B-QUEST MODAL COMPONENT - THE ULTIMATE STABLE VERSION
  * -----------------------------------------------------------
- * Features: 
- * - Smart Switch: Auto Open/Close cards based on data
- * - Smart Capacity: Green for original work, Red for overloaded new work
- * - Validation: Block Save if Capacity > 10 & Alert with Swal
- * - UI: Icons, Centered Capacity, Owner on Top-Right
+ * - Auto-Clean Database on Switch Off (Set to NULL)
+ * - Hide Status UI when Switch is OFF
+ * - Smart Capacity Validation (Original Work Exemption)
+ * - Centered UI & Icons
  */
 
 const B_QUEST_MODAL_HTML = `
@@ -49,10 +48,11 @@ const B_QUEST_MODAL_HTML = `
     .role-card-body { max-height: 0; padding: 0 20px; transition: all 0.4s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 15px 18px 18px 18px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
-    /* Timeline & Centered Capacity */
+    /* Capacity UI */
     .timeline-zone { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 10px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 8px; display: none; text-align: center; width: 100%; }
 
+    /* Switch & Status UI */
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
@@ -63,14 +63,15 @@ const B_QUEST_MODAL_HTML = `
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; color: #fff; min-width: 95px; text-align-last: center; height: 28px; }
     .status-progress { background-color: #4e73df !important; }
     .status-done { background-color: #94a3b8 !important; }
+    
+    /* 🚩 Hide status when card is not active */
+    .role-card:not(.active) .bq-status-select { display: none !important; }
 
-    /* Footer Buttons */
+    /* Footer */
     .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; height: 42px; display: none; cursor: pointer; transition: 0.2s; }
+    .btn-bq-delete:hover { background: #fecaca; }
     .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; height: 42px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; }
-
-    .bq-search-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .bq-search-card { background: #fff; width: 400px; max-height: 80%; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -139,7 +140,7 @@ const B_QUEST_MODAL_HTML = `
                                         <div class="role-card-title"><i class="bi bi-brush me-2"></i>Designer</div>
                                         <span class="bq-assign-badge" id="badge-assign-designer"></span>
                                     </div>
-                                    <select class="bq-status-select status-progress edit-only" id="b-quest-modal-designer-status" name="designer_status" onchange="updateStatusUI(this)">
+                                    <select class="bq-status-select status-progress" id="b-quest-modal-designer-status" name="designer_status" onchange="updateStatusUI(this)">
                                         <option value="Progress">Progress</option><option value="Done">Done</option>
                                     </select>
                                 </div>
@@ -168,7 +169,7 @@ const B_QUEST_MODAL_HTML = `
                                         <div class="role-card-title"><i class="bi bi-rocket me-2"></i>Creative</div>
                                         <span class="bq-assign-badge" id="badge-assign-creative"></span>
                                     </div>
-                                    <select class="bq-status-select status-progress edit-only" id="b-quest-modal-creative-status" name="creative_status" onchange="updateStatusUI(this)">
+                                    <select class="bq-status-select status-progress" id="b-quest-modal-creative-status" name="creative_status" onchange="updateStatusUI(this)">
                                         <option value="Progress">Progress</option><option value="Done">Done</option>
                                     </select>
                                 </div>
@@ -203,7 +204,7 @@ const B_QUEST_MODAL_HTML = `
 </div>
 `;
 
-// --- CORE LOGIC ---
+// --- LOGIC ---
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 let currentCapacities = { designer: 0, creative: 0 };
 
@@ -265,14 +266,12 @@ async function openTaskModal(taskId = null, workData = []) {
     setupModalWorkDropdown(workData);
     setupModalTypeDropdown();
 
-    const editOnly = document.querySelectorAll('.edit-only');
     const deleteBtn = document.getElementById('btn-delete-task');
     const ownerTop = document.getElementById('modal-owner-display');
 
     if (taskId) {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
         document.getElementById('btn-submit-text').innerText = 'Save Changes';
-        editOnly.forEach(el => el.style.display = 'block');
         deleteBtn.style.display = 'block';
 
         const data = await BQuestService.getQuestById(taskId);
@@ -281,7 +280,7 @@ async function openTaskModal(taskId = null, workData = []) {
             fillFormData(data);
             ['designer', 'creative'].forEach(role => {
                 updateStatusUI(document.getElementById(`b-quest-modal-${role}-status`));
-                // 🚩 Smart Check: Only open switch if actual work data exists
+                // Smart Switch Check
                 const hasData = !!(data[role] || data[`${role}_deadline`]);
                 document.getElementById(`check-${role}`).checked = hasData;
                 updateRoleUI(role);
@@ -290,7 +289,6 @@ async function openTaskModal(taskId = null, workData = []) {
     } else {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
         document.getElementById('btn-submit-text').innerText = 'Create Task';
-        editOnly.forEach(el => el.style.display = 'none');
         deleteBtn.style.display = 'none';
         ownerTop.innerText = 'Owner: -';
         ['designer', 'creative'].forEach(role => {
@@ -362,7 +360,7 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
 
     if (!isDes && !isCre) return Swal.fire('Wait!', 'Select at least one role.', 'warning');
 
-    // 🚩 Smart Capacity Validation
+    // Smart Capacity Logic
     const validateCap = async (role) => {
         const checkbox = document.getElementById(`check-${role}`);
         if (!checkbox.checked) return true;
@@ -376,17 +374,37 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     };
 
     if (!(await validateCap('designer')) || !(await validateCap('creative'))) {
-        return Swal.fire({ icon: 'error', title: 'Max Capacity Reached!', text: 'This person is over-loaded (max 10). Please choose another date.', confirmButtonColor: '#1e293b' });
+        return Swal.fire({ icon: 'error', title: 'Max Capacity Reached!', text: 'Load exceeds 10. Please adjust dates.', confirmButtonColor: '#1e293b' });
     }
 
     const payload = Object.fromEntries(new FormData(form).entries());
     const isEdit = !!payload.id && payload.id.length > 10;
     
-    if (!isEdit) { delete payload.id; payload.owner = "Test (BX001)"; payload.designer_assign = null; payload.creative_assign = null; }
+    if (!isEdit) { 
+        delete payload.id; 
+        payload.owner = "Test (BX001)"; 
+        payload.designer_assign = null; 
+        payload.creative_assign = null; 
+    }
     
+    // Cleaning nulls
     ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'].forEach(f => { if(payload[f] === "") payload[f] = null; });
-    payload.designer_weight = parseInt(payload.designer_weight) || 0;
-    payload.creative_weight = parseInt(payload.creative_weight) || 0;
+
+    // 🚩 IMPORTANT: Clean inactive role data to NULL in DB
+    if (!isDes) {
+        payload.designer = null; payload.designer_type = null; payload.designer_deadline = null;
+        payload.designer_weight = 0; payload.designer_assign = null; payload.designer_status = null;
+    } else {
+        payload.designer_weight = parseInt(payload.designer_weight) || 0;
+    }
+
+    if (!isCre) {
+        payload.creative = null; payload.creative_type = null; payload.creative_deadline = null;
+        payload.creative_weight = 0; payload.creative_assign = null; payload.creative_status = null;
+    } else {
+        payload.creative_weight = parseInt(payload.creative_weight) || 0;
+    }
+
     payload.last_update = new Date().toISOString();
 
     const { error } = isEdit ? await supabaseClient.from('b-quest-list').update(payload).eq('id', currentId) : await supabaseClient.from('b-quest-list').insert([payload]);
