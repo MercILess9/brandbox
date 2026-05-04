@@ -1,19 +1,20 @@
 <style>
+    /* --- Modal & Container --- */
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     .bq-form-header { padding: 18px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
     .bq-form-body { padding: 25px 30px; background: #f8fafc; }
     .bq-form-footer { padding: 15px 30px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* --- Sections & Cards --- */
     .bq-card-section { background: #ffffff; border-radius: 16px; padding: 20px; border: 1px solid #eef2f6; height: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02); }
     .bq-card-highlight { border-top: 3px solid #bdc432; }
+
     .bq-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
     .bq-section-title { font-size: 0.75rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; }
     .bq-owner-tag { background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; border: 1px solid #e2e8f0; }
-    .bq-status-select { 
-        border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; 
-        padding: 6px 15px; color: #1e293b; outline: none; cursor: pointer; background: #fff;
-        min-width: 120px; text-align: center; text-align-last: center;
-    }
+
+    /* --- Form Elements --- */
     .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
     .bq-input { 
         width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; 
@@ -22,6 +23,14 @@
         text-align: center; text-align-last: center; 
     }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
+    
+    .bq-status-select { 
+        border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; 
+        padding: 6px 15px; color: #1e293b; outline: none; cursor: pointer; background: #fff;
+        min-width: 120px; text-align: center; text-align-last: center;
+    }
+
+    /* --- Info & Buttons --- */
     .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 800; transition: 0.2s; }
     .btn-bq-save:hover { background: #0f172a; transform: translateY(-2px); }
@@ -45,23 +54,26 @@
                         <div class="col-md-6">
                             <div class="bq-card-section">
                                 <label class="bq-label">Account Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name" required>
-                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name" list="account-options" required>
-<datalist id="account-options"></datalist>
+                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name" list="account-options" required placeholder="Search or type account...">
+                                <datalist id="account-options"></datalist>
+
                                 <label class="bq-label">Opportunity Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name">
+                                <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="Enter Opportunity">
+
                                 <label class="bq-label">Task Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required>
+                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required placeholder="Enter Task Title">
+
                                 <label class="bq-label">Link</label>
-                                <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link">
+                                <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link" placeholder="https://...">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="bq-card-section">
                                 <label class="bq-label">Publish Date</label>
                                 <input type="date" class="bq-input" id="b-quest-modal-publish-date" name="publish_date">
+                                
                                 <label class="bq-label">Detail</label>
-                                <textarea class="bq-input m-0" id="b-quest-modal-detail" name="detail" rows="7" style="resize: none; height: 135px; text-align: left;"></textarea>
+                                <textarea class="bq-input m-0" id="b-quest-modal-detail" name="detail" rows="7" style="resize: none; height: 135px; text-align: left;" placeholder="Task breakdown..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -70,7 +82,7 @@
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title">DESIGNER <span class="bq-owner-tag" id="designer-codename-tag">-</span></div>
+                                    <div class="bq-section-title"><i class="bi bi-brush"></i> DESIGNER</div>
                                     <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status">
                                         <option value="Progress">Progress</option>
                                         <option value="Done">Done</option>
@@ -92,7 +104,7 @@
                                         <input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline">
                                     </div>
                                     <div class="col-6">
-                                        <label class="bq-label">Daily Capacity</label>
+                                        <label class="bq-label">Workload Info</label>
                                         <div id="designer-capacity-info" class="capacity-info">Select Date...</div>
                                     </div>
                                 </div>
@@ -102,7 +114,7 @@
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title">CREATIVE <span class="bq-owner-tag" id="creative-codename-tag">-</span></div>
+                                    <div class="bq-section-title"><i class="bi bi-rocket-takeoff"></i> CREATIVE</div>
                                     <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status">
                                         <option value="Progress">Progress</option>
                                         <option value="Done">Done</option>
@@ -124,7 +136,7 @@
                                         <input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline">
                                     </div>
                                     <div class="col-6">
-                                        <label class="bq-label">Daily Capacity</label>
+                                        <label class="bq-label">Workload Info</label>
                                         <div id="creative-capacity-info" class="capacity-info">Select Date...</div>
                                     </div>
                                 </div>
@@ -134,6 +146,7 @@
                 </div>
 
                 <div class="bq-form-footer">
+                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-bq-save">Save Mission</button>
                 </div>
             </form>
