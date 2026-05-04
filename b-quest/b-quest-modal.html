@@ -53,9 +53,17 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <div class="bq-card-section">
-                                <label class="bq-label">Account Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-account" name="account_name" list="account-options" required placeholder="Search or type account...">
-                                <datalist id="account-options"></datalist>
+                                <<label class="bq-label">Account Name</label>
+<div class="input-group mb-3">
+    <input type="text" class="bq-input m-0" id="b-quest-modal-account" name="account_name" required placeholder="Enter Account Name">
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 0 10px 10px 0; border: 1px solid #e2e8f0; border-left: none; background: #fff;">
+        <i class="bi bi-person-lines-fill"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" id="account-dropdown-list" style="max-height: 250px; overflow-y: auto; border-radius: 12px; font-size: 0.85rem;">
+        <li><h6 class="dropdown-header">Select Existing Account</h6></li>
+        <li><hr class="dropdown-divider"></li>
+    </ul>
+</div>
 
                                 <label class="bq-label">Opportunity Name</label>
                                 <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="Enter Opportunity">

@@ -1,6 +1,7 @@
 // ==========================================
-// 1. CONFIGURATION
+// b-quest.js (Full Version - รวมระบบปุ่ม Account)
 // ==========================================
+
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
     itemsPerPage: 10,
@@ -11,33 +12,24 @@ const B_QUEST_CONFIG = {
     ]
 };
 
-// ==========================================
-// 2. MODAL CORE LOGIC
-// ==========================================
-
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
     if (!modalEl || !form) return;
 
-    // 1. Reset ฟอร์มและ ID
     form.reset();
-    const idField = document.getElementById('b-quest-modal-id');
-    if (idField) idField.value = '';
+    if(document.getElementById('b-quest-modal-id')) document.getElementById('b-quest-modal-id').value = '';
 
-    // 2. เตรียม Dropdown และ Autocomplete
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
-    setupAccountAutocomplete(); // เพิ่มระบบเลือกชื่อ Account
+    setupAccountDropdown(); // ดึงรายชื่อ Account มาใส่ปุ่มข้างๆ
 
-    // 3. เช็คโหมด New หรือ Edit
     if (taskId) {
         document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Mission</span>';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
-            if (idField) idField.value = taskId;
+            document.getElementById('b-quest-modal-id').value = taskId;
             fillFormData(data);
-            // คำนวณ Capacity ทันทีหลังโหลดข้อมูล
             checkCapacity('designer');
             checkCapacity('creative');
         }
@@ -45,17 +37,46 @@ async function openTaskModal(taskId = null, workData = []) {
         document.getElementById('b-quest-modal-label').innerHTML = 'New <span style="color: #bdc432;">Mission</span>';
     }
 
-    // 4. ผูก Event Listeners สำหรับ Capacity
     initModalEventListeners();
 
-    // 5. แสดง Modal
     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
     modalInstance.show();
 }
 
-// ==========================================
-// 3. CAPACITY & AUTOCOMPLETE LOGIC
-// ==========================================
+/**
+ * ดึงรายชื่อ Account มาหยอดในปุ่ม Dropdown ข้างช่อง Input
+ */
+async function setupAccountDropdown() {
+    const dropdownList = document.getElementById('account-dropdown-list');
+    const accountInput = document.getElementById('b-quest-modal-account');
+    if (!dropdownList) return;
+
+    try {
+        const { data } = await supabaseClient.from('b-quest-list').select('account_name');
+        if (data) {
+            const uniqueAccounts = [...new Set(data.map(item => item.account_name))]
+                .filter(n => n && n !== '-')
+                .sort();
+
+            // ล้างค่าเก่า (เหลือแค่ Header กับ Divider)
+            dropdownList.innerHTML = '<li><h6 class="dropdown-header">Select Existing Account</h6></li><li><hr class="dropdown-divider"></li>';
+
+            uniqueAccounts.forEach(name => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.className = "dropdown-item py-2";
+                a.href = "#";
+                a.innerText = name;
+                a.onclick = (e) => {
+                    e.preventDefault();
+                    accountInput.value = name; // เมื่อกดแล้วเอาชื่อไปใส่ใน Input
+                };
+                li.appendChild(a);
+                dropdownList.appendChild(li);
+            });
+        }
+    } catch (e) { console.error(e); }
+}
 
 async function checkCapacity(role) {
     const dateInput = document.getElementById(`b-quest-modal-${role}-deadline`);
@@ -75,8 +96,6 @@ async function checkCapacity(role) {
 
     try {
         const roleKey = role.charAt(0).toUpperCase() + role.slice(1);
-        
-        // ดึงโหลดงานอื่น (ไม่รวมตัวเองถ้า Edit) และ Max Capacity พร้อมกัน
         let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
         if (taskId) query = query.neq('id', taskId);
 
@@ -89,41 +108,16 @@ async function checkCapacity(role) {
         const maxCapacity = capRes.data ? capRes.data.max_capacity : 10;
         const totalAfterSave = existingLoad + currentWeight;
 
-        // แสดงผลตามโจทย์: Use : 1 | Capacity 1 / 10
         infoEl.innerHTML = `Use : ${currentWeight} | Capacity <strong>${totalAfterSave} / ${maxCapacity}</strong>`;
-        
-        // ปรับสีตามความหนาแน่น
-        if (totalAfterSave > maxCapacity) infoEl.style.color = "#ef4444";
-        else if (totalAfterSave === maxCapacity) infoEl.style.color = "#f59e0b";
-        else infoEl.style.color = "#bdc432";
-
-    } catch (e) {
-        infoEl.innerText = "Error Loading Data";
-    }
-}
-
-async function setupAccountAutocomplete() {
-    const datalist = document.getElementById('account-options');
-    if (!datalist) return;
-    try {
-        const { data } = await supabaseClient.from('b-quest-list').select('account_name');
-        if (data) {
-            const uniqueAccounts = [...new Set(data.map(item => item.account_name))].filter(n => n && n !== '-').sort();
-            datalist.innerHTML = uniqueAccounts.map(name => `<option value="${name}">`).join('');
-        }
-    } catch (e) { console.error(e); }
+        infoEl.style.color = totalAfterSave > maxCapacity ? "#ef4444" : (totalAfterSave === maxCapacity ? "#f59e0b" : "#bdc432");
+    } catch (e) { infoEl.innerText = "Error Loading Data"; }
 }
 
 function initModalEventListeners() {
-    const roles = ['designer', 'creative'];
-    roles.forEach(role => {
+    ['designer', 'creative'].forEach(role => {
         document.getElementById(`b-quest-modal-${role}-deadline`)?.addEventListener('change', () => checkCapacity(role));
     });
 }
-
-// ==========================================
-// 4. DROPDOWNS & FORM HANDLING
-// ==========================================
 
 function setupModalWorkDropdowns(workData) {
     const configs = [
@@ -134,10 +128,8 @@ function setupModalWorkDropdowns(workData) {
     configs.forEach(config => {
         const el = document.getElementById(config.id);
         if (!el) return;
-
         el.innerHTML = '<option value="" selected>None</option>';
         const filtered = workData.filter(item => item.role === config.role);
-        
         filtered.forEach(item => {
             const opt = new Option(item.work, item.work);
             opt.dataset.weight = item.weight || 0;
@@ -148,7 +140,6 @@ function setupModalWorkDropdowns(workData) {
         el.onchange = () => {
             const selectedOpt = el.options[el.selectedIndex];
             document.getElementById(config.weightId).value = selectedOpt.dataset.weight || 0;
-
             const taskId = document.getElementById('b-quest-modal-id').value;
             if (!taskId && selectedOpt.dataset.task) {
                 document.getElementById('b-quest-modal-detail').value = selectedOpt.dataset.task;
@@ -192,10 +183,6 @@ function fillFormData(data) {
     }
 }
 
-// ==========================================
-// 5. SERVICE & API CALLS
-// ==========================================
-
 const BQuestService = {
     async getQuestById(id) {
         const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single();
@@ -216,15 +203,12 @@ const BQuestService = {
     }
 };
 
-// Form Submit Handling
 document.getElementById('b-quest-modal-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
-    
     payload.owner = 'Admin'; 
     payload.last_update = new Date().toISOString();
-
     const { error } = payload.id 
         ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
         : await supabaseClient.from('b-quest-list').insert([payload]);
