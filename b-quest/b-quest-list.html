@@ -38,7 +38,6 @@
 
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
 
-        /* Smooth Slide Advance Zone */
         .flt-advanced-zone { 
             max-height: 0; 
             overflow: hidden; 
@@ -138,7 +137,7 @@
         <div class="flt-advanced-row">
             <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
             <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
-            <div class="flt-select-box"><span class="flt-select-tag">Staff</span><select class="flt-select-input" id="filterAssign"></select></div>
+            <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"></select></div>
             <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"></select></div>
             <button class="btn-reset" onclick="resetAdvanced()">RESET</button>
         </div>
@@ -161,7 +160,7 @@
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
-    let dataList = []; // เปลี่ยนชื่อจาก MASTER_WORK_DATA
+    let dataList = []; 
 
     // --- UI Helpers ---
     document.getElementById('toggleFilters').addEventListener('click', () => {
@@ -196,7 +195,7 @@
     // --- Data Loading ---
     async function loadMasterData() {
         try {
-            // โหลดข้อมูลงานและพนักงานพร้อมกัน
+            // 1. โหลดข้อมูล Work & Profiles
             const [workRes, profileRes] = await Promise.all([
                 supabaseClient.from('b-quest-work').select('*').order('work_name'),
                 supabaseClient.from('b-quest-profiles').select('*').order('codename')
@@ -205,21 +204,26 @@
             dataList = workRes.data || [];
             const allProfiles = profileRes.data || [];
 
-            // 1. หยอด Work Dropdown
+            // 2. หยอด Work & Type Dropdowns
             renderWorkDropdown();
-
-            // 2. หยอด Type Dropdown จาก Config
             const typeEl = document.getElementById('filterType');
             setupDefaultOptions(typeEl, "Type");
             B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            // 3. หยอด Owner Dropdown (AE)
+            // 3. หยอด Assign Dropdown (Grouping D/C) จาก Profiles
+            renderAssignFilter(allProfiles);
+
+            // 4. หยอด Owner Dropdown (ดึงจากข้อมูลที่มีจริงใน database b-quest-list)
+            const { data: owners } = await supabaseClient
+                .from('b-quest-list')
+                .select('owner');
+            
             const ownerEl = document.getElementById('filterOwner');
             setupDefaultOptions(ownerEl, "Owner");
-            allProfiles.filter(p => p.role_ae).forEach(ae => ownerEl.add(new Option(ae.codename, ae.codename)));
-
-            // 4. หยอด Assign Dropdown (Grouping D/C)
-            renderAssignFilter(allProfiles);
+            if (owners) {
+                const uniqueOwners = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
+                uniqueOwners.forEach(name => ownerEl.add(new Option(name, name)));
+            }
 
         } catch (e) { console.error("Load Master Data Failed:", e); }
     }
@@ -249,7 +253,7 @@
     function renderAssignFilter(profiles) {
         const el = document.getElementById('filterAssign');
         if (!el) return;
-        setupDefaultOptions(el, "Staff");
+        setupDefaultOptions(el, "Assign");
 
         const designers = profiles.filter(p => p.role_designer);
         const creatives = profiles.filter(p => p.role_creative);
