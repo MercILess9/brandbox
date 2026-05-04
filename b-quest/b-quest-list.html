@@ -303,7 +303,7 @@
         if (val('filterAssign')) query = query.or(`designer_assign.eq."${val('filterAssign')}",creative_assign.eq."${val('filterAssign')}"`);
         if (val('filterOwner')) query = query.eq('owner', val('filterOwner'));
 
-        query = query.range(from, to).order('id', { ascending: false });
+        query = query.range(from, to).order('last_update', { ascending: false });
 
         try {
             const { data, error } = await query;
