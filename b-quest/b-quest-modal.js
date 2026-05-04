@@ -1,13 +1,18 @@
 /**
- * B-QUEST MODAL COMPONENT (Full Version: Zero Backdrop Fix)
+ * B-QUEST MODAL COMPONENT (Fixed Backdrop & Functional Search)
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
-    /* ตั้งค่าลำดับชั้นให้ Modal ค้นหาอยู่สูงกว่าเสมอ */
+    /* ตั้งค่า Modal หลัก */
     #b-quest-modal { z-index: 1050 !important; }
-    #universal-search-modal { z-index: 2000 !important; }
+    
+    /* ตั้งค่า Modal ค้นหา ให้สูงกว่า และจัดการพื้นหลังเอง */
+    #universal-search-modal { 
+        z-index: 1060 !important; 
+        background: rgba(0, 0, 0, 0.2); /* ใส่สีเข้มบางๆ เอง ไม่พึ่งระบบ Backdrop */
+    }
 
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
@@ -23,7 +28,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-owner-tag { background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; border: 1px solid #e2e8f0; }
 
     .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .bq-input { width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 0.88rem; background: #ffffff; margin-bottom: 15px; color: #1e293b; text-align: center; transition: 0.2s; }
+    .bq-input { width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 0.88rem; background: #ffffff; margin-bottom: 15px; color: #1e293b; text-align: center; }
     
     .bq-input-group { display: flex; margin-bottom: 15px; }
     .bq-input-left { border-radius: 10px 0 0 10px !important; margin-bottom: 0 !important; }
@@ -33,10 +38,13 @@ const B_QUEST_MODAL_HTML = `
     .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 800; transition: 0.2s; cursor: pointer; }
 
-    /* ปรับแต่ง Modal ค้นหาให้ดูเป็น Overlay ชั้นบน */
-    #universal-search-modal .modal-content { border-radius: 20px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid #e2e8f0; }
-    .uni-list-item { border: none; border-radius: 12px !important; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; padding: 12px 15px; }
-    .uni-list-item:hover { background: #bdc432 !important; color: #fff !important; transform: translateX(5px); }
+    .uni-list-item { 
+        border: none; border-radius: 12px !important; margin-bottom: 5px; 
+        font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; 
+        text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        display: block; width: 100%; padding: 12px 15px; background: #fff;
+    }
+    .uni-list-item:hover { background: #bdc432 !important; color: #fff !important; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -132,14 +140,14 @@ const B_QUEST_MODAL_HTML = `
 
 <div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
+        <div class="modal-content shadow-lg" style="border: 1px solid #ddd;">
             <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-800" id="search-modal-title">Select Item</h6>
+                <h6 class="modal-title fw-800" id="search-modal-title">Select</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." autocomplete="off">
-                <div id="universal-list-container" class="list-group p-0" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;"></div>
+                <div id="universal-list-container" class="list-group p-0" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
         </div>
     </div>
@@ -152,9 +160,9 @@ document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
-    if (!modalEl) return;
-
     const form = document.getElementById('b-quest-modal-form');
+    if (!modalEl || !form) return;
+
     form.reset();
     if(document.getElementById('b-quest-modal-id')) document.getElementById('b-quest-modal-id').value = '';
 
@@ -172,44 +180,30 @@ async function openTaskModal(taskId = null, workData = []) {
         }
     } else {
         document.getElementById('b-quest-modal-label').innerHTML = 'New Mission';
-        document.getElementById('designer-owner-tag').innerText = 'Admin';
-        document.getElementById('creative-owner-tag').innerText = 'Admin';
     }
 
     initModalEventListeners();
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-/**
- * แก้ไขปัญหาจอดำทับ (Fixed Backdrop Issue)
- */
 async function openGeneralSearchModal(fieldName, targetInputId) {
     const searchModalEl = document.getElementById('universal-search-modal');
     const container = document.getElementById('universal-list-container');
     const searchInput = document.getElementById('universal-search-input');
-    const title = document.getElementById('search-modal-title');
     
-    title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
-    container.innerHTML = '<div class="text-center p-4">Loading...</div>';
+    container.innerHTML = '<div class="text-center p-3">Loading...</div>';
     
-    // สำคัญ: ตั้งค่า backdrop: false เพื่อไม่ให้จอดำซ้อนทับกัน
-    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl, {
-        backdrop: false
-    });
+    // สำคัญ: ปิด backdrop ผ่าน JS อีกชั้น
+    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl, { backdrop: false });
     searchModal.show();
 
     try {
         const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
-        const uniqueItems = [...new Set(data?.map(i => i[fieldName]))].filter(n => n && n !== '-').sort();
+        const unique = [...new Set(data?.map(i => i[fieldName]))].filter(n => n && n !== '-').sort();
 
         const render = (f = '') => {
             container.innerHTML = '';
-            const filtered = uniqueItems.filter(n => n.toLowerCase().includes(f.toLowerCase()));
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="p-3 text-center text-muted">No data.</div>';
-                return;
-            }
-            filtered.forEach(val => {
+            unique.filter(n => n.toLowerCase().includes(f.toLowerCase())).forEach(val => {
                 const b = document.createElement('button');
                 b.className = "list-group-item list-group-item-action uni-list-item";
                 b.innerText = val;
@@ -224,7 +218,7 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
         searchInput.oninput = (e) => render(e.target.value);
         render();
         searchInput.value = '';
-        setTimeout(() => searchInput.focus(), 500);
+        setTimeout(() => searchInput.focus(), 400);
     } catch (e) { console.error(e); }
 }
 
@@ -236,11 +230,11 @@ async function checkCapacity(role) {
     
     if (!infoEl || !dateInput || !dateInput.value) return;
 
-    const date = dateInput.value;
-    const currentWeight = Number(weightInput.value) || 0;
-
     try {
+        const date = dateInput.value;
+        const weight = Number(weightInput.value) || 0;
         const roleKey = role.charAt(0).toUpperCase() + role.slice(1);
+
         let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
         if (taskId) query = query.neq('id', taskId);
 
@@ -251,17 +245,16 @@ async function checkCapacity(role) {
 
         const existing = loadRes.data?.reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) || 0;
         const max = capRes.data ? capRes.data.max_capacity : 10;
-        const total = existing + currentWeight;
+        const total = existing + weight;
 
-        infoEl.innerHTML = `Use:${currentWeight} | <strong>${total}/${max}</strong>`;
+        infoEl.innerHTML = `Use:${weight} | <strong>${total}/${max}</strong>`;
         infoEl.style.color = total > max ? "#ef4444" : (total === max ? "#f59e0b" : "#bdc432");
     } catch (e) { console.error(e); }
 }
 
 function initModalEventListeners() {
     ['designer', 'creative'].forEach(r => {
-        const el = document.getElementById(`b-quest-modal-${r}-deadline`);
-        if (el) el.addEventListener('change', () => checkCapacity(r));
+        document.getElementById(`b-quest-modal-${r}-deadline`)?.addEventListener('change', () => checkCapacity(r));
     });
 }
 
@@ -289,8 +282,7 @@ function setupModalWorkDropdowns(workData) {
 }
 
 function setupModalTypeDropdowns() {
-    const types = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
-    types.forEach(id => {
+    ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.innerHTML = '<option value="" selected>Select Type...</option>';
