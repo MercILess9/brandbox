@@ -1,14 +1,14 @@
 /**
- * B-QUEST MODAL COMPONENT (Full Version: Fixed Backdrop & Owner Tags)
+ * B-QUEST MODAL COMPONENT (Full Version: Zero Backdrop Fix)
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
-    /* ปรับแต่งลำดับชั้น Modal */
-    #b-quest-modal { z-index: 1050; } 
-    #universal-search-modal { z-index: 1080 !important; background: rgba(0,0,0,0.4); } /* บังคับพื้นหลังเข้มเอง */
-    
+    /* ตั้งค่าลำดับชั้นให้ Modal ค้นหาอยู่สูงกว่าเสมอ */
+    #b-quest-modal { z-index: 1050 !important; }
+    #universal-search-modal { z-index: 2000 !important; }
+
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     .bq-form-header { padding: 18px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
@@ -24,7 +24,6 @@ const B_QUEST_MODAL_HTML = `
 
     .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
     .bq-input { width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 0.88rem; background: #ffffff; margin-bottom: 15px; color: #1e293b; text-align: center; transition: 0.2s; }
-    .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     
     .bq-input-group { display: flex; margin-bottom: 15px; }
     .bq-input-left { border-radius: 10px 0 0 10px !important; margin-bottom: 0 !important; }
@@ -34,12 +33,9 @@ const B_QUEST_MODAL_HTML = `
     .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 800; transition: 0.2s; cursor: pointer; }
 
-    .uni-list-item { 
-        border: none; border-radius: 12px !important; margin-bottom: 5px; 
-        font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; 
-        text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-        display: block; width: 100%; padding: 12px 15px;
-    }
+    /* ปรับแต่ง Modal ค้นหาให้ดูเป็น Overlay ชั้นบน */
+    #universal-search-modal .modal-content { border-radius: 20px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid #e2e8f0; }
+    .uni-list-item { border: none; border-radius: 12px !important; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; padding: 12px 15px; }
     .uni-list-item:hover { background: #bdc432 !important; color: #fff !important; transform: translateX(5px); }
 </style>
 
@@ -134,9 +130,9 @@ const B_QUEST_MODAL_HTML = `
     </div>
 </div>
 
-<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content shadow-lg" style="border-radius: 20px; border: none;">
+        <div class="modal-content">
             <div class="modal-header border-0 pb-0">
                 <h6 class="modal-title fw-800" id="search-modal-title">Select Item</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -156,9 +152,9 @@ document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
-    const form = document.getElementById('b-quest-modal-form');
-    if (!modalEl || !form) return;
+    if (!modalEl) return;
 
+    const form = document.getElementById('b-quest-modal-form');
     form.reset();
     if(document.getElementById('b-quest-modal-id')) document.getElementById('b-quest-modal-id').value = '';
 
@@ -176,7 +172,6 @@ async function openTaskModal(taskId = null, workData = []) {
         }
     } else {
         document.getElementById('b-quest-modal-label').innerHTML = 'New Mission';
-        // เคลียร์ Tag Owner เป็นค่าเริ่มต้นตอนสร้างใหม่
         document.getElementById('designer-owner-tag').innerText = 'Admin';
         document.getElementById('creative-owner-tag').innerText = 'Admin';
     }
@@ -185,6 +180,9 @@ async function openTaskModal(taskId = null, workData = []) {
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
+/**
+ * แก้ไขปัญหาจอดำทับ (Fixed Backdrop Issue)
+ */
 async function openGeneralSearchModal(fieldName, targetInputId) {
     const searchModalEl = document.getElementById('universal-search-modal');
     const container = document.getElementById('universal-list-container');
@@ -192,10 +190,12 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
     const title = document.getElementById('search-modal-title');
     
     title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
-    container.innerHTML = '<div class="text-center p-4"><div class="spinner-border spinner-border-sm text-secondary"></div></div>';
+    container.innerHTML = '<div class="text-center p-4">Loading...</div>';
     
-    // แก้ปัญหาจอดำทับ: ปิด backdrop อัตโนมัติของ Modal ที่สอง
-    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl, { backdrop: false });
+    // สำคัญ: ตั้งค่า backdrop: false เพื่อไม่ให้จอดำซ้อนทับกัน
+    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl, {
+        backdrop: false
+    });
     searchModal.show();
 
     try {
@@ -304,7 +304,6 @@ function fillFormData(data) {
         const el = document.getElementById(id);
         if (el) el.value = map[id] || '';
     }
-    // หยอดข้อมูล Owner Tag ด้วย
     if(data.designer_assign) document.getElementById('designer-owner-tag').innerText = data.designer_assign;
     if(data.creative_assign) document.getElementById('creative-owner-tag').innerText = data.creative_assign;
 }
