@@ -1,22 +1,5 @@
-/**
- * ============================================================================
- * B-QUEST MODAL COMPONENT - THE ULTIMATE MASTERPIECE (FIXED)
- * ============================================================================
- * Features:
- * - UI Layout 100% Original
- * - Independent Visibility for Status and Assign Badge
- * - Smart Capacity: Hides on initial load or when values match the original DB
- * - Auto-Clean (NULL) when roles are switched off
- * - Auto "On Progress" for new tasks/roles
- * ============================================================================
- */
-
-// ----------------------------------------------------------------------------
-// 1. STYLES & HTML TEMPLATE (ไม่แตะต้อง UI เดิม 100%)
-// ----------------------------------------------------------------------------
 const B_QUEST_MODAL_HTML = `
 <style>
-    /* Modal Core */
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-modern-header { background: #fff; padding: 18px 35px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); }
@@ -27,14 +10,12 @@ const B_QUEST_MODAL_HTML = `
     .bq-modern-body { padding: 20px 35px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
-    /* Forms & Inputs */
     .bq-glass-card { background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; height: 100%; display: flex; flex-direction: column; }
     .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
     .bq-input-modern { width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 12px; font-size: 0.85rem; color: #334155; margin-bottom: 10px; text-align-last: center; height: 35px; transition: 0.2s; }
     .was-validated .bq-input-modern:invalid { border-color: #dc3545 !important; background-color: #fff8f8; }
     .bq-input-detail { flex-grow: 1; min-height: 140px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
-    /* Role Cards */
     .role-card { background: #fff; border-radius: 22px; border: 1px solid #e2e8f0; margin-bottom: 12px; transition: all 0.4s ease; overflow: hidden; }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
     .role-card-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
@@ -43,7 +24,6 @@ const B_QUEST_MODAL_HTML = `
     .role-card-body { max-height: 0; padding: 0 20px; transition: all 0.4s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 15px 18px 18px 18px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
-    /* Status, Badge, Capacity */
     .bq-assign-badge { background: #eff6ff; color: #3b82f6; padding: 2px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; border: 1px solid #dbeafe; display: none; margin-left: 8px; }
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; color: #fff; min-width: 95px; text-align-last: center; height: 28px; display: none; margin-left: auto; }
     .status-progress { background-color: #4e73df !important; }
@@ -51,7 +31,6 @@ const B_QUEST_MODAL_HTML = `
     .timeline-zone { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 10px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 8px; display: none; text-align: center; width: 100%; }
 
-    /* Toggle Switch */
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
@@ -59,13 +38,11 @@ const B_QUEST_MODAL_HTML = `
     input:checked + .bq-slider { background-color: #bdc432 !important; }
     input:checked + .bq-slider:before { transform: translateX(16px); }
 
-    /* Search Overlay */
     .bq-search-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.35); z-index: 10001; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: 0.3s; }
     .bq-search-card { background: #fff; width: 450px; max-height: 70vh; border-radius: 30px; padding: 25px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); }
     .uni-item-modern { border: none; background: #fff; border-radius: 15px; margin-bottom: 6px; padding: 14px 20px; font-size: 0.9rem; font-weight: 600; text-align: left; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; color: #334155; }
     .uni-item-modern:hover { background: #f8fafc; border-color: #bdc432; color: #bdc432; transform: scale(1.02); }
 
-    /* Footer Actions */
     .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; height: 42px; display: none; cursor: pointer; }
     .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; height: 42px; cursor: pointer; }
@@ -74,7 +51,6 @@ const B_QUEST_MODAL_HTML = `
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content">
-            
             <div id="bq-search-overlay" class="bq-search-overlay" onclick="BQuestApp.closeSearchOverlay()">
                 <div class="bq-search-card" onclick="event.stopPropagation()">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -98,7 +74,6 @@ const B_QUEST_MODAL_HTML = `
                 <input type="hidden" id="b-quest-modal-id" name="id">
                 <div class="bq-modern-body">
                     <div class="row g-4 bq-main-row">
-                        
                         <div class="col-lg-6">
                             <div class="bq-glass-card">
                                 <label class="bq-label-modern">Account Name</label>
@@ -106,16 +81,13 @@ const B_QUEST_MODAL_HTML = `
                                     <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-account" name="account_name" required>
                                     <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px;" onclick="BQuestApp.openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
-                                
                                 <label class="bq-label-modern">Opportunity Name</label>
                                 <div class="d-flex mb-2">
                                     <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" required>
                                     <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px;" onclick="BQuestApp.openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
                                 </div>
-                                
                                 <label class="bq-label-modern">Task Name</label>
                                 <input type="text" class="bq-input-modern" style="text-align-last: left;" id="b-quest-modal-taskname" name="task_name" required>
-                                
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-8">
                                         <label class="bq-label-modern">Link</label>
@@ -185,7 +157,6 @@ const B_QUEST_MODAL_HTML = `
                                     <input type="hidden" id="b-quest-modal-creative-weight" name="creative_weight" value="0">
                                 </div>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
@@ -200,20 +171,13 @@ const B_QUEST_MODAL_HTML = `
 </div>
 `;
 
-// Inject HTML
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
-// ----------------------------------------------------------------------------
-// 2. CORE LOGIC & NAMESPACE
-// ----------------------------------------------------------------------------
 const BQuestApp = (() => {
-
-    // --- State Management ---
     const State = { capacities: { designer: 0, creative: 0 }, currentData: null, roles: ['designer', 'creative'] };
     const el = id => document.getElementById(id);
     const show = (id, condition, display = 'block') => { const e = el(id); if(e) e.style.display = condition ? display : 'none'; };
 
-    // --- Data Service ---
     const BQuestService = {
         async getQuestById(id) {
             const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single();
@@ -221,7 +185,6 @@ const BQuestApp = (() => {
         }
     };
 
-    // --- Setup Helpers ---
     function setupDropdowns(workData) {
         State.roles.forEach(role => {
             const workSelect = el(`b-quest-modal-${role}-work`);
@@ -244,7 +207,6 @@ const BQuestApp = (() => {
         });
     }
 
-    // 🚩 แก้ไขจุดบั๊ก: กลับมาใช้ Map จับคู่ ID แบบเป๊ะๆ 100% ป้องกันการ Error
     function fillFormData(data) {
         const fields = { 
             'account_name': 'b-quest-modal-account', 
@@ -271,7 +233,6 @@ const BQuestApp = (() => {
         el('modal-owner-display').innerText = `Owner: ${data.owner || '-'}`;
     }
 
-    // --- UI Logic ---
     function updateStatusUI(selectEl) {
         if (selectEl.value === "On Progress") { 
             selectEl.classList.add('status-progress'); selectEl.classList.remove('status-done'); 
@@ -299,7 +260,6 @@ const BQuestApp = (() => {
         }
     }
 
-    // --- Smart Capacity ---
     async function checkCapacity(role) {
         const dl = el(`b-quest-modal-${role}-deadline`).value;
         const work = el(`b-quest-modal-${role}-work`).value;
@@ -331,7 +291,6 @@ const BQuestApp = (() => {
         } catch (e) { console.error(e); }
     }
 
-    // --- Overlay & Deletion ---
     async function openSearchOverlay(fieldName, targetId) {
         const container = el('uni-list-container');
         const searchInput = el('uni-search-input');
@@ -362,7 +321,6 @@ const BQuestApp = (() => {
         if (res.isConfirmed) { await supabaseClient.from('b-quest-list').delete().eq('id', id); location.reload(); }
     }
 
-    // --- MAIN MODULE EXPORT ---
     return {
         async openModal(taskId = null, workData = []) {
             const form = el('b-quest-modal-form');
@@ -395,7 +353,9 @@ const BQuestApp = (() => {
                         if (assignName && assignName !== '-' && assignName !== '') {
                             badge.innerText = assignName;
                             show(badge.id, true, 'inline-block');
-                        } else { show(badge.id, false); }
+                        } else {
+                            show(badge.id, false);
+                        }
 
                         show(`${role}-capacity-info`, false);
                     });
@@ -453,7 +413,10 @@ const BQuestApp = (() => {
             if (!isEdit) { delete payload.id; payload.owner = "Test (BX001)"; }
             payload.last_update = new Date().toISOString();
 
-            const { error } = isEdit ? await supabaseClient.from('b-quest-list').update(payload).eq('id', currentId) : await supabaseClient.from('b-quest-list').insert([payload]);
+            const { error } = isEdit 
+                ? await supabaseClient.from('b-quest-list').update(payload).eq('id', currentId) 
+                : await supabaseClient.from('b-quest-list').insert([payload]);
+
             if (!error) Swal.fire({ icon: 'success', title: 'Success!', showConfirmButton: false, timer: 1500 }).then(() => location.reload());
             else Swal.fire('Error', error.message, 'error');
         },
@@ -462,7 +425,6 @@ const BQuestApp = (() => {
     };
 })();
 
-// --- GLOBAL ATTACHMENTS (สำคัญ: ทำให้ปุ่มข้างนอกเรียกใช้ได้แน่นอน) ---
 window.BQuestApp = BQuestApp;
 window.openTaskModal = BQuestApp.openModal;
 document.getElementById('b-quest-modal-form').addEventListener('submit', BQuestApp.submitForm);
