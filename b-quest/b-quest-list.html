@@ -6,6 +6,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <script src="../config.js"></script>
     <script src="../system.js"></script>
@@ -156,14 +157,13 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'publish_date', 'designer', 'designer_assign', 'designer_type', 'creative', 'creative_assign', 'creative_type', 'owner'];
+    const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'designer_assign', 'creative_assign', 'owner'];
+    let dataList = []; // Global: เก็บ work, weight, role
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
-    let dataList = []; // ข้อมูลงาน b-quest-work
-    let profilesList = []; // ข้อมูลพนักงาน b-quest-profiles
 
-    // --- Helper Functions ---
+    // --- Helpers ---
     function setupDefaultOptions(el, label) {
         if (!el) return;
         el.innerHTML = `<option value="">All ${label}</option>`;
@@ -184,21 +184,39 @@
         selectEl.appendChild(group);
     }
 
-    // --- UI Logic ---
-    document.getElementById('toggleFilters').addEventListener('click', () => {
-        document.getElementById('advancedFilterZone').classList.toggle('show');
-    });
+    // --- Main Logic ---
+    async function loadMasterData() {
+        try {
+            const [workRes, profileRes] = await Promise.all([
+                supabaseClient.from('b-quest-work').select('work, weight, role').order('work'),
+                supabaseClient.from('b-quest-profiles').select('codename, role_designer, role_creative').order('codename')
+            ]);
 
-    function togglePill(btn, type) {
-        // เปลี่ยนจาก type === 'prog' เป็น 'progress'
-        const className = 'active-' + (type === 'designer' || type === 'creative' ? 'role' : type);
-        btn.classList.toggle(className);
-        
-        if (type === 'designer' || type === 'creative') {
+            dataList = workRes.data || [];
+            const tempProfiles = profileRes.data || [];
+
             renderWorkFilter();
-            renderAssignFilter(profilesList);
-        }
-        applyFilters();
+            
+            // Assign Filter: ใช้ tempProfiles ทันที ไม่เก็บ Global
+            const assignEl = document.getElementById('filterAssign');
+            setupDefaultOptions(assignEl, "Assign");
+            appendRoleGroup(assignEl, "Designers", tempProfiles, 'role_designer', true, 'codename', 'codename');
+            appendRoleGroup(assignEl, "Creatives", tempProfiles, 'role_creative', true, 'codename', 'codename');
+
+            // Type Dropdown จาก Config
+            const typeEl = document.getElementById('filterType');
+            setupDefaultOptions(typeEl, "Type");
+            B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
+
+            // Owner Dropdown จาก DB จริง
+            const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
+            const ownerEl = document.getElementById('filterOwner');
+            setupDefaultOptions(ownerEl, "Owner");
+            if (owners) {
+                const unique = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
+                unique.forEach(name => ownerEl.add(new Option(name, name)));
+            }
+        } catch (e) { console.error(e); }
     }
 
     function renderWorkFilter() {
@@ -210,70 +228,18 @@
         if (document.getElementById('pill-designer').classList.contains('active-role')) {
             appendRoleGroup(select, "Designer", dataList, 'role', 'Designer', 'work', 'work');
         }
-        
         if (document.getElementById('pill-creative').classList.contains('active-role')) {
             appendRoleGroup(select, "Creative", dataList, 'role', 'Creative', 'work', 'work');
         }
-        
         select.value = cur;
         updateHighlight('filterWork');
     }
 
-    function renderAssignFilter(profiles) {
-        const el = document.getElementById('filterAssign');
-        if (!el) return;
-        const cur = el.value;
-        setupDefaultOptions(el, "Assign");
-
-        if (document.getElementById('pill-designer').classList.contains('active-role')) {
-            appendRoleGroup(el, "Designers", profiles, 'role_designer', true, 'codename', 'codename');
-        }
-
-        if (document.getElementById('pill-creative').classList.contains('active-role')) {
-            appendRoleGroup(el, "Creatives", profiles, 'role_creative', true, 'codename', 'codename');
-        }
-
-        el.value = cur;
-        updateHighlight('filterAssign');
-    }
-
-    function resetAdvanced() {
-        ['filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.value = "";
-            updateHighlight(id);
-        });
+    function togglePill(btn, type) {
+        const className = 'active-' + (type === 'designer' || type === 'creative' ? 'role' : type);
+        btn.classList.toggle(className);
+        if (type === 'designer' || type === 'creative') renderWorkFilter();
         applyFilters();
-    }
-
-    // --- Data Management ---
-    async function loadMasterData() {
-        try {
-            const [workRes, profileRes] = await Promise.all([
-                supabaseClient.from('b-quest-work').select('*').order('work'),
-                supabaseClient.from('b-quest-profiles').select('*').order('codename')
-            ]);
-
-            dataList = workRes.data || [];
-            profilesList = profileRes.data || [];
-
-            renderWorkFilter();
-            renderAssignFilter(profilesList);
-
-            // Type Dropdown
-            const typeEl = document.getElementById('filterType');
-            setupDefaultOptions(typeEl, "Type");
-            B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
-
-            // Owner Dropdown (Real database)
-            const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
-            const ownerEl = document.getElementById('filterOwner');
-            setupDefaultOptions(ownerEl, "Owner");
-            if (owners) {
-                const unique = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
-                unique.forEach(name => ownerEl.add(new Option(name, name)));
-            }
-        } catch (e) { console.error(e); }
     }
 
     function applyFilters() {
@@ -288,6 +254,7 @@
         const limit = B_QUEST_CONFIG.itemsPerPage || 20;
         const from = currentPage * limit;
         const to = from + limit - 1;
+
         let query = supabaseClient.from('b-quest-list').select('*');
 
         const search = document.getElementById('globalSearch').value.trim();
@@ -295,12 +262,12 @@
 
         const designerActive = document.getElementById('pill-designer').classList.contains('active-role');
         const creativeActive = document.getElementById('pill-creative').classList.contains('active-role');
-        const sd = document.getElementById('startDate').value;
-        const ed = document.getElementById('endDate').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
         if (!designerActive && !creativeActive) query = query.eq('id', -1);
         else {
-            const build = (r) => `and(${r}.neq.-,${r}.not.is.null${sd?`,${r}_deadline.gte.${sd}`:''}${ed?`,${r}_deadline.lte.${ed}`:''})`;
+            const build = (r) => `and(${r}.neq.-,${r}.not.is.null${startDate?`,${r}_deadline.gte.${startDate}`:''}${endDate?`,${r}_deadline.lte.${endDate}`:''})`;
             let parts = [];
             if (designerActive) parts.push(build('designer'));
             if (creativeActive) parts.push(build('creative'));
@@ -310,12 +277,12 @@
         const progressActive = document.getElementById('pill-progress').classList.contains('active-progress');
         const doneActive = document.getElementById('pill-done').classList.contains('active-done');
         
-        if (progressActive && doneActive) { /* All */ }
+        if (progressActive && doneActive) { }
         else if (progressActive) query = query.or('designer_status.neq.Done,creative_status.neq.Done');
         else if (doneActive) query = query.eq('designer_status','Done').eq('creative_status','Done');
         else query = query.eq('id', -1);
 
-        const val = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
+        const val = (id) => document.getElementById(id)?.value || "";
         if (val('filterWork')) query = query.or(`designer.eq."${val('filterWork')}",creative.eq."${val('filterWork')}"`);
         if (val('filterType')) query = query.or(`designer_type.eq."${val('filterType')}",creative_type.eq."${val('filterType')}"`);
         if (val('filterAssign')) query = query.or(`designer_assign.eq."${val('filterAssign')}",creative_assign.eq."${val('filterAssign')}"`);
@@ -356,7 +323,7 @@
                             <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}', dataList)">Edit</button>
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px;">
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
                                     <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}', dataList)">Edit Mission</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
                                     <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="BQuestService.deleteQuest('${task.id}')">Delete</a></li>
@@ -395,18 +362,31 @@
         });
     }
 
+    function resetAdvanced() {
+        ['filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = "";
+            updateHighlight(id);
+        });
+        applyFilters();
+    }
+
+    // --- Init ---
     async function initPage() {
         try {
             await System.initLayout(B_QUEST_CONFIG);
             await UILoader.loadModal('b-quest-modal.html'); 
             await loadMasterData();
             fetchQuests(true);
-        } catch (e) { console.error("Init failed:", e); }
+        } catch (e) { console.error(e); }
     }
 
+    document.getElementById('toggleFilters').addEventListener('click', () => {
+        document.getElementById('advancedFilterZone').classList.toggle('show');
+    });
+
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.addEventListener('change', () => {
+        document.getElementById(id)?.addEventListener('change', () => {
             if(id.startsWith('filter')) updateHighlight(id);
             applyFilters();
         });
