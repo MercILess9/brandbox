@@ -1,6 +1,6 @@
 /**
- * B-QUEST MODAL COMPONENT - COMPLETED
- * Updated: Status Colors (Progress: #4e73df, Done: #626e7f) & Cap Text Size 0.9
+ * B-QUEST MODAL COMPONENT - FINAL LOGIC VERSION
+ * Updated: Default Close, Strict Validation, Auto-Clear Data
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
@@ -61,8 +61,7 @@ const B_QUEST_MODAL_HTML = `
         padding: 10px; height: 100%; display: flex; flex-direction: column; justify-content: center;
     }
 
-    /* Capacity Text - ปรับฟอนต์เป็น 0.9rem */
-    .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 5px; display: none; letter-spacing: -0.2px; }
+    .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 5px; display: none; }
 
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
@@ -77,7 +76,6 @@ const B_QUEST_MODAL_HTML = `
     input:checked + .bq-slider { background-color: #bdc432 !important; }
     input:checked + .bq-slider:before { transform: translateX(16px); }
 
-    /* Custom Select สำหรับสถานะ */
     .bq-status-select { 
         border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 800; 
         padding: 2px 6px; background: #fff; min-width: 95px; text-align-last: center; height: 28px;
@@ -119,7 +117,7 @@ const B_QUEST_MODAL_HTML = `
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form id="b-quest-modal-form">
+            <form id="b-quest-modal-form" novalidate>
                 <div class="bq-modern-body">
                     <input type="hidden" id="b-quest-modal-id" name="id">
                     
@@ -133,7 +131,7 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                                 <label class="bq-label-modern">Opportunity Name</label>
                                 <div class="d-flex mb-2">
-                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="opportunity name...">
+                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" required placeholder="opportunity name...">
                                     <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px; display: flex; align-items: center;" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search" style="font-size: 0.8rem;"></i></button>
                                 </div>
                                 <label class="bq-label-modern">Task Name</label>
@@ -145,7 +143,7 @@ const B_QUEST_MODAL_HTML = `
                                     </div>
                                     <div class="col-md-4">
                                         <label class="bq-label-modern text-center d-block">Publish Date</label>
-                                        <input type="date" class="bq-input-modern m-0" id="b-quest-modal-publish-date" name="publish_date">
+                                        <input type="date" class="bq-input-modern m-0" id="b-quest-modal-publish-date" name="publish_date" required>
                                     </div>
                                 </div>
                                 <div class="mt-2 flex-grow-1 d-flex flex-column">
@@ -156,10 +154,10 @@ const B_QUEST_MODAL_HTML = `
                         </div>
 
                         <div class="col-lg-6">
-                            <div id="card-designer" class="role-card active">
+                            <div id="card-designer" class="role-card">
                                 <div class="role-card-header">
                                     <div class="role-header-left">
-                                        <label class="bq-toggle"><input type="checkbox" id="check-designer" checked onchange="updateRoleUI('designer')"><span class="bq-slider"></span></label>
+                                        <label class="bq-toggle"><input type="checkbox" id="check-designer" onchange="updateRoleUI('designer')"><span class="bq-slider"></span></label>
                                         <div class="role-card-title">Designer</div>
                                         <span class="bq-owner-badge">อมม (BX0054)</span>
                                     </div>
@@ -186,10 +184,10 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                             </div>
 
-                            <div id="card-creative" class="role-card active">
+                            <div id="card-creative" class="role-card">
                                 <div class="role-card-header">
                                     <div class="role-header-left">
-                                        <label class="bq-toggle"><input type="checkbox" id="check-creative" checked onchange="updateRoleUI('creative')"><span class="bq-slider"></span></label>
+                                        <label class="bq-toggle"><input type="checkbox" id="check-creative" onchange="updateRoleUI('creative')"><span class="bq-slider"></span></label>
                                         <div class="role-card-title">Creative</div>
                                         <span class="bq-owner-badge">อมม (BX0054)</span>
                                     </div>
@@ -232,32 +230,43 @@ const B_QUEST_MODAL_HTML = `
 
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
-/**
- * ปรับปรุง UI ของปุ่มสถานะให้เปลี่ยนสีตามข้อมูลที่เลือก
- */
 function updateStatusUI(el) {
-    if (el.value === "Progress") {
-        el.classList.add('status-progress');
-        el.classList.remove('status-done');
-    } else {
-        el.classList.add('status-done');
-        el.classList.remove('status-progress');
-    }
+    if (el.value === "Progress") { el.classList.add('status-progress'); el.classList.remove('status-done'); } 
+    else { el.classList.add('status-done'); el.classList.remove('status-progress'); }
 }
 
+/**
+ * ปรับปรุง Logic เปิด/ปิด Card:
+ * - ถ้าเปิด (Checked): ใส่ required ให้ Type, Work, Deadline
+ * - ถ้าปิด (Unchecked): ลบ required และล้างค่าทั้งหมด
+ */
 function updateRoleUI(role) {
     const checkbox = document.getElementById(`check-${role}`);
     if (!checkbox) return;
     const card = document.getElementById(`card-${role}`);
-    if (checkbox.checked) {
+    const isChecked = checkbox.checked;
+
+    const typeEl = document.getElementById(`b-quest-modal-${role}-type`);
+    const workEl = document.getElementById(`b-quest-modal-${role}-work`);
+    const deadlineEl = document.getElementById(`b-quest-modal-${role}-deadline`);
+
+    if (isChecked) {
         card.classList.add('active');
         card.classList.remove('disabled');
+        // ตั้งค่าเป็น required เมื่อเปิด
+        typeEl.required = true;
+        workEl.required = true;
+        deadlineEl.required = true;
     } else {
         card.classList.remove('active');
         card.classList.add('disabled');
-        document.getElementById(`b-quest-modal-${role}-type`).value = "";
-        document.getElementById(`b-quest-modal-${role}-work`).value = "";
-        document.getElementById(`b-quest-modal-${role}-deadline`).value = "";
+        // ลบ required และล้างค่าเมื่อปิด
+        typeEl.required = false;
+        workEl.required = false;
+        deadlineEl.required = false;
+        typeEl.value = "";
+        workEl.value = "";
+        deadlineEl.value = "";
         document.getElementById(`b-quest-modal-${role}-weight`).value = "0";
         document.getElementById(`${role}-capacity-info`).style.display = 'none';
     }
@@ -274,10 +283,7 @@ async function checkCapacity(role) {
     const workVal = workEl ? workEl.value : null;
     const weight = weightEl ? Number(weightEl.value) || 0 : 0;
 
-    if (!date || !workVal) {
-        infoEl.style.display = 'none';
-        return;
-    }
+    if (!date || !workVal) { infoEl.style.display = 'none'; return; }
 
     infoEl.style.display = 'block';
     try {
@@ -295,16 +301,21 @@ async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
     form.reset();
+
+    // Default: ปิดทั้ง 2 Card เมื่อสร้างใหม่
     ['designer', 'creative'].forEach(role => {
-        document.getElementById(`check-${role}`).checked = true;
+        const checkbox = document.getElementById(`check-${role}`);
+        checkbox.checked = false; 
         document.getElementById(`${role}-capacity-info`).style.display = 'none';
         const statusEl = document.getElementById(`b-quest-modal-${role}-status`);
         statusEl.value = "Progress";
         updateStatusUI(statusEl);
         updateRoleUI(role);
     });
+
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
+
     if (taskId) {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
         document.getElementById('btn-submit-text').innerText = 'Save Changes';
@@ -315,8 +326,9 @@ async function openTaskModal(taskId = null, workData = []) {
             ['designer', 'creative'].forEach(role => {
                 const statusEl = document.getElementById(`b-quest-modal-${role}-status`);
                 updateStatusUI(statusEl);
-                if (!data[role] && !data[`${role}_deadline`]) {
-                    document.getElementById(`check-${role}`).checked = false;
+                // ถ้ามีข้อมูลงาน ให้เปิด Card อัตโนมัติ
+                if (data[role] || data[`${role}_deadline`]) {
+                    document.getElementById(`check-${role}`).checked = true;
                     updateRoleUI(role);
                 }
             });
@@ -326,6 +338,7 @@ async function openTaskModal(taskId = null, workData = []) {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
         document.getElementById('btn-submit-text').innerText = 'Create Task';
     }
+
     initModalEventListeners();
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
@@ -400,12 +413,39 @@ const BQuestService = {
     }
 };
 
+/**
+ * Handle Form Submission with Validation
+ */
 document.getElementById('b-quest-modal-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const payload = Object.fromEntries(new FormData(e.target).entries());
+    const form = e.target;
+
+    // 1. Basic Bootstrap Validation
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        Swal.fire('Warning', 'Please fill in all required fields.', 'warning');
+        return;
+    }
+
+    const payload = Object.fromEntries(new FormData(form).entries());
     payload.designer_assign = "อมม (BX0054)"; payload.creative_assign = "อมม (BX0054)";
-    if (!document.getElementById('check-designer').checked) { payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; }
-    if (!document.getElementById('check-creative').checked) { payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; }
-    const { error } = payload.id ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id) : await supabaseClient.from('b-quest-list').insert([payload]);
-    if (!error) location.reload();
+
+    // 2. Clear data if Toggle is OFF
+    if (!document.getElementById('check-designer').checked) {
+        payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0;
+    }
+    if (!document.getElementById('check-creative').checked) {
+        payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0;
+    }
+
+    // 3. Save to Supabase
+    const { error } = payload.id 
+        ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
+        : await supabaseClient.from('b-quest-list').insert([payload]);
+
+    if (!error) {
+        location.reload();
+    } else {
+        Swal.fire('Error', error.message, 'error');
+    }
 });
