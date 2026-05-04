@@ -1,11 +1,11 @@
 /**
- * B-QUEST MODAL COMPONENT - FINAL MASTER VERSION 2026
+ * B-QUEST MODAL COMPONENT - MASTER FINAL V2
  * -----------------------------------------------------------
  * Features: 
- * - Icons for Designer (bi-brush) & Creative (bi-rocket)
- * - Centered Capacity UI
- * - Fixed Edit Mode (Type/Work Data Fetching)
- * - SweetAlert2 Confirm Delete & Success Popups
+ * - Smart Switch: Auto Open/Close cards based on data
+ * - Smart Capacity: Green for original work, Red for overloaded new work
+ * - Validation: Block Save if Capacity > 10 & Alert with Swal
+ * - UI: Icons, Centered Capacity, Owner on Top-Right
  */
 
 const B_QUEST_MODAL_HTML = `
@@ -27,7 +27,6 @@ const B_QUEST_MODAL_HTML = `
     .bq-modern-body { padding: 20px 35px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
-    /* Inputs */
     .bq-glass-card { background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; height: 100%; display: flex; flex-direction: column; }
     .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
     .bq-input-modern { width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 12px; font-size: 0.85rem; color: #334155; margin-bottom: 10px; text-align-last: center; height: 35px; transition: 0.2s; }
@@ -68,9 +67,7 @@ const B_QUEST_MODAL_HTML = `
     /* Footer Buttons */
     .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; height: 42px; display: none; cursor: pointer; transition: 0.2s; }
-    .btn-bq-delete:hover { background: #fecaca; }
-    .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; height: 42px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; }
-    .btn-bq-create:hover { background: #0f172a; transform: translateY(-1px); }
+    .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; height: 42px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; }
 
     .bq-search-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .bq-search-card { background: #fff; width: 400px; max-height: 80%; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; }
@@ -102,7 +99,6 @@ const B_QUEST_MODAL_HTML = `
             <form id="b-quest-modal-form" novalidate>
                 <div class="bq-modern-body">
                     <input type="hidden" id="b-quest-modal-id" name="id">
-                    
                     <div class="row g-4 bq-main-row">
                         <div class="col-lg-6">
                             <div class="bq-glass-card">
@@ -157,7 +153,7 @@ const B_QUEST_MODAL_HTML = `
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-designer-deadline" name="designer_deadline">
-                                                <div class="mt-auto text-center"><span class="bq-cap-text" id="designer-capacity-info">Use 0 | Capacity 0/10</span></div>
+                                                <div class="mt-auto text-center"><span class="bq-cap-text" id="designer-capacity-info"></span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -186,7 +182,7 @@ const B_QUEST_MODAL_HTML = `
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-creative-deadline" name="creative_deadline">
-                                                <div class="mt-auto text-center"><span class="bq-cap-text" id="creative-capacity-info">Use 0 | Capacity 0/10</span></div>
+                                                <div class="mt-auto text-center"><span class="bq-cap-text" id="creative-capacity-info"></span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -207,7 +203,7 @@ const B_QUEST_MODAL_HTML = `
 </div>
 `;
 
-// --- LOGIC ---
+// --- CORE LOGIC ---
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 let currentCapacities = { designer: 0, creative: 0 };
 
@@ -241,15 +237,23 @@ async function checkCapacity(role) {
     const currentId = document.getElementById('b-quest-modal-id').value;
 
     if (!deadline || !work) { infoEl.style.display = 'none'; return; }
-    infoEl.style.display = 'block';
+
     try {
+        let isOriginal = false;
+        if (currentId) {
+            const original = await BQuestService.getQuestById(currentId);
+            if (original && original[role] === work && original[`${role}_deadline`] === deadline) isOriginal = true;
+        }
+
         let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, deadline);
         if (currentId) query = query.neq('id', currentId);
         const { data } = await query;
         const total = (data || []).reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) + weight;
+        
         currentCapacities[role] = total;
+        infoEl.style.display = 'block';
         infoEl.innerText = `Use ${weight} | Capacity ${total}/10`;
-        infoEl.style.color = total >= 10 ? '#ef4444' : '#bdc432';
+        infoEl.style.color = (isOriginal || total <= 10) ? '#bdc432' : '#ef4444';
     } catch (e) { console.error(e); }
 }
 
@@ -258,7 +262,6 @@ async function openTaskModal(taskId = null, workData = []) {
     form.reset();
     form.classList.remove('was-validated');
 
-    // 🚩 Important: Build dropdowns before filling data
     setupModalWorkDropdown(workData);
     setupModalTypeDropdown();
 
@@ -278,10 +281,11 @@ async function openTaskModal(taskId = null, workData = []) {
             fillFormData(data);
             ['designer', 'creative'].forEach(role => {
                 updateStatusUI(document.getElementById(`b-quest-modal-${role}-status`));
-                document.getElementById(`check-${role}`).checked = !!(data[role] || data[`${role}_deadline`]);
+                // 🚩 Smart Check: Only open switch if actual work data exists
+                const hasData = !!(data[role] || data[`${role}_deadline`]);
+                document.getElementById(`check-${role}`).checked = hasData;
                 updateRoleUI(role);
             });
-            setTimeout(() => { checkCapacity('designer'); checkCapacity('creative'); }, 100);
         }
     } else {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
@@ -337,7 +341,7 @@ function setupModalTypeDropdown() {
 async function handleDeleteTask() {
     const id = document.getElementById('b-quest-modal-id').value;
     if (!id) return;
-    const res = await Swal.fire({ title: 'Delete Task?', text: "You won't be able to revert this!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'Yes, delete it!' });
+    const res = await Swal.fire({ title: 'Are you sure?', text: "You won't be able to revert this!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'Yes, delete it!' });
     if (res.isConfirmed) {
         const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
         if (!error) { 
@@ -354,13 +358,30 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
 
     const isDes = document.getElementById('check-designer').checked;
     const isCre = document.getElementById('check-creative').checked;
+    const currentId = document.getElementById('b-quest-modal-id').value;
+
     if (!isDes && !isCre) return Swal.fire('Wait!', 'Select at least one role.', 'warning');
-    if (currentCapacities.designer > 10 || currentCapacities.creative > 10) return Swal.fire('Capacity Full', 'Load exceeds 10/10.', 'error');
+
+    // 🚩 Smart Capacity Validation
+    const validateCap = async (role) => {
+        const checkbox = document.getElementById(`check-${role}`);
+        if (!checkbox.checked) return true;
+        const dl = document.getElementById(`b-quest-modal-${role}-deadline`).value;
+        const work = document.getElementById(`b-quest-modal-${role}-work`).value;
+        if (currentId) {
+            const orig = await BQuestService.getQuestById(currentId);
+            if (orig && orig[role] === work && orig[`${role}_deadline`] === dl) return true;
+        }
+        return currentCapacities[role] <= 10;
+    };
+
+    if (!(await validateCap('designer')) || !(await validateCap('creative'))) {
+        return Swal.fire({ icon: 'error', title: 'Max Capacity Reached!', text: 'This person is over-loaded (max 10). Please choose another date.', confirmButtonColor: '#1e293b' });
+    }
 
     const payload = Object.fromEntries(new FormData(form).entries());
     const isEdit = !!payload.id && payload.id.length > 10;
-    const currentId = payload.id;
-
+    
     if (!isEdit) { delete payload.id; payload.owner = "Test (BX001)"; payload.designer_assign = null; payload.creative_assign = null; }
     
     ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'].forEach(f => { if(payload[f] === "") payload[f] = null; });
