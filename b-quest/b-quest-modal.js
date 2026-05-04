@@ -1,13 +1,11 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Updated: 1000px Width, 60/40 Layout, Task New Header
+ * Feature: 50/50 Equal Height Layout, Flexible Detail Box, Fixed Owner BX0054
  */
 
 const B_QUEST_MODAL_HTML = `
 <style>
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
-    
-    /* ปรับความกว้างรวมเป็น 1000px */
     .bq-modal-1000 { max-width: 1000px !important; }
 
     .bq-modern-header {
@@ -20,8 +18,14 @@ const B_QUEST_MODAL_HTML = `
 
     .bq-modern-body { padding: 25px 35px; }
 
+    /* Layout Adjustment for Equal Height */
+    .bq-main-row { display: flex; align-items: stretch; } /* บังคับให้ col ซ้าย-ขวาสูงเท่ากัน */
+
     /* Card & Inputs */
-    .bq-glass-card { background: #ffffff; border-radius: 20px; padding: 22px; border: 1px solid #e2e8f0; height: 100%; }
+    .bq-glass-card { 
+        background: #ffffff; border-radius: 20px; padding: 22px; border: 1px solid #e2e8f0; 
+        height: 100%; display: flex; flex-direction: column; /* เพื่อให้ Detail ยืดได้ */
+    }
     .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.8px; }
     
     .bq-input-modern { 
@@ -30,24 +34,22 @@ const B_QUEST_MODAL_HTML = `
         text-align-last: center; height: 43px;
     }
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1); }
-    
     input[type="date"].bq-input-modern { text-align: center; }
+
+    /* Special Detail Box */
+    .bq-detail-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
+    .bq-input-detail { flex-grow: 1; min-height: 120px; text-align: left !important; text-align-last: left !important; resize: none; }
 
     /* Role Card Style */
     .role-card {
         background: #fff; border-radius: 22px; border: 1px solid #e2e8f0;
-        margin-bottom: 15px; transition: all 0.4s ease; overflow: hidden;
+        margin-bottom: 18px; transition: all 0.4s ease; overflow: hidden;
     }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
-    
     .role-card-header { padding: 15px 22px; display: flex; align-items: center; gap: 12px; }
     .role-header-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
-    .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
-    
-    .bq-owner-badge { 
-        background: #f8fafc; color: #64748b; padding: 3px 10px; border-radius: 8px; 
-        font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; 
-    }
+    .role-card-title { font-size: 0.9rem; font-weight: 800; color: #1e293b; margin: 0; }
+    .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 3px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; }
 
     .role-card-body {
         max-height: 0; padding: 0 22px; transition: all 0.4s ease;
@@ -63,7 +65,7 @@ const B_QUEST_MODAL_HTML = `
         padding: 10px; height: 100%; display: flex; flex-direction: column;
     }
 
-    /* Toggle Switch Style */
+    /* Toggle Switch - #bdc432 */
     .bq-toggle { position: relative; display: inline-block; width: 38px; height: 20px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider {
@@ -87,7 +89,7 @@ const B_QUEST_MODAL_HTML = `
         border-radius: 10px; font-size: 0.65rem; font-weight: 800; color: #1e293b;
     }
 
-    /* Footer */
+    /* Footer Actions */
     .bq-footer-actions { padding: 20px 40px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
     .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 12px 35px; border-radius: 12px; font-weight: 700; cursor: pointer; }
@@ -98,7 +100,7 @@ const B_QUEST_MODAL_HTML = `
         background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
     }
     .bq-search-card { background: #fff; width: 400px; max-height: 80%; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; }
-    .uni-item-modern { border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 12px 15px; font-size: 0.88rem; font-weight: 600; text-align: left; }
+    .uni-item-modern { border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 14px 18px; font-size: 0.88rem; font-weight: 600; text-align: left; }
     .uni-item-modern:hover { background: #f1f5f9; color: #3b82f6; }
 </style>
 
@@ -126,8 +128,8 @@ const B_QUEST_MODAL_HTML = `
                 <div class="bq-modern-body">
                     <input type="hidden" id="b-quest-modal-id" name="id">
                     
-                    <div class="row g-4">
-                        <div class="col-lg-7">
+                    <div class="row g-4 bq-main-row">
+                        <div class="col-lg-6">
                             <div class="bq-glass-card">
                                 <label class="bq-label-modern">Account Name</label>
                                 <div class="d-flex mb-3">
@@ -155,12 +157,15 @@ const B_QUEST_MODAL_HTML = `
                                     </div>
                                 </div>
                                 
-                                <label class="bq-label-modern">Detail</label>
-                                <textarea class="bq-input-modern m-0" style="text-align-last: left;" id="b-quest-modal-detail" name="detail" rows="4" style="resize: none; height: 110px;" placeholder="detail..."></textarea>
+                                <div class="bq-detail-wrapper">
+                                    <label class="bq-label-modern">Detail</label>
+                                    <textarea class="bq-input-modern bq-input-detail m-0" id="b-quest-modal-detail" name="detail" placeholder="detail..."></textarea>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-lg-5">
+                        <div class="col-lg-6">
+                            
                             <div id="card-designer" class="role-card active">
                                 <div class="role-card-header">
                                     <div class="role-header-left">
@@ -177,7 +182,7 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-2 justify-content-between">
+                                    <div class="row g-3 justify-content-between">
                                         <div class="col-6">
                                             <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-designer-type" name="designer_type"></select>
@@ -214,7 +219,7 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-2 justify-content-between">
+                                    <div class="row g-3 justify-content-between">
                                         <div class="col-6">
                                             <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-creative-type" name="creative_type"></select>
@@ -234,6 +239,7 @@ const B_QUEST_MODAL_HTML = `
                                     <input type="hidden" id="b-quest-modal-creative-weight" name="creative_weight" value="0">
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
