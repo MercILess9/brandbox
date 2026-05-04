@@ -33,7 +33,7 @@
         
         .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; }
         .flt-pill.active-role { background: var(--c-role); color: #fff; border-color: var(--c-role); }
-        .flt-pill.active-prog { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
+        .flt-pill.active-progress { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
         .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
 
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
@@ -63,9 +63,10 @@
         .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; }
         .btn-reset:hover { background: #f8fafc; color: var(--c-text-main); border-color: #cbd5e1; }
 
+        /* --- Card Styles --- */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-status-done { border-left-color: var(--c-done); }
-        .bqc-status-prog { border-left-color: var(--c-progress); }
+        .bqc-status-progress { border-left-color: var(--c-progress); }
         .bqc-header { cursor: pointer; padding: 20px 28px; display: flex; align-items: center; }
         .bqc-info-zone { width: 50%; flex-shrink: 0; padding-right: 20px; }
         .bqc-title { font-weight: 700; font-size: 1rem; color: var(--c-text-main); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -100,7 +101,7 @@
         .bqc-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--c-slate); }
         .bqc-val { font-weight: 600; }
         .bqc-dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        .bqc-dot-prog { background-color: var(--c-progress); }
+        .bqc-dot-progress { background-color: var(--c-progress); }
         .bqc-dot-done { background-color: var(--c-done); }
 
         .fab-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1e293b; color: #bdc432; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; border: none; z-index: 1000; transition: 0.3s; }
@@ -126,7 +127,7 @@
         </div>
         <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 5px;"></div>
         <div class="flt-pill-group">
-            <button id="pill-prog" class="flt-pill active-prog" onclick="togglePill(this, 'prog')">Progress</button>
+            <button id="pill-progress" class="flt-pill active-progress" onclick="togglePill(this, 'progress')">Progress</button>
             <button id="pill-done" class="flt-pill active-done" onclick="togglePill(this, 'done')">Done</button>
         </div>
         <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
@@ -159,20 +160,12 @@
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
-    let dataList = []; // ใช้เก็บข้อมูล b-quest-work
+    let dataList = []; // ข้อมูลงาน b-quest-work
+    let profilesList = []; // ข้อมูลพนักงาน b-quest-profiles
 
-    // --- UI Helpers ---
-    document.getElementById('toggleFilters').addEventListener('click', () => {
-        document.getElementById('advancedFilterZone').classList.toggle('show');
-    });
-
-    function togglePill(btn, type) {
-        btn.classList.toggle('active-' + (type === 'designer' || type === 'creative' ? 'role' : type));
-        if (type === 'designer' || type === 'creative') renderWorkDropdown();
-        applyFilters();
-    }
-
+    // --- Helper Functions ---
     function setupDefaultOptions(el, label) {
+        if (!el) return;
         el.innerHTML = `<option value="">All ${label}</option>`;
     }
 
@@ -180,6 +173,68 @@
         const el = document.getElementById(id);
         const box = el.closest('.flt-select-box');
         if (box) el.value !== "" ? box.classList.add('active-filter') : box.classList.remove('active-filter');
+    }
+
+    function appendRoleGroup(selectEl, label, data, filterKey, filterVal, textKey, valueKey) {
+        const group = document.createElement('optgroup');
+        group.label = `── ${label} ──`;
+        data.filter(item => item[filterKey] === filterVal).forEach(item => {
+            group.appendChild(new Option(item[textKey], item[valueKey]));
+        });
+        selectEl.appendChild(group);
+    }
+
+    // --- UI Logic ---
+    document.getElementById('toggleFilters').addEventListener('click', () => {
+        document.getElementById('advancedFilterZone').classList.toggle('show');
+    });
+
+    function togglePill(btn, type) {
+        // เปลี่ยนจาก type === 'prog' เป็น 'progress'
+        const className = 'active-' + (type === 'designer' || type === 'creative' ? 'role' : type);
+        btn.classList.toggle(className);
+        
+        if (type === 'designer' || type === 'creative') {
+            renderWorkFilter();
+            renderAssignFilter(profilesList);
+        }
+        applyFilters();
+    }
+
+    function renderWorkFilter() {
+        const select = document.getElementById('filterWork');
+        if (!select) return;
+        const cur = select.value;
+        setupDefaultOptions(select, "Work");
+
+        if (document.getElementById('pill-designer').classList.contains('active-role')) {
+            appendRoleGroup(select, "Designer", dataList, 'role', 'Designer', 'work', 'work');
+        }
+        
+        if (document.getElementById('pill-creative').classList.contains('active-role')) {
+            appendRoleGroup(select, "Creative", dataList, 'role', 'Creative', 'work', 'work');
+        }
+        
+        select.value = cur;
+        updateHighlight('filterWork');
+    }
+
+    function renderAssignFilter(profiles) {
+        const el = document.getElementById('filterAssign');
+        if (!el) return;
+        const cur = el.value;
+        setupDefaultOptions(el, "Assign");
+
+        if (document.getElementById('pill-designer').classList.contains('active-role')) {
+            appendRoleGroup(el, "Designers", profiles, 'role_designer', true, 'codename', 'codename');
+        }
+
+        if (document.getElementById('pill-creative').classList.contains('active-role')) {
+            appendRoleGroup(el, "Creatives", profiles, 'role_creative', true, 'codename', 'codename');
+        }
+
+        el.value = cur;
+        updateHighlight('filterAssign');
     }
 
     function resetAdvanced() {
@@ -191,106 +246,36 @@
         applyFilters();
     }
 
-    // --- Data Loading ---
+    // --- Data Management ---
     async function loadMasterData() {
         try {
-            // 1. โหลดข้อมูลงานและพนักงานพร้อมกัน
             const [workRes, profileRes] = await Promise.all([
                 supabaseClient.from('b-quest-work').select('*').order('work'),
                 supabaseClient.from('b-quest-profiles').select('*').order('codename')
             ]);
 
             dataList = workRes.data || [];
-            const allProfiles = profileRes.data || [];
+            profilesList = profileRes.data || [];
 
-            // 2. หยอด Work Dropdown (ใช้ชื่อฟังก์ชันใหม่ตามสั่ง)
             renderWorkFilter();
+            renderAssignFilter(profilesList);
 
-            // 3. หยอด Type Dropdown จาก Config
+            // Type Dropdown
             const typeEl = document.getElementById('filterType');
             setupDefaultOptions(typeEl, "Type");
-            if (B_QUEST_CONFIG.listTypes) {
-                B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
-            }
+            B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            // 4. หยอด Assign Dropdown (ใช้ชื่อฟังก์ชันใหม่)
-            renderAssignFilter(allProfiles);
-
-            // 5. หยอด Owner Dropdown (ดึงจากข้อมูลจริงใน b-quest-list)
+            // Owner Dropdown (Real database)
             const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
             const ownerEl = document.getElementById('filterOwner');
             setupDefaultOptions(ownerEl, "Owner");
             if (owners) {
-                const uniqueOwners = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
-                uniqueOwners.forEach(name => ownerEl.add(new Option(name, name)));
+                const unique = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
+                unique.forEach(name => ownerEl.add(new Option(name, name)));
             }
-        } catch (e) { console.error("Error Loading Master Data:", e); }
+        } catch (e) { console.error(e); }
     }
 
-    function renderWorkFilter() {
-        const select = document.getElementById('filterWork');        
-        const designer = document.getElementById('pill-designer').classList.contains('active-role');
-        const creative = document.getElementById('pill-creative').classList.contains('active-role');
-        const cur = select.value;
-        
-        setupDefaultOptions(select, "Work");
-
-        if (designer) {
-            const group = document.createElement('optgroup'); 
-            group.label = "── Designer ──";
-            dataList.filter(i => i.role === 'Designer').forEach(w => {
-                group.appendChild(new Option(w.work, w.work));
-            });
-            select.appendChild(group);
-        }
-        
-        if (creative) {
-            const group = document.createElement('optgroup'); 
-            group.label = "── Creative ──";
-            dataList.filter(i => i.role === 'Creative').forEach(w => {
-                group.appendChild(new Option(w.work, w.work));
-            });
-            select.appendChild(group);
-        }
-        
-        select.value = cur;
-        updateHighlight('filterWork');
-    }
-
-    function renderAssignFilter(profiles) {
-        const el = document.getElementById('filterAssign');
-        if (!el) return;
-        
-        const pDes = document.getElementById('pill-designer').classList.contains('active-role');
-        const pCre = document.getElementById('pill-creative').classList.contains('active-role');
-        const cur = el.value;
-
-        setupDefaultOptions(el, "Assign");
-
-        if (pDes) {
-            const designers = profiles.filter(p => p.role_designer === true);
-            if (designers.length > 0) {
-                const g = document.createElement('optgroup'); 
-                g.label = "── Designers ──";
-                designers.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
-                el.appendChild(g);
-            }
-        }
-        if (pCre) {
-            const creatives = profiles.filter(p => p.role_creative === true);
-            if (creatives.length > 0) {
-                const g = document.createElement('optgroup'); 
-                g.label = "── Creatives ──";
-                creatives.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
-                el.appendChild(g);
-            }
-        }
-
-        el.value = cur;
-        updateHighlight('filterAssign');
-    }
-
-    // --- Search & Fetch Logic ---
     function applyFilters() {
         currentPage = 0; hasMore = true;
         document.getElementById("taskContainer").innerHTML = ''; 
@@ -308,26 +293,26 @@
         const search = document.getElementById('globalSearch').value.trim();
         if (search) query = query.or(SEARCH_COLUMNS.map(col => `${col}.ilike.%${search}%`).join(','));
 
-        const pDes = document.getElementById('pill-des').classList.contains('active-role');
-        const pCre = document.getElementById('pill-cre').classList.contains('active-role');
+        const designerActive = document.getElementById('pill-designer').classList.contains('active-role');
+        const creativeActive = document.getElementById('pill-creative').classList.contains('active-role');
         const sd = document.getElementById('startDate').value;
         const ed = document.getElementById('endDate').value;
 
-        if (!pDes && !pCre) query = query.eq('id', -1);
+        if (!designerActive && !creativeActive) query = query.eq('id', -1);
         else {
             const build = (r) => `and(${r}.neq.-,${r}.not.is.null${sd?`,${r}_deadline.gte.${sd}`:''}${ed?`,${r}_deadline.lte.${ed}`:''})`;
             let parts = [];
-            if (pDes) parts.push(build('designer'));
-            if (pCre) parts.push(build('creative'));
+            if (designerActive) parts.push(build('designer'));
+            if (creativeActive) parts.push(build('creative'));
             query = query.or(parts.join(','));
         }
 
-        const pProg = document.getElementById('pill-prog').classList.contains('active-prog');
-        const pDone = document.getElementById('pill-done').classList.contains('active-done');
+        const progressActive = document.getElementById('pill-progress').classList.contains('active-progress');
+        const doneActive = document.getElementById('pill-done').classList.contains('active-done');
         
-        if (pProg && pDone) { /* All */ }
-        else if (pProg) query = query.or('designer_status.neq.Done,creative_status.neq.Done');
-        else if (pDone) query = query.eq('designer_status','Done').eq('creative_status','Done');
+        if (progressActive && doneActive) { /* All */ }
+        else if (progressActive) query = query.or('designer_status.neq.Done,creative_status.neq.Done');
+        else if (doneActive) query = query.eq('designer_status','Done').eq('creative_status','Done');
         else query = query.eq('id', -1);
 
         const val = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
@@ -357,7 +342,7 @@
             const card = document.createElement("div");
             card.className = "col-12";
             card.innerHTML = `
-                <div class="bqc-card ${isDone ? 'bqc-status-done' : 'bqc-status-prog'}">
+                <div class="bqc-card ${isDone ? 'bqc-status-done' : 'bqc-status-progress'}">
                     <div class="bqc-header">
                         <div class="bqc-info-zone" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                             <div class="bqc-title">${task.task_name || 'Untitled'}</div>
@@ -392,11 +377,11 @@
                             <div class="bqc-layout-row">
                                 <div class="bqc-col-30">
                                     <div class="bqc-panel-label"><i class="bi bi-brush"></i> DESIGNER</div>
-                                    ${hasD ? `<div class="bqc-panel"><div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.designer_status}</span></div><div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type}</span></div><div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer}</span></div><div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.designer_assign}</span></div><div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div></div>` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
+                                    ${hasD ? `<div class="bqc-panel"><div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status==='Done'?'bqc-dot-done':'bqc-dot-progress'}"></span>${task.designer_status}</span></div><div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type}</span></div><div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer}</span></div><div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.designer_assign}</span></div><div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div></div>` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
                                 </div>
                                 <div class="bqc-col-30">
                                     <div class="bqc-panel-label"><i class="bi bi-rocket"></i> CREATIVE</div>
-                                    ${hasC ? `<div class="bqc-panel"><div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status==='Done'?'bqc-dot-done':'bqc-dot-prog'}"></span>${task.creative_status}</span></div><div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type}</span></div><div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative}</span></div><div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.creative_assign}</span></div><div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div></div>` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
+                                    ${hasC ? `<div class="bqc-panel"><div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status==='Done'?'bqc-dot-done':'bqc-dot-progress'}"></span>${task.creative_status}</span></div><div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type}</span></div><div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative}</span></div><div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.creative_assign}</span></div><div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div></div>` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
                                 </div>
                                 <div class="bqc-col-40">
                                     <div class="bqc-panel-label"><i class="bi bi-justify-left"></i> DETAIL</div>
@@ -419,7 +404,6 @@
         } catch (e) { console.error("Init failed:", e); }
     }
 
-    // Event Listeners
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('change', () => {
@@ -430,10 +414,10 @@
 
     document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
 
-    const obs = new IntersectionObserver(e => { 
-        if(e[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
+    const observer = new IntersectionObserver(entries => { 
+        if(entries[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
     }, { rootMargin: '100px' });
-    obs.observe(document.getElementById('load-more-trigger'));
+    observer.observe(document.getElementById('load-more-trigger'));
 
     initPage();
 </script>
