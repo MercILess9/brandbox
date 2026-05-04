@@ -11,22 +11,6 @@ const B_QUEST_CONFIG = {
 
 
 
-// --- 2. หยอด Type พร้อม Placeholder ---
-function setupTypeDropdowns() {
-    const types = B_QUEST_CONFIG.listTypes;
-    const targetIds = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
-    
-    targetIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            // ใส่ Placeholder ที่เลือกซ้ำไม่ได้
-            el.innerHTML = '<option value="" disabled selected hidden>Choose Type...</option>';
-            
-            types.forEach(t => el.add(new Option(t, t)));
-        }
-    });
-}
-
 // --- 3. ฟังก์ชันเปิด Modal ---
 async function openTaskModal(taskId = null) {
     const modalEl = document.getElementById('b-quest-modal');
