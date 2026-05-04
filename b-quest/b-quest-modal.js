@@ -1,8 +1,9 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Final Refinement: Text-only Capacity, Balanced Layout, Fixed Alignments
+ * Final Refinement: Task New Header, 50/50 Balanced, Center Inputs & Complete Logic
  */
 
+// --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
@@ -19,7 +20,6 @@ const B_QUEST_MODAL_HTML = `
     .bq-modern-body { padding: 20px 35px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
-    /* Card & Inputs */
     .bq-glass-card { 
         background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; 
         height: 100%; display: flex; flex-direction: column; 
@@ -35,10 +35,8 @@ const B_QUEST_MODAL_HTML = `
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     input[type="date"].bq-input-modern { text-align: center; height: 35px; }
 
-    /* Detail Box */
     .bq-input-detail { flex-grow: 1; min-height: 120px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
-    /* Role Card Style */
     .role-card {
         background: #fff; border-radius: 22px; border: 1px solid #e2e8f0;
         margin-bottom: 12px; transition: all 0.4s ease; overflow: hidden;
@@ -63,13 +61,8 @@ const B_QUEST_MODAL_HTML = `
         padding: 10px; height: 100%; display: flex; flex-direction: column; justify-content: center;
     }
 
-    /* Capacity Text (No Border) */
-    .bq-cap-text { 
-        font-size: 0.72rem; font-weight: 700; color: #64748b; 
-        margin-top: 5px; display: block;
-    }
+    .bq-cap-text { font-size: 0.72rem; font-weight: 700; color: #64748b; margin-top: 5px; display: block; }
 
-    /* Toggle Switch */
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider {
@@ -88,19 +81,17 @@ const B_QUEST_MODAL_HTML = `
         padding: 2px 6px; background: #fff; min-width: 90px; text-align-last: center; height: 28px;
     }
 
-    /* Footer Buttons (Compact) */
     .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 10px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 0 20px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; height: 38px; }
     .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 0 28px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; height: 38px; }
 
-    /* Overlay Search */
     .bq-search-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
     }
     .bq-search-card { background: #fff; width: 400px; max-height: 80%; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; }
-    .uni-item-modern { border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 12px 15px; font-size: 0.88rem; font-weight: 600; text-align: left; }
-    .uni-item-modern:hover { background: #f1f5f9; color: #3b82f6; }
+    .uni-item-modern { border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 12px 15px; font-size: 0.88rem; font-weight: 600; text-align: left; border: 1px solid transparent; }
+    .uni-item-modern:hover { background: #f1f5f9; color: #3b82f6; border-color: #e2e8f0; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -110,7 +101,7 @@ const B_QUEST_MODAL_HTML = `
             <div id="bq-search-overlay" class="bq-search-overlay" onclick="closeSearchOverlay()">
                 <div class="bq-search-card" onclick="event.stopPropagation()">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-900 m-0">Selection</h6>
+                        <h6 class="fw-900 m-0" id="search-title">Selection</h6>
                         <button type="button" class="btn-close" onclick="closeSearchOverlay()"></button>
                     </div>
                     <input type="text" class="form-control mb-3" id="uni-search-input" placeholder="Search..." style="border-radius: 10px;">
@@ -251,19 +242,24 @@ const B_QUEST_MODAL_HTML = `
 </div>
 `;
 
+// Insert HTML to body
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
-// --- LOGIC HANDLING ---
+// --- 2. LOGIC HANDLING ---
 
 function updateRoleUI(role) {
-    const isChecked = document.getElementById(`check-${role}`).checked;
+    const checkbox = document.getElementById(`check-${role}`);
+    if (!checkbox) return;
+    const isChecked = checkbox.checked;
     const card = document.getElementById(`card-${role}`);
+    
     if (isChecked) {
         card.classList.add('active');
         card.classList.remove('disabled');
     } else {
         card.classList.remove('active');
         card.classList.add('disabled');
+        // Clear inputs
         document.getElementById(`b-quest-modal-${role}-type`).value = "";
         document.getElementById(`b-quest-modal-${role}-work`).value = "";
         document.getElementById(`b-quest-modal-${role}-deadline`).value = "";
@@ -298,13 +294,16 @@ async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
     form.reset();
+    
     ['designer', 'creative'].forEach(role => {
         document.getElementById(`check-${role}`).checked = true;
         document.getElementById(`${role}-capacity-info`).innerText = "Use 0 | Capacity 0/10";
         updateRoleUI(role);
     });
+
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
+
     if (taskId) {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
         document.getElementById('btn-submit-text').innerText = 'Save Changes';
@@ -320,6 +319,7 @@ async function openTaskModal(taskId = null, workData = []) {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
         document.getElementById('btn-submit-text').innerText = 'Create Task';
     }
+
     initModalEventListeners();
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
@@ -327,6 +327,7 @@ async function openTaskModal(taskId = null, workData = []) {
 function setupModalWorkDropdowns(workData) {
     ['designer', 'creative'].forEach(role => {
         const el = document.getElementById(`b-quest-modal-${role}-work`);
+        if (!el) return;
         el.innerHTML = '<option value="" selected disabled>Select...</option>';
         workData.filter(i => i.role === role.charAt(0).toUpperCase() + role.slice(1)).forEach(i => {
             const opt = new Option(i.work, i.work);
@@ -340,10 +341,89 @@ function setupModalWorkDropdowns(workData) {
     });
 }
 
-function initModalEventListeners() {
-    ['designer', 'creative'].forEach(r => {
-        document.getElementById(`b-quest-modal-${r}-deadline`).addEventListener('change', () => checkCapacity(r));
+function setupModalTypeDropdowns() {
+    ['designer', 'creative'].forEach(role => {
+        const el = document.getElementById(`b-quest-modal-${role}-type`);
+        if (!el) return;
+        el.innerHTML = '<option value="" selected disabled>Select...</option>';
+        B_QUEST_CONFIG.listTypes.forEach(t => el.add(new Option(t, t)));
     });
 }
 
-// (openSearchOverlay, closeSearchOverlay, setupModalTypeDropdowns, fillFormData, BQuestService, submit listener remain same as previous version)
+function initModalEventListeners() {
+    ['designer', 'creative'].forEach(r => {
+        const el = document.getElementById(`b-quest-modal-${r}-deadline`);
+        if (el) el.onchange = () => checkCapacity(r);
+    });
+}
+
+async function openSearchOverlay(fieldName, targetId) {
+    const overlay = document.getElementById('bq-search-overlay');
+    const container = document.getElementById('uni-list-container');
+    const searchInput = document.getElementById('uni-search-input');
+    overlay.style.display = 'flex';
+    container.innerHTML = '<div class="text-center p-4">Loading...</div>';
+    try {
+        const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
+        const unique = [...new Set(data?.map(i => i[fieldName]))].filter(n => n && n !== '-').sort();
+        const render = (f = '') => {
+            container.innerHTML = '';
+            unique.filter(n => n.toLowerCase().includes(f.toLowerCase())).forEach(val => {
+                const btn = document.createElement('button');
+                btn.className = "uni-item-modern"; btn.innerText = val; btn.type = "button";
+                btn.onclick = () => { document.getElementById(targetId).value = val; closeSearchOverlay(); };
+                container.appendChild(btn);
+            });
+        };
+        searchInput.oninput = (e) => render(e.target.value);
+        render();
+        setTimeout(() => searchInput.focus(), 150);
+    } catch (e) { console.error(e); }
+}
+
+function closeSearchOverlay() { document.getElementById('bq-search-overlay').style.display = 'none'; }
+
+function fillFormData(data) {
+    const map = { 
+        'b-quest-modal-account': data.account_name, 'b-quest-modal-opportunity': data.opportunity_name, 
+        'b-quest-modal-taskname': data.task_name, 'b-quest-modal-link': data.link, 
+        'b-quest-modal-publish-date': data.publish_date, 'b-quest-modal-detail': data.detail, 
+        'b-quest-modal-designer-status': data.designer_status, 'b-quest-modal-designer-type': data.designer_type, 
+        'b-quest-modal-designer-work': data.designer, 'b-quest-modal-designer-deadline': data.designer_deadline, 
+        'b-quest-modal-designer-weight': data.designer_weight, 'b-quest-modal-creative-status': data.creative_status, 
+        'b-quest-modal-creative-type': data.creative_type, 'b-quest-modal-creative-work': data.creative, 
+        'b-quest-modal-creative-deadline': data.creative_deadline, 'b-quest-modal-creative-weight': data.creative_weight 
+    };
+    for (let id in map) { 
+        const field = document.getElementById(id);
+        if (field) field.value = map[id] || ''; 
+    }
+}
+
+const BQuestService = {
+    async getQuestById(id) {
+        const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single();
+        return error ? null : data;
+    }
+};
+
+document.getElementById('b-quest-modal-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = Object.fromEntries(new FormData(e.target).entries());
+    payload.designer_assign = "อมม (BX0054)";
+    payload.creative_assign = "อมม (BX0054)";
+    
+    if (!document.getElementById('check-designer').checked) { 
+        payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; 
+    }
+    if (!document.getElementById('check-creative').checked) { 
+        payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; 
+    }
+    
+    const { error } = payload.id 
+        ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
+        : await supabaseClient.from('b-quest-list').insert([payload]);
+    
+    if (!error) location.reload();
+    else Swal.fire('Error', error.message, 'error');
+});
