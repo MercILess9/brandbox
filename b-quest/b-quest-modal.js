@@ -1,6 +1,6 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Feature: Compact Floating Search Overlay (Mobile-Friendly List Style)
+ * Feature: Compact Floating Search Overlay with Scroll Locking
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
@@ -13,7 +13,7 @@ const B_QUEST_MODAL_HTML = `
         position: relative; min-height: 600px;
     }
     .bq-form-header { padding: 20px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
-    .bq-form-body { padding: 25px 30px; background: #f8fafc; }
+    .bq-form-body { padding: 25px 30px; background: #f8fafc; overflow-y: auto; max-height: 80vh; }
     .bq-form-footer { padding: 15px 30px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; }
     
     .bq-card-section { background: #ffffff; border-radius: 18px; padding: 22px; border: 1px solid #eef2f6; height: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02); }
@@ -34,7 +34,7 @@ const B_QUEST_MODAL_HTML = `
     .capacity-info { font-size: 0.72rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 18px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 12px 30px; border-radius: 14px; font-weight: 800; cursor: pointer; }
 
-    /* --- Floating Search Overlay (Compact & Clean) --- */
+    /* --- Floating Search Overlay --- */
     .bq-search-overlay {
         position: absolute; 
         top: 0; left: 0; width: 100%; height: 100%;
@@ -46,7 +46,7 @@ const B_QUEST_MODAL_HTML = `
 
     .search-inner-card {
         background: #ffffff;
-        width: 420px; /* บีบให้แคบพอดิบพอดี */
+        width: 420px; 
         max-height: 80%;
         border-radius: 20px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -60,26 +60,25 @@ const B_QUEST_MODAL_HTML = `
 
     .search-card-header { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; background: #fff; }
     .search-card-body { 
-        padding: 10px; /* ลด padding รอบนอกเพื่อความแคบ */
+        padding: 10px; 
         overflow-y: auto; 
         flex-grow: 1; 
-        background: #fff;
-        overscroll-behavior: contain; 
+        background: #fff; 
+        overscroll-behavior: contain; /* ป้องกันการไหลไป scroll หน้าข้างหลัง */
     }
 
-    /* แก้ไขสไตล์รายการให้อ่านง่ายขึ้น ไม่ซ้อนกัน */
     .uni-list-item { 
         border: none !important; 
         background: #fff;
         border-radius: 10px !important; 
-        margin-bottom: 6px !important; /* เว้นช่องไฟระหว่างรายการ */
+        margin-bottom: 6px !important; 
         padding: 14px 18px !important; 
         font-size: 0.9rem !important; 
         font-weight: 600 !important; 
         color: #334155 !important;
         text-align: left !important; 
         transition: all 0.2s ease;
-        line-height: 1.2 !important; /* จัดความสูงบรรทัดให้พอดี */
+        line-height: 1.2 !important; 
         display: block !important;
         width: 100% !important;
         white-space: nowrap !important; 
@@ -87,14 +86,12 @@ const B_QUEST_MODAL_HTML = `
         text-overflow: ellipsis !important;
     }
 
-    /* Zebra Stripe สลับสีแถวให้อ่านง่าย */
     .uni-list-item:nth-child(even) { background: #f8fafc; }
-
     .uni-list-item:hover { 
         background: #f1f5f9 !important; 
         color: #bdc432 !important; 
-        padding-left: 24px !important; /* เลื่อนตัวหนังสือหลบเวลา hover */
-        box-shadow: inset 4px 0 0 0 #bdc432; /* เพิ่มแถบสีด้านซ้ายตอนเลือก */
+        padding-left: 24px !important; 
+        box-shadow: inset 4px 0 0 0 #bdc432; 
     }
 </style>
 
@@ -122,7 +119,7 @@ const B_QUEST_MODAL_HTML = `
             </div>
 
             <form id="b-quest-modal-form">
-                <div class="bq-form-body">
+                <div class="bq-form-body" id="bq-main-form-body">
                     <input type="hidden" id="b-quest-modal-id" name="id">
                     <input type="hidden" id="b-quest-modal-designer-weight" name="designer_weight" value="0">
                     <input type="hidden" id="b-quest-modal-creative-weight" name="creative_weight" value="0">
@@ -242,10 +239,13 @@ async function openSearchOverlay(fieldName, targetId) {
     const container = document.getElementById('uni-list-container');
     const searchInput = document.getElementById('uni-search-input');
     const title = document.getElementById('search-title');
+    const formBody = document.getElementById('bq-main-form-body');
 
     title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
     container.innerHTML = '<div class="text-center p-4"><div class="spinner-border spinner-border-sm text-secondary"></div></div>';
+    
     overlay.style.display = 'flex';
+    if (formBody) formBody.style.overflow = 'hidden'; // ล็อก Scroll หน้าหลัก
 
     try {
         const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
@@ -262,7 +262,7 @@ async function openSearchOverlay(fieldName, targetId) {
 
             filtered.forEach(val => {
                 const btn = document.createElement('button');
-                btn.className = "uni-list-item btn"; // เพิ่ม class btn เพื่อช่วย reset style
+                btn.className = "uni-list-item btn"; 
                 btn.innerText = val;
                 btn.type = "button";
                 btn.onclick = () => {
@@ -281,7 +281,9 @@ async function openSearchOverlay(fieldName, targetId) {
 
 function closeSearchOverlay() {
     const overlay = document.getElementById('bq-search-overlay');
+    const formBody = document.getElementById('bq-main-form-body');
     if (overlay) overlay.style.display = 'none';
+    if (formBody) formBody.style.overflow = 'auto'; // คืนค่า Scroll หน้าหลัก
 }
 
 async function checkCapacity(role) {
@@ -364,6 +366,19 @@ const BQuestService = {
     async getQuestById(id) {
         const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single();
         return error ? null : data;
+    },
+    async deleteQuest(id) {
+        const result = await Swal.fire({
+            title: 'Delete Mission?',
+            text: "This cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1e293b'
+        });
+        if (result.isConfirmed) {
+            const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
+            if(!error) location.reload();
+        }
     }
 };
 
