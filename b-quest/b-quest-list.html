@@ -63,7 +63,6 @@
         .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; }
         .btn-reset:hover { background: #f8fafc; color: var(--c-text-main); border-color: #cbd5e1; }
 
-        /* --- Card Styles --- */
         .bqc-card { background: white; border: 1px solid #f1f5f9; border-radius: var(--radius-card); margin-bottom: 15px; border-left: 6px solid #e2e8f0; transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
         .bqc-status-done { border-left-color: var(--c-done); }
         .bqc-status-prog { border-left-color: var(--c-progress); }
@@ -160,7 +159,7 @@
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
-    let dataList = []; 
+    let dataList = []; // ใช้เก็บข้อมูล b-quest-work
 
     // --- UI Helpers ---
     document.getElementById('toggleFilters').addEventListener('click', () => {
@@ -193,90 +192,60 @@
     }
 
     // --- Data Loading ---
-    // --- Data Loading ---
     async function loadMasterData() {
         try {
-            console.log("Starting to load Master Data...");
-            
-            // 1. โหลดข้อมูล Work & Profiles พร้อมกัน
             const [workRes, profileRes] = await Promise.all([
-                supabaseClient.from('b-quest-work').select('*'), // ดึงทุกคอลัมน์รวมถึง work_name, type_designer, type_creative
+                supabaseClient.from('b-quest-work').select('*').order('work'),
                 supabaseClient.from('b-quest-profiles').select('*').order('codename')
             ]);
 
-            if (workRes.error) throw workRes.error;
-            if (profileRes.error) throw profileRes.error;
-
             dataList = workRes.data || [];
             const allProfiles = profileRes.data || [];
-            
-            console.log("Data loaded:", { dataList, allProfiles });
 
-            // 2. หยอด Work Dropdown (คัดกรองตาม Pill)
+            // 1. Work Dropdown (คุมด้วย dataList)
             renderWorkDropdown();
 
-            // 3. หยอด Type Dropdown จาก Config
+            // 2. Type Dropdown (คุมด้วย config listTypes)
             const typeEl = document.getElementById('filterType');
             setupDefaultOptions(typeEl, "Type");
-            if (window.B_QUEST_CONFIG && B_QUEST_CONFIG.listTypes) {
-                B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
-            }
+            B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            // 4. หยอด Assign Dropdown (Grouping D/C)
+            // 3. Assign Dropdown (Grouping D/C จาก Profiles)
             renderAssignFilter(allProfiles);
 
-            // 5. หยอด Owner Dropdown (ดึงจากข้อมูลที่มีจริงใน database b-quest-list)
-            const { data: owners, error: ownerErr } = await supabaseClient
-                .from('b-quest-list')
-                .select('owner');
-            
+            // 4. Owner Dropdown (ดึงจากข้อมูลจริงใน b-quest-list)
+            const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
             const ownerEl = document.getElementById('filterOwner');
             setupDefaultOptions(ownerEl, "Owner");
             if (owners) {
-                // กรองชื่อที่ไม่ซ้ำและไม่เป็นค่าว่าง
                 const uniqueOwners = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
                 uniqueOwners.forEach(name => ownerEl.add(new Option(name, name)));
             }
-
-        } catch (e) { 
-            console.error("Load Master Data Failed:", e);
-            Swal.fire('Error', 'โหลดข้อมูลไม่สำเร็จ ตรวจสอบ Console ครับพี่', 'error');
-        }
+        } catch (e) { console.error(e); }
     }
 
     function renderWorkDropdown() {
         const select = document.getElementById('filterWork');
         if(!select) return;
-        
-        // เช็คว่าปุ่ม Designer/Creative ไหนถูกเปิดอยู่
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const cur = select.value;
-        
         setupDefaultOptions(select, "Work");
         
-        // ถ้ากด Designer Pill
+        // กรองจากข้อมูลจริงที่พี่เช็คใน Console (ใช้ .work และ .role)
+        const dW = dataList.filter(i => i.role === 'Designer');
+        const cW = dataList.filter(i => i.role === 'Creative');
+        
         if (pDes) {
-            const g1 = document.createElement('optgroup'); 
-            g1.label = "── Designer Work ──";
-            // ใช้ work_name และเช็ค type_designer ตามตารางใหม่
-            dataList.filter(i => i.type_designer === true).forEach(w => {
-                g1.appendChild(new Option(w.work_name, w.work_name));
-            });
+            const g1 = document.createElement('optgroup'); g1.label = "-- Designer --";
+            dW.forEach(w => g1.appendChild(new Option(w.work, w.work)));
             select.appendChild(g1);
         }
-        
-        // ถ้ากด Creative Pill
         if (pCre) {
-            const g2 = document.createElement('optgroup'); 
-            g2.label = "── Creative Work ──";
-            // ใช้ work_name และเช็ค type_creative ตามตารางใหม่
-            dataList.filter(i => i.type_creative === true).forEach(w => {
-                g2.appendChild(new Option(w.work_name, w.work_name));
-            });
+            const g2 = document.createElement('optgroup'); g2.label = "-- Creative --";
+            cW.forEach(w => g2.appendChild(new Option(w.work, w.work)));
             select.appendChild(g2);
         }
-        
         select.value = cur;
         updateHighlight('filterWork');
     }
@@ -286,20 +255,16 @@
         if (!el) return;
         setupDefaultOptions(el, "Assign");
 
-        // กรองตามชื่อคอลัมน์ใน b-quest-profiles ที่เราสร้างใหม่
         const designers = profiles.filter(p => p.role_designer === true);
         const creatives = profiles.filter(p => p.role_creative === true);
 
         if (designers.length > 0) {
-            const g = document.createElement('optgroup'); 
-            g.label = "── Designers ──";
+            const g = document.createElement('optgroup'); g.label = "── Designers ──";
             designers.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
             el.appendChild(g);
         }
-        
         if (creatives.length > 0) {
-            const g = document.createElement('optgroup'); 
-            g.label = "── Creatives ──";
+            const g = document.createElement('optgroup'); g.label = "── Creatives ──";
             creatives.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
             el.appendChild(g);
         }
