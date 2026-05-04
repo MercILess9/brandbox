@@ -1,12 +1,12 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Redesign: Switch-only Expand, Fixed Owner BX0054 & Balanced Layout
+ * Final Refinement: Task New Header, 5/5 Layout, Center Align & Fixed Capacity Logic
  */
 
 const B_QUEST_MODAL_HTML = `
 <style>
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
-    .bq-modal-1100 { max-width: 1000px !important; }
+    .bq-modal-1000 { max-width: 1000px !important; }
 
     .bq-modern-header {
         background: #fff; padding: 22px 35px; display: flex;
@@ -14,7 +14,7 @@ const B_QUEST_MODAL_HTML = `
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     .bq-header-title { font-size: 1.3rem; font-weight: 800; color: #1e293b; }
-    .bq-header-title span { color: #3b82f6; }
+    .bq-header-title span { color: #bdc432; }
 
     .bq-modern-body { padding: 25px 35px; }
 
@@ -25,7 +25,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-input-modern { 
         width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; 
         padding: 10px 15px; font-size: 0.9rem; color: #334155; margin-bottom: 12px; 
-        text-align-last: left; height: 43px; 
+        text-align-last: center; height: 43px;
     }
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1); }
     
@@ -38,14 +38,14 @@ const B_QUEST_MODAL_HTML = `
     }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
     
-    .role-card-header {
-        padding: 15px 22px; display: flex; align-items: center; gap: 12px;
-        /* ปิด cursor pointer เพราะเราไม่ให้กดที่หัวแล้ว */
-    }
-    
+    .role-card-header { padding: 15px 22px; display: flex; align-items: center; gap: 12px; }
     .role-header-left { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
     .role-card-title { font-size: 0.9rem; font-weight: 800; color: #1e293b; margin: 0; }
-    .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 2px 10px; border-radius: 8px; font-size: 0.65rem; border: 1px solid #e2e8f0; }
+    
+    .bq-owner-badge { 
+        background: #f8fafc; color: #64748b; padding: 3px 12px; border-radius: 8px; 
+        font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; 
+    }
 
     .role-card-body {
         max-height: 0; padding: 0 22px; transition: all 0.4s ease;
@@ -61,7 +61,7 @@ const B_QUEST_MODAL_HTML = `
         padding: 12px; height: 100%; display: flex; flex-direction: column;
     }
 
-    /* Toggle Style - Fixed Color #bdc432 */
+    /* Toggle Switch Style */
     .bq-toggle { position: relative; display: inline-block; width: 38px; height: 20px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider {
@@ -72,7 +72,7 @@ const B_QUEST_MODAL_HTML = `
         position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
         background-color: white; transition: .4s; border-radius: 50%;
     }
-    input:checked + .bq-slider { background-color: #bdc432 !important; } /* ทั้งคู่สีเดียวกัน */
+    input:checked + .bq-slider { background-color: #bdc432 !important; }
     input:checked + .bq-slider:before { transform: translateX(18px); }
 
     .bq-status-select { 
@@ -85,11 +85,12 @@ const B_QUEST_MODAL_HTML = `
         border-radius: 10px; font-size: 0.7rem; font-weight: 800; color: #1e293b;
     }
 
-    /* Footer Buttons */
+    /* Footer Actions */
     .bq-footer-actions { padding: 20px 40px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
     .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 12px 35px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
+    /* Search Overlay */
     .bq-search-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
@@ -100,7 +101,7 @@ const B_QUEST_MODAL_HTML = `
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog bq-modal-1100 modal-dialog-centered">
+    <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content">
             
             <div id="bq-search-overlay" class="bq-search-overlay" onclick="closeSearchOverlay()">
@@ -115,7 +116,7 @@ const B_QUEST_MODAL_HTML = `
             </div>
 
             <div class="bq-modern-header">
-                <div class="bq-header-title" id="b-quest-modal-label-text">New <span>Task</span></div>
+                <div class="bq-header-title" id="b-quest-modal-label-text">Task <span>New</span></div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -128,32 +129,32 @@ const B_QUEST_MODAL_HTML = `
                             <div class="bq-glass-card">
                                 <label class="bq-label-modern">Account Name</label>
                                 <div class="d-flex mb-3">
-                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px;" id="b-quest-modal-account" name="account_name" required placeholder="Enter account name...">
+                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px; text-align-last: left;" id="b-quest-modal-account" name="account_name" required placeholder="account name...">
                                     <button type="button" class="btn border border-start-0" style="border-radius: 0 12px 12px 0; background: #fff; height: 43px;" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Opportunity Name</label>
                                 <div class="d-flex mb-3">
-                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px;" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="opportunity name...">
+                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="opportunity name...">
                                     <button type="button" class="btn border border-start-0" style="border-radius: 0 12px 12px 0; background: #fff; height: 43px;" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Task Name</label>
-                                <input type="text" class="bq-input-modern" id="b-quest-modal-taskname" name="task_name" required placeholder="task name....">
+                                <input type="text" class="bq-input-modern" style="text-align-last: left;" id="b-quest-modal-taskname" name="task_name" required placeholder="task name....">
 
                                 <div class="row g-3">
                                     <div class="col-md-8">
                                         <label class="bq-label-modern">Link</label>
-                                        <input type="url" class="bq-input-modern" id="b-quest-modal-link" name="link" placeholder="https://...">
+                                        <input type="url" class="bq-input-modern" style="text-align-last: left;" id="b-quest-modal-link" name="link" placeholder="https://...">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="bq-label-modern">Publish Date</label>
+                                        <label class="bq-label-modern text-center d-block">Publish Date</label>
                                         <input type="date" class="bq-input-modern" id="b-quest-modal-publish-date" name="publish_date">
                                     </div>
                                 </div>
                                 
                                 <label class="bq-label-modern">Detail</label>
-                                <textarea class="bq-input-modern m-0" id="b-quest-modal-detail" name="detail" rows="4" style="resize: none; height: 110px;" placeholder="detail..."></textarea>
+                                <textarea class="bq-input-modern m-0" style="text-align-last: left;" id="b-quest-modal-detail" name="detail" rows="4" style="resize: none; height: 110px;" placeholder="detail..."></textarea>
                             </div>
                         </div>
 
@@ -174,14 +175,14 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="bq-label-modern">Type</label>
+                                    <div class="row g-3 justify-content-between">
+                                        <div class="col-5">
+                                            <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-designer-type" name="designer_type"></select>
-                                            <label class="bq-label-modern">Work</label>
+                                            <label class="bq-label-modern text-center d-block">Work</label>
                                             <select class="bq-input-modern m-0" id="b-quest-modal-designer-work" name="designer"></select>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-5">
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-designer-deadline" name="designer_deadline">
@@ -211,14 +212,14 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="bq-label-modern">Type</label>
+                                    <div class="row g-3 justify-content-between">
+                                        <div class="col-5">
+                                            <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-creative-type" name="creative_type"></select>
-                                            <label class="bq-label-modern">Work</label>
+                                            <label class="bq-label-modern text-center d-block">Work</label>
                                             <select class="bq-input-modern m-0" id="b-quest-modal-creative-work" name="creative"></select>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-5">
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-creative-deadline" name="creative_deadline">
@@ -258,10 +259,12 @@ function updateRoleUI(role) {
     } else {
         card.classList.remove('active');
         card.classList.add('disabled');
-        const prefix = `b-quest-modal-${role}`;
-        if(document.getElementById(`${prefix}-type`)) document.getElementById(`${prefix}-type`).value = "";
-        if(document.getElementById(`${prefix}-work`)) document.getElementById(`${prefix}-work`).value = "";
-        if(document.getElementById(`${prefix}-deadline`)) document.getElementById(`${prefix}-deadline`).value = "";
+        // Clear data when disabled
+        document.getElementById(`b-quest-modal-${role}-type`).value = "";
+        document.getElementById(`b-quest-modal-${role}-work`).value = "";
+        document.getElementById(`b-quest-modal-${role}-deadline`).value = "";
+        document.getElementById(`b-quest-modal-${role}-weight`).value = "0";
+        document.getElementById(`${role}-capacity-info`).innerText = "Load: 0/10";
     }
 }
 
@@ -280,19 +283,28 @@ async function openTaskModal(taskId = null, workData = []) {
     setupModalTypeDropdowns();
 
     if (taskId) {
-        document.getElementById('b-quest-modal-label-text').innerHTML = 'Edit <span>Task</span>';
+        document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
         document.getElementById('btn-submit-text').innerText = 'Save Changes';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
             document.getElementById('b-quest-modal-id').value = taskId;
             fillFormData(data);
-            if (!data.designer && !data.designer_deadline) { document.getElementById('check-designer').checked = false; updateRoleUI('designer'); }
-            if (!data.creative && !data.creative_deadline) { document.getElementById('check-creative').checked = false; updateRoleUI('creative'); }
+            
+            // Auto close if data is empty
+            if (!data.designer && !data.designer_deadline) { 
+                document.getElementById('check-designer').checked = false; 
+                updateRoleUI('designer'); 
+            }
+            if (!data.creative && !data.creative_deadline) { 
+                document.getElementById('check-creative').checked = false; 
+                updateRoleUI('creative'); 
+            }
+            
             checkCapacity('designer');
             checkCapacity('creative');
         }
     } else {
-        document.getElementById('b-quest-modal-label-text').innerHTML = 'New <span>Task</span>';
+        document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
         document.getElementById('btn-submit-text').innerText = 'Create Task';
     }
 
@@ -325,36 +337,75 @@ async function openSearchOverlay(fieldName, targetId) {
 
 function closeSearchOverlay() { document.getElementById('bq-search-overlay').style.display = 'none'; }
 
+// ฟังก์ชันหลักที่ใช้เช็ค Capacity
 async function checkCapacity(role) {
-    const date = document.getElementById(`b-quest-modal-${role}-deadline`).value;
+    const deadlineEl = document.getElementById(`b-quest-modal-${role}-deadline`);
+    const weightEl = document.getElementById(`b-quest-modal-${role}-weight`);
     const infoEl = document.getElementById(`${role}-capacity-info`);
-    if (!date) { infoEl.innerText = "Load: 0/10"; return; }
+    const currentId = document.getElementById('b-quest-modal-id').value;
+
+    const date = deadlineEl ? deadlineEl.value : null;
+    const weight = weightEl ? Number(weightEl.value) || 0 : 0;
+
+    if (!date) {
+        infoEl.innerText = "Load: 0/10";
+        infoEl.style.color = '#1e293b';
+        return;
+    }
+
     try {
-        const { data } = await supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
-        const total = data.reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0);
+        // ดึง weight รวมของวันนั้นๆ (ไม่รวมงานปัจจุบันถ้าเป็นการ Edit)
+        let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
+        if (currentId) query = query.neq('id', currentId);
+        
+        const { data } = await query;
+        const existingWeight = data.reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0);
+        const total = existingWeight + weight;
+
         infoEl.innerText = `Load: ${total}/10`;
+        // เปลี่ยนสีถ้าเต็ม
         infoEl.style.color = total >= 10 ? '#ef4444' : '#1e293b';
-    } catch (e) { console.error(e); }
+        if (total >= 10) infoEl.style.fontWeight = '900';
+        else infoEl.style.fontWeight = '800';
+
+    } catch (e) { 
+        console.error("Check Capacity Error:", e); 
+    }
 }
 
 function initModalEventListeners() {
     ['designer', 'creative'].forEach(r => {
-        document.getElementById(`b-quest-modal-${r}-deadline`).addEventListener('change', () => checkCapacity(r));
+        const el = document.getElementById(`b-quest-modal-${r}-deadline`);
+        if (el) {
+            // ลบ event เดิมออกก่อนเพื่อป้องกันซ้อน
+            el.removeEventListener('change', () => checkCapacity(r)); 
+            el.addEventListener('change', () => checkCapacity(r));
+        }
     });
 }
 
 function setupModalWorkDropdowns(workData) {
     ['designer', 'creative'].forEach(role => {
         const el = document.getElementById(`b-quest-modal-${role}-work`);
+        if (!el) return;
+        
         el.innerHTML = '<option value="" selected disabled>Select...</option>';
         workData.filter(i => i.role === role.charAt(0).toUpperCase() + role.slice(1)).forEach(i => {
             const opt = new Option(i.work, i.work);
             opt.dataset.weight = i.weight || 0;
             el.appendChild(opt);
         });
+
         el.onchange = () => {
-            document.getElementById(`b-quest-modal-${role}-weight`).value = el.options[el.selectedIndex].dataset.weight;
-            checkCapacity(role);
+            const selectedOpt = el.options[el.selectedIndex];
+            const weightValue = selectedOpt ? selectedOpt.dataset.weight : 0;
+            const weightInput = document.getElementById(`b-quest-modal-${role}-weight`);
+            
+            if (weightInput) {
+                weightInput.value = weightValue;
+                // เมื่อเลือก Work เสร็จ ให้คำนวณ Capacity ทันที
+                checkCapacity(role);
+            }
         };
     });
 }
@@ -362,14 +413,35 @@ function setupModalWorkDropdowns(workData) {
 function setupModalTypeDropdowns() {
     ['designer', 'creative'].forEach(role => {
         const el = document.getElementById(`b-quest-modal-${role}-type`);
+        if (!el) return;
         el.innerHTML = '<option value="" selected disabled>Select...</option>';
         B_QUEST_CONFIG.listTypes.forEach(t => el.add(new Option(t, t)));
     });
 }
 
 function fillFormData(data) {
-    const map = { 'b-quest-modal-account': data.account_name, 'b-quest-modal-opportunity': data.opportunity_name, 'b-quest-modal-taskname': data.task_name, 'b-quest-modal-link': data.link, 'b-quest-modal-publish-date': data.publish_date, 'b-quest-modal-detail': data.detail, 'b-quest-modal-designer-status': data.designer_status, 'b-quest-modal-designer-type': data.designer_type, 'b-quest-modal-designer-work': data.designer, 'b-quest-modal-designer-deadline': data.designer_deadline, 'b-quest-modal-designer-weight': data.designer_weight, 'b-quest-modal-creative-status': data.creative_status, 'b-quest-modal-creative-type': data.creative_type, 'b-quest-modal-creative-work': data.creative, 'b-quest-modal-creative-deadline': data.creative_deadline, 'b-quest-modal-creative-weight': data.creative_weight };
-    for (let id in map) { if (document.getElementById(id)) document.getElementById(id).value = map[id] || ''; }
+    const map = { 
+        'b-quest-modal-account': data.account_name, 
+        'b-quest-modal-opportunity': data.opportunity_name, 
+        'b-quest-modal-taskname': data.task_name, 
+        'b-quest-modal-link': data.link, 
+        'b-quest-modal-publish-date': data.publish_date, 
+        'b-quest-modal-detail': data.detail, 
+        'b-quest-modal-designer-status': data.designer_status, 
+        'b-quest-modal-designer-type': data.designer_type, 
+        'b-quest-modal-designer-work': data.designer, 
+        'b-quest-modal-designer-deadline': data.designer_deadline, 
+        'b-quest-modal-designer-weight': data.designer_weight, 
+        'b-quest-modal-creative-status': data.creative_status, 
+        'b-quest-modal-creative-type': data.creative_type, 
+        'b-quest-modal-creative-work': data.creative, 
+        'b-quest-modal-creative-deadline': data.creative_deadline, 
+        'b-quest-modal-creative-weight': data.creative_weight 
+    };
+    for (let id in map) { 
+        const field = document.getElementById(id);
+        if (field) field.value = map[id] || ''; 
+    }
 }
 
 document.getElementById('b-quest-modal-form').addEventListener('submit', async (e) => {
@@ -378,13 +450,19 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     payload.designer_assign = "อมม (BX0054)";
     payload.creative_assign = "อมม (BX0054)";
     
-    if (!document.getElementById('check-designer').checked) { payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; }
-    if (!document.getElementById('check-creative').checked) { payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; }
+    if (!document.getElementById('check-designer').checked) { 
+        payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; 
+    }
+    if (!document.getElementById('check-creative').checked) { 
+        payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; 
+    }
     
     const { error } = payload.id 
         ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
         : await supabaseClient.from('b-quest-list').insert([payload]);
+    
     if (!error) location.reload();
+    else console.error("Save Error:", error);
 });
 
 const BQuestService = {
