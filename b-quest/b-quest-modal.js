@@ -6,7 +6,7 @@
 const B_QUEST_MODAL_HTML = `
 <style>
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
-    .bq-modal-1100 { max-width: 1100px !important; }
+    .bq-modal-1100 { max-width: 1000px !important; }
 
     .bq-modern-header {
         background: #fff; padding: 22px 35px; display: flex;
