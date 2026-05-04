@@ -1,17 +1,14 @@
 /**
- * B-QUEST MODAL COMPONENT (Fixed: Nested Modal Visibility)
+ * B-QUEST MODAL COMPONENT (Full Version: Fixed Backdrop & Owner Tags)
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
-    /* ปรับแต่ง Modal หลัก */
+    /* ปรับแต่งลำดับชั้น Modal */
     #b-quest-modal { z-index: 1050; } 
+    #universal-search-modal { z-index: 1080 !important; background: rgba(0,0,0,0.4); } /* บังคับพื้นหลังเข้มเอง */
     
-    /* ปรับแต่ง Modal ค้นหาให้สูงกว่าเสมอ */
-    #universal-search-modal { z-index: 1070; background: rgba(0,0,0,0.3); }
-    .modal-backdrop:nth-of-type(even) { z-index: 1060; } /* ฉากหลังตัวที่สอง */
-
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     .bq-form-header { padding: 18px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
@@ -20,26 +17,28 @@ const B_QUEST_MODAL_HTML = `
     
     .bq-card-section { background: #ffffff; border-radius: 16px; padding: 20px; border: 1px solid #eef2f6; height: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02); }
     .bq-card-highlight { border-top: 3px solid #bdc432; }
-    .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
     
+    .bq-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+    .bq-section-title { font-size: 0.75rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+    .bq-owner-tag { background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; border: 1px solid #e2e8f0; }
+
+    .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
     .bq-input { width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 0.88rem; background: #ffffff; margin-bottom: 15px; color: #1e293b; text-align: center; transition: 0.2s; }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     
     .bq-input-group { display: flex; margin-bottom: 15px; }
     .bq-input-left { border-radius: 10px 0 0 10px !important; margin-bottom: 0 !important; }
-    .btn-search-append { border-radius: 0 10px 10px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #64748b; padding: 0 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-    .btn-search-append:hover { background: #f8fafc; color: #bdc432; }
-
+    .btn-search-append { border-radius: 0 10px 10px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #64748b; padding: 0 15px; cursor: pointer; display: flex; align-items: center; }
+    
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; padding: 6px 15px; color: #1e293b; outline: none; cursor: pointer; background: #fff; min-width: 120px; text-align-last: center; }
     .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 800; transition: 0.2s; cursor: pointer; }
 
-    /* รายการใน Search Modal */
     .uni-list-item { 
         border: none; border-radius: 12px !important; margin-bottom: 5px; 
         font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; 
         text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-        display: block; width: 100%; padding: 12px 15px; background: transparent;
+        display: block; width: 100%; padding: 12px 15px;
     }
     .uni-list-item:hover { background: #bdc432 !important; color: #fff !important; transform: translateX(5px); }
 </style>
@@ -65,17 +64,15 @@ const B_QUEST_MODAL_HTML = `
                                     <input type="text" class="bq-input bq-input-left" id="b-quest-modal-account" name="account_name" required placeholder="Account Name">
                                     <button type="button" class="btn-search-append" onclick="openGeneralSearchModal('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
-
                                 <label class="bq-label">Opportunity Name</label>
                                 <div class="bq-input-group">
                                     <input type="text" class="bq-input bq-input-left" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="Opportunity Name">
                                     <button type="button" class="btn-search-append" onclick="openGeneralSearchModal('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
                                 </div>
-
                                 <label class="bq-label">Task Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required placeholder="Task Name">
+                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required placeholder="Task Title">
                                 <label class="bq-label">Link</label>
-                                <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link" placeholder="URL Link">
+                                <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link" placeholder="URL">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -92,7 +89,7 @@ const B_QUEST_MODAL_HTML = `
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title"><i class="bi bi-brush"></i> DESIGNER</div>
+                                    <div class="bq-section-title">DESIGNER <span class="bq-owner-tag" id="designer-owner-tag">Admin</span></div>
                                     <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status">
                                         <option value="Progress">Progress</option>
                                         <option value="Done">Done</option>
@@ -104,14 +101,14 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline"></div>
-                                    <div class="col-6"><label class="bq-label">Workload Info</label><div id="designer-capacity-info" class="capacity-info">Select Date...</div></div>
+                                    <div class="col-6"><label class="bq-label">Workload</label><div id="designer-capacity-info" class="capacity-info">Select Date...</div></div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
-                                    <div class="bq-section-title"><i class="bi bi-rocket-takeoff"></i> CREATIVE</div>
+                                    <div class="bq-section-title">CREATIVE <span class="bq-owner-tag" id="creative-owner-tag">Admin</span></div>
                                     <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status">
                                         <option value="Progress">Progress</option>
                                         <option value="Done">Done</option>
@@ -123,7 +120,7 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline"></div>
-                                    <div class="col-6"><label class="bq-label">Workload Info</label><div id="creative-capacity-info" class="capacity-info">Select Date...</div></div>
+                                    <div class="col-6"><label class="bq-label">Workload</label><div id="creative-capacity-info" class="capacity-info">Select Date...</div></div>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +134,7 @@ const B_QUEST_MODAL_HTML = `
     </div>
 </div>
 
-<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true" style="z-index: 2000;">
+<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content shadow-lg" style="border-radius: 20px; border: none;">
             <div class="modal-header border-0 pb-0">
@@ -145,7 +142,7 @@ const B_QUEST_MODAL_HTML = `
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." style="border-radius: 12px; height: 45px; border: 1px solid #eee;">
+                <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." autocomplete="off">
                 <div id="universal-list-container" class="list-group p-0" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;"></div>
             </div>
         </div>
@@ -153,7 +150,6 @@ const B_QUEST_MODAL_HTML = `
 </div>
 `;
 
-// แทรก HTML เข้า Body
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 // --- 2. LOGIC HANDLING ---
@@ -180,16 +176,15 @@ async function openTaskModal(taskId = null, workData = []) {
         }
     } else {
         document.getElementById('b-quest-modal-label').innerHTML = 'New Mission';
+        // เคลียร์ Tag Owner เป็นค่าเริ่มต้นตอนสร้างใหม่
+        document.getElementById('designer-owner-tag').innerText = 'Admin';
+        document.getElementById('creative-owner-tag').innerText = 'Admin';
     }
 
     initModalEventListeners();
-    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modalInstance.show();
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-/**
- * แก้ไขปัญหา Modal ซ้อนกัน: ใช้ชุดคำสั่งที่บังคับชั้นความสูง
- */
 async function openGeneralSearchModal(fieldName, targetInputId) {
     const searchModalEl = document.getElementById('universal-search-modal');
     const container = document.getElementById('universal-list-container');
@@ -199,8 +194,8 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
     title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
     container.innerHTML = '<div class="text-center p-4"><div class="spinner-border spinner-border-sm text-secondary"></div></div>';
     
-    // แสดง Modal ค้นหา
-    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl);
+    // แก้ปัญหาจอดำทับ: ปิด backdrop อัตโนมัติของ Modal ที่สอง
+    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl, { backdrop: false });
     searchModal.show();
 
     try {
@@ -258,7 +253,7 @@ async function checkCapacity(role) {
         const max = capRes.data ? capRes.data.max_capacity : 10;
         const total = existing + currentWeight;
 
-        infoEl.innerHTML = `Use : ${currentWeight} | Capacity <strong>${total} / ${max}</strong>`;
+        infoEl.innerHTML = `Use:${currentWeight} | <strong>${total}/${max}</strong>`;
         infoEl.style.color = total > max ? "#ef4444" : (total === max ? "#f59e0b" : "#bdc432");
     } catch (e) { console.error(e); }
 }
@@ -309,6 +304,9 @@ function fillFormData(data) {
         const el = document.getElementById(id);
         if (el) el.value = map[id] || '';
     }
+    // หยอดข้อมูล Owner Tag ด้วย
+    if(data.designer_assign) document.getElementById('designer-owner-tag').innerText = data.designer_assign;
+    if(data.creative_assign) document.getElementById('creative-owner-tag').innerText = data.creative_assign;
 }
 
 const BQuestService = {
