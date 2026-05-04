@@ -150,7 +150,7 @@
     <div id="load-more-trigger" style="height: 50px;"></div>
 </main>
 
-<button class="fab-add" onclick="openTaskModal(null, MASTER_WORK_DATA)" title="New Mission">
+<button class="fab-add" onclick="openTaskModal(null, dataList)" title="B-QUEST Form">
     <i class="bi bi-plus-lg"></i>
 </button>
 
@@ -161,6 +161,7 @@
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
+    let dataList = []; // เปลี่ยนชื่อจาก MASTER_WORK_DATA
 
     // --- UI Helpers ---
     document.getElementById('toggleFilters').addEventListener('click', () => {
@@ -195,29 +196,32 @@
     // --- Data Loading ---
     async function loadMasterData() {
         try {
-            // โหลดข้อมูลงานหลัก
-            const { data } = await supabaseClient.from('b-quest-work').select('*').order('work');
-            MASTER_WORK_DATA = data || [];
+            // โหลดข้อมูลงานและพนักงานพร้อมกัน
+            const [workRes, profileRes] = await Promise.all([
+                supabaseClient.from('b-quest-work').select('*').order('work_name'),
+                supabaseClient.from('b-quest-profiles').select('*').order('codename')
+            ]);
+
+            dataList = workRes.data || [];
+            const allProfiles = profileRes.data || [];
+
+            // 1. หยอด Work Dropdown
             renderWorkDropdown();
 
-            // หยอด Type Dropdown จาก Config
-            setupTypeDropdowns(['filterType']);
+            // 2. หยอด Type Dropdown จาก Config
+            const typeEl = document.getElementById('filterType');
+            setupDefaultOptions(typeEl, "Type");
+            B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            // ดึงรายชื่อพนักงาน/Owner จากตารางงาน
-            const { data: list } = await supabaseClient.from('b-quest-list').select('designer_assign, creative_assign, owner');
-            if (list) {
-                const fill = (id, lbl, keys) => {
-                    const set = new Set();
-                    list.forEach(i => keys.forEach(k => { if(i[k] && i[k] !== '-') set.add(i[k]); }));
-                    const el = document.getElementById(id);
-                    if(!el) return;
-                    setupDefaultOptions(el, lbl);
-                    [...set].sort().forEach(v => el.add(new Option(v, v)));
-                };
-                fill('filterAssign', "Staff", ['designer_assign', 'creative_assign']);
-                fill('filterOwner', "Owner", ['owner']);
-            }
-        } catch (e) { console.error(e); }
+            // 3. หยอด Owner Dropdown (AE)
+            const ownerEl = document.getElementById('filterOwner');
+            setupDefaultOptions(ownerEl, "Owner");
+            allProfiles.filter(p => p.role_ae).forEach(ae => ownerEl.add(new Option(ae.codename, ae.codename)));
+
+            // 4. หยอด Assign Dropdown (Grouping D/C)
+            renderAssignFilter(allProfiles);
+
+        } catch (e) { console.error("Load Master Data Failed:", e); }
     }
 
     function renderWorkDropdown() {
@@ -228,31 +232,38 @@
         const cur = select.value;
         setupDefaultOptions(select, "Work");
         
-        const dW = MASTER_WORK_DATA.filter(i => i.role === 'Designer');
-        const cW = MASTER_WORK_DATA.filter(i => i.role === 'Creative');
-        
         if (pDes) {
-            const g1 = document.createElement('optgroup'); g1.label = "-- Designer --";
-            dW.forEach(w => g1.appendChild(new Option(w.work, w.work)));
+            const g1 = document.createElement('optgroup'); g1.label = "── Designer Work ──";
+            dataList.filter(i => i.type_designer).forEach(w => g1.appendChild(new Option(w.work_name, w.work_name)));
             select.appendChild(g1);
         }
         if (pCre) {
-            const g2 = document.createElement('optgroup'); g2.label = "-- Creative --";
-            cW.forEach(w => g2.appendChild(new Option(w.work, w.work)));
+            const g2 = document.createElement('optgroup'); g2.label = "── Creative Work ──";
+            dataList.filter(i => i.type_creative).forEach(w => g2.appendChild(new Option(w.work_name, w.work_name)));
             select.appendChild(g2);
         }
         select.value = cur;
         updateHighlight('filterWork');
     }
 
-    function setupTypeDropdowns(targetIds = []) {
-        targetIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                setupDefaultOptions(el, id.includes('filter') ? 'Type' : '');
-                B_QUEST_CONFIG.listTypes.forEach(t => el.add(new Option(t, t)));
-            }
-        });
+    function renderAssignFilter(profiles) {
+        const el = document.getElementById('filterAssign');
+        if (!el) return;
+        setupDefaultOptions(el, "Staff");
+
+        const designers = profiles.filter(p => p.role_designer);
+        const creatives = profiles.filter(p => p.role_creative);
+
+        if (designers.length > 0) {
+            const g = document.createElement('optgroup'); g.label = "── Designers ──";
+            designers.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
+            el.appendChild(g);
+        }
+        if (creatives.length > 0) {
+            const g = document.createElement('optgroup'); g.label = "── Creatives ──";
+            creatives.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
+            el.appendChild(g);
+        }
     }
 
     // --- Search & Fetch Logic ---
@@ -333,11 +344,11 @@
                             <div class="bqc-dl-col">${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}</div>
                         </div>
                         <div class="bqc-actions">
-                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}', MASTER_WORK_DATA)">Edit</button>
+                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}', dataList)">Edit</button>
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px;">
-                                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}', MASTER_WORK_DATA)">Edit Mission</a></li>
+                                    <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="openTaskModal('${task.id}', dataList)">Edit Mission</a></li>
                                     <li><hr class="dropdown-divider opacity-50"></li>
                                     <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="BQuestService.deleteQuest('${task.id}')">Delete</a></li>
                                 </ul>
