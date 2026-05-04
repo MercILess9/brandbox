@@ -201,12 +201,12 @@
             renderFilterWork();
             renderFilterAssign();
 
-            // Type Dropdown
+            // type filter
             const typeEl = document.getElementById('filterType');
             setupDefaultOptions(typeEl, "Type");
             B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            // Owner Dropdown
+            // owner filter
             const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
             const ownerEl = document.getElementById('filterOwner');
             setupDefaultOptions(ownerEl, "Owner");
@@ -224,10 +224,10 @@
         setupDefaultOptions(filterWork, "Work");
 
         if (document.getElementById('pill-designer').classList.contains('active-role')) {
-            appendRoleGroup(filterWork, "Designer Work", dataList, 'role', 'Designer', 'work', 'work');
+            appendRoleGroup(filterWork, "Designer", dataList, 'role', 'Designer', 'work', 'work');
         }
         if (document.getElementById('pill-creative').classList.contains('active-role')) {
-            appendRoleGroup(filterWork, "Creative Work", dataList, 'role', 'Creative', 'work', 'work');
+            appendRoleGroup(filterWork, "Creative", dataList, 'role', 'Creative', 'work', 'work');
         }
         filterWork.value = currentSelection;
         updateHighlight('filterWork');
