@@ -1,6 +1,6 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Final Refinement: 50/50 Balanced Layout, Long Detail, and Equal Height Link/Date
+ * Final Refinement: 50/50 Balanced Layout, Long Detail, and Compact Height (35px)
  */
 
 const B_QUEST_MODAL_HTML = `
@@ -9,7 +9,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-modal-1000 { max-width: 1000px !important; }
 
     .bq-modern-header {
-        background: #fff; padding: 22px 35px; display: flex;
+        background: #fff; padding: 20px 35px; display: flex;
         justify-content: space-between; align-items: center;
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
@@ -23,23 +23,23 @@ const B_QUEST_MODAL_HTML = `
 
     /* Card Style */
     .bq-glass-card { 
-        background: #ffffff; border-radius: 20px; padding: 22px; border: 1px solid #e2e8f0; 
+        background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; 
         height: 100%; display: flex; flex-direction: column; 
     }
-    .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
     .text-left-label { text-align: left !important; display: block; width: 100%; }
 
-    /* Inputs */
+    /* Inputs - ปรับความสูงเป็น 35px */
     .bq-input-modern { 
-        width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; 
-        padding: 10px 15px; font-size: 0.9rem; color: #334155; margin-bottom: 12px; 
-        text-align-last: center; height: 45px; /* ปรับความสูงให้ดูมั่นคง */
+        width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; 
+        padding: 5px 12px; font-size: 0.85rem; color: #334155; margin-bottom: 10px; 
+        text-align-last: center; height: 35px; /* ความสูงตามสั่ง */
     }
-    .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1); }
+    .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     input[type="date"].bq-input-modern { text-align: center; }
 
     /* Detail Box - Long */
-    .bq-input-detail { flex-grow: 1; min-height: 150px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 15px; }
+    .bq-input-detail { flex-grow: 1; min-height: 140px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
     /* Role Card Style */
     .role-card {
@@ -47,13 +47,13 @@ const B_QUEST_MODAL_HTML = `
         margin-bottom: 15px; transition: all 0.4s ease; overflow: hidden;
     }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
-    .role-card-header { padding: 15px 22px; display: flex; align-items: center; gap: 12px; }
+    .role-card-header { padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
     .role-header-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
     .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
-    .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 3px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; }
+    .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 2px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; }
 
     .role-card-body {
-        max-height: 0; padding: 0 22px; transition: all 0.4s ease;
+        max-height: 0; padding: 0 20px; transition: all 0.4s ease;
         visibility: hidden; opacity: 0;
     }
     .role-card.active .role-card-body {
@@ -67,30 +67,30 @@ const B_QUEST_MODAL_HTML = `
     }
 
     /* Toggle Switch */
-    .bq-toggle { position: relative; display: inline-block; width: 38px; height: 20px; margin: 0; }
+    .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider {
         position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
         background-color: #cbd5e1; transition: .4s; border-radius: 34px;
     }
     .bq-slider:before {
-        position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+        position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
         background-color: white; transition: .4s; border-radius: 50%;
     }
     input:checked + .bq-slider { background-color: #bdc432 !important; }
-    input:checked + .bq-slider:before { transform: translateX(18px); }
+    input:checked + .bq-slider:before { transform: translateX(16px); }
 
     .bq-status-select { 
-        border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.72rem; font-weight: 700; 
-        padding: 4px 6px; background: #fff; min-width: 90px; text-align-last: center; height: 32px;
+        border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 700; 
+        padding: 2px 6px; background: #fff; min-width: 90px; text-align-last: center; height: 28px;
     }
 
-    .bq-cap-pill { background: #fff; border: 1px solid #e2e8f0; padding: 5px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; }
+    .bq-cap-pill { background: #fff; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; }
 
     /* Buttons */
     .bq-footer-actions { padding: 20px 40px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
-    .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-    .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 12px 35px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; height: 42px; }
+    .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 10px 35px; border-radius: 12px; font-weight: 700; cursor: pointer; height: 42px; }
 
     /* Overlay */
     .bq-search-overlay {
@@ -130,15 +130,15 @@ const B_QUEST_MODAL_HTML = `
                         <div class="col-lg-6">
                             <div class="bq-glass-card">
                                 <label class="bq-label-modern">Account Name</label>
-                                <div class="d-flex mb-3">
-                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px; text-align-last: left;" id="b-quest-modal-account" name="account_name" required placeholder="account name...">
-                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 12px 12px 0; background: #fff; height: 45px;" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
+                                <div class="d-flex mb-2">
+                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-account" name="account_name" required placeholder="account name...">
+                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px; display: flex; align-items: center;" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search" style="font-size: 0.8rem;"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Opportunity Name</label>
-                                <div class="d-flex mb-3">
-                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="opportunity name...">
-                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 12px 12px 0; background: #fff; height: 45px;" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
+                                <div class="d-flex mb-2">
+                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="opportunity name...">
+                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px; display: flex; align-items: center;" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search" style="font-size: 0.8rem;"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Task Name</label>
@@ -155,8 +155,10 @@ const B_QUEST_MODAL_HTML = `
                                     </div>
                                 </div>
                                 
-                                <label class="bq-label-modern">Detail</label>
-                                <textarea class="bq-input-modern bq-input-detail m-0" id="b-quest-modal-detail" name="detail" placeholder="detail..."></textarea>
+                                <div class="bq-detail-wrapper">
+                                    <label class="bq-label-modern">Detail</label>
+                                    <textarea class="bq-input-modern bq-input-detail m-0" id="b-quest-modal-detail" name="detail" placeholder="detail..."></textarea>
+                                </div>
                             </div>
                         </div>
 
@@ -247,6 +249,7 @@ const B_QUEST_MODAL_HTML = `
     </div>
 </div>
 `;
+// ... (Logic remains the same as previous) ...
 
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
