@@ -1,6 +1,6 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Redesign: Switch-only Expand, Fixed Owner BX0054 & Balanced Layout
+ * Final Refinement: Task New Header, 5/5 Layout, Center Align & Font Updates
  */
 
 const B_QUEST_MODAL_HTML = `
@@ -14,7 +14,7 @@ const B_QUEST_MODAL_HTML = `
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     .bq-header-title { font-size: 1.3rem; font-weight: 800; color: #1e293b; }
-    .bq-header-title span { color: #3b82f6; }
+    .bq-header-title span { color: #bdc432; } /* สี New */
 
     .bq-modern-body { padding: 25px 35px; }
 
@@ -25,7 +25,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-input-modern { 
         width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; 
         padding: 10px 15px; font-size: 0.9rem; color: #334155; margin-bottom: 12px; 
-        text-align-last: left; height: 43px; 
+        text-align-last: center; height: 43px; /* Dropdown center */
     }
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1); }
     
@@ -38,14 +38,15 @@ const B_QUEST_MODAL_HTML = `
     }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
     
-    .role-card-header {
-        padding: 15px 22px; display: flex; align-items: center; gap: 12px;
-        /* ปิด cursor pointer เพราะเราไม่ให้กดที่หัวแล้ว */
-    }
-    
+    .role-card-header { padding: 15px 22px; display: flex; align-items: center; gap: 12px; }
     .role-header-left { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
     .role-card-title { font-size: 0.9rem; font-weight: 800; color: #1e293b; margin: 0; }
-    .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 2px 10px; border-radius: 8px; font-size: 0.65rem; border: 1px solid #e2e8f0; }
+    
+    /* Owner Tag Font Size 0.8rem */
+    .bq-owner-badge { 
+        background: #f8fafc; color: #64748b; padding: 3px 12px; border-radius: 8px; 
+        font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; 
+    }
 
     .role-card-body {
         max-height: 0; padding: 0 22px; transition: all 0.4s ease;
@@ -61,7 +62,7 @@ const B_QUEST_MODAL_HTML = `
         padding: 12px; height: 100%; display: flex; flex-direction: column;
     }
 
-    /* Toggle Style - Fixed Color #bdc432 */
+    /* Toggle Switch Style */
     .bq-toggle { position: relative; display: inline-block; width: 38px; height: 20px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider {
@@ -72,7 +73,7 @@ const B_QUEST_MODAL_HTML = `
         position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
         background-color: white; transition: .4s; border-radius: 50%;
     }
-    input:checked + .bq-slider { background-color: #bdc432 !important; } /* ทั้งคู่สีเดียวกัน */
+    input:checked + .bq-slider { background-color: #bdc432 !important; }
     input:checked + .bq-slider:before { transform: translateX(18px); }
 
     .bq-status-select { 
@@ -85,11 +86,12 @@ const B_QUEST_MODAL_HTML = `
         border-radius: 10px; font-size: 0.7rem; font-weight: 800; color: #1e293b;
     }
 
-    /* Footer Buttons */
+    /* Footer */
     .bq-footer-actions { padding: 20px 40px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
     .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 12px 35px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
+    /* Search Overlay */
     .bq-search-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
@@ -115,7 +117,7 @@ const B_QUEST_MODAL_HTML = `
             </div>
 
             <div class="bq-modern-header">
-                <div class="bq-header-title" id="b-quest-modal-label-text">New <span>Task</span></div>
+                <div class="bq-header-title" id="b-quest-modal-label-text">Task <span>New</span></div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -128,32 +130,32 @@ const B_QUEST_MODAL_HTML = `
                             <div class="bq-glass-card">
                                 <label class="bq-label-modern">Account Name</label>
                                 <div class="d-flex mb-3">
-                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px;" id="b-quest-modal-account" name="account_name" required placeholder="Enter account name...">
+                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px; text-align-last: left;" id="b-quest-modal-account" name="account_name" required placeholder="account name...">
                                     <button type="button" class="btn border border-start-0" style="border-radius: 0 12px 12px 0; background: #fff; height: 43px;" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Opportunity Name</label>
                                 <div class="d-flex mb-3">
-                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px;" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="opportunity name...">
+                                    <input type="text" class="bq-input-modern m-0" style="border-radius: 12px 0 0 12px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="opportunity name...">
                                     <button type="button" class="btn border border-start-0" style="border-radius: 0 12px 12px 0; background: #fff; height: 43px;" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Task Name</label>
-                                <input type="text" class="bq-input-modern" id="b-quest-modal-taskname" name="task_name" required placeholder="task name....">
+                                <input type="text" class="bq-input-modern" style="text-align-last: left;" id="b-quest-modal-taskname" name="task_name" required placeholder="task name....">
 
                                 <div class="row g-3">
                                     <div class="col-md-8">
                                         <label class="bq-label-modern">Link</label>
-                                        <input type="url" class="bq-input-modern" id="b-quest-modal-link" name="link" placeholder="https://...">
+                                        <input type="url" class="bq-input-modern" style="text-align-last: left;" id="b-quest-modal-link" name="link" placeholder="https://...">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="bq-label-modern">Publish Date</label>
+                                        <label class="bq-label-modern text-center d-block">Publish Date</label>
                                         <input type="date" class="bq-input-modern" id="b-quest-modal-publish-date" name="publish_date">
                                     </div>
                                 </div>
                                 
                                 <label class="bq-label-modern">Detail</label>
-                                <textarea class="bq-input-modern m-0" id="b-quest-modal-detail" name="detail" rows="4" style="resize: none; height: 110px;" placeholder="detail..."></textarea>
+                                <textarea class="bq-input-modern m-0" style="text-align-last: left;" id="b-quest-modal-detail" name="detail" rows="4" style="resize: none; height: 110px;" placeholder="detail..."></textarea>
                             </div>
                         </div>
 
@@ -174,14 +176,14 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="bq-label-modern">Type</label>
+                                    <div class="row g-3 justify-content-between">
+                                        <div class="col-5">
+                                            <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-designer-type" name="designer_type"></select>
-                                            <label class="bq-label-modern">Work</label>
+                                            <label class="bq-label-modern text-center d-block">Work</label>
                                             <select class="bq-input-modern m-0" id="b-quest-modal-designer-work" name="designer"></select>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-5">
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-designer-deadline" name="designer_deadline">
@@ -211,14 +213,14 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="bq-label-modern">Type</label>
+                                    <div class="row g-3 justify-content-between">
+                                        <div class="col-5">
+                                            <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-creative-type" name="creative_type"></select>
-                                            <label class="bq-label-modern">Work</label>
+                                            <label class="bq-label-modern text-center d-block">Work</label>
                                             <select class="bq-input-modern m-0" id="b-quest-modal-creative-work" name="creative"></select>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-5">
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-creative-deadline" name="creative_deadline">
@@ -265,6 +267,10 @@ function updateRoleUI(role) {
     }
 }
 
+function handleCardClick(role) {
+    // ปิด function นี้ตามสั่งเพื่อให้ย่อขยายเฉพาะ switch
+}
+
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
@@ -280,7 +286,7 @@ async function openTaskModal(taskId = null, workData = []) {
     setupModalTypeDropdowns();
 
     if (taskId) {
-        document.getElementById('b-quest-modal-label-text').innerHTML = 'Edit <span>Task</span>';
+        document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
         document.getElementById('btn-submit-text').innerText = 'Save Changes';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
@@ -292,7 +298,7 @@ async function openTaskModal(taskId = null, workData = []) {
             checkCapacity('creative');
         }
     } else {
-        document.getElementById('b-quest-modal-label-text').innerHTML = 'New <span>Task</span>';
+        document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
         document.getElementById('btn-submit-text').innerText = 'Create Task';
     }
 
