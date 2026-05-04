@@ -1,12 +1,6 @@
 /**
- * B-QUEST MODAL COMPONENT - MASTER COMPLETE VERSION
- * -----------------------------------------------------------
- * Features:
- * - New Mode: Task New (Cards Closed, Hide Owner/Status, Auto-assign BX001)
- * - Edit Mode: Task Edit (Show Owner/Status, Buttons: Delete & Save)
- * - Strict Validation: Highlight fields on error (Red/Green)
- * - Smart Capacity: Bloack Save if Load > 10/10 (Show only when ready)
- * - Compact UI: 35px Inputs, 140px Detail, No Cancel Button
+ * B-QUEST MODAL COMPONENT - FINAL MASTER VERSION 2026
+ * Features: Mode Switching, Strict Validation, Capacity Check, SweetAlert2 Popup
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
@@ -26,7 +20,6 @@ const B_QUEST_MODAL_HTML = `
     .bq-modern-body { padding: 20px 35px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
-    /* Main Card Data */
     .bq-glass-card { 
         background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; 
         height: 100%; display: flex; flex-direction: column; 
@@ -40,10 +33,11 @@ const B_QUEST_MODAL_HTML = `
     }
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
 
-    /* 🟢 Validation Styles (Highlight) */
+    /* 🔴 Highlight Fields on Error */
     .was-validated .bq-input-modern:invalid { border-color: #dc3545 !important; background-color: #fff8f8; }
     .was-validated .bq-input-modern:valid { border-color: #198754 !important; }
 
+    /* Detail Box min-height 140px */
     .bq-input-detail { flex-grow: 1; min-height: 140px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
     /* Assignment Cards */
@@ -53,7 +47,6 @@ const B_QUEST_MODAL_HTML = `
     .role-header-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
     .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
     
-    /* Logic For Edit Only UI */
     .edit-only { display: none; }
     .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 3px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; }
 
@@ -61,9 +54,11 @@ const B_QUEST_MODAL_HTML = `
     .role-card.active .role-card-body { max-height: 450px; padding: 15px 18px 18px 18px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
     .timeline-zone { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 10px; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+    
+    /* Capacity Text font 0.9 */
     .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 5px; display: none; }
 
-    /* Switch Style */
+    /* Toggle Switch */
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
@@ -71,19 +66,18 @@ const B_QUEST_MODAL_HTML = `
     input:checked + .bq-slider { background-color: #bdc432 !important; }
     input:checked + .bq-slider:before { transform: translateX(16px); }
 
-    /* Status Style */
+    /* Status Select Colors */
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; background: #fff; min-width: 95px; text-align-last: center; height: 28px; transition: all 0.2s; color: #fff; }
     .status-progress { background-color: #4e73df !important; border-color: #4e73df !important; }
     .status-done { background-color: #626e7f !important; border-color: #626e7f !important; }
 
-    /* Footer buttons */
-    .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 10px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
-    .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; height: 38px; display: none; transition: 0.2s; }
+    /* Footer Buttons */
+    .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
+    .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; height: 42px; display: none; transition: 0.2s; }
     .btn-bq-delete:hover { background: #fecaca; }
     .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; height: 42px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.15); transition: 0.2s; }
     .btn-bq-create:hover { background: #2563eb; transform: translateY(-1px); }
 
-    /* Overlay */
     .bq-search-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .bq-search-card { background: #fff; width: 400px; max-height: 80%; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; }
     .uni-item-modern { border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 12px 15px; font-size: 0.88rem; font-weight: 600; text-align: left; }
@@ -131,7 +125,7 @@ const B_QUEST_MODAL_HTML = `
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-8">
                                         <label class="bq-label-modern">Link</label>
-                                        <input type="url" class="bq-input-modern m-0" style="text-align-last: left;" id="b-quest-modal-link" name="link" placeholder="https://...">
+                                        <input type="text" class="bq-input-modern m-0" style="text-align-last: left;" id="b-quest-modal-link" name="link" placeholder="link...">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="bq-label-modern text-center d-block">Publish Date</label>
@@ -266,7 +260,7 @@ async function checkCapacity(role) {
         let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
         if (currentId) query = query.neq('id', currentId);
         const { data } = await query;
-        const total = data.reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) + weight;
+        const total = (data || []).reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) + weight;
         
         currentCapacities[role] = total;
         infoEl.innerText = `Use ${weight} | Capacity ${total}/10`;
@@ -280,13 +274,13 @@ async function openTaskModal(taskId = null, workData = []) {
     form.reset();
     form.classList.remove('was-validated');
 
-    const editOnlyElements = document.querySelectorAll('.edit-only');
+    const editOnly = document.querySelectorAll('.edit-only');
     const deleteBtn = document.getElementById('btn-delete-task');
     
     if (taskId) {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
         document.getElementById('btn-submit-text').innerText = 'Save Changes';
-        editOnlyElements.forEach(el => el.style.display = 'block');
+        editOnly.forEach(el => el.style.display = 'block');
         deleteBtn.style.display = 'block';
 
         const data = await BQuestService.getQuestById(taskId);
@@ -304,7 +298,7 @@ async function openTaskModal(taskId = null, workData = []) {
     } else {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
         document.getElementById('btn-submit-text').innerText = 'Create Task';
-        editOnlyElements.forEach(el => el.style.display = 'none');
+        editOnly.forEach(el => el.style.display = 'none');
         deleteBtn.style.display = 'none';
         ['designer', 'creative'].forEach(role => {
             document.getElementById(`check-${role}`).checked = false;
@@ -313,17 +307,15 @@ async function openTaskModal(taskId = null, workData = []) {
         });
     }
 
-    setupModalWorkDropdowns(workData);
-    setupModalTypeDropdowns();
-    initModalEventListeners();
+    setupModalWorkDropdown(workData); setupModalTypeDropdown();
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-function setupModalWorkDropdowns(workData) {
+function setupModalWorkDropdown(workData) {
     ['designer', 'creative'].forEach(role => {
         const el = document.getElementById(`b-quest-modal-${role}-work`);
         el.innerHTML = '<option value="" selected disabled>Select...</option>';
-        workData.filter(i => i.role === role.charAt(0).toUpperCase() + role.slice(1)).forEach(i => {
+        (workData || []).filter(i => i.role === role.charAt(0).toUpperCase() + role.slice(1)).forEach(i => {
             const opt = new Option(i.work, i.work); opt.dataset.weight = i.weight || 0; el.appendChild(opt);
         });
         el.onchange = () => {
@@ -333,7 +325,7 @@ function setupModalWorkDropdowns(workData) {
     });
 }
 
-function setupModalTypeDropdowns() {
+function setupModalTypeDropdown() {
     ['designer', 'creative'].forEach(role => {
         const el = document.getElementById(`b-quest-modal-${role}-type`);
         el.innerHTML = '<option value="" selected disabled>Select...</option>';
@@ -350,7 +342,8 @@ function initModalEventListeners() {
 async function handleDeleteTask() {
     const id = document.getElementById('b-quest-modal-id').value;
     if (!id) return;
-    if (confirm('Are you sure you want to delete this task?')) {
+    const confirm = await Swal.fire({ title: 'Are you sure?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!', confirmButtonColor: '#ef4444' });
+    if (confirm.isConfirmed) {
         const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
         if (!error) location.reload();
     }
@@ -360,61 +353,53 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     e.preventDefault();
     const form = e.target;
 
-    if (!form.checkValidity()) {
-        form.classList.add('was-validated');
+    // 1. Validate Fields
+    if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
+
+    // 2. Strict Requirement: At least 1 card active
+    const isDesActive = document.getElementById('check-designer').checked;
+    const isCreActive = document.getElementById('check-creative').checked;
+    if (!isDesActive && !isCreActive) {
+        Swal.fire('Wait!', 'Please select at least one role (Designer or Creative).', 'warning');
         return;
     }
 
-    const formData = new FormData(form);
-    let payload = Object.fromEntries(formData.entries());
+    // 3. Check Capacity
+    if (currentCapacities.designer > 10 || currentCapacities.creative > 10) {
+        Swal.fire('Capacity Full', 'Load exceeds 10/10. Please adjust deadlines.', 'error');
+        return;
+    }
 
-    // --- [DEBUG LOG] ส่องข้อมูลก่อนยิง ---
-    console.log("🚀 Payload to send:", payload);
-
-    // จัดการ IDs และ Data Types ให้ชัวร์ 100%
-    const isEdit = payload.id && payload.id.length > 5;
+    const payload = Object.fromEntries(new FormData(form).entries());
+    const isEdit = payload.id && payload.id.length > 10;
     const currentId = payload.id;
-    
+
     if (!isEdit) {
         delete payload.id;
         payload.owner = "Test (BX001)";
+        if (isDesActive) { payload.designer_assign = "Test (BX001)"; payload.designer_status = "Progress"; }
+        if (isCreActive) { payload.creative_assign = "Test (BX001)"; payload.creative_status = "Progress"; }
     }
 
-    // แปลง Weight เป็น Number เสมอ (ถ้าเป็น "" จะพัง Integer ใน DB)
-    payload.designer_weight = payload.designer_weight ? parseInt(payload.designer_weight) : 0;
-    payload.creative_weight = payload.creative_weight ? parseInt(payload.creative_weight) : 0;
+    // Null Safety & Data Cleanup
+    const fields = ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'];
+    fields.forEach(f => { if (payload[f] === "") payload[f] = null; });
+    payload.designer_weight = parseInt(payload.designer_weight) || 0;
+    payload.creative_weight = parseInt(payload.creative_weight) || 0;
 
-    // ล้างค่าว่างให้เป็น null สำหรับ Date และ Text อื่นๆ
-    const fieldsToClean = ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'];
-    fieldsToClean.forEach(f => {
-        if (payload[f] === "") payload[f] = null;
-    });
+    if (!isDesActive) { payload.designer = null; payload.designer_type = null; payload.designer_deadline = null; payload.designer_weight = 0; payload.designer_assign = null; payload.designer_status = null; }
+    if (!isCreActive) { payload.creative = null; payload.creative_type = null; payload.creative_deadline = null; payload.creative_weight = 0; payload.creative_assign = null; payload.creative_status = null; }
 
-    try {
-        let result;
-        if (!isEdit) {
-            console.log("📡 Mode: INSERT");
-            result = await supabaseClient.from('b-quest-list').insert([payload]).select();
-        } else {
-            console.log("📡 Mode: UPDATE");
-            delete payload.id;
-            result = await supabaseClient.from('b-quest-list').update(payload).eq('id', currentId).select();
-        }
+    payload.last_update = new Date().toISOString();
 
-        // --- [DEBUG CHECK] เช็คผลลัพธ์ ---
-        if (result.error) {
-            console.error("❌ Supabase Error Detail:", result.error);
-            // โชว์ Alert รายละเอียดสูง
-            alert(`ไม่สำเร็จ!\nCode: ${result.error.code}\nMessage: ${result.error.message}\nHint: ${result.error.hint}`);
-        } else {
-            console.log("✅ Success Result:", result.data);
-            alert("บันทึกสำเร็จเรียบร้อย!");
-            location.reload();
-        }
+    const { error } = isEdit 
+        ? await supabaseClient.from('b-quest-list').update(payload).eq('id', currentId)
+        : await supabaseClient.from('b-quest-list').insert([payload]);
 
-    } catch (err) {
-        console.error("💥 Critical System Error:", err);
-        alert("ระบบขัดข้อง: " + err.message);
+    if (!error) {
+        Swal.fire({ icon: 'success', title: 'Success!', showConfirmButton: false, timer: 1500 }).then(() => location.reload());
+    } else {
+        Swal.fire('Error', error.message, 'error');
     }
 });
 
@@ -423,6 +408,8 @@ const BQuestService = { async getQuestById(id) { const { data, error } = await s
 function fillFormData(data) {
     const map = { 'b-quest-modal-account': data.account_name, 'b-quest-modal-opportunity': data.opportunity_name, 'b-quest-modal-taskname': data.task_name, 'b-quest-modal-link': data.link, 'b-quest-modal-publish-date': data.publish_date, 'b-quest-modal-detail': data.detail, 'b-quest-modal-designer-status': data.designer_status, 'b-quest-modal-designer-type': data.designer_type, 'b-quest-modal-designer-work': data.designer, 'b-quest-modal-designer-deadline': data.designer_deadline, 'b-quest-modal-designer-weight': data.designer_weight, 'b-quest-modal-creative-status': data.creative_status, 'b-quest-modal-creative-type': data.creative_type, 'b-quest-modal-creative-work': data.creative, 'b-quest-modal-creative-deadline': data.creative_deadline, 'b-quest-modal-creative-weight': data.creative_weight };
     for (let id in map) { const field = document.getElementById(id); if (field) field.value = map[id] || ''; }
+    if(data.designer_assign) document.getElementById('badge-designer').innerText = data.designer_assign;
+    if(data.creative_assign) document.getElementById('badge-creative').innerText = data.creative_assign;
 }
 
 async function openSearchOverlay(fieldName, targetId) {
@@ -430,7 +417,7 @@ async function openSearchOverlay(fieldName, targetId) {
     const container = document.getElementById('uni-list-container');
     overlay.style.display = 'flex';
     const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
-    const unique = [...new Set(data?.map(i => i[fieldName]))].filter(n => n && n !== '-').sort();
+    const unique = [...new Set((data || []).map(i => i[fieldName]))].filter(n => n && n !== '-').sort();
     container.innerHTML = '';
     unique.forEach(val => {
         const btn = document.createElement('button'); btn.className = "uni-item-modern"; btn.innerText = val; btn.type = "button";
@@ -440,3 +427,4 @@ async function openSearchOverlay(fieldName, targetId) {
 }
 
 function closeSearchOverlay() { document.getElementById('bq-search-overlay').style.display = 'none'; }
+initModalEventListeners();
