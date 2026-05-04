@@ -1,7 +1,8 @@
 /**
- * B-QUEST MODAL COMPONENT - MASTER FINAL V8
+ * B-QUEST MODAL COMPONENT - MASTER FINAL V9
  * -----------------------------------------------------------
- * - Independent Visibility: Status และ Assign โชว์แยกกันตามข้อมูลที่มีใน DB
+ * - Smart Capacity Visibility: ซ่อน Capacity เมื่อเป็นค่าเดิมจาก DB หรือตอนเริ่มเปิด Modal
+ * - Independent Visibility: Status และ Assign โชว์แยกกันตามข้อมูลจริง
  * - UI Preserved: โครงสร้างเดิม 100% (Toggle/Label แยกกัน)
  * - Auto Status: บันทึกเป็น "On Progress" สำหรับงานใหม่/Card ใหม่
  * - Data Integrity: ล้าง NULL เมื่อปิด Switch
@@ -65,7 +66,7 @@ const B_QUEST_MODAL_HTML = `
             <div id="bq-search-overlay" class="bq-search-overlay" onclick="closeSearchOverlay()">
                 <div class="bq-search-card" onclick="event.stopPropagation()">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-800 m-0">Select Data</h5>
+                        <h5 class="fw-800 m-0" style="color:#1e293b">Select Data</h5>
                         <button type="button" class="btn-close" onclick="closeSearchOverlay()"></button>
                     </div>
                     <input type="text" class="form-control mb-3" id="uni-search-input" placeholder="Search..." style="border-radius:15px;">
@@ -167,7 +168,38 @@ const B_QUEST_MODAL_HTML = `
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 let currentCapacities = { designer: 0, creative: 0 };
 
-// 🚩 ฟังก์ชันเปิด Modal และจัดลำดับการโชว์ UI
+// 🚩 ฟังก์ชันเช็ค Capacity (ฉลาดขึ้น: ซ่อนเมื่อเป็นค่าเดิมจาก DB)
+async function checkCapacity(role) {
+    const dl = document.getElementById(`b-quest-modal-${role}-deadline`)?.value;
+    const work = document.getElementById(`b-quest-modal-${role}-work`)?.value;
+    const weight = Number(document.getElementById(`b-quest-modal-${role}-weight`)?.value) || 0;
+    const infoEl = document.getElementById(`${role}-capacity-info`);
+    const currentId = document.getElementById('b-quest-modal-id').value;
+
+    if (!dl || !work) { infoEl.style.display = 'none'; return; }
+
+    try {
+        // 🚩 ตรวจสอบว่าเป็นค่าเดิมใน Database หรือไม่
+        if (currentId) {
+            const { data: orig } = await supabaseClient.from('b-quest-list').select(role + ', ' + role + '_deadline').eq('id', currentId).single();
+            if (orig && orig[role] === work && orig[`${role}_deadline`] === dl) {
+                // เป็นงานเดิม วันเดิม -> ไม่ต้องโชว์ Capacity ให้งง
+                infoEl.style.display = 'none';
+                return;
+            }
+        }
+
+        // คำนวณ Load (ไม่รวมงานปัจจุบัน)
+        let { data } = await supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, dl).neq('id', currentId || -1);
+        const total = (data || []).reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) + weight;
+        
+        currentCapacities[role] = total;
+        infoEl.style.display = 'block';
+        infoEl.innerText = `Use ${weight} | Capacity ${total}/10`;
+        infoEl.style.color = (total <= 10) ? '#bdc432' : '#ef4444';
+    } catch (e) { console.error(e); }
+}
+
 async function openTaskModal(taskId = null, workData = []) {
     const form = document.getElementById('b-quest-modal-form');
     form.reset(); form.classList.remove('was-validated');
@@ -184,20 +216,15 @@ async function openTaskModal(taskId = null, workData = []) {
             ['designer', 'creative'].forEach(role => {
                 const statusEl = document.getElementById(`b-quest-modal-${role}-status`);
                 const badge = document.getElementById(`badge-assign-${role}`);
-                
-                // 🚩 Logic แยกกัน:
-                // Status โชว์เมื่อมีค่า status ใน DB
                 statusEl.style.display = (data[`${role}_status`]) ? 'block' : 'none';
                 updateStatusUI(statusEl);
-
-                // Assign Badge โชว์เมื่อมีชื่อคนรับงาน
                 const name = data[`${role}_assign`];
                 badge.style.display = (name && name !== '-' && name !== '') ? 'inline-block' : 'none';
-
-                const hasRoleData = !!(data[role] || data[`${role}_deadline`]);
-                document.getElementById(`check-${role}`).checked = hasRoleData;
+                const hasData = !!(data[role] || data[`${role}_deadline`]);
+                document.getElementById(`check-${role}`).checked = hasData;
                 updateRoleUI(role);
-                if(hasRoleData) checkCapacity(role);
+                // 🚩 ตอนเปิด Modal ครั้งแรก สั่งซ่อน Capacity Info ทันที
+                document.getElementById(`${role}-capacity-info`).style.display = 'none';
             });
         }
     } else {
@@ -216,8 +243,8 @@ async function openTaskModal(taskId = null, workData = []) {
 }
 
 function fillFormData(data) {
-    const fields = { 'account_name': 'b-quest-modal-account', 'opportunity_name': 'b-quest-modal-opportunity', 'task_name': 'b-quest-modal-taskname', 'link': 'b-quest-modal-link', 'publish_date': 'b-quest-modal-publish-date', 'detail': 'b-quest-modal-detail', 'designer_status': 'b-quest-modal-designer-status', 'designer_type': 'b-quest-modal-designer-type', 'designer': 'b-quest-modal-designer-work', 'designer_deadline': 'b-quest-modal-designer-deadline', 'designer_weight': 'b-quest-modal-designer-weight', 'creative_status': 'b-quest-modal-creative-status', 'creative_type': 'b-quest-modal-creative-type', 'creative': 'b-quest-modal-creative-work', 'creative_deadline': 'b-quest-modal-creative-deadline', 'creative_weight': 'b-quest-modal-creative-weight' };
-    for (let k in fields) { const el = document.getElementById(fields[k]); if (el) el.value = data[k] || ''; }
+    const f = { 'account_name': 'b-quest-modal-account', 'opportunity_name': 'b-quest-modal-opportunity', 'task_name': 'b-quest-modal-taskname', 'link': 'b-quest-modal-link', 'publish_date': 'b-quest-modal-publish-date', 'detail': 'b-quest-modal-detail', 'designer_status': 'b-quest-modal-designer-status', 'designer_type': 'b-quest-modal-designer-type', 'designer': 'b-quest-modal-designer-work', 'designer_deadline': 'b-quest-modal-designer-deadline', 'designer_weight': 'b-quest-modal-designer-weight', 'creative_status': 'b-quest-modal-creative-status', 'creative_type': 'b-quest-modal-creative-type', 'creative': 'b-quest-modal-creative-work', 'creative_deadline': 'b-quest-modal-creative-deadline', 'creative_weight': 'b-quest-modal-creative-weight' };
+    for (let k in f) { const el = document.getElementById(f[k]); if (el) el.value = data[k] || ''; }
     document.getElementById('modal-owner-display').innerText = `Owner: ${data.owner || '-'}`;
     ['designer', 'creative'].forEach(role => {
         const badge = document.getElementById(`badge-assign-${role}`);
@@ -235,12 +262,15 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     const currentId = document.getElementById('b-quest-modal-id').value;
     if (!isDes && !isCre) return Swal.fire('Wait!', 'Select at least one role.', 'warning');
     
-    // Capacity Check
+    // Capacity Check Before Save (Only for truly new/changed entries)
     const validateCap = async (role) => {
         const cb = document.getElementById(`check-${role}`); if (!cb.checked) return true;
         const dl = document.getElementById(`b-quest-modal-${role}-deadline`).value;
         const work = document.getElementById(`b-quest-modal-${role}-work`).value;
-        if (currentId) { const orig = await BQuestService.getQuestById(currentId); if (orig && orig[role] === work && orig[`${role}_deadline`] === dl) return true; }
+        if (currentId) {
+            const { data: orig } = await supabaseClient.from('b-quest-list').select(role + ', ' + role + '_deadline').eq('id', currentId).single();
+            if (orig && orig[role] === work && orig[`${role}_deadline`] === dl) return true;
+        }
         return currentCapacities[role] <= 10;
     };
     if (!(await validateCap('designer')) || !(await validateCap('creative'))) return Swal.fire({ icon: 'error', title: 'Over Capacity!', text: 'Maximum load is 10.' });
@@ -248,14 +278,12 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     const payload = Object.fromEntries(new FormData(form).entries());
     const isEdit = !!payload.id && payload.id.length > 10;
 
-    // Logic Auto Status "On Progress" & Data Cleaning
     if (!isDes) {
         payload.designer = null; payload.designer_type = null; payload.designer_deadline = null; payload.designer_weight = 0; payload.designer_assign = null; payload.designer_status = null;
     } else {
         payload.designer_weight = parseInt(payload.designer_weight) || 0;
         if (!payload.designer_status) payload.designer_status = "On Progress";
     }
-
     if (!isCre) {
         payload.creative = null; payload.creative_type = null; payload.creative_deadline = null; payload.creative_weight = 0; payload.creative_assign = null; payload.creative_status = null;
     } else {
@@ -265,13 +293,12 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
 
     if (!isEdit) { delete payload.id; payload.owner = "Test (BX001)"; }
     payload.last_update = new Date().toISOString();
-
     const { error } = isEdit ? await supabaseClient.from('b-quest-list').update(payload).eq('id', currentId) : await supabaseClient.from('b-quest-list').insert([payload]);
     if (!error) Swal.fire({ icon: 'success', title: 'Success!', showConfirmButton: false, timer: 1500 }).then(() => location.reload());
     else Swal.fire('Error', error.message, 'error');
 });
 
-// --- UI Helpers ---
+// --- UI Helpers & Search ---
 function updateRoleUI(role) {
     const cb = document.getElementById(`check-${role}`);
     const card = document.getElementById(`card-${role}`);
@@ -282,23 +309,6 @@ function updateRoleUI(role) {
 function updateStatusUI(el) {
     if (el.value === "On Progress") { el.classList.add('status-progress'); el.classList.remove('status-done'); } 
     else { el.classList.add('status-done'); el.classList.remove('status-progress'); }
-}
-async function checkCapacity(role) {
-    const dl = document.getElementById(`b-quest-modal-${role}-deadline`)?.value;
-    const work = document.getElementById(`b-quest-modal-${role}-work`)?.value;
-    const weight = Number(document.getElementById(`b-quest-modal-${role}-weight`)?.value) || 0;
-    const info = document.getElementById(`${role}-capacity-info`);
-    const cid = document.getElementById('b-quest-modal-id').value;
-    if (!dl || !work) { info.style.display = 'none'; return; }
-    try {
-        let isOrig = false;
-        if (cid) { const orig = await BQuestService.getQuestById(cid); if (orig && orig[role] === work && orig[`${role}_deadline`] === dl) isOrig = true; }
-        let { data } = await supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, dl).neq('id', cid || -1);
-        const total = (data || []).reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) + weight;
-        currentCapacities[role] = total;
-        info.style.display = 'block'; info.innerText = `Use ${weight} | Capacity ${total}/10`;
-        info.style.color = (isOrig || total <= 10) ? '#bdc432' : '#ef4444';
-    } catch (e) { console.error(e); }
 }
 async function openSearchOverlay(fieldName, targetId) {
     const container = document.getElementById('uni-list-container');
@@ -337,7 +347,7 @@ function setupModalTypeDropdown() {
 }
 async function handleDeleteTask() {
     const id = document.getElementById('b-quest-modal-id').value;
-    const res = await Swal.fire({ title: 'Are you sure?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
+    const res = await Swal.fire({ title: 'Delete Task?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
     if (res.isConfirmed) { await supabaseClient.from('b-quest-list').delete().eq('id', id); location.reload(); }
 }
 const BQuestService = { async getQuestById(id) { const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single(); return error ? null : data; } };
