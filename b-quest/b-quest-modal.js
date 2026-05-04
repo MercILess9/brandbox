@@ -390,32 +390,63 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     e.preventDefault();
     const form = e.target;
 
-    // 1. Validation
-    if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
-
-    // 2. Capacity Check (บล็อกเฉพาะ New หรือตอนเปลี่ยนวันที่แล้วเกิน)
-    if (currentCapacities.designer > 10 || currentCapacities.creative > 10) {
-        Swal.fire('Capacity Exceeded', 'Cannot save task. One of the roles has reached maximum capacity (10/10).', 'error');
+    // 1. Validation Highlight
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
         return;
     }
 
-    const payload = Object.fromEntries(new FormData(form).entries());
-    const isNew = !payload.id;
-
-    if (isNew) {
-        payload.designer_assign = "Test (BX001)";
-        payload.creative_assign = "Test (BX001)";
-        payload.designer_status = "Progress";
-        payload.creative_status = "Progress";
-        payload.owner = "Test (BX001)";
+    // 2. Capacity Check
+    if (currentCapacities.designer > 10 || currentCapacities.creative > 10) {
+        Swal.fire('Capacity Exceeded', 'Cannot save task. Capacity is full.', 'error');
+        return;
     }
 
-    // Clear data if OFF
-    if (!document.getElementById('check-designer').checked) { payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; }
-    if (!document.getElementById('check-creative').checked) { payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; }
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
 
-    const { error } = payload.id ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id) : await supabaseClient.from('b-quest-list').insert([payload]);
-    if (!error) location.reload();
+    // 3. จัดการข้อมูลก่อนส่ง (ให้ตรง Schema)
+    const isNew = !payload.id;
+    
+    if (isNew) {
+        // ลบ id ออกจาก payload ถ้าเป็นงานใหม่ เพื่อให้ Database เจน UUID เอง
+        delete payload.id; 
+        payload.owner = "Test (BX001)"; // ต้องส่งเพราะใน DB เป็น Not Null
+        payload.designer_assign = document.getElementById('check-designer').checked ? "Test (BX001)" : null;
+        payload.creative_assign = document.getElementById('check-creative').checked ? "Test (BX001)" : null;
+    }
+
+    // จัดการเรื่องสถานะ Default ถ้าเปิด Card แต่ไม่ได้เลือก (กันเหนียว)
+    if (document.getElementById('check-designer').checked && !payload.designer_status) payload.designer_status = "Progress";
+    if (document.getElementById('check-creative').checked && !payload.creative_status) payload.creative_status = "Progress";
+
+    // 4. ล้างค่าขาที่ปิด Toggle
+    if (!document.getElementById('check-designer').checked) {
+        payload.designer = null; payload.designer_type = null; payload.designer_deadline = null; 
+        payload.designer_weight = 0; payload.designer_assign = null; payload.designer_status = null;
+    }
+    if (!document.getElementById('check-creative').checked) {
+        payload.creative = null; payload.creative_type = null; payload.creative_deadline = null; 
+        payload.creative_weight = 0; payload.creative_assign = null; payload.creative_status = null;
+    }
+
+    // บังคับอัปเดตเวลาล่าสุด
+    payload.last_update = new Date().toISOString();
+
+    // 5. Execute Supabase
+    let result;
+    if (isNew) {
+        result = await supabaseClient.from('b-quest-list').insert([payload]);
+    } else {
+        result = await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id);
+    }
+
+    if (!result.error) {
+        location.reload();
+    } else {
+        console.error("Database Error:", result.error);
+        Swal.fire('Database Error', result.error.message, 'error');
+    }
 });
 
 const BQuestService = { async getQuestById(id) { const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single(); return error ? null : data; } };
