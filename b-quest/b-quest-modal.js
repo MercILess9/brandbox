@@ -1,12 +1,14 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Final Refinement: Task New Header, 5/5 Layout, Center Align & Font Updates
+ * Updated: 1000px Width, 60/40 Layout, Task New Header
  */
 
 const B_QUEST_MODAL_HTML = `
 <style>
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
-    .bq-modal-1100 { max-width: 1100px !important; }
+    
+    /* ปรับความกว้างรวมเป็น 1000px */
+    .bq-modal-1000 { max-width: 1000px !important; }
 
     .bq-modern-header {
         background: #fff; padding: 22px 35px; display: flex;
@@ -14,7 +16,7 @@ const B_QUEST_MODAL_HTML = `
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     .bq-header-title { font-size: 1.3rem; font-weight: 800; color: #1e293b; }
-    .bq-header-title span { color: #bdc432; } /* สี New */
+    .bq-header-title span { color: #bdc432; }
 
     .bq-modern-body { padding: 25px 35px; }
 
@@ -25,7 +27,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-input-modern { 
         width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; 
         padding: 10px 15px; font-size: 0.9rem; color: #334155; margin-bottom: 12px; 
-        text-align-last: center; height: 43px; /* Dropdown center */
+        text-align-last: center; height: 43px;
     }
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1); }
     
@@ -34,17 +36,16 @@ const B_QUEST_MODAL_HTML = `
     /* Role Card Style */
     .role-card {
         background: #fff; border-radius: 22px; border: 1px solid #e2e8f0;
-        margin-bottom: 18px; transition: all 0.4s ease; overflow: hidden;
+        margin-bottom: 15px; transition: all 0.4s ease; overflow: hidden;
     }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
     
     .role-card-header { padding: 15px 22px; display: flex; align-items: center; gap: 12px; }
-    .role-header-left { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
-    .role-card-title { font-size: 0.9rem; font-weight: 800; color: #1e293b; margin: 0; }
+    .role-header-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+    .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
     
-    /* Owner Tag Font Size 0.8rem */
     .bq-owner-badge { 
-        background: #f8fafc; color: #64748b; padding: 3px 12px; border-radius: 8px; 
+        background: #f8fafc; color: #64748b; padding: 3px 10px; border-radius: 8px; 
         font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; 
     }
 
@@ -53,13 +54,13 @@ const B_QUEST_MODAL_HTML = `
         visibility: hidden; opacity: 0;
     }
     .role-card.active .role-card-body {
-        max-height: 400px; padding: 15px 22px 22px 22px;
+        max-height: 450px; padding: 15px 18px 18px 18px;
         border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1;
     }
 
     .timeline-zone {
         background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px;
-        padding: 12px; height: 100%; display: flex; flex-direction: column;
+        padding: 10px; height: 100%; display: flex; flex-direction: column;
     }
 
     /* Toggle Switch Style */
@@ -77,13 +78,13 @@ const B_QUEST_MODAL_HTML = `
     input:checked + .bq-slider:before { transform: translateX(18px); }
 
     .bq-status-select { 
-        border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.75rem; font-weight: 700; 
-        padding: 4px 10px; background: #fff; min-width: 100px; text-align-last: center;
+        border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.72rem; font-weight: 700; 
+        padding: 4px 6px; background: #fff; min-width: 90px; text-align-last: center;
     }
 
     .bq-cap-pill { 
-        background: #fff; border: 1px solid #e2e8f0; padding: 5px 12px; 
-        border-radius: 10px; font-size: 0.7rem; font-weight: 800; color: #1e293b;
+        background: #fff; border: 1px solid #e2e8f0; padding: 5px 10px; 
+        border-radius: 10px; font-size: 0.65rem; font-weight: 800; color: #1e293b;
     }
 
     /* Footer */
@@ -102,7 +103,7 @@ const B_QUEST_MODAL_HTML = `
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog bq-modal-1100 modal-dialog-centered">
+    <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content">
             
             <div id="bq-search-overlay" class="bq-search-overlay" onclick="closeSearchOverlay()">
@@ -126,7 +127,7 @@ const B_QUEST_MODAL_HTML = `
                     <input type="hidden" id="b-quest-modal-id" name="id">
                     
                     <div class="row g-4">
-                        <div class="col-lg-6">
+                        <div class="col-lg-7">
                             <div class="bq-glass-card">
                                 <label class="bq-label-modern">Account Name</label>
                                 <div class="d-flex mb-3">
@@ -159,7 +160,7 @@ const B_QUEST_MODAL_HTML = `
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-lg-5">
                             <div id="card-designer" class="role-card active">
                                 <div class="role-card-header">
                                     <div class="role-header-left">
@@ -176,14 +177,14 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-3 justify-content-between">
-                                        <div class="col-5">
+                                    <div class="row g-2 justify-content-between">
+                                        <div class="col-6">
                                             <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-designer-type" name="designer_type"></select>
                                             <label class="bq-label-modern text-center d-block">Work</label>
                                             <select class="bq-input-modern m-0" id="b-quest-modal-designer-work" name="designer"></select>
                                         </div>
-                                        <div class="col-5">
+                                        <div class="col-6">
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-designer-deadline" name="designer_deadline">
@@ -213,14 +214,14 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="role-card-body">
-                                    <div class="row g-3 justify-content-between">
-                                        <div class="col-5">
+                                    <div class="row g-2 justify-content-between">
+                                        <div class="col-6">
                                             <label class="bq-label-modern text-center d-block">Type</label>
                                             <select class="bq-input-modern" id="b-quest-modal-creative-type" name="creative_type"></select>
                                             <label class="bq-label-modern text-center d-block">Work</label>
                                             <select class="bq-input-modern m-0" id="b-quest-modal-creative-work" name="creative"></select>
                                         </div>
-                                        <div class="col-5">
+                                        <div class="col-6">
                                             <div class="timeline-zone">
                                                 <label class="bq-label-modern text-center d-block">Deadline</label>
                                                 <input type="date" class="bq-input-modern" id="b-quest-modal-creative-deadline" name="creative_deadline">
@@ -265,10 +266,6 @@ function updateRoleUI(role) {
         if(document.getElementById(`${prefix}-work`)) document.getElementById(`${prefix}-work`).value = "";
         if(document.getElementById(`${prefix}-deadline`)) document.getElementById(`${prefix}-deadline`).value = "";
     }
-}
-
-function handleCardClick(role) {
-    // ปิด function นี้ตามสั่งเพื่อให้ย่อขยายเฉพาะ switch
 }
 
 async function openTaskModal(taskId = null, workData = []) {
