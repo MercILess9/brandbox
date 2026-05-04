@@ -1,7 +1,6 @@
 // ==========================================
-// b-quest.js (Full Updated with Dynamic Capacity)
+// 1. CONFIGURATION
 // ==========================================
-
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
     itemsPerPage: 10,
@@ -12,24 +11,33 @@ const B_QUEST_CONFIG = {
     ]
 };
 
+// ==========================================
+// 2. MODAL CORE LOGIC
+// ==========================================
+
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
     if (!modalEl || !form) return;
 
+    // 1. Reset ฟอร์มและ ID
     form.reset();
-    if(document.getElementById('b-quest-modal-id')) document.getElementById('b-quest-modal-id').value = '';
+    const idField = document.getElementById('b-quest-modal-id');
+    if (idField) idField.value = '';
 
+    // 2. เตรียม Dropdown และ Autocomplete
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
+    setupAccountAutocomplete(); // เพิ่มระบบเลือกชื่อ Account
 
+    // 3. เช็คโหมด New หรือ Edit
     if (taskId) {
         document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Mission</span>';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
-            document.getElementById('b-quest-modal-id').value = taskId;
+            if (idField) idField.value = taskId;
             fillFormData(data);
-            // โหลด Capacity ทันทีหลังหยอดข้อมูล
+            // คำนวณ Capacity ทันทีหลังโหลดข้อมูล
             checkCapacity('designer');
             checkCapacity('creative');
         }
@@ -37,21 +45,20 @@ async function openTaskModal(taskId = null, workData = []) {
         document.getElementById('b-quest-modal-label').innerHTML = 'New <span style="color: #bdc432;">Mission</span>';
     }
 
+    // 4. ผูก Event Listeners สำหรับ Capacity
     initModalEventListeners();
 
+    // 5. แสดง Modal
     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
     modalInstance.show();
 }
 
-/**
- * คำนวณ Capacity โดยดึง Max จากตาราง b_quest_capacity
- */
-/**
- * คำนวณ Capacity แบบละเอียด: โหลดปัจจุบัน / Max (งานที่กำลังเลือก)
- */
+// ==========================================
+// 3. CAPACITY & AUTOCOMPLETE LOGIC
+// ==========================================
+
 async function checkCapacity(role) {
     const dateInput = document.getElementById(`b-quest-modal-${role}-deadline`);
-    const workInput = document.getElementById(`b-quest-modal-${role}-work`);
     const weightInput = document.getElementById(`b-quest-modal-${role}-weight`);
     const infoEl = document.getElementById(`${role}-capacity-info`);
     
@@ -61,60 +68,62 @@ async function checkCapacity(role) {
     }
 
     const date = dateInput.value;
-    const currentWeight = Number(weightInput.value) || 0; // Weight ของงานที่กำลังเลือก
-    
+    const currentWeight = Number(weightInput.value) || 0; 
+    const taskId = document.getElementById('b-quest-modal-id').value;
+
     infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
 
     try {
         const roleKey = role.charAt(0).toUpperCase() + role.slice(1);
-        const taskId = document.getElementById('b-quest-modal-id').value;
-
-        // 1. ดึงโหลดงานที่มีอยู่แล้วในเบส (ไม่นับรวมงานตัวเองถ้าเป็นการ Edit)
+        
+        // ดึงโหลดงานอื่น (ไม่รวมตัวเองถ้า Edit) และ Max Capacity พร้อมกัน
         let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
-        if (taskId) query = query.neq('id', taskId); // ถ้า Edit อยู่ ไม่เอาโหลดเดิมตัวเองมาบวกซ้ำ
+        if (taskId) query = query.neq('id', taskId);
 
         const [loadRes, capRes] = await Promise.all([
             query,
             supabaseClient.from('b_quest_capacity').select('max_capacity').eq('role', roleKey).single()
         ]);
 
-        if (loadRes.error) throw loadRes.error;
-        
-        // โหลดสะสมของคนอื่น/งานอื่นในวันนั้น
-        const existingLoad = loadRes.data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
+        const existingLoad = loadRes.data ? loadRes.data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0) : 0;
         const maxCapacity = capRes.data ? capRes.data.max_capacity : 10;
-        
-        // โหลดทั้งหมดถ้าเราเซฟงานนี้ลงไป
         const totalAfterSave = existingLoad + currentWeight;
 
-        // 2. แสดงผลรูปแบบ: Capacity 8/10 (+2)
-        // existingLoad = งานอื่น, totalAfterSave = รวมงานนี้แล้ว
-        infoEl.innerHTML = `Capacity <strong>${totalAfterSave} / ${maxCapacity}</strong> <span style="font-size: 0.6rem; opacity: 0.8;">(+${currentWeight})</span>`;
+        // แสดงผลตามโจทย์: Use : 1 | Capacity 1 / 10
+        infoEl.innerHTML = `Use : ${currentWeight} | Capacity <strong>${totalAfterSave} / ${maxCapacity}</strong>`;
         
-        // 3. ปรับสีตามความโหลด
-        if (totalAfterSave > maxCapacity) {
-            infoEl.style.color = "#ef4444"; // แดง (เกิน)
-        } else if (totalAfterSave === maxCapacity) {
-            infoEl.style.color = "#f59e0b"; // ส้ม (เต็มพอดี)
-        } else {
-            infoEl.style.color = "#bdc432"; // เขียว (เหลือที่)
-        }
+        // ปรับสีตามความหนาแน่น
+        if (totalAfterSave > maxCapacity) infoEl.style.color = "#ef4444";
+        else if (totalAfterSave === maxCapacity) infoEl.style.color = "#f59e0b";
+        else infoEl.style.color = "#bdc432";
 
     } catch (e) {
-        console.error("Capacity Error:", e);
         infoEl.innerText = "Error Loading Data";
     }
+}
+
+async function setupAccountAutocomplete() {
+    const datalist = document.getElementById('account-options');
+    if (!datalist) return;
+    try {
+        const { data } = await supabaseClient.from('b-quest-list').select('account_name');
+        if (data) {
+            const uniqueAccounts = [...new Set(data.map(item => item.account_name))].filter(n => n && n !== '-').sort();
+            datalist.innerHTML = uniqueAccounts.map(name => `<option value="${name}">`).join('');
+        }
+    } catch (e) { console.error(e); }
 }
 
 function initModalEventListeners() {
     const roles = ['designer', 'creative'];
     roles.forEach(role => {
-        // ดักเปลี่ยนวันที่
         document.getElementById(`b-quest-modal-${role}-deadline`)?.addEventListener('change', () => checkCapacity(role));
-        // ดักเปลี่ยนงาน (เพราะ Weight เปลี่ยน)
-        document.getElementById(`b-quest-modal-${role}-work`)?.addEventListener('change', () => checkCapacity(role));
     });
 }
+
+// ==========================================
+// 4. DROPDOWNS & FORM HANDLING
+// ==========================================
 
 function setupModalWorkDropdowns(workData) {
     const configs = [
@@ -183,30 +192,36 @@ function fillFormData(data) {
     }
 }
 
+// ==========================================
+// 5. SERVICE & API CALLS
+// ==========================================
+
 const BQuestService = {
     async getQuestById(id) {
         const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single();
         return error ? null : data;
     },
     async deleteQuest(id) {
-        const result = await Swal.fire({
+        const { isConfirmed } = await Swal.fire({
             title: 'Delete Mission?',
             text: "This cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#1e293b'
         });
-        if (result.isConfirmed) {
+        if (isConfirmed) {
             const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
             if(!error) location.reload();
         }
     }
 };
 
+// Form Submit Handling
 document.getElementById('b-quest-modal-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
+    
     payload.owner = 'Admin'; 
     payload.last_update = new Date().toISOString();
 
