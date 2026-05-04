@@ -1,15 +1,14 @@
 /**
- * B-QUEST MODAL COMPONENT - MASTER FINAL V4 (STRICT UI PRESERVATION)
+ * B-QUEST MODAL COMPONENT - MASTER FINAL V4 (STABLE LOGIC)
  * -----------------------------------------------------------
- * - UI Preserved: ยึดโครงสร้าง HTML/CSS เดิมของพี่ 100%
- * - Smart Status: โชว์ Status/Assign เฉพาะที่มีข้อมูลจริงใน DB
- * - Auto-Progress: ตั้งค่า Progress อัตโนมัติเมื่อเริ่มงานใหม่
- * - Data Integrity: ล้างค่าเป็น NULL เมื่อปิด Switch
+ * - UI Preservation: ยึดโครงสร้างสไตล์เดิม 100%
+ * - Assign-Based Visibility: โชว์ Status/Badge เฉพาะเมื่อมี Assignee เท่านั้น
+ * - Auto-Progress: ตั้งค่า Progress อัตโนมัติในฐานข้อมูลเมื่อบันทึก
+ * - Data Integrity: ล้างข้อมูลเป็น NULL เมื่อปิด Switch
  */
 
 const B_QUEST_MODAL_HTML = `
 <style>
-    /* --- Modal Core (โครงเดิมของพี่เป๊ะๆ) --- */
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
     .bq-modal-1000 { max-width: 1000px !important; }
 
@@ -20,7 +19,6 @@ const B_QUEST_MODAL_HTML = `
     }
     .bq-header-title { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
     .bq-header-title span { color: #bdc432; }
-
     .bq-header-right { display: flex; align-items: center; gap: 15px; }
     .bq-owner-top { background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; border: 1px solid #e2e8f0; }
 
@@ -39,28 +37,19 @@ const B_QUEST_MODAL_HTML = `
     .role-header-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
     .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
     .role-card-title i { color: #64748b; font-size: 1rem; vertical-align: middle; }
-    .role-card.active .role-card-title i { color: #1e293b; }
     
+    /* Assign Badge (Blue) */
     .bq-assign-badge { background: #eff6ff; color: #3b82f6; padding: 2px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; border: 1px solid #dbeafe; display: none; }
 
     .role-card-body { max-height: 0; padding: 0 20px; transition: all 0.4s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 15px 18px 18px 18px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
-    .timeline-zone { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 10px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 8px; display: none; text-align: center; }
-
-    .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
-    .bq-toggle input { opacity: 0; width: 0; height: 0; }
-    .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
-    .bq-slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .bq-slider { background-color: #bdc432 !important; }
-    input:checked + .bq-slider:before { transform: translateX(16px); }
-
+    /* Status UI */
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; color: #fff; min-width: 95px; text-align-last: center; height: 28px; display: none; }
     .status-progress { background-color: #4e73df !important; }
     .status-done { background-color: #94a3b8 !important; }
 
-    /* 🌟 Selection Overlay (Modal-on-Modal UI) */
+    /* Selection Overlay (Modal-on-Modal UI) */
     .bq-search-overlay { 
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
         background: rgba(15, 23, 42, 0.35); z-index: 10001; 
@@ -84,6 +73,14 @@ const B_QUEST_MODAL_HTML = `
     .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; height: 42px; display: none; cursor: pointer; }
     .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; height: 42px; cursor: pointer; }
+
+    /* Switch */
+    .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
+    .bq-toggle input { opacity: 0; width: 0; height: 0; }
+    .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+    .bq-slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .bq-slider { background-color: #bdc432 !important; }
+    input:checked + .bq-slider:before { transform: translateX(16px); }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -211,31 +208,9 @@ const B_QUEST_MODAL_HTML = `
 </div>
 `;
 
-// --- LOGIC ---
+// --- CORE LOGIC ---
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 let currentCapacities = { designer: 0, creative: 0 };
-
-async function openSearchOverlay(fieldName, targetId) {
-    const container = document.getElementById('uni-list-container');
-    const searchInput = document.getElementById('uni-search-input');
-    document.getElementById('bq-search-overlay').style.display = 'flex';
-    container.innerHTML = '<div class="p-3 text-center text-muted">Loading...</div>';
-    searchInput.value = '';
-    try {
-        const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
-        const unique = [...new Set((data || []).map(i => i[fieldName]))].filter(n => n && n !== '-').sort((a,b)=>a.localeCompare(b,'th'));
-        const render = (f = '') => {
-            container.innerHTML = '';
-            unique.filter(i => i.toLowerCase().includes(f.toLowerCase())).forEach(val => {
-                const btn = document.createElement('button'); btn.className = "uni-item-modern w-100"; btn.innerText = val;
-                btn.onclick = () => { document.getElementById(targetId).value = val; closeSearchOverlay(); };
-                container.appendChild(btn);
-            });
-        };
-        render(); searchInput.oninput = (e) => render(e.target.value);
-    } catch (e) { console.error(e); }
-}
-function closeSearchOverlay() { document.getElementById('bq-search-overlay').style.display = 'none'; }
 
 function updateStatusUI(el) {
     if (el.value === "Progress") { el.classList.add('status-progress'); el.classList.remove('status-done'); } 
@@ -253,7 +228,7 @@ function updateRoleUI(role) {
         card.classList.remove('active'); card.classList.add('disabled');
         els.forEach(el => { el.required = false; el.value = ""; });
         document.getElementById(`${role}-capacity-info`).style.display = 'none';
-        // 🚩 ซ่อนสถานะเมื่อปิด Switch
+        // 🚩 ซ่อนสถานะและ Badge เมื่อปิดการใช้งานเสมอ
         document.getElementById(`badge-assign-${role}`).style.display = 'none';
         document.getElementById(`b-quest-modal-${role}-status`).style.display = 'none';
     }
@@ -275,12 +250,13 @@ async function openTaskModal(taskId = null, workData = []) {
             fillFormData(data);
             ['designer', 'creative'].forEach(role => {
                 const statusEl = document.getElementById(`b-quest-modal-${role}-status`);
-                const badge = document.getElementById(`badge-assign-${role}`);
-                const hasAssign = !!(data[`${role}_assign`] && data[`${role}_assign`] !== '-');
+                const assignName = data[`${role}_assign`];
+                
+                // 🚩 เงื่อนไขใหม่: โชว์ Status เฉพาะกรณีที่มีข้อมูล Assign ใน DB (ไม่ใช่ '-' หรือว่าง)
+                const isAssigned = !!(assignName && assignName !== '-' && assignName !== '');
                 const hasData = !!(data[role] || data[`${role}_deadline`]);
 
-                // 🚩 โชว์ Status เฉพาะกรณีที่ใน DB มี Assign แล้ว
-                statusEl.style.display = (hasData && hasAssign) ? 'block' : 'none';
+                statusEl.style.display = isAssigned ? 'block' : 'none';
                 updateStatusUI(statusEl);
 
                 document.getElementById(`check-${role}`).checked = hasData;
@@ -306,9 +282,11 @@ function fillFormData(data) {
     const f = { 'account_name': 'b-quest-modal-account', 'opportunity_name': 'b-quest-modal-opportunity', 'task_name': 'b-quest-modal-taskname', 'link': 'b-quest-modal-link', 'publish_date': 'b-quest-modal-publish-date', 'detail': 'b-quest-modal-detail', 'designer_status': 'b-quest-modal-designer-status', 'designer_type': 'b-quest-modal-designer-type', 'designer': 'b-quest-modal-designer-work', 'designer_deadline': 'b-quest-modal-designer-deadline', 'designer_weight': 'b-quest-modal-designer-weight', 'creative_status': 'b-quest-modal-creative-status', 'creative_type': 'b-quest-modal-creative-type', 'creative': 'b-quest-modal-creative-work', 'creative_deadline': 'b-quest-modal-creative-deadline', 'creative_weight': 'b-quest-modal-creative-weight' };
     for (let k in f) { const el = document.getElementById(f[k]); if (el) el.value = data[k] || ''; }
     document.getElementById('modal-owner-display').innerText = `Owner: ${data.owner || '-'}`;
+    
     ['designer', 'creative'].forEach(role => {
         const badge = document.getElementById(`badge-assign-${role}`);
         const name = data[`${role}_assign`];
+        // 🚩 โชว์ป้ายชื่อเฉพาะกรณีที่มีคนรับงานแล้ว
         if (name && name !== '-' && name !== '') { badge.innerText = name; badge.style.display = 'inline-block'; } 
         else { badge.style.display = 'none'; }
     });
@@ -320,18 +298,8 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     const isDes = document.getElementById('check-designer').checked;
     const isCre = document.getElementById('check-creative').checked;
     const currentId = document.getElementById('b-quest-modal-id').value;
-    if (!isDes && !isCre) return Swal.fire('Wait!', 'Select at least one role.', 'warning');
-    
-    // (Logic Capacity Check...)
-    const validateCap = async (role) => {
-        const cb = document.getElementById(`check-${role}`); if (!cb.checked) return true;
-        const dl = document.getElementById(`b-quest-modal-${role}-deadline`).value;
-        const work = document.getElementById(`b-quest-modal-${role}-work`).value;
-        if (currentId) { const orig = await BQuestService.getQuestById(currentId); if (orig && orig[role] === work && orig[`${role}_deadline`] === dl) return true; }
-        return currentCapacities[role] <= 10;
-    };
 
-    if (!(await validateCap('designer')) || !(await validateCap('creative'))) return Swal.fire({ icon: 'error', title: 'Over Capacity!', text: 'Maximum load is 10.' });
+    if (!isDes && !isCre) return Swal.fire('Wait!', 'Select at least one role.', 'warning');
 
     const payload = Object.fromEntries(new FormData(form).entries());
     const isEdit = !!payload.id && payload.id.length > 10;
@@ -339,13 +307,14 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     
     ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'].forEach(f => { if(payload[f] === "") payload[f] = null; });
     
-    // 🚩 Logic: ล้างข้อมูลฝั่งที่ปิด Switch และจัดการ Auto-Status
+    // 🚩 Logic Auto-Clean และ Auto-Status
     if (!isDes) {
         payload.designer = null; payload.designer_type = null; payload.designer_deadline = null;
         payload.designer_weight = 0; payload.designer_assign = null; payload.designer_status = null;
     } else { 
         payload.designer_weight = parseInt(payload.designer_weight) || 0; 
-        if (!payload.designer_status) payload.designer_status = "Progress"; // Auto-Progress
+        // 🚩 ถ้าเริ่มงานใหม่ หรือยังไม่มี status ให้บังคับเป็น Progress
+        if (!payload.designer_status) payload.designer_status = "Progress";
     }
 
     if (!isCre) {
@@ -353,7 +322,7 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
         payload.creative_weight = 0; payload.creative_assign = null; payload.creative_status = null;
     } else { 
         payload.creative_weight = parseInt(payload.creative_weight) || 0; 
-        if (!payload.creative_status) payload.creative_status = "Progress"; // Auto-Progress
+        if (!payload.creative_status) payload.creative_status = "Progress";
     }
 
     payload.last_update = new Date().toISOString();
@@ -362,7 +331,28 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     else Swal.fire('Error', error.message, 'error');
 });
 
-// --- Helpers (BQuestService, checkCapacity, Dropdowns...) ---
+// --- Search & Helpers (Restored) ---
+async function openSearchOverlay(fieldName, targetId) {
+    const container = document.getElementById('uni-list-container');
+    const searchInput = document.getElementById('uni-search-input');
+    document.getElementById('bq-search-overlay').style.display = 'flex';
+    container.innerHTML = '<div class="p-3 text-center text-muted">Loading...</div>';
+    searchInput.value = '';
+    try {
+        const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
+        const unique = [...new Set((data || []).map(i => i[fieldName]))].filter(n => n && n !== '-').sort((a,b)=>a.localeCompare(b,'th'));
+        const render = (f = '') => {
+            container.innerHTML = '';
+            unique.filter(i => i.toLowerCase().includes(f.toLowerCase())).forEach(val => {
+                const btn = document.createElement('button'); btn.className = "uni-item-modern w-100"; btn.innerText = val;
+                btn.onclick = () => { document.getElementById(targetId).value = val; closeSearchOverlay(); };
+                container.appendChild(btn);
+            });
+        };
+        render(); searchInput.oninput = (e) => render(e.target.value);
+    } catch (e) { console.error(e); }
+}
+function closeSearchOverlay() { document.getElementById('bq-search-overlay').style.display = 'none'; }
 const BQuestService = { async getQuestById(id) { const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single(); return error ? null : data; } };
 function setupModalWorkDropdown(workData) {
     ['designer', 'creative'].forEach(role => {
@@ -381,11 +371,6 @@ function setupModalTypeDropdown() {
         B_QUEST_CONFIG.listTypes.forEach(t => el.add(new Option(t, t)));
     });
 }
-async function handleDeleteTask() {
-    const id = document.getElementById('b-quest-modal-id').value;
-    const res = await Swal.fire({ title: 'Are you sure?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
-    if (res.isConfirmed) { await supabaseClient.from('b-quest-list').delete().eq('id', id); location.reload(); }
-}
 async function checkCapacity(role) {
     const dl = document.getElementById(`b-quest-modal-${role}-deadline`)?.value;
     const work = document.getElementById(`b-quest-modal-${role}-work`)?.value;
@@ -401,5 +386,10 @@ async function checkCapacity(role) {
         info.style.display = 'block'; info.innerText = `Use ${weight} | Capacity ${total}/10`;
         info.style.color = (isOrig || total <= 10) ? '#bdc432' : '#ef4444';
     } catch (e) { console.error(e); }
+}
+async function handleDeleteTask() {
+    const id = document.getElementById('b-quest-modal-id').value;
+    const res = await Swal.fire({ title: 'Are you sure?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
+    if (res.isConfirmed) { await supabaseClient.from('b-quest-list').delete().eq('id', id); location.reload(); }
 }
 ['designer', 'creative'].forEach(r => { document.getElementById(`b-quest-modal-${r}-deadline`).onchange = () => checkCapacity(r); });
