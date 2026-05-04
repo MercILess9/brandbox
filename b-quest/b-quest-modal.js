@@ -1,6 +1,6 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Redesign: Toggle-able Roles (Designer/Creative) with Modern 50/50 Layout
+ * Redesign: Expandable Role Cards with Toggle Checkbox (50/50 Layout)
  */
 
 const B_QUEST_MODAL_HTML = `
@@ -18,18 +18,6 @@ const B_QUEST_MODAL_HTML = `
 
     .bq-modern-body { padding: 25px 35px; }
 
-    /* Role Toggle Switch */
-    .bq-role-selector {
-        display: flex; gap: 10px; margin-bottom: 20px;
-        background: #e2e8f0; padding: 5px; border-radius: 16px; width: fit-content;
-    }
-    .role-toggle-btn {
-        padding: 8px 20px; border-radius: 12px; border: none; font-weight: 800; font-size: 0.8rem;
-        cursor: pointer; transition: 0.3s; color: #64748b; background: transparent;
-    }
-    .role-toggle-btn.active.btn-des { background: #3b82f6; color: #fff; }
-    .role-toggle-btn.active.btn-cre { background: #bdc432; color: #fff; }
-
     /* Card & Inputs */
     .bq-glass-card { background: #ffffff; border-radius: 20px; padding: 22px; border: 1px solid #e2e8f0; height: 100%; }
     .bq-label-modern { font-size: 0.65rem; font-weight: 800; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -40,25 +28,53 @@ const B_QUEST_MODAL_HTML = `
     .bq-input-modern:focus { background: #fff; border-color: #3b82f6; outline: none; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
     input[type="date"].bq-input-modern { text-align: center; }
 
-    /* Assignment Panels */
-    .role-panel-container { transition: all 0.4s ease; opacity: 1; transform: scale(1); }
-    .role-panel-container.hidden { display: none; opacity: 0; transform: scale(0.95); }
-
-    .bq-role-panel { padding: 20px; border-radius: 20px; background: #ffffff; border: 1px solid #e2e8f0; position: relative; margin-bottom: 15px; }
-    .bq-role-designer { border-top: 6px solid #3b82f6; }
-    .bq-role-creative { border-top: 6px solid #bdc432; }
+    /* --- Expandable Role Card Style --- */
+    .role-card {
+        background: #fff; border-radius: 22px; border: 1px solid #e2e8f0;
+        margin-bottom: 18px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+    .role-card.disabled { opacity: 0.6; background: #f1f5f9; }
     
-    .bq-role-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; }
-    .bq-status-select { border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; }
+    .role-card-header {
+        padding: 18px 22px; display: flex; justify-content: space-between; align-items: center;
+        cursor: pointer; user-select: none;
+    }
+    .role-card-title { font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 12px; color: #1e293b; }
+    
+    /* Body ที่ยืดหดได้ */
+    .role-card-body {
+        max-height: 0; padding: 0 22px; transition: all 0.4s ease;
+        border-top: 0 solid transparent; visibility: hidden;
+    }
+    .role-card.active .role-card-body {
+        max-height: 400px; padding: 15px 22px 22px 22px;
+        border-top: 1px solid #f1f5f9; visibility: visible;
+    }
 
-    .bq-cap-pill { background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-align: center; }
+    /* Checkbox / Toggle Style */
+    .bq-toggle {
+        position: relative; display: inline-block; width: 44px; height: 24px;
+    }
+    .bq-toggle input { opacity: 0; width: 0; height: 0; }
+    .bq-slider {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #cbd5e1; transition: .4s; border-radius: 34px;
+    }
+    .bq-slider:before {
+        position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+        background-color: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .bq-slider.slider-des { background-color: #3b82f6; }
+    input:checked + .bq-slider.slider-cre { background-color: #bdc432; }
+    input:checked + .bq-slider:before { transform: translateX(20px); }
 
     /* Footer Buttons */
     .bq-footer-actions { padding: 20px 40px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
-    .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; }
-    .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 12px 35px; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 10px rgba(59,130,246,0.2); }
+    .btn-bq-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 12px 35px; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 10px rgba(59,130,246,0.2); cursor: pointer; }
 
-    /* Search Overlay (Custom) */
+    /* Search Overlay */
     .bq-search-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
@@ -127,16 +143,21 @@ const B_QUEST_MODAL_HTML = `
                         </div>
 
                         <div class="col-lg-6">
-                            <label class="bq-label-modern">Assign Roles</label>
-                            <div class="bq-role-selector">
-                                <button type="button" class="role-toggle-btn active btn-des" id="toggle-des" onclick="toggleRole('designer')">Designer</button>
-                                <button type="button" class="role-toggle-btn active btn-cre" id="toggle-cre" onclick="toggleRole('creative')">Creative</button>
-                            </div>
-
-                            <div id="panel-designer" class="role-panel-container">
-                                <div class="bq-role-panel bq-role-designer">
+                            
+                            <div id="card-designer" class="role-card active">
+                                <div class="role-card-header" onclick="handleCardClick('designer')">
+                                    <div class="role-card-title">
+                                        <i class="bi bi-brush text-primary"></i> Designer
+                                        <span class="bq-owner-badge" id="designer-owner-tag">Admin</span>
+                                    </div>
+                                    <label class="bq-toggle" onclick="event.stopPropagation()">
+                                        <input type="checkbox" id="check-designer" checked onchange="updateRoleUI('designer')">
+                                        <span class="bq-slider slider-des"></span>
+                                    </label>
+                                </div>
+                                <div class="role-card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div class="bq-role-title"><i class="bi bi-brush"></i> Designer <span class="bq-owner-badge" id="designer-owner-tag">Admin</span></div>
+                                        <div class="bq-label-modern m-0">Status</div>
                                         <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status">
                                             <option value="Progress">Progress</option>
                                             <option value="Done">Done</option>
@@ -154,10 +175,20 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                             </div>
 
-                            <div id="panel-creative" class="role-panel-container">
-                                <div class="bq-role-panel bq-role-creative">
+                            <div id="card-creative" class="role-card active">
+                                <div class="role-card-header" onclick="handleCardClick('creative')">
+                                    <div class="role-card-title">
+                                        <i class="bi bi-rocket-takeoff" style="color: #bdc432;"></i> Creative
+                                        <span class="bq-owner-badge" id="creative-owner-tag">Admin</span>
+                                    </div>
+                                    <label class="bq-toggle" onclick="event.stopPropagation()">
+                                        <input type="checkbox" id="check-creative" checked onchange="updateRoleUI('creative')">
+                                        <span class="bq-slider slider-cre"></span>
+                                    </label>
+                                </div>
+                                <div class="role-card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div class="bq-role-title"><i class="bi bi-rocket-takeoff"></i> Creative <span class="bq-owner-badge" id="creative-owner-tag">Admin</span></div>
+                                        <div class="bq-label-modern m-0">Status</div>
                                         <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status">
                                             <option value="Progress">Progress</option>
                                             <option value="Done">Done</option>
@@ -174,6 +205,7 @@ const B_QUEST_MODAL_HTML = `
                                     <input type="hidden" id="b-quest-modal-creative-weight" name="creative_weight" value="0">
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -192,25 +224,36 @@ document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 // --- LOGIC HANDLING ---
 
-let activeRoles = { designer: true, creative: true };
-
-function toggleRole(role) {
-    activeRoles[role] = !activeRoles[role];
-    const btn = document.getElementById(`toggle-${role}`);
-    const panel = document.getElementById(`panel-${role}`);
+/**
+ * จัดการการแสดงผลของ Card ตาม Checkbox
+ */
+function updateRoleUI(role) {
+    const isChecked = document.getElementById(`check-${role}`).checked;
+    const card = document.getElementById(`card-${role}`);
     
-    if (activeRoles[role]) {
-        btn.classList.add('active');
-        panel.classList.remove('hidden');
+    if (isChecked) {
+        card.classList.add('active');
+        card.classList.remove('disabled');
     } else {
-        btn.classList.remove('active');
-        panel.classList.add('hidden');
-        // Clear data when disabled
-        document.getElementById(`b-quest-modal-${role}-type`).value = "";
-        document.getElementById(`b-quest-modal-${role}-work`).value = "";
-        document.getElementById(`b-quest-modal-${role}-deadline`).value = "";
-        document.getElementById(`${role}-capacity-info`).innerText = "Load: -";
+        card.classList.remove('active');
+        card.classList.add('disabled');
+        // Clear data
+        const prefix = `b-quest-modal-${role}`;
+        if(document.getElementById(`${prefix}-type`)) document.getElementById(`${prefix}-type`).value = "";
+        if(document.getElementById(`${prefix}-work`)) document.getElementById(`${prefix}-work`).value = "";
+        if(document.getElementById(`${prefix}-deadline`)) document.getElementById(`${prefix}-deadline`).value = "";
     }
+}
+
+/**
+ * คลิกที่หัว Card เพื่อเปิด/ปิด (เฉพาะเมื่อ Toggle เปิดอยู่)
+ */
+function handleCardClick(role) {
+    const isChecked = document.getElementById(`check-${role}`).checked;
+    if (!isChecked) return; // ถ้าปิด toggle อยู่ ห้ามกดขยาย
+    
+    const card = document.getElementById(`card-${role}`);
+    card.classList.toggle('active');
 }
 
 async function openTaskModal(taskId = null, workData = []) {
@@ -218,12 +261,11 @@ async function openTaskModal(taskId = null, workData = []) {
     const form = document.getElementById('b-quest-modal-form');
     form.reset();
     
-    // Reset Toggles to Active
-    activeRoles = { designer: true, creative: true };
-    document.getElementById('toggle-des').classList.add('active');
-    document.getElementById('toggle-cre').classList.add('active');
-    document.getElementById('panel-designer').classList.remove('hidden');
-    document.getElementById('panel-creative').classList.remove('hidden');
+    // Initial State: เปิดหมด
+    ['designer', 'creative'].forEach(role => {
+        document.getElementById(`check-${role}`).checked = true;
+        updateRoleUI(role);
+    });
 
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
@@ -236,9 +278,9 @@ async function openTaskModal(taskId = null, workData = []) {
             document.getElementById('b-quest-modal-id').value = taskId;
             fillFormData(data);
             
-            // Auto toggle if no data assigned
-            if (!data.designer && !data.designer_deadline) toggleRole('designer');
-            if (!data.creative && !data.creative_deadline) toggleRole('creative');
+            // Auto close if no data
+            if (!data.designer) { document.getElementById('check-designer').checked = false; updateRoleUI('designer'); }
+            if (!data.creative) { document.getElementById('check-creative').checked = false; updateRoleUI('creative'); }
             
             checkCapacity('designer');
             checkCapacity('creative');
@@ -252,14 +294,13 @@ async function openTaskModal(taskId = null, workData = []) {
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-// (Rest of the functions: openSearchOverlay, closeSearchOverlay, checkCapacity, setupModalWorkDropdowns, setupModalTypeDropdowns, fillFormData, BQuestService, submit listener are same as previous logic but integrated with new IDs)
+// --- ฟังก์ชันเสริม (เหมือนเดิมแต่ย้ายมาอยู่ในไฟล์นี้ให้ครบ) ---
 
 async function openSearchOverlay(fieldName, targetId) {
     const overlay = document.getElementById('bq-search-overlay');
     const container = document.getElementById('uni-list-container');
     const searchInput = document.getElementById('uni-search-input');
     overlay.style.display = 'flex';
-    container.innerHTML = '<div class="text-center p-4">Loading...</div>';
     try {
         const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
         const unique = [...new Set(data?.map(i => i[fieldName]))].filter(n => n && n !== '-').sort();
@@ -287,7 +328,7 @@ async function checkCapacity(role) {
     try {
         const { data } = await supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, date);
         const total = data.reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0);
-        infoEl.innerText = `Load: ${total}/10`; // Assuming 10 is max
+        infoEl.innerText = `Load: ${total}/10`;
     } catch (e) { console.error(e); }
 }
 
@@ -329,17 +370,19 @@ function fillFormData(data) {
 document.getElementById('b-quest-modal-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = Object.fromEntries(new FormData(e.target).entries());
-    payload.owner = 'Admin';
-    payload.last_update = new Date().toISOString();
     
-    // สำคัญ: ถ้า role ไหนถูกปิด ให้เคลียร์ข้อมูลก่อนส่ง
-    if (!activeRoles.designer) { payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; }
-    if (!activeRoles.creative) { payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; }
+    // Clear data if toggle is off
+    if (!document.getElementById('check-designer').checked) {
+        payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0;
+    }
+    if (!document.getElementById('check-creative').checked) {
+        payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0;
+    }
 
     const { error } = payload.id 
         ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
         : await supabaseClient.from('b-quest-list').insert([payload]);
-    if (!error) { Swal.fire('Success!', 'Task Saved.', 'success').then(() => location.reload()); }
+    if (!error) location.reload();
 });
 
 const BQuestService = {
