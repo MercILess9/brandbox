@@ -1,9 +1,8 @@
 /**
- * B-QUEST MODAL COMPONENT
- * รวม HTML, CSS และ Logic ไว้ในไฟล์เดียว
+ * B-QUEST MODAL COMPONENT (Updated: Account & Opportunity Search)
  */
 
-// --- 1. ยัด HTML & CSS เข้า Body ---
+// --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
     .bq-modal-1000 { max-width: 1000px !important; }
@@ -16,15 +15,25 @@ const B_QUEST_MODAL_HTML = `
     .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
     .bq-input { width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 0.88rem; background: #ffffff; margin-bottom: 15px; color: #1e293b; text-align: center; transition: 0.2s; }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
+    
+    /* Input Group for Buttons */
     .bq-input-group { display: flex; margin-bottom: 15px; }
     .bq-input-left { border-radius: 10px 0 0 10px !important; margin-bottom: 0 !important; }
-    .btn-search-append { border-radius: 0 10px 10px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #64748b; padding: 0 15px; cursor: pointer; }
+    .btn-search-append { border-radius: 0 10px 10px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #64748b; padding: 0 15px; cursor: pointer; transition: 0.2s; }
     .btn-search-append:hover { background: #f8fafc; color: #bdc432; }
+
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; padding: 6px 15px; color: #1e293b; outline: none; cursor: pointer; background: #fff; min-width: 120px; text-align-last: center; }
     .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 800; transition: 0.2s; cursor: pointer; }
     .btn-bq-save:hover { background: #0f172a; transform: translateY(-2px); }
-    .acc-list-item { border: none; border-radius: 10px !important; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; text-align: left; }
+
+    /* Search Modal Items - แก้ไขตัด Scrollbar แนวนอน */
+    .acc-list-item { 
+        border: none; border-radius: 10px !important; margin-bottom: 5px; 
+        font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; 
+        text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        display: block; width: 100%;
+    }
     .acc-list-item:hover { background: #f4f7a1 !important; transform: translateX(5px); }
 </style>
 
@@ -47,14 +56,19 @@ const B_QUEST_MODAL_HTML = `
                                 <label class="bq-label">Account Name</label>
                                 <div class="bq-input-group">
                                     <input type="text" class="bq-input bq-input-left" id="b-quest-modal-account" name="account_name" required placeholder="Account Name">
-                                    <button type="button" class="btn-search-append" onclick="openAccountSearchModal()"><i class="bi bi-search"></i></button>
+                                    <button type="button" class="btn-search-append" onclick="openGeneralSearchModal('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
+
                                 <label class="bq-label">Opportunity Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-opportunity" name="opportunity_name">
+                                <div class="bq-input-group">
+                                    <input type="text" class="bq-input bq-input-left" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="Opportunity Name">
+                                    <button type="button" class="btn-search-append" onclick="openGeneralSearchModal('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
+                                </div>
+
                                 <label class="bq-label">Task Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required>
+                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required placeholder="Task Name">
                                 <label class="bq-label">Link</label>
-                                <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link">
+                                <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link" placeholder="URL Link">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -78,24 +92,12 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <label class="bq-label">Type</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-designer-type" name="designer_type"></select>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="bq-label">Work</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-designer-work" name="designer"></select>
-                                    </div>
+                                    <div class="col-6"><label class="bq-label">Type</label><select class="bq-input m-0" id="b-quest-modal-designer-type" name="designer_type"></select></div>
+                                    <div class="col-6"><label class="bq-label">Work</label><select class="bq-input m-0" id="b-quest-modal-designer-work" name="designer"></select></div>
                                 </div>
                                 <div class="row g-2">
-                                    <div class="col-6">
-                                        <label class="bq-label">Deadline</label>
-                                        <input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline">
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="bq-label">Daily Capacity</label>
-                                        <div id="designer-capacity-info" class="capacity-info">Select Date...</div>
-                                    </div>
+                                    <div class="col-6"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline"></div>
+                                    <div class="col-6"><label class="bq-label">Daily Capacity</label><div id="designer-capacity-info" class="capacity-info">Select Date...</div></div>
                                 </div>
                             </div>
                         </div>
@@ -109,24 +111,12 @@ const B_QUEST_MODAL_HTML = `
                                     </select>
                                 </div>
                                 <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <label class="bq-label">Type</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-creative-type" name="creative_type"></select>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="bq-label">Work</label>
-                                        <select class="bq-input m-0" id="b-quest-modal-creative-work" name="creative"></select>
-                                    </div>
+                                    <div class="col-6"><label class="bq-label">Type</label><select class="bq-input m-0" id="b-quest-modal-creative-type" name="creative_type"></select></div>
+                                    <div class="col-6"><label class="bq-label">Work</label><select class="bq-input m-0" id="b-quest-modal-creative-work" name="creative"></select></div>
                                 </div>
                                 <div class="row g-2">
-                                    <div class="col-6">
-                                        <label class="bq-label">Deadline</label>
-                                        <input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline">
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="bq-label">Daily Capacity</label>
-                                        <div id="creative-capacity-info" class="capacity-info">Select Date...</div>
-                                    </div>
+                                    <div class="col-6"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline"></div>
+                                    <div class="col-6"><label class="bq-label">Daily Capacity</label><div id="creative-capacity-info" class="capacity-info">Select Date...</div></div>
                                 </div>
                             </div>
                         </div>
@@ -140,23 +130,23 @@ const B_QUEST_MODAL_HTML = `
     </div>
 </div>
 
-<div class="modal fade" id="account-search-modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 20px; border: none;">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
             <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-800">Search <span style="color: #bdc432;">Account</span></h6>
+                <h6 class="modal-title fw-800" id="search-modal-title">Select Item</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="text" class="form-control mb-3" id="acc-search-input" placeholder="Search..." style="border-radius: 12px;">
-                <div id="acc-list-container" class="list-group p-1" style="max-height: 300px; overflow-y: auto;"></div>
+                <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." style="border-radius: 12px; height: 45px;">
+                <div id="universal-list-container" class="list-group p-1" style="max-height: 350px; overflow-y: auto; overflow-x: hidden;"></div>
             </div>
         </div>
     </div>
 </div>
 `;
 
-// แทรก HTML เข้าไปใน Body ทันทีที่โหลดไฟล์
+// แทรก HTML เข้า Body
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 // --- 2. LOGIC HANDLING ---
@@ -189,26 +179,38 @@ async function openTaskModal(taskId = null, workData = []) {
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-async function openAccountSearchModal() {
-    const searchModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('account-search-modal'));
-    const container = document.getElementById('acc-list-container');
-    const searchInput = document.getElementById('acc-search-input');
+/**
+ * ระบบ Modal ค้นหาอเนกประสงค์ (ใช้ร่วมกันทั้ง Account และ Opportunity)
+ * @param {string} fieldName - ชื่อฟิลด์ใน DB (account_name / opportunity_name)
+ * @param {string} targetInputId - ID ของช่อง Input ที่จะเอาข้อมูลไปใส่
+ */
+async function openGeneralSearchModal(fieldName, targetInputId) {
+    const searchModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('universal-search-modal'));
+    const container = document.getElementById('universal-list-container');
+    const searchInput = document.getElementById('universal-search-input');
+    const title = document.getElementById('search-modal-title');
     
-    container.innerHTML = '<div class="text-center p-3">Loading...</div>';
+    title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
+    container.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-secondary"></div></div>';
     searchModal.show();
 
     try {
-        const { data } = await supabaseClient.from('b-quest-list').select('account_name');
-        const unique = [...new Set(data?.map(i => i.account_name))].filter(n => n && n !== '-').sort();
+        const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
+        const uniqueItems = [...new Set(data?.map(i => i[fieldName]))].filter(n => n && n !== '-').sort();
 
         const render = (f = '') => {
             container.innerHTML = '';
-            unique.filter(n => n.toLowerCase().includes(f.toLowerCase())).forEach(name => {
+            const filtered = uniqueItems.filter(n => n.toLowerCase().includes(f.toLowerCase()));
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="p-4 text-center text-muted">No data found.</div>';
+                return;
+            }
+            filtered.forEach(val => {
                 const b = document.createElement('button');
                 b.className = "list-group-item list-group-item-action acc-list-item";
-                b.innerText = name;
+                b.innerText = val;
                 b.onclick = () => {
-                    document.getElementById('b-quest-modal-account').value = name;
+                    document.getElementById(targetInputId).value = val;
                     searchModal.hide();
                 };
                 container.appendChild(b);
@@ -216,6 +218,7 @@ async function openAccountSearchModal() {
         };
         searchInput.oninput = (e) => render(e.target.value);
         render();
+        searchInput.value = '';
         setTimeout(() => searchInput.focus(), 500);
     } catch (e) { console.error(e); }
 }
@@ -225,7 +228,6 @@ async function checkCapacity(role) {
     const weight = Number(document.getElementById(`b-quest-modal-${role}-weight`)?.value) || 0;
     const infoEl = document.getElementById(`${role}-capacity-info`);
     const taskId = document.getElementById('b-quest-modal-id').value;
-    
     if (!infoEl || !date) return;
 
     try {
@@ -249,7 +251,8 @@ async function checkCapacity(role) {
 
 function initModalEventListeners() {
     ['designer', 'creative'].forEach(r => {
-        document.getElementById(`b-quest-modal-${r}-deadline`)?.addEventListener('change', () => checkCapacity(r));
+        const el = document.getElementById(`b-quest-modal-${r}-deadline`);
+        if (el) el.addEventListener('change', () => checkCapacity(r));
     });
 }
 
@@ -300,18 +303,15 @@ const BQuestService = {
     }
 };
 
-// --- Submit Form ---
 document.addEventListener('submit', async (e) => {
     if (e.target.id !== 'b-quest-modal-form') return;
     e.preventDefault();
     const payload = Object.fromEntries(new FormData(e.target).entries());
     payload.owner = 'Admin';
     payload.last_update = new Date().toISOString();
-
     const { error } = payload.id 
         ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
         : await supabaseClient.from('b-quest-list').insert([payload]);
-
     if (!error) Swal.fire('Success!', 'Mission Saved.', 'success').then(() => location.reload());
     else Swal.fire('Error!', error.message, 'error');
 });
