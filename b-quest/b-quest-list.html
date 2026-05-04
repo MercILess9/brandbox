@@ -193,59 +193,90 @@
     }
 
     // --- Data Loading ---
+    // --- Data Loading ---
     async function loadMasterData() {
         try {
-            // 1. โหลดข้อมูล Work & Profiles
+            console.log("Starting to load Master Data...");
+            
+            // 1. โหลดข้อมูล Work & Profiles พร้อมกัน
             const [workRes, profileRes] = await Promise.all([
-                supabaseClient.from('b-quest-work').select('*').order('work_name'),
+                supabaseClient.from('b-quest-work').select('*'), // ดึงทุกคอลัมน์รวมถึง work_name, type_designer, type_creative
                 supabaseClient.from('b-quest-profiles').select('*').order('codename')
             ]);
 
+            if (workRes.error) throw workRes.error;
+            if (profileRes.error) throw profileRes.error;
+
             dataList = workRes.data || [];
             const allProfiles = profileRes.data || [];
+            
+            console.log("Data loaded:", { dataList, allProfiles });
 
-            // 2. หยอด Work & Type Dropdowns
+            // 2. หยอด Work Dropdown (คัดกรองตาม Pill)
             renderWorkDropdown();
+
+            // 3. หยอด Type Dropdown จาก Config
             const typeEl = document.getElementById('filterType');
             setupDefaultOptions(typeEl, "Type");
-            B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
+            if (window.B_QUEST_CONFIG && B_QUEST_CONFIG.listTypes) {
+                B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
+            }
 
-            // 3. หยอด Assign Dropdown (Grouping D/C) จาก Profiles
+            // 4. หยอด Assign Dropdown (Grouping D/C)
             renderAssignFilter(allProfiles);
 
-            // 4. หยอด Owner Dropdown (ดึงจากข้อมูลที่มีจริงใน database b-quest-list)
-            const { data: owners } = await supabaseClient
+            // 5. หยอด Owner Dropdown (ดึงจากข้อมูลที่มีจริงใน database b-quest-list)
+            const { data: owners, error: ownerErr } = await supabaseClient
                 .from('b-quest-list')
                 .select('owner');
             
             const ownerEl = document.getElementById('filterOwner');
             setupDefaultOptions(ownerEl, "Owner");
             if (owners) {
+                // กรองชื่อที่ไม่ซ้ำและไม่เป็นค่าว่าง
                 const uniqueOwners = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
                 uniqueOwners.forEach(name => ownerEl.add(new Option(name, name)));
             }
 
-        } catch (e) { console.error("Load Master Data Failed:", e); }
+        } catch (e) { 
+            console.error("Load Master Data Failed:", e);
+            Swal.fire('Error', 'โหลดข้อมูลไม่สำเร็จ ตรวจสอบ Console ครับพี่', 'error');
+        }
     }
 
     function renderWorkDropdown() {
         const select = document.getElementById('filterWork');
         if(!select) return;
+        
+        // เช็คว่าปุ่ม Designer/Creative ไหนถูกเปิดอยู่
         const pDes = document.getElementById('pill-des').classList.contains('active-role');
         const pCre = document.getElementById('pill-cre').classList.contains('active-role');
         const cur = select.value;
+        
         setupDefaultOptions(select, "Work");
         
+        // ถ้ากด Designer Pill
         if (pDes) {
-            const g1 = document.createElement('optgroup'); g1.label = "── Designer Work ──";
-            dataList.filter(i => i.type_designer).forEach(w => g1.appendChild(new Option(w.work_name, w.work_name)));
+            const g1 = document.createElement('optgroup'); 
+            g1.label = "── Designer Work ──";
+            // ใช้ work_name และเช็ค type_designer ตามตารางใหม่
+            dataList.filter(i => i.type_designer === true).forEach(w => {
+                g1.appendChild(new Option(w.work_name, w.work_name));
+            });
             select.appendChild(g1);
         }
+        
+        // ถ้ากด Creative Pill
         if (pCre) {
-            const g2 = document.createElement('optgroup'); g2.label = "── Creative Work ──";
-            dataList.filter(i => i.type_creative).forEach(w => g2.appendChild(new Option(w.work_name, w.work_name)));
+            const g2 = document.createElement('optgroup'); 
+            g2.label = "── Creative Work ──";
+            // ใช้ work_name และเช็ค type_creative ตามตารางใหม่
+            dataList.filter(i => i.type_creative === true).forEach(w => {
+                g2.appendChild(new Option(w.work_name, w.work_name));
+            });
             select.appendChild(g2);
         }
+        
         select.value = cur;
         updateHighlight('filterWork');
     }
@@ -255,16 +286,20 @@
         if (!el) return;
         setupDefaultOptions(el, "Assign");
 
-        const designers = profiles.filter(p => p.role_designer);
-        const creatives = profiles.filter(p => p.role_creative);
+        // กรองตามชื่อคอลัมน์ใน b-quest-profiles ที่เราสร้างใหม่
+        const designers = profiles.filter(p => p.role_designer === true);
+        const creatives = profiles.filter(p => p.role_creative === true);
 
         if (designers.length > 0) {
-            const g = document.createElement('optgroup'); g.label = "── Designers ──";
+            const g = document.createElement('optgroup'); 
+            g.label = "── Designers ──";
             designers.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
             el.appendChild(g);
         }
+        
         if (creatives.length > 0) {
-            const g = document.createElement('optgroup'); g.label = "── Creatives ──";
+            const g = document.createElement('optgroup'); 
+            g.label = "── Creatives ──";
             creatives.forEach(p => g.appendChild(new Option(p.codename, p.codename)));
             el.appendChild(g);
         }
