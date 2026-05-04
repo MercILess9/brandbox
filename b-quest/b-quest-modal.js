@@ -1,6 +1,6 @@
 /**
- * B-QUEST MODAL COMPONENT - FINAL LOGIC VERSION
- * Updated: Default Close, Strict Validation, Auto-Clear Data
+ * B-QUEST MODAL COMPONENT - COMPLETE VALIDATION VERSION
+ * Updated: Field Highlighting on Missing Data, 140px Detail, Fixed Owner
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
@@ -27,16 +27,27 @@ const B_QUEST_MODAL_HTML = `
     .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
     .text-left-label { text-align: left !important; display: block; width: 100%; }
 
+    /* Input Base */
     .bq-input-modern { 
         width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; 
         padding: 5px 12px; font-size: 0.85rem; color: #334155; margin-bottom: 10px; 
-        text-align-last: center; height: 35px;
+        text-align-last: center; height: 35px; transition: border-color 0.2s;
     }
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     input[type="date"].bq-input-modern { text-align: center; height: 35px; }
 
+    /* 🟢 Validation Styles (Highlight กรอบ) */
+    .was-validated .bq-input-modern:invalid {
+        border-color: #dc3545 !important;
+        background-image: none; /* ปิดไอคอน default ของ bootstrap */
+    }
+    .was-validated .bq-input-modern:valid {
+        border-color: #198754 !important;
+    }
+
     .bq-input-detail { flex-grow: 1; min-height: 140px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
+    /* Role Card */
     .role-card {
         background: #fff; border-radius: 22px; border: 1px solid #e2e8f0;
         margin-bottom: 12px; transition: all 0.4s ease; overflow: hidden;
@@ -63,6 +74,7 @@ const B_QUEST_MODAL_HTML = `
 
     .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 5px; display: none; }
 
+    /* Toggle & Status */
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider {
@@ -84,10 +96,12 @@ const B_QUEST_MODAL_HTML = `
     .status-progress { background-color: #4e73df !important; border-color: #4e73df !important; }
     .status-done { background-color: #626e7f !important; border-color: #626e7f !important; }
 
+    /* Footer Buttons */
     .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
     .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; height: 42px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.15); transition: 0.2s; }
     .btn-bq-create:hover { background: #2563eb; transform: translateY(-1px); }
 
+    /* Overlay Search */
     .bq-search-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
@@ -100,7 +114,6 @@ const B_QUEST_MODAL_HTML = `
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content">
-            
             <div id="bq-search-overlay" class="bq-search-overlay" onclick="closeSearchOverlay()">
                 <div class="bq-search-card" onclick="event.stopPropagation()">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -162,8 +175,7 @@ const B_QUEST_MODAL_HTML = `
                                         <span class="bq-owner-badge">อมม (BX0054)</span>
                                     </div>
                                     <select class="bq-status-select status-progress" id="b-quest-modal-designer-status" name="designer_status" onchange="updateStatusUI(this)">
-                                        <option value="Progress">Progress</option>
-                                        <option value="Done">Done</option>
+                                        <option value="Progress">Progress</option><option value="Done">Done</option>
                                     </select>
                                 </div>
                                 <div class="role-card-body">
@@ -192,8 +204,7 @@ const B_QUEST_MODAL_HTML = `
                                         <span class="bq-owner-badge">อมม (BX0054)</span>
                                     </div>
                                     <select class="bq-status-select status-progress" id="b-quest-modal-creative-status" name="creative_status" onchange="updateStatusUI(this)">
-                                        <option value="Progress">Progress</option>
-                                        <option value="Done">Done</option>
+                                        <option value="Progress">Progress</option><option value="Done">Done</option>
                                     </select>
                                 </div>
                                 <div class="role-card-body">
@@ -235,32 +246,24 @@ function updateStatusUI(el) {
     else { el.classList.add('status-done'); el.classList.remove('status-progress'); }
 }
 
-/**
- * ปรับปรุง Logic เปิด/ปิด Card:
- * - ถ้าเปิด (Checked): ใส่ required ให้ Type, Work, Deadline
- * - ถ้าปิด (Unchecked): ลบ required และล้างค่าทั้งหมด
- */
 function updateRoleUI(role) {
     const checkbox = document.getElementById(`check-${role}`);
-    if (!checkbox) return;
     const card = document.getElementById(`card-${role}`);
-    const isChecked = checkbox.checked;
-
     const typeEl = document.getElementById(`b-quest-modal-${role}-type`);
     const workEl = document.getElementById(`b-quest-modal-${role}-work`);
     const deadlineEl = document.getElementById(`b-quest-modal-${role}-deadline`);
 
-    if (isChecked) {
+    if (checkbox.checked) {
         card.classList.add('active');
         card.classList.remove('disabled');
-        // ตั้งค่าเป็น required เมื่อเปิด
+        // เปิดใช้งาน Validation
         typeEl.required = true;
         workEl.required = true;
         deadlineEl.required = true;
     } else {
         card.classList.remove('active');
         card.classList.add('disabled');
-        // ลบ required และล้างค่าเมื่อปิด
+        // ปิดการใช้งาน Validation และล้างค่า
         typeEl.required = false;
         workEl.required = false;
         deadlineEl.required = false;
@@ -301,16 +304,15 @@ async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
     form.reset();
+    form.classList.remove('was-validated'); // ล้าง Highlight สีแดงเดิมออก
 
-    // Default: ปิดทั้ง 2 Card เมื่อสร้างใหม่
     ['designer', 'creative'].forEach(role => {
         const checkbox = document.getElementById(`check-${role}`);
         checkbox.checked = false; 
-        document.getElementById(`${role}-capacity-info`).style.display = 'none';
+        updateRoleUI(role);
         const statusEl = document.getElementById(`b-quest-modal-${role}-status`);
         statusEl.value = "Progress";
         updateStatusUI(statusEl);
-        updateRoleUI(role);
     });
 
     setupModalWorkDropdowns(workData); 
@@ -326,7 +328,6 @@ async function openTaskModal(taskId = null, workData = []) {
             ['designer', 'creative'].forEach(role => {
                 const statusEl = document.getElementById(`b-quest-modal-${role}-status`);
                 updateStatusUI(statusEl);
-                // ถ้ามีข้อมูลงาน ให้เปิด Card อัตโนมัติ
                 if (data[role] || data[`${role}_deadline`]) {
                     document.getElementById(`check-${role}`).checked = true;
                     updateRoleUI(role);
@@ -413,39 +414,21 @@ const BQuestService = {
     }
 };
 
-/**
- * Handle Form Submission with Validation
- */
 document.getElementById('b-quest-modal-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
 
-    // 1. Basic Bootstrap Validation
+    // ✅ สั่งให้ Highlight ขอบสีแดงตามกฎ Required
     if (!form.checkValidity()) {
         form.classList.add('was-validated');
-        Swal.fire('Warning', 'Please fill in all required fields.', 'warning');
         return;
     }
 
     const payload = Object.fromEntries(new FormData(form).entries());
     payload.designer_assign = "อมม (BX0054)"; payload.creative_assign = "อมม (BX0054)";
-
-    // 2. Clear data if Toggle is OFF
-    if (!document.getElementById('check-designer').checked) {
-        payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0;
-    }
-    if (!document.getElementById('check-creative').checked) {
-        payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0;
-    }
-
-    // 3. Save to Supabase
-    const { error } = payload.id 
-        ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
-        : await supabaseClient.from('b-quest-list').insert([payload]);
-
-    if (!error) {
-        location.reload();
-    } else {
-        Swal.fire('Error', error.message, 'error');
-    }
+    if (!document.getElementById('check-designer').checked) { payload.designer = ""; payload.designer_type = ""; payload.designer_deadline = null; payload.designer_weight = 0; }
+    if (!document.getElementById('check-creative').checked) { payload.creative = ""; payload.creative_type = ""; payload.creative_deadline = null; payload.creative_weight = 0; }
+    
+    const { error } = payload.id ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id) : await supabaseClient.from('b-quest-list').insert([payload]);
+    if (!error) location.reload();
 });
