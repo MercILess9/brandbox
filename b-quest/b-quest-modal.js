@@ -1,13 +1,13 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Redesign: Balanced 50/50 Layout with Inline Role Inputs
+ * Redesign: 50/50 Layout with Modern Blue Theme & Bottom-Right Actions
  */
 
 const B_QUEST_MODAL_HTML = `
 <style>
     #b-quest-modal .modal-content {
         background: #f8fafc;
-        border-radius: 30px;
+        border-radius: 28px;
         border: none;
         overflow: hidden;
     }
@@ -23,7 +23,7 @@ const B_QUEST_MODAL_HTML = `
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     .bq-header-title { font-size: 1.3rem; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; }
-    .bq-header-title span { color: #bdc432; }
+    .bq-header-title span { color: #3b82f6; } /* เปลี่ยนเป็นสีฟ้า */
 
     .bq-modern-body { padding: 25px 35px; }
     
@@ -58,10 +58,13 @@ const B_QUEST_MODAL_HTML = `
     }
     .bq-input-modern:focus {
         background: #fff;
-        border-color: #bdc432;
-        box-shadow: 0 0 0 4px rgba(189, 196, 50, 0.1);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         outline: none;
     }
+    
+    /* Center text for Date inputs */
+    input[type="date"].bq-input-modern { text-align: center; }
 
     .bq-group-modern { display: flex; align-items: center; position: relative; margin-bottom: 15px; }
     .bq-group-modern input { margin-bottom: 0 !important; border-radius: 12px 0 0 12px !important; }
@@ -99,11 +102,26 @@ const B_QUEST_MODAL_HTML = `
         font-size: 0.7rem; font-weight: 800; color: #1e293b; text-align: center;
     }
 
-    .btn-save-master {
-        background: #1e293b; color: #bdc432; padding: 14px 45px; border-radius: 15px;
-        font-weight: 800; font-size: 1rem; border: none; transition: 0.3s;
+    /* Footer Buttons */
+    .bq-footer-actions {
+        background: #fff;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        border-top: 1px solid rgba(0,0,0,0.05);
     }
-    .btn-save-master:hover { background: #000; transform: translateY(-2px); }
+    .btn-bq-cancel {
+        background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px; 
+        border-radius: 12px; font-weight: 700; transition: 0.2s;
+    }
+    .btn-bq-cancel:hover { background: #e2e8f0; }
+    .btn-bq-create {
+        background: #3b82f6; color: #fff; border: none; padding: 12px 35px; 
+        border-radius: 12px; font-weight: 700; transition: 0.2s;
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+    }
+    .btn-bq-create:hover { background: #2563eb; transform: translateY(-1px); }
 
     .bq-search-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -120,7 +138,7 @@ const B_QUEST_MODAL_HTML = `
         border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 12px 15px;
         font-size: 0.88rem; font-weight: 600; color: #334155; text-align: left; transition: 0.2s;
     }
-    .uni-item-modern:hover { background: #f1f5f9; color: #bdc432; padding-left: 20px; }
+    .uni-item-modern:hover { background: #f1f5f9; color: #3b82f6; padding-left: 20px; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -139,7 +157,7 @@ const B_QUEST_MODAL_HTML = `
             </div>
 
             <div class="bq-modern-header">
-                <div class="bq-header-title">Mission <span>Control</span></div>
+                <div class="bq-header-title" id="b-quest-modal-label-text">New <span>Task</span></div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -154,23 +172,23 @@ const B_QUEST_MODAL_HTML = `
                             <div class="bq-glass-card">
                                 <label class="bq-label-modern">Account Name</label>
                                 <div class="bq-group-modern">
-                                    <input type="text" class="bq-input-modern" id="b-quest-modal-account" name="account_name" required placeholder="Select client...">
+                                    <input type="text" class="bq-input-modern" id="b-quest-modal-account" name="account_name" required placeholder="Search or Enter Account Name">
                                     <button type="button" class="bq-btn-search" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Opportunity Name</label>
                                 <div class="bq-group-modern">
-                                    <input type="text" class="bq-input-modern" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="Project name...">
+                                    <input type="text" class="bq-input-modern" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="Search or Enter Opportunity Name">
                                     <button type="button" class="bq-btn-search" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
                                 </div>
 
                                 <label class="bq-label-modern">Task Name</label>
-                                <input type="text" class="bq-input-modern" id="b-quest-modal-taskname" name="task_name" required placeholder="Task Title">
+                                <input type="text" class="bq-input-modern" id="b-quest-modal-taskname" name="task_name" required placeholder="Enter Task Name">
 
                                 <div class="row g-3">
                                     <div class="col-md-7">
-                                        <label class="bq-label-modern">Link / URL</label>
-                                        <input type="url" class="bq-input-modern" id="b-quest-modal-link" name="link" placeholder="https://...">
+                                        <label class="bq-label-modern">Link</label>
+                                        <input type="url" class="bq-input-modern" id="b-quest-modal-link" name="link" placeholder="Enter Link URL">
                                     </div>
                                     <div class="col-md-5">
                                         <label class="bq-label-modern">Publish Date</label>
@@ -179,7 +197,7 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                                 
                                 <label class="bq-label-modern">Detail</label>
-                                <textarea class="bq-input-modern m-0" id="b-quest-modal-detail" name="detail" rows="4" style="resize: none; height: 110px;" placeholder="Brief details..."></textarea>
+                                <textarea class="bq-input-modern m-0" id="b-quest-modal-detail" name="detail" rows="4" style="resize: none; height: 110px;" placeholder="Enter Detail"></textarea>
                             </div>
                         </div>
 
@@ -247,10 +265,9 @@ const B_QUEST_MODAL_HTML = `
                     </div>
                 </div>
 
-                <div class="text-center pb-5">
-                    <button type="submit" class="btn-save-master">
-                        <i class="bi bi-check2-circle me-2"></i> Save Mission
-                    </button>
+                <div class="bq-footer-actions">
+                    <button type="button" class="btn-bq-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-bq-create" id="btn-submit-text">Create Task</button>
                 </div>
             </form>
         </div>
@@ -273,7 +290,8 @@ async function openTaskModal(taskId = null, workData = []) {
     setupModalTypeDropdowns();
 
     if (taskId) {
-        document.querySelector('.bq-header-title').innerHTML = 'Edit <span>Mission</span>';
+        document.getElementById('b-quest-modal-label-text').innerHTML = 'Edit <span>Task</span>';
+        document.getElementById('btn-submit-text').innerText = 'Save Changes';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
             document.getElementById('b-quest-modal-id').value = taskId;
@@ -282,7 +300,8 @@ async function openTaskModal(taskId = null, workData = []) {
             checkCapacity('creative');
         }
     } else {
-        document.querySelector('.bq-header-title').innerHTML = 'New <span>Mission</span>';
+        document.getElementById('b-quest-modal-label-text').innerHTML = 'New <span>Task</span>';
+        document.getElementById('btn-submit-text').innerText = 'Create Task';
         document.getElementById('designer-owner-tag').innerText = 'Admin';
         document.getElementById('creative-owner-tag').innerText = 'Admin';
     }
@@ -370,7 +389,10 @@ function setupModalWorkDropdowns(workData) {
     configs.forEach(c => {
         const el = document.getElementById(c.id);
         if (!el) return;
-        el.innerHTML = '<option value="" selected disabled>Select...</option><option value="-">None</option>';
+        
+        // ล้างตัวเลือกเก่าออก และใส่ Select... เป็นตัวแรก
+        el.innerHTML = '<option value="" selected disabled>Select...</option>';
+        
         workData.filter(i => i.role === c.role).forEach(i => {
             const opt = new Option(i.work, i.work);
             opt.dataset.weight = i.weight || 0;
@@ -392,7 +414,10 @@ function setupModalTypeDropdowns() {
     ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.innerHTML = '<option value="" selected disabled>Select...</option><option value="-">None</option>';
+        
+        // ล้างตัวเลือกเก่าออก และใส่ Select... เป็นตัวแรก
+        el.innerHTML = '<option value="" selected disabled>Select...</option>';
+        
         B_QUEST_CONFIG.listTypes.forEach(t => el.add(new Option(t, t)));
     });
 }
@@ -423,6 +448,6 @@ document.addEventListener('submit', async (e) => {
     const { error } = payload.id 
         ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
         : await supabaseClient.from('b-quest-list').insert([payload]);
-    if (!error) Swal.fire('Success!', 'Mission Data Saved.', 'success').then(() => location.reload());
+    if (!error) Swal.fire('Success!', 'Task Data Saved.', 'success').then(() => location.reload());
     else Swal.fire('Error!', error.message, 'error');
 });
