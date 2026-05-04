@@ -4,17 +4,10 @@
     <meta charset="UTF-8">
     <title>B-QUEST | Master Dashboard</title>
     
-    <!-- Frameworks & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <!-- Project Scripts -->
-    <script src="../config.js"></script>
-    <script src="../system.js"></script>
-    <script src="b-quest.js"></script>
-    <script src="b-quest-modal.js"></script>
-
     <style>
         :root { 
             --c-progress: #4e73df; --c-done: #94a3b8; --c-bg: #f8fafc;
@@ -158,11 +151,15 @@
 </button>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../config.js"></script>
+<script src="../system.js"></script>
+<script src="b-quest.js"></script>
+<script src="b-quest-modal.js"></script>
 
 <script>
     const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'designer_assign', 'creative_assign', 'owner'];
-    let dataList = [];     // ประเภทงาน
-    let assignList = [];   // รายชื่อพนักงาน (Global เพื่อใช้กรอง Assign แบบ Real-time)
+    let dataList = [];     
+    let assignList = [];   
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
@@ -202,12 +199,10 @@
             renderFilterWork();
             renderFilterAssign();
 
-            // type filter
             const typeEl = document.getElementById('filterType');
             setupDefaultOptions(typeEl, "Type");
             B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            // owner filter
             const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
             const ownerEl = document.getElementById('filterOwner');
             setupDefaultOptions(ownerEl, "Owner");
@@ -225,10 +220,10 @@
         setupDefaultOptions(filterWork, "Work");
 
         if (document.getElementById('pill-designer').classList.contains('active-role')) {
-            appendRoleGroup(filterWork, "Designer", dataList, 'role', 'Designer', 'work', 'work');
+            appendRoleGroup(filterWork, "Designer Work", dataList, 'role', 'Designer', 'work', 'work');
         }
         if (document.getElementById('pill-creative').classList.contains('active-role')) {
-            appendRoleGroup(filterWork, "Creative", dataList, 'role', 'Creative', 'work', 'work');
+            appendRoleGroup(filterWork, "Creative Work", dataList, 'role', 'Creative', 'work', 'work');
         }
         filterWork.value = currentSelection;
         updateHighlight('filterWork');
@@ -271,7 +266,7 @@
     async function fetchQuests(isFirst = false) {
         if (isFetching || (!hasMore && !isFirst)) return;
         isFetching = true;
-        const limit = B_QUEST_CONFIG.itemsPerPage;
+        const limit = B_QUEST_CONFIG.itemsPerPage || 20;
         const from = currentPage * limit;
         const to = from + limit - 1;
 
