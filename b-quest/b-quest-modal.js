@@ -1,43 +1,50 @@
 /**
- * B-QUEST MODAL COMPONENT (Updated: Account & Opportunity Search)
+ * B-QUEST MODAL COMPONENT (Fixed: Nested Modal Visibility)
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
+    /* ปรับแต่ง Modal หลัก */
+    #b-quest-modal { z-index: 1050; } 
+    
+    /* ปรับแต่ง Modal ค้นหาให้สูงกว่าเสมอ */
+    #universal-search-modal { z-index: 1070; background: rgba(0,0,0,0.3); }
+    .modal-backdrop:nth-of-type(even) { z-index: 1060; } /* ฉากหลังตัวที่สอง */
+
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     .bq-form-header { padding: 18px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
     .bq-form-body { padding: 25px 30px; background: #f8fafc; }
     .bq-form-footer { padding: 15px 30px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; }
+    
     .bq-card-section { background: #ffffff; border-radius: 16px; padding: 20px; border: 1px solid #eef2f6; height: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02); }
     .bq-card-highlight { border-top: 3px solid #bdc432; }
     .bq-label { font-size: 0.68rem; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    
     .bq-input { width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 0.88rem; background: #ffffff; margin-bottom: 15px; color: #1e293b; text-align: center; transition: 0.2s; }
     .bq-input:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
     
-    /* Input Group for Buttons */
     .bq-input-group { display: flex; margin-bottom: 15px; }
     .bq-input-left { border-radius: 10px 0 0 10px !important; margin-bottom: 0 !important; }
-    .btn-search-append { border-radius: 0 10px 10px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #64748b; padding: 0 15px; cursor: pointer; transition: 0.2s; }
+    .btn-search-append { border-radius: 0 10px 10px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #64748b; padding: 0 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
     .btn-search-append:hover { background: #f8fafc; color: #bdc432; }
 
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; padding: 6px 15px; color: #1e293b; outline: none; cursor: pointer; background: #fff; min-width: 120px; text-align-last: center; }
     .capacity-info { font-size: 0.7rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 15px; }
     .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 800; transition: 0.2s; cursor: pointer; }
-    .btn-bq-save:hover { background: #0f172a; transform: translateY(-2px); }
 
-    /* Search Modal Items - แก้ไขตัด Scrollbar แนวนอน */
-    .acc-list-item { 
-        border: none; border-radius: 10px !important; margin-bottom: 5px; 
+    /* รายการใน Search Modal */
+    .uni-list-item { 
+        border: none; border-radius: 12px !important; margin-bottom: 5px; 
         font-size: 0.9rem; font-weight: 600; color: #1e293b; transition: 0.2s; 
         text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-        display: block; width: 100%;
+        display: block; width: 100%; padding: 12px 15px; background: transparent;
     }
-    .acc-list-item:hover { background: #f4f7a1 !important; transform: translateX(5px); }
+    .uni-list-item:hover { background: #bdc432 !important; color: #fff !important; transform: translateX(5px); }
 </style>
 
-<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content bq-form-container">
             <div class="bq-form-header d-flex justify-content-between align-items-center">
@@ -97,7 +104,7 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-designer-deadline" name="designer_deadline"></div>
-                                    <div class="col-6"><label class="bq-label">Daily Capacity</label><div id="designer-capacity-info" class="capacity-info">Select Date...</div></div>
+                                    <div class="col-6"><label class="bq-label">Workload Info</label><div id="designer-capacity-info" class="capacity-info">Select Date...</div></div>
                                 </div>
                             </div>
                         </div>
@@ -116,7 +123,7 @@ const B_QUEST_MODAL_HTML = `
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6"><label class="bq-label">Deadline</label><input type="date" class="bq-input m-0" id="b-quest-modal-creative-deadline" name="creative_deadline"></div>
-                                    <div class="col-6"><label class="bq-label">Daily Capacity</label><div id="creative-capacity-info" class="capacity-info">Select Date...</div></div>
+                                    <div class="col-6"><label class="bq-label">Workload Info</label><div id="creative-capacity-info" class="capacity-info">Select Date...</div></div>
                                 </div>
                             </div>
                         </div>
@@ -130,16 +137,16 @@ const B_QUEST_MODAL_HTML = `
     </div>
 </div>
 
-<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true" style="z-index: 2000;">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content shadow-lg" style="border-radius: 20px; border: none;">
             <div class="modal-header border-0 pb-0">
                 <h6 class="modal-title fw-800" id="search-modal-title">Select Item</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." style="border-radius: 12px; height: 45px;">
-                <div id="universal-list-container" class="list-group p-1" style="max-height: 350px; overflow-y: auto; overflow-x: hidden;"></div>
+                <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." style="border-radius: 12px; height: 45px; border: 1px solid #eee;">
+                <div id="universal-list-container" class="list-group p-0" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;"></div>
             </div>
         </div>
     </div>
@@ -163,7 +170,7 @@ async function openTaskModal(taskId = null, workData = []) {
     setupModalTypeDropdowns();
 
     if (taskId) {
-        document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Mission</span>';
+        document.getElementById('b-quest-modal-label').innerHTML = 'Edit Mission';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
             document.getElementById('b-quest-modal-id').value = taskId;
@@ -172,26 +179,28 @@ async function openTaskModal(taskId = null, workData = []) {
             checkCapacity('creative');
         }
     } else {
-        document.getElementById('b-quest-modal-label').innerHTML = 'New <span style="color: #bdc432;">Mission</span>';
+        document.getElementById('b-quest-modal-label').innerHTML = 'New Mission';
     }
 
     initModalEventListeners();
-    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalInstance.show();
 }
 
 /**
- * ระบบ Modal ค้นหาอเนกประสงค์ (ใช้ร่วมกันทั้ง Account และ Opportunity)
- * @param {string} fieldName - ชื่อฟิลด์ใน DB (account_name / opportunity_name)
- * @param {string} targetInputId - ID ของช่อง Input ที่จะเอาข้อมูลไปใส่
+ * แก้ไขปัญหา Modal ซ้อนกัน: ใช้ชุดคำสั่งที่บังคับชั้นความสูง
  */
 async function openGeneralSearchModal(fieldName, targetInputId) {
-    const searchModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('universal-search-modal'));
+    const searchModalEl = document.getElementById('universal-search-modal');
     const container = document.getElementById('universal-list-container');
     const searchInput = document.getElementById('universal-search-input');
     const title = document.getElementById('search-modal-title');
     
     title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
-    container.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-secondary"></div></div>';
+    container.innerHTML = '<div class="text-center p-4"><div class="spinner-border spinner-border-sm text-secondary"></div></div>';
+    
+    // แสดง Modal ค้นหา
+    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl);
     searchModal.show();
 
     try {
@@ -202,13 +211,14 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
             container.innerHTML = '';
             const filtered = uniqueItems.filter(n => n.toLowerCase().includes(f.toLowerCase()));
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="p-4 text-center text-muted">No data found.</div>';
+                container.innerHTML = '<div class="p-3 text-center text-muted">No data.</div>';
                 return;
             }
             filtered.forEach(val => {
                 const b = document.createElement('button');
-                b.className = "list-group-item list-group-item-action acc-list-item";
+                b.className = "list-group-item list-group-item-action uni-list-item";
                 b.innerText = val;
+                b.type = "button";
                 b.onclick = () => {
                     document.getElementById(targetInputId).value = val;
                     searchModal.hide();
@@ -224,11 +234,15 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
 }
 
 async function checkCapacity(role) {
-    const date = document.getElementById(`b-quest-modal-${role}-deadline`)?.value;
-    const weight = Number(document.getElementById(`b-quest-modal-${role}-weight`)?.value) || 0;
+    const dateInput = document.getElementById(`b-quest-modal-${role}-deadline`);
+    const weightInput = document.getElementById(`b-quest-modal-${role}-weight`);
     const infoEl = document.getElementById(`${role}-capacity-info`);
     const taskId = document.getElementById('b-quest-modal-id').value;
-    if (!infoEl || !date) return;
+    
+    if (!infoEl || !dateInput || !dateInput.value) return;
+
+    const date = dateInput.value;
+    const currentWeight = Number(weightInput.value) || 0;
 
     try {
         const roleKey = role.charAt(0).toUpperCase() + role.slice(1);
@@ -242,9 +256,9 @@ async function checkCapacity(role) {
 
         const existing = loadRes.data?.reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) || 0;
         const max = capRes.data ? capRes.data.max_capacity : 10;
-        const total = existing + weight;
+        const total = existing + currentWeight;
 
-        infoEl.innerHTML = `Use : ${weight} | Capacity <strong>${total} / ${max}</strong>`;
+        infoEl.innerHTML = `Use : ${currentWeight} | Capacity <strong>${total} / ${max}</strong>`;
         infoEl.style.color = total > max ? "#ef4444" : (total === max ? "#f59e0b" : "#bdc432");
     } catch (e) { console.error(e); }
 }
@@ -280,7 +294,8 @@ function setupModalWorkDropdowns(workData) {
 }
 
 function setupModalTypeDropdowns() {
-    ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'].forEach(id => {
+    const types = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
+    types.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.innerHTML = '<option value="" selected>Select Type...</option>';
@@ -292,7 +307,7 @@ function fillFormData(data) {
     const map = { 'b-quest-modal-account': data.account_name, 'b-quest-modal-opportunity': data.opportunity_name, 'b-quest-modal-taskname': data.task_name, 'b-quest-modal-link': data.link, 'b-quest-modal-publish-date': data.publish_date, 'b-quest-modal-detail': data.detail, 'b-quest-modal-designer-status': data.designer_status, 'b-quest-modal-designer-type': data.designer_type, 'b-quest-modal-designer-work': data.designer, 'b-quest-modal-designer-deadline': data.designer_deadline, 'b-quest-modal-designer-weight': data.designer_weight, 'b-quest-modal-creative-status': data.creative_status, 'b-quest-modal-creative-type': data.creative_type, 'b-quest-modal-creative-work': data.creative, 'b-quest-modal-creative-deadline': data.creative_deadline, 'b-quest-modal-creative-weight': data.creative_weight };
     for (let id in map) {
         const el = document.getElementById(id);
-        if (el) el.value = map[id] || (el.tagName === 'SELECT' ? '' : '');
+        if (el) el.value = map[id] || '';
     }
 }
 
@@ -312,6 +327,6 @@ document.addEventListener('submit', async (e) => {
     const { error } = payload.id 
         ? await supabaseClient.from('b-quest-list').update(payload).eq('id', payload.id)
         : await supabaseClient.from('b-quest-list').insert([payload]);
-    if (!error) Swal.fire('Success!', 'Mission Saved.', 'success').then(() => location.reload());
+    if (!error) Swal.fire('Success!', 'Saved.', 'success').then(() => location.reload());
     else Swal.fire('Error!', error.message, 'error');
 });
