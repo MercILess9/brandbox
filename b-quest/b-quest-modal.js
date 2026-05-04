@@ -1,17 +1,20 @@
 /**
  * B-QUEST MODAL COMPONENT 
- * Feature: Compact Floating Search Overlay (Mobile-Friendly List Style)
+ * Feature: Dual Independent Modals (Main Form + Compact Search)
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
+    /* ตั้งค่าลำดับชั้น (Z-index) เพื่อให้ Modal ค้นหาอยู่เหนือ Modal หลักเสมอ */
+    #b-quest-modal { z-index: 1050 !important; }
+    #universal-search-modal { z-index: 1080 !important; }
+    
+    /* บังคับให้ฉากหลัง (Backdrop) ของ Modal ที่สองอยู่เหนือ Modal แรก แต่ต่ำกว่าตัวมันเอง */
+    .modal-backdrop:nth-of-type(even) { z-index: 1070 !important; }
+
     .bq-modal-1000 { max-width: 1000px !important; }
-    .bq-form-container { 
-        border-radius: 24px; border: none; background: #ffffff; 
-        overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); 
-        position: relative; min-height: 600px;
-    }
+    .bq-form-container { border-radius: 24px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     .bq-form-header { padding: 20px 30px; background: #fff; border-bottom: 1px solid #f1f5f9; }
     .bq-form-body { padding: 25px 30px; background: #f8fafc; }
     .bq-form-footer { padding: 15px 30px; background: #fff; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; }
@@ -28,92 +31,38 @@ const B_QUEST_MODAL_HTML = `
     
     .bq-input-group { display: flex; margin-bottom: 16px; }
     .bq-input-left { border-radius: 12px 0 0 12px !important; margin-bottom: 0 !important; }
-    .btn-search-append { border-radius: 0 12px 12px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #94a3b8; padding: 0 16px; cursor: pointer; }
+    .btn-search-append { border-radius: 0 12px 12px 0 !important; border: 1px solid #e2e8f0; border-left: none; background: #fff; color: #94a3b8; padding: 0 16px; cursor: pointer; transition: 0.2s; }
+    .btn-search-append:hover { color: #bdc432; background: #fcfcfc; }
     
     .bq-status-select { border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; padding: 6px 15px; color: #1e293b; outline: none; background: #fff; min-width: 120px; text-align-last: center; }
     .capacity-info { font-size: 0.72rem; font-weight: 700; color: #bdc432; margin-top: 5px; text-align: right; min-height: 18px; }
-    .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 12px 30px; border-radius: 14px; font-weight: 800; cursor: pointer; }
+    .btn-bq-save { background: #1e293b; color: #bdc432; border: none; padding: 12px 30px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: 0.2s; }
 
-    /* --- Floating Search Overlay (Compact & Clean) --- */
-    .bq-search-overlay {
-        position: absolute; 
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(30, 41, 59, 0.4); /* มืดหลังนิดนึงให้โฟกัสง่าย */
-        z-index: 2000; 
-        display: none; 
-        align-items: center; justify-content: center; /* จัดให้อยู่กลางพอดิบพอดี */
+    /* --- Universal Search Modal UI (แคบลงและอ่านง่าย) --- */
+    .search-compact-modal { max-width: 420px !important; }
+    #universal-search-modal .modal-content { border-radius: 24px; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+    #universal-search-modal .modal-header { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; }
+    
+    .uni-list-container { padding: 10px; max-height: 400px; overflow-y: auto; }
+    .uni-item { 
+        border: none; background: #fff; border-radius: 12px !important; 
+        margin-bottom: 5px; padding: 14px 18px; 
+        font-size: 0.92rem; font-weight: 600; color: #334155;
+        text-align: left; transition: 0.2s; line-height: 1.4;
+        display: block; width: 100%; white-space: nowrap; 
+        overflow: hidden; text-overflow: ellipsis;
     }
-
-    .search-inner-card {
-        background: #ffffff;
-        width: 450px; /* บีบให้แคบลงตามสั่ง */
-        max-height: 80%;
-        border-radius: 20px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        display: flex; flex-direction: column;
-        overflow: hidden;
-        animation: bqScaleUp 0.2s ease-out;
-        border: 1px solid #e2e8f0;
-    }
-
-    @keyframes bqScaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-    .search-card-header { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; background: #fff; }
-    .search-card-body { padding: 15px; overflow-y: auto; flex-grow: 1; background: #fff; }
-
-    /* ปรับแต่ง List Item ให้อ่านง่าย ไม่ซ้อนกัน */
-    .uni-list-item { 
-        border: none; 
-        background: #fff;
-        border-radius: 12px !important; 
-        margin-bottom: 4px; /* ระยะห่างระหว่างรายการ */
-        padding: 12px 18px; 
-        font-size: 0.9rem; 
-        font-weight: 600; 
-        color: #334155;
-        text-align: left; 
-        transition: all 0.2s ease;
-        line-height: 1.4; /* เพิ่มระยะบรรทัด */
-        display: block;
-        width: 100%;
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis;
-    }
-
-    /* Zebra Stripe สลับสีแถว */
-    .uni-list-item:nth-child(even) { background: #f8fafc; }
-
-    .uni-list-item:hover { 
-        background: #f1f5f9 !important; 
-        color: #bdc432 !important; 
-        padding-left: 25px; /* เลื่อนขวานิดนึงเวลาชี้ */
-    }
+    .uni-item:nth-child(even) { background: #f8fafc; }
+    .uni-item:hover { background: #f1f5f9 !important; color: #bdc432 !important; padding-left: 25px; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content bq-form-container">
-            
-            <div id="bq-search-overlay" class="bq-search-overlay" onclick="closeSearchOverlay()">
-                <div class="search-inner-card" onclick="event.stopPropagation()">
-                    <div class="search-card-header">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="fw-800 m-0" id="search-title">Select Item</h6>
-                            <button type="button" class="btn-close" onclick="closeSearchOverlay()"></button>
-                        </div>
-                        <input type="text" class="form-control" id="uni-search-input" placeholder="Search..." autocomplete="off" style="border-radius: 10px; height: 45px;">
-                    </div>
-                    <div id="uni-list-container" class="search-card-body list-group list-group-flush">
-                        </div>
-                </div>
-            </div>
-
             <div class="bq-form-header d-flex justify-content-between align-items-center">
                 <h5 class="fw-800 m-0" id="b-quest-modal-label">Mission Control</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
             <form id="b-quest-modal-form">
                 <div class="bq-form-body">
                     <input type="hidden" id="b-quest-modal-id" name="id">
@@ -126,15 +75,15 @@ const B_QUEST_MODAL_HTML = `
                                 <label class="bq-label">Account Name</label>
                                 <div class="bq-input-group">
                                     <input type="text" class="bq-input bq-input-left" id="b-quest-modal-account" name="account_name" required placeholder="Account Name">
-                                    <button type="button" class="btn-search-append" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
+                                    <button type="button" class="btn-search-append" onclick="openGeneralSearchModal('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
                                 <label class="bq-label">Opportunity Name</label>
                                 <div class="bq-input-group">
                                     <input type="text" class="bq-input bq-input-left" id="b-quest-modal-opportunity" name="opportunity_name" placeholder="Opportunity Name">
-                                    <button type="button" class="btn-search-append" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
+                                    <button type="button" class="btn-search-append" onclick="openGeneralSearchModal('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
                                 </div>
                                 <label class="bq-label">Task Name</label>
-                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required placeholder="Task Name">
+                                <input type="text" class="bq-input" id="b-quest-modal-taskname" name="task_name" required placeholder="Task Title">
                                 <label class="bq-label">Link</label>
                                 <input type="url" class="bq-input m-0" id="b-quest-modal-link" name="link">
                             </div>
@@ -154,10 +103,7 @@ const B_QUEST_MODAL_HTML = `
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
                                     <div class="bq-section-title">DESIGNER <span class="bq-owner-tag" id="designer-owner-tag">Admin</span></div>
-                                    <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status">
-                                        <option value="Progress">Progress</option>
-                                        <option value="Done">Done</option>
-                                    </select>
+                                    <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status"><option value="Progress">Progress</option><option value="Done">Done</option></select>
                                 </div>
                                 <div class="row g-2 mb-3">
                                     <div class="col-6"><label class="bq-label">Type</label><select class="bq-input m-0" id="b-quest-modal-designer-type" name="designer_type"></select></div>
@@ -173,10 +119,7 @@ const B_QUEST_MODAL_HTML = `
                             <div class="bq-card-section bq-card-highlight">
                                 <div class="bq-section-header">
                                     <div class="bq-section-title">CREATIVE <span class="bq-owner-tag" id="creative-owner-tag">Admin</span></div>
-                                    <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status">
-                                        <option value="Progress">Progress</option>
-                                        <option value="Done">Done</option>
-                                    </select>
+                                    <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status"><option value="Progress">Progress</option><option value="Done">Done</option></select>
                                 </div>
                                 <div class="row g-2 mb-3">
                                     <div class="col-6"><label class="bq-label">Type</label><select class="bq-input m-0" id="b-quest-modal-creative-type" name="creative_type"></select></div>
@@ -197,6 +140,24 @@ const B_QUEST_MODAL_HTML = `
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered search-compact-modal">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-800" id="search-modal-title">Select</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="p-3">
+                    <input type="text" class="form-control" id="uni-search-input" placeholder="Search..." autocomplete="off" style="border-radius: 10px; height: 45px; border: 1px solid #e2e8f0;">
+                </div>
+                <div id="uni-list-container" class="uni-list-container list-group list-group-flush">
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
 `;
 
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
@@ -208,7 +169,6 @@ async function openTaskModal(taskId = null, workData = []) {
     if (!modalEl) return;
     const form = document.getElementById('b-quest-modal-form');
     form.reset();
-    closeSearchOverlay(); 
     
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
@@ -224,21 +184,27 @@ async function openTaskModal(taskId = null, workData = []) {
         }
     } else {
         document.getElementById('b-quest-modal-label').innerHTML = 'New Mission';
+        document.getElementById('designer-owner-tag').innerText = 'Admin';
+        document.getElementById('creative-owner-tag').innerText = 'Admin';
     }
 
     initModalEventListeners();
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-async function openSearchOverlay(fieldName, targetId) {
-    const overlay = document.getElementById('bq-search-overlay');
+/** * ระบบ Modal ค้นหาแบบแยกอิสระ 
+ */
+async function openGeneralSearchModal(fieldName, targetId) {
+    const searchModalEl = document.getElementById('universal-search-modal');
     const container = document.getElementById('uni-list-container');
     const searchInput = document.getElementById('uni-search-input');
-    const title = document.getElementById('search-title');
-
+    const title = document.getElementById('search-modal-title');
+    
     title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
     container.innerHTML = '<div class="text-center p-4">Loading...</div>';
-    overlay.style.display = 'flex';
+    
+    const searchModal = bootstrap.Modal.getOrCreateInstance(searchModalEl);
+    searchModal.show();
 
     try {
         const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
@@ -247,20 +213,18 @@ async function openSearchOverlay(fieldName, targetId) {
         const render = (f = '') => {
             container.innerHTML = '';
             const filtered = unique.filter(n => n.toLowerCase().includes(f.toLowerCase()));
-            
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="p-4 text-center text-muted">No records found.</div>';
+                container.innerHTML = '<div class="p-3 text-center text-muted">No data found.</div>';
                 return;
             }
-
             filtered.forEach(val => {
                 const btn = document.createElement('button');
-                btn.className = "uni-list-item";
+                btn.className = "uni-item";
                 btn.innerText = val;
                 btn.type = "button";
                 btn.onclick = () => {
                     document.getElementById(targetId).value = val;
-                    closeSearchOverlay();
+                    searchModal.hide();
                 };
                 container.appendChild(btn);
             });
@@ -268,12 +232,8 @@ async function openSearchOverlay(fieldName, targetId) {
         searchInput.oninput = (e) => render(e.target.value);
         render();
         searchInput.value = '';
-        setTimeout(() => searchInput.focus(), 150);
+        setTimeout(() => searchInput.focus(), 300);
     } catch (e) { console.error(e); }
-}
-
-function closeSearchOverlay() {
-    document.getElementById('bq-search-overlay').style.display = 'none';
 }
 
 async function checkCapacity(role) {
