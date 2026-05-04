@@ -1,3 +1,6 @@
+// ==========================================
+// 1. CONFIGURATION
+// ==========================================
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
     itemsPerPage: 10,
@@ -8,30 +11,60 @@ const B_QUEST_CONFIG = {
     ]
 };
 
+// ==========================================
+// 2. MODAL CORE LOGIC
+// ==========================================
+
+/**
+ * ฟังก์ชันหลักเปิด Modal
+ * @param {string|null} taskId - ID งาน (null = สร้างใหม่)
+ * @param {Array} workData - dataList (Master Work) ที่ส่งมาจากหน้าหลัก
+ */
 async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     const form = document.getElementById('b-quest-modal-form');
-    if (!modalEl || !form) return;
+    if (!modalEl || !form) {
+        console.error("Critical: Modal or Form element not found!");
+        return;
+    }
 
+    // 1. Reset ฟอร์ม
     form.reset();
+    if(document.getElementById('b-quest-modal-id')) {
+        document.getElementById('b-quest-modal-id').value = '';
+    }
+
+    // 2. เติมข้อมูล Dropdown (สำคัญ: ต้องส่ง workData เข้าไป)
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
 
+    // 3. เช็คโหมด New หรือ Edit
     if (taskId) {
         document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Mission</span>';
         const data = await BQuestService.getQuestById(taskId);
         if (data) {
             document.getElementById('b-quest-modal-id').value = taskId;
-            fillFormData(data); // หยอดข้อมูลเข้าฟอร์ม
+            fillFormData(data);
+            
+            // คำนวณ Capacity ทันทีหลังโหลดข้อมูล Edit
+            if(data.designer_deadline) checkCapacity(data.designer_deadline, 'designer');
+            if(data.creative_deadline) checkCapacity(data.creative_deadline, 'creative');
         }
     } else {
         document.getElementById('b-quest-modal-label').innerHTML = 'New <span style="color: #bdc432;">Mission</span>';
-        document.getElementById('b-quest-modal-id').value = '';
     }
 
-    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    // 4. ผูก Event Listener สำหรับ Capacity (เรียกใช้ครั้งเดียวตอนเปิด)
+    initCapacityListeners();
+
+    // 5. แสดง Modal
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalInstance.show();
 }
 
+/**
+ * วาด Dropdown งาน และผูก Logic Auto-fill
+ */
 function setupModalWorkDropdowns(workData) {
     const configs = [
         { id: 'b-quest-modal-designer-work', role: 'Designer', weightId: 'b-quest-modal-designer-weight' },
@@ -41,28 +74,43 @@ function setupModalWorkDropdowns(workData) {
     configs.forEach(config => {
         const el = document.getElementById(config.id);
         if (!el) return;
+
         el.innerHTML = '<option value="" selected>None</option>';
         const filtered = workData.filter(item => item.role === config.role);
+        
         filtered.forEach(item => {
-            const opt = new Option(item.work, item.work);
-            opt.dataset.weight = item.weight;
-            opt.dataset.task = item.task || ''; // เก็บ Template ไว้ fill Detail
-            el.add(opt);
+            const opt = document.createElement('option');
+            opt.value = item.work;
+            opt.textContent = item.work;
+            opt.dataset.weight = item.weight || 0;
+            opt.dataset.task = item.task || ''; // ข้อมูล fill เข้าช่อง detail
+            el.appendChild(opt);
         });
 
-        // Event: เมื่อเลือกงานให้หยอด Weight และ Detail อัตโนมัติ
-        el.onchange = (e) => {
-            const selected = e.target.options[e.target.selectedIndex];
-            document.getElementById(config.weightId).value = selected.dataset.weight || 0;
-            if(selected.dataset.task && !taskId) { // Fill detail เฉพาะตอน New
-                document.getElementById('b-quest-modal-detail').value = selected.dataset.task;
+        // Event: เมื่อเปลี่ยนงาน -> อัปเดต Weight และ Auto-fill Detail
+        el.onchange = () => {
+            const selectedOpt = el.options[el.selectedIndex];
+            const weightVal = selectedOpt.dataset.weight || 0;
+            document.getElementById(config.weightId).value = weightVal;
+
+            // Auto-fill Detail เฉพาะกรณีเป็นงานใหม่ (New Task) และมีข้อมูล Task Template
+            const taskId = document.getElementById('b-quest-modal-id').value;
+            if (!taskId && selectedOpt.dataset.task) {
+                document.getElementById('b-quest-modal-detail').value = selectedOpt.dataset.task;
+            }
+
+            // คำนวณ Capacity ใหม่เพราะ Weight เปลี่ยน
+            const deadlineInput = document.getElementById(`b-quest-modal-${config.role.toLowerCase()}-deadline`);
+            if(deadlineInput && deadlineInput.value) {
+                checkCapacity(deadlineInput.value, config.role.toLowerCase());
             }
         };
     });
 }
 
 function setupModalTypeDropdowns() {
-    ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'].forEach(id => {
+    const typeIds = ['b-quest-modal-designer-type', 'b-quest-modal-creative-type'];
+    typeIds.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.innerHTML = '<option value="" selected>Select Type...</option>';
@@ -70,8 +118,55 @@ function setupModalTypeDropdowns() {
     });
 }
 
+// ==========================================
+// 3. CAPACITY LOGIC
+// ==========================================
+
+async function checkCapacity(date, role) {
+    const infoEl = document.getElementById(`${role}-capacity-info`);
+    if (!infoEl) return;
+    if (!date) {
+        infoEl.innerText = "Select Date...";
+        return;
+    }
+
+    infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('b-quest-list')
+            .select(`${role}_weight`)
+            .eq(`${role}_deadline`, date);
+
+        if (error) throw error;
+
+        const totalWeight = data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
+        
+        infoEl.innerHTML = `Total Load: <strong>${totalWeight}</strong> Weight`;
+        infoEl.style.color = totalWeight >= 10 ? "#ef4444" : "#bdc432";
+    } catch (e) {
+        console.error("Capacity Error:", e);
+        infoEl.innerText = "Error Loading";
+    }
+}
+
+function initCapacityListeners() {
+    // Designer Side
+    document.getElementById('b-quest-modal-designer-deadline')?.addEventListener('change', (e) => {
+        checkCapacity(e.target.value, 'designer');
+    });
+    // Creative Side
+    document.getElementById('b-quest-modal-creative-deadline')?.addEventListener('change', (e) => {
+        checkCapacity(e.target.value, 'creative');
+    });
+}
+
+// ==========================================
+// 4. DATA HANDLING (FILL / SAVE)
+// ==========================================
+
 function fillFormData(data) {
-    // หยอดข้อมูลพื้นฐาน
+    // พื้นฐาน
     document.getElementById('b-quest-modal-account').value = data.account_name || '';
     document.getElementById('b-quest-modal-opportunity').value = data.opportunity_name || '';
     document.getElementById('b-quest-modal-taskname').value = data.task_name || '';
@@ -79,14 +174,14 @@ function fillFormData(data) {
     document.getElementById('b-quest-modal-publish-date').value = data.publish_date || '';
     document.getElementById('b-quest-modal-detail').value = data.detail || '';
 
-    // หยอด Designer Section
+    // Designer
     document.getElementById('b-quest-modal-designer-status').value = data.designer_status || 'Progress';
     document.getElementById('b-quest-modal-designer-type').value = data.designer_type || '';
     document.getElementById('b-quest-modal-designer-work').value = data.designer || '';
     document.getElementById('b-quest-modal-designer-deadline').value = data.designer_deadline || '';
     document.getElementById('b-quest-modal-designer-weight').value = data.designer_weight || 0;
 
-    // หยอด Creative Section
+    // Creative
     document.getElementById('b-quest-modal-creative-status').value = data.creative_status || 'Progress';
     document.getElementById('b-quest-modal-creative-type').value = data.creative_type || '';
     document.getElementById('b-quest-modal-creative-work').value = data.creative || '';
@@ -100,28 +195,30 @@ const BQuestService = {
         return error ? null : data;
     },
     async deleteQuest(id) {
-        const { isConfirmed } = await Swal.fire({
+        const result = await Swal.fire({
             title: 'Delete Mission?',
             text: "This cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#1e293b'
         });
-        if (isConfirmed) {
-            await supabaseClient.from('b-quest-list').delete().eq('id', id);
-            location.reload();
+        if (result.isConfirmed) {
+            const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
+            if(!error) location.reload();
         }
     }
 };
 
-// Form Submit Logic
+// Form Submit Handling
 document.getElementById('b-quest-modal-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const payload = Object.fromEntries(formData.entries());
     
-    // เติม owner เป็นตัวเราเอง (ในอนาคตดึงจาก Profile)
-    payload.owner = 'Admin';
+    // Mapping ชื่อฟิลด์ให้ตรงกับ Database (เนื่องจากในฟอร์มใช้ชื่อ designer/creative แต่เบสใช้ designer/creative)
+    payload.designer = payload.designer; 
+    payload.creative = payload.creative;
+    payload.owner = 'Admin'; // หรือดึงจาก Auth
     payload.last_update = new Date().toISOString();
 
     const { error } = payload.id 
@@ -134,70 +231,3 @@ document.getElementById('b-quest-modal-form')?.addEventListener('submit', async 
         Swal.fire('Error!', error.message, 'error');
     }
 });
-
-// b-quest.js (เพิ่มเติม)
-
-/**
- * ฟังก์ชันดึงค่า Weight รวมจากฐานข้อมูลมาโชว์ที่ Capacity Info
- * @param {string} date - วันที่ Deadline
- * @param {string} role - 'designer' หรือ 'creative'
- */
-async function checkCapacity(date, role) {
-    const infoEl = document.getElementById(`${role}-capacity-info`);
-    if (!date) {
-        infoEl.innerText = "Select Date...";
-        return;
-    }
-
-    infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
-
-    try {
-        // ดึงผลรวม Weight ของงานทั้งหมดในวันที่เลือกของ Role นั้นๆ
-        const { data, error } = await supabaseClient
-            .from('b-quest-list')
-            .select(`${role}_weight`)
-            .eq(`${role}_deadline`, date);
-
-        if (error) throw error;
-
-        // คำนวณผลรวม
-        const totalWeight = data.reduce((sum, item) => sum + (Number(item[`${role}_weight`]) || 0), 0);
-        
-        // แสดงผล
-        infoEl.innerHTML = `Total Load: <strong>${totalWeight}</strong> Weight`;
-        
-        // ใส่สีเตือนถ้าโหลดเยอะเกิน (ตัวอย่างเช่น เกิน 10 ให้เป็นสีแดง)
-        if (totalWeight >= 10) {
-            infoEl.style.color = "#ef4444"; // Red
-        } else {
-            infoEl.style.color = "#bdc432"; // B-Quest Green
-        }
-    } catch (e) {
-        console.error("Capacity Error:", e);
-        infoEl.innerText = "Error loading data";
-    }
-}
-
-// --- เพิ่ม Event Listeners ในฟังก์ชัน openTaskModal หรือท้ายไฟล์ ---
-function initCapacityListeners() {
-    const dDate = document.getElementById('b-quest-modal-designer-deadline');
-    const cDate = document.getElementById('b-quest-modal-creative-deadline');
-    const dWork = document.getElementById('b-quest-modal-designer-work');
-    const cWork = document.getElementById('b-quest-modal-creative-work');
-
-    // เมื่อเปลี่ยนวันที่ Deadline
-    if(dDate) dDate.addEventListener('change', (e) => checkCapacity(e.target.value, 'designer'));
-    if(cDate) cDate.addEventListener('change', (e) => checkCapacity(e.target.value, 'creative'));
-
-    // เมื่อเปลี่ยนประเภทงาน (เพราะ Weight เปลี่ยน)
-    if(dWork) dWork.addEventListener('change', () => {
-        const date = document.getElementById('b-quest-modal-designer-deadline').value;
-        checkCapacity(date, 'designer');
-    });
-    if(cWork) cWork.addEventListener('change', () => {
-        const date = document.getElementById('b-quest-modal-creative-deadline').value;
-        checkCapacity(date, 'creative');
-    });
-}
-
-// เรียกใช้ Listener หลังจาก Modal ถูกโหลด (หรือเรียกท้าย openTaskModal)
