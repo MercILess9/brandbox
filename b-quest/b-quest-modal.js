@@ -1,18 +1,28 @@
 /**
- * B-QUEST MODAL COMPONENT (Fixed: Ultimate Backdrop Killer)
+ * B-QUEST MODAL COMPONENT (Fixed: Ultimate Manual Toggle)
  */
 
 // --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
-    /* บังคับให้หน้า Modal หลักคลิกได้เสมอ */
-    #b-quest-modal { z-index: 1050 !important; overflow-y: auto !important; }
-    
-    /* บังคับให้ Modal ค้นหา ลอยอยู่บนสุดจริงๆ */
-    #universal-search-modal { 
-        z-index: 9999 !important; 
-        background: rgba(0,0,0,0.5) !important; 
+    /* Modal หลัก */
+    #b-quest-modal { z-index: 1050 !important; }
+
+    /* Custom Search Overlay (ไม่ใช้ระบบ Modal ของ Bootstrap เพื่อเลี่ยงจอดำ) */
+    #universal-search-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 9999;
+        display: none; /* ปิดไว้ก่อน */
+        align-items: center; justify-content: center;
     }
+    .search-panel {
+        background: #fff; width: 90%; max-width: 400px;
+        border-radius: 24px; padding: 25px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        animation: bqFadeIn 0.2s ease-out;
+    }
+    @keyframes bqFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
     .bq-modal-1000 { max-width: 1000px !important; }
     .bq-form-container { border-radius: 20px; border: none; background: #ffffff; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
@@ -42,11 +52,11 @@ const B_QUEST_MODAL_HTML = `
     .uni-list-item:hover { background: #bdc432 !important; color: #fff !important; }
 </style>
 
-<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog bq-modal-1000 modal-dialog-centered">
         <div class="modal-content bq-form-container">
             <div class="bq-form-header d-flex justify-content-between align-items-center">
-                <h5 class="fw-800 m-0" id="b-quest-modal-label">Mission 2 Control</h5>
+                <h5 class="fw-800 m-0" id="b-quest-modal-label">Mission Control</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="b-quest-modal-form">
@@ -133,18 +143,14 @@ const B_QUEST_MODAL_HTML = `
     </div>
 </div>
 
-<div class="modal fade" id="universal-search-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content shadow-lg">
-            <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-800" id="search-modal-title">Select</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." autocomplete="off">
-                <div id="universal-list-container" class="list-group p-0" style="max-height: 300px; overflow-y: auto;"></div>
-            </div>
+<div id="universal-search-overlay" onclick="closeGeneralSearchModal(event)">
+    <div class="search-panel" onclick="event.stopPropagation()">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="m-0 fw-800" id="search-modal-title">Select</h6>
+            <button type="button" class="btn-close" onclick="closeGeneralSearchModal()"></button>
         </div>
+        <input type="text" class="form-control mb-3" id="universal-search-input" placeholder="Search..." autocomplete="off">
+        <div id="universal-list-container" class="list-group p-0" style="max-height: 300px; overflow-y: auto;"></div>
     </div>
 </div>
 `;
@@ -157,15 +163,9 @@ async function openTaskModal(taskId = null, workData = []) {
     const modalEl = document.getElementById('b-quest-modal');
     if (!modalEl) return;
 
-    // เคลียร์ Backdrop ที่อาจค้างอยู่จากการเปิดครั้งก่อน
-    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-    document.body.classList.remove('modal-open');
-    document.body.style = "";
-
     const form = document.getElementById('b-quest-modal-form');
     form.reset();
-    if(document.getElementById('b-quest-modal-id')) document.getElementById('b-quest-modal-id').value = '';
-
+    
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
 
@@ -189,23 +189,20 @@ async function openTaskModal(taskId = null, workData = []) {
     modalInstance.show();
 }
 
+/**
+ * เปิด Search Overlay แบบ Manual
+ */
 async function openGeneralSearchModal(fieldName, targetInputId) {
-    const searchModalEl = document.getElementById('universal-search-modal');
+    const overlay = document.getElementById('universal-search-overlay');
     const container = document.getElementById('universal-list-container');
     const searchInput = document.getElementById('universal-search-input');
+    const title = document.getElementById('search-modal-title');
     
+    title.innerText = fieldName === 'account_name' ? 'Select Account' : 'Select Opportunity';
     container.innerHTML = '<div class="text-center p-3">Loading...</div>';
     
-    // บังคับเปิดแบบไม่มี Backdrop 100%
-    const searchModal = new bootstrap.Modal(searchModalEl, { backdrop: false });
-    searchModal.show();
-
-    // ล้าง Backdrop ที่อาจจะแอบโผล่มา
-    setTimeout(() => {
-        document.querySelectorAll('.modal-backdrop').forEach((el, index) => {
-            if (index > 0) el.remove(); // เก็บไว้อันเดียวคือของ Modal หลัก
-        });
-    }, 50);
+    overlay.style.display = 'flex'; // แสดง Overlay
+    searchInput.value = '';
 
     try {
         const { data } = await supabaseClient.from('b-quest-list').select(fieldName);
@@ -220,16 +217,19 @@ async function openGeneralSearchModal(fieldName, targetInputId) {
                 b.type = "button";
                 b.onclick = () => {
                     document.getElementById(targetInputId).value = val;
-                    searchModal.hide();
+                    closeGeneralSearchModal();
                 };
                 container.appendChild(b);
             });
         };
         searchInput.oninput = (e) => render(e.target.value);
         render();
-        searchInput.value = '';
-        setTimeout(() => searchInput.focus(), 300);
+        setTimeout(() => searchInput.focus(), 100);
     } catch (e) { console.error(e); }
+}
+
+function closeGeneralSearchModal(e) {
+    document.getElementById('universal-search-overlay').style.display = 'none';
 }
 
 async function checkCapacity(role) {
