@@ -1,5 +1,5 @@
 // ==========================================
-// b-quest.js (Full Version - รวมระบบปุ่ม Account)
+// b-quest.js (Full Version - รวมระบบ Searchable Dropdown)
 // ==========================================
 
 const B_QUEST_CONFIG = {
@@ -22,7 +22,7 @@ async function openTaskModal(taskId = null, workData = []) {
 
     setupModalWorkDropdowns(workData); 
     setupModalTypeDropdowns();
-    setupAccountDropdown(); // ดึงรายชื่อ Account มาใส่ปุ่มข้างๆ
+    setupAccountDropdown(); // เรียกใช้ระบบ Dropdown Search
 
     if (taskId) {
         document.getElementById('b-quest-modal-label').innerHTML = 'Edit <span style="color: #bdc432;">Mission</span>';
@@ -44,12 +44,17 @@ async function openTaskModal(taskId = null, workData = []) {
 }
 
 /**
- * ดึงรายชื่อ Account มาหยอดในปุ่ม Dropdown ข้างช่อง Input
+ * ระบบ Searchable Dropdown สำหรับ Account
  */
 async function setupAccountDropdown() {
-    const dropdownList = document.getElementById('account-dropdown-list');
+    const container = document.getElementById('account-items-container');
     const accountInput = document.getElementById('b-quest-modal-account');
-    if (!dropdownList) return;
+    const searchInput = document.getElementById('account-search-input');
+    
+    if (!container || !searchInput) return;
+
+    // ล้างค่าในช่องค้นหาก่อน
+    searchInput.value = '';
 
     try {
         const { data } = await supabaseClient.from('b-quest-list').select('account_name');
@@ -58,22 +63,36 @@ async function setupAccountDropdown() {
                 .filter(n => n && n !== '-')
                 .sort();
 
-            // ล้างค่าเก่า (เหลือแค่ Header กับ Divider)
-            dropdownList.innerHTML = '<li><h6 class="dropdown-header">Select Existing Account</h6></li><li><hr class="dropdown-divider"></li>';
+            const renderList = (filter = '') => {
+                container.innerHTML = '';
+                const filtered = uniqueAccounts.filter(name => name.toLowerCase().includes(filter.toLowerCase()));
+                
+                if (filtered.length === 0) {
+                    container.innerHTML = '<li><span class="dropdown-item-text text-muted">No account found</span></li>';
+                    return;
+                }
 
-            uniqueAccounts.forEach(name => {
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.className = "dropdown-item py-2";
-                a.href = "#";
-                a.innerText = name;
-                a.onclick = (e) => {
-                    e.preventDefault();
-                    accountInput.value = name; // เมื่อกดแล้วเอาชื่อไปใส่ใน Input
-                };
-                li.appendChild(a);
-                dropdownList.appendChild(li);
-            });
+                filtered.forEach(name => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.className = "dropdown-item py-2 account-item";
+                    a.href = "#";
+                    a.innerText = name;
+                    a.onclick = (e) => {
+                        e.preventDefault();
+                        accountInput.value = name;
+                        bootstrap.Dropdown.getInstance(document.querySelector('.dropdown-toggle')).hide();
+                    };
+                    li.appendChild(a);
+                    container.appendChild(li);
+                });
+            };
+
+            // ดักฟังการพิมพ์ในช่อง Search
+            searchInput.oninput = (e) => renderList(e.target.value);
+            
+            // แสดงรายการเริ่มต้น
+            renderList();
         }
     } catch (e) { console.error(e); }
 }
@@ -91,8 +110,6 @@ async function checkCapacity(role) {
     const date = dateInput.value;
     const currentWeight = Number(weightInput.value) || 0; 
     const taskId = document.getElementById('b-quest-modal-id').value;
-
-    infoEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Calculating...';
 
     try {
         const roleKey = role.charAt(0).toUpperCase() + role.slice(1);
@@ -196,7 +213,7 @@ const BQuestService = {
             showCancelButton: true,
             confirmButtonColor: '#1e293b'
         });
-        if (isConfirmed) {
+        if (result.isConfirmed) {
             const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
             if(!error) location.reload();
         }
