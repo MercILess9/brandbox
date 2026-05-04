@@ -1,9 +1,13 @@
 /**
- * B-QUEST MODAL COMPONENT - FINAL MASTER VERSION 2026
- * Features: Mode Switching, Strict Validation, Capacity Check, SweetAlert2 Popup
+ * B-QUEST MODAL COMPONENT - ULTIMATE VERSION 2026
+ * -----------------------------------------------------------
+ * Features: 
+ * - Owner on Top-Right Header
+ * - Assign Badge shows only when Assigned
+ * - Strict 1-Card Minimum Validation
+ * - SweetAlert2 Integration & Null Safety
  */
 
-// --- 1. HTML & CSS TEMPLATE ---
 const B_QUEST_MODAL_HTML = `
 <style>
     #b-quest-modal .modal-content { background: #f8fafc; border-radius: 30px; border: none; overflow: hidden; }
@@ -17,48 +21,36 @@ const B_QUEST_MODAL_HTML = `
     .bq-header-title { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
     .bq-header-title span { color: #bdc432; }
 
+    /* Header Right: Owner Display */
+    .bq-header-right { display: flex; align-items: center; gap: 15px; }
+    .bq-owner-top { background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; border: 1px solid #e2e8f0; }
+
     .bq-modern-body { padding: 20px 35px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
-    .bq-glass-card { 
-        background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; 
-        height: 100%; display: flex; flex-direction: column; 
-    }
+    /* Input Styles */
+    .bq-glass-card { background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; height: 100%; display: flex; flex-direction: column; }
     .bq-label-modern { font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
-    
-    .bq-input-modern { 
-        width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; 
-        padding: 5px 12px; font-size: 0.85rem; color: #334155; margin-bottom: 10px; 
-        text-align-last: center; height: 35px; transition: all 0.2s;
-    }
+    .bq-input-modern { width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 12px; font-size: 0.85rem; color: #334155; margin-bottom: 10px; text-align-last: center; height: 35px; transition: 0.2s; }
     .bq-input-modern:focus { border-color: #bdc432; outline: none; box-shadow: 0 0 0 3px rgba(189, 196, 50, 0.1); }
-
-    /* 🔴 Highlight Fields on Error */
     .was-validated .bq-input-modern:invalid { border-color: #dc3545 !important; background-color: #fff8f8; }
-    .was-validated .bq-input-modern:valid { border-color: #198754 !important; }
-
-    /* Detail Box min-height 140px */
+    
     .bq-input-detail { flex-grow: 1; min-height: 140px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
-    /* Assignment Cards */
+    /* Role Cards */
     .role-card { background: #fff; border-radius: 22px; border: 1px solid #e2e8f0; margin-bottom: 12px; transition: all 0.4s ease; overflow: hidden; }
     .role-card.disabled { opacity: 0.5; background: #f1f5f9; }
-    .role-card-header { padding: 16px 20px 18px 20px; display: flex; align-items: center; gap: 12px; }
+    .role-card-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
     .role-header-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
     .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
     
-    .edit-only { display: none; }
-    .bq-owner-badge { background: #f8fafc; color: #64748b; padding: 3px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: 1px solid #e2e8f0; }
+    /* Assign Badge (Blue) */
+    .bq-assign-badge { background: #eff6ff; color: #3b82f6; padding: 2px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; border: 1px solid #dbeafe; display: none; }
 
     .role-card-body { max-height: 0; padding: 0 20px; transition: all 0.4s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 15px 18px 18px 18px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
-    .timeline-zone { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 10px; height: 100%; display: flex; flex-direction: column; justify-content: center; }
-    
-    /* Capacity Text font 0.9 */
-    .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 5px; display: none; }
-
-    /* Toggle Switch */
+    /* Toggle & Status */
     .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
@@ -66,21 +58,22 @@ const B_QUEST_MODAL_HTML = `
     input:checked + .bq-slider { background-color: #bdc432 !important; }
     input:checked + .bq-slider:before { transform: translateX(16px); }
 
-    /* Status Select Colors */
-    .bq-status-select { border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; background: #fff; min-width: 95px; text-align-last: center; height: 28px; transition: all 0.2s; color: #fff; }
-    .status-progress { background-color: #4e73df !important; border-color: #4e73df !important; }
-    .status-done { background-color: #626e7f !important; border-color: #626e7f !important; }
+    .bq-status-select { border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; color: #fff; min-width: 95px; text-align-last: center; height: 28px; }
+    .status-progress { background-color: #4e73df !important; }
+    .status-done { background-color: #94a3b8 !important; }
+    .bq-cap-text { font-size: 0.9rem; font-weight: 800; color: #64748b; margin-top: 5px; display: none; }
 
     /* Footer Buttons */
     .bq-footer-actions { padding: 15px 35px; display: flex; justify-content: flex-end; gap: 12px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
-    .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; height: 42px; display: none; transition: 0.2s; }
-    .btn-bq-delete:hover { background: #fecaca; }
-    .btn-bq-create { background: #3b82f6; color: #fff; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; height: 42px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.15); transition: 0.2s; }
-    .btn-bq-create:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; height: 42px; display: none; cursor: pointer; }
+    .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 35px; border-radius: 12px; font-weight: 700; height: 42px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; }
+    .btn-bq-create:hover { transform: translateY(-1px); background: #0f172a; }
 
+    /* Overlay Search */
     .bq-search-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .bq-search-card { background: #fff; width: 400px; max-height: 80%; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; }
-    .uni-item-modern { border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 12px 15px; font-size: 0.88rem; font-weight: 600; text-align: left; }
+    .uni-item-modern { border: none; background: #fff; border-radius: 12px; margin-bottom: 4px; padding: 12px 15px; font-size: 0.88rem; font-weight: 600; text-align: left; cursor: pointer; }
+    .uni-item-modern:hover { background: #f8fafc; }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -100,7 +93,10 @@ const B_QUEST_MODAL_HTML = `
 
             <div class="bq-modern-header">
                 <div class="bq-header-title" id="b-quest-modal-label-text">Task <span>New</span></div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="bq-header-right">
+                    <span class="bq-owner-top" id="modal-owner-display">Owner: -</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
             </div>
 
             <form id="b-quest-modal-form" novalidate>
@@ -113,12 +109,12 @@ const B_QUEST_MODAL_HTML = `
                                 <label class="bq-label-modern">Account Name</label>
                                 <div class="d-flex mb-2">
                                     <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-account" name="account_name" required placeholder="account name...">
-                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px;" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search" style="font-size: 0.8rem;"></i></button>
+                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px;" onclick="openSearchOverlay('account_name', 'b-quest-modal-account')"><i class="bi bi-search"></i></button>
                                 </div>
                                 <label class="bq-label-modern">Opportunity Name</label>
                                 <div class="d-flex mb-2">
                                     <input type="text" class="bq-input-modern m-0" style="border-radius: 10px 0 0 10px; text-align-last: left;" id="b-quest-modal-opportunity" name="opportunity_name" required placeholder="opportunity name...">
-                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px;" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search" style="font-size: 0.8rem;"></i></button>
+                                    <button type="button" class="btn border border-start-0" style="border-radius: 0 10px 10px 0; background: #fff; height: 35px;" onclick="openSearchOverlay('opportunity_name', 'b-quest-modal-opportunity')"><i class="bi bi-search"></i></button>
                                 </div>
                                 <label class="bq-label-modern">Task Name</label>
                                 <input type="text" class="bq-input-modern" style="text-align-last: left;" id="b-quest-modal-taskname" name="task_name" required placeholder="task name....">
@@ -145,7 +141,7 @@ const B_QUEST_MODAL_HTML = `
                                     <div class="role-header-left">
                                         <label class="bq-toggle"><input type="checkbox" id="check-designer" onchange="updateRoleUI('designer')"><span class="bq-slider"></span></label>
                                         <div class="role-card-title">Designer</div>
-                                        <span class="bq-owner-badge edit-only" id="badge-designer">Test (BX001)</span>
+                                        <span class="bq-assign-badge" id="badge-assign-designer"></span>
                                     </div>
                                     <select class="bq-status-select status-progress edit-only" id="b-quest-modal-designer-status" name="designer_status" onchange="updateStatusUI(this)">
                                         <option value="Progress">Progress</option><option value="Done">Done</option>
@@ -174,7 +170,7 @@ const B_QUEST_MODAL_HTML = `
                                     <div class="role-header-left">
                                         <label class="bq-toggle"><input type="checkbox" id="check-creative" onchange="updateRoleUI('creative')"><span class="bq-slider"></span></label>
                                         <div class="role-card-title">Creative</div>
-                                        <span class="bq-owner-badge edit-only" id="badge-creative">Test (BX001)</span>
+                                        <span class="bq-assign-badge" id="badge-assign-creative"></span>
                                     </div>
                                     <select class="bq-status-select status-progress edit-only" id="b-quest-modal-creative-status" name="creative_status" onchange="updateStatusUI(this)">
                                         <option value="Progress">Progress</option><option value="Done">Done</option>
@@ -211,8 +207,7 @@ const B_QUEST_MODAL_HTML = `
 </div>
 `;
 
-// --- 2. LOGIC HANDLING ---
-
+// --- LOGIC ---
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 let currentCapacities = { designer: 0, creative: 0 };
@@ -276,6 +271,7 @@ async function openTaskModal(taskId = null, workData = []) {
 
     const editOnly = document.querySelectorAll('.edit-only');
     const deleteBtn = document.getElementById('btn-delete-task');
+    const ownerTop = document.getElementById('modal-owner-display');
     
     if (taskId) {
         document.getElementById('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
@@ -300,8 +296,10 @@ async function openTaskModal(taskId = null, workData = []) {
         document.getElementById('btn-submit-text').innerText = 'Create Task';
         editOnly.forEach(el => el.style.display = 'none');
         deleteBtn.style.display = 'none';
+        ownerTop.innerText = 'Owner: -';
         ['designer', 'creative'].forEach(role => {
             document.getElementById(`check-${role}`).checked = false;
+            document.getElementById(`badge-assign-${role}`).style.display = 'none';
             updateRoleUI(role);
             updateStatusUI(document.getElementById(`b-quest-modal-${role}-status`));
         });
@@ -309,6 +307,19 @@ async function openTaskModal(taskId = null, workData = []) {
 
     setupModalWorkDropdown(workData); setupModalTypeDropdown();
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+function fillFormData(data) {
+    const map = { 'b-quest-modal-account': data.account_name, 'b-quest-modal-opportunity': data.opportunity_name, 'b-quest-modal-taskname': data.task_name, 'b-quest-modal-link': data.link, 'b-quest-modal-publish-date': data.publish_date, 'b-quest-modal-detail': data.detail, 'b-quest-modal-designer-status': data.designer_status, 'b-quest-modal-designer-type': data.designer_type, 'b-quest-modal-designer-work': data.designer, 'b-quest-modal-designer-deadline': data.designer_deadline, 'b-quest-modal-designer-weight': data.designer_weight, 'b-quest-modal-creative-status': data.creative_status, 'b-quest-modal-creative-type': data.creative_type, 'b-quest-modal-creative-work': data.creative, 'b-quest-modal-creative-deadline': data.creative_deadline, 'b-quest-modal-creative-weight': data.creative_weight };
+    for (let id in map) { const field = document.getElementById(id); if (field) field.value = map[id] || ''; }
+    
+    document.getElementById('modal-owner-display').innerText = `Owner: ${data.owner || '-'}`;
+    ['designer', 'creative'].forEach(role => {
+        const badge = document.getElementById(`badge-assign-${role}`);
+        const name = data[`${role}_assign`];
+        if (name && name !== '-' && name !== '') { badge.innerText = name; badge.style.display = 'inline-block'; } 
+        else { badge.style.display = 'none'; }
+    });
 }
 
 function setupModalWorkDropdown(workData) {
@@ -333,16 +344,10 @@ function setupModalTypeDropdown() {
     });
 }
 
-function initModalEventListeners() {
-    ['designer', 'creative'].forEach(r => {
-        document.getElementById(`b-quest-modal-${r}-deadline`).onchange = () => checkCapacity(r);
-    });
-}
-
 async function handleDeleteTask() {
     const id = document.getElementById('b-quest-modal-id').value;
     if (!id) return;
-    const confirm = await Swal.fire({ title: 'Are you sure?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!', confirmButtonColor: '#ef4444' });
+    const confirm = await Swal.fire({ title: 'Delete Task?', text: "You won't be able to revert this!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
     if (confirm.isConfirmed) {
         const { error } = await supabaseClient.from('b-quest-list').delete().eq('id', id);
         if (!error) location.reload();
@@ -353,41 +358,34 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
     e.preventDefault();
     const form = e.target;
 
-    // 1. Validate Fields
     if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
 
-    // 2. Strict Requirement: At least 1 card active
     const isDesActive = document.getElementById('check-designer').checked;
     const isCreActive = document.getElementById('check-creative').checked;
     if (!isDesActive && !isCreActive) {
-        Swal.fire('Wait!', 'Please select at least one role (Designer or Creative).', 'warning');
+        Swal.fire('Wait!', 'Select at least Designer or Creative role.', 'warning');
         return;
     }
 
-    // 3. Check Capacity
     if (currentCapacities.designer > 10 || currentCapacities.creative > 10) {
-        Swal.fire('Capacity Full', 'Load exceeds 10/10. Please adjust deadlines.', 'error');
+        Swal.fire('Capacity Full', 'Load exceeds 10/10.', 'error');
         return;
     }
 
     const payload = Object.fromEntries(new FormData(form).entries());
-    const isEdit = payload.id && payload.id.length > 10;
+    const isEdit = !!payload.id && payload.id.length > 10;
     const currentId = payload.id;
 
     if (!isEdit) {
         delete payload.id;
         payload.owner = "Test (BX001)";
-        
-        payload.designer_assign = null; 
+        // For new task, assignees stay null until manager picks them
+        payload.designer_assign = null;
         payload.creative_assign = null;
-        
-        if (isDesActive) { payload.designer_status = "Progress"; }
-        if (isCreActive) { payload.creative_status = "Progress"; }
     }
 
-    // Null Safety & Data Cleanup
-    const fields = ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'];
-    fields.forEach(f => { if (payload[f] === "") payload[f] = null; });
+    const clean = (f) => { if (payload[f] === "") payload[f] = null; };
+    ['designer_deadline', 'creative_deadline', 'publish_date', 'detail', 'link', 'designer', 'creative', 'designer_type', 'creative_type', 'designer_status', 'creative_status'].forEach(clean);
     payload.designer_weight = parseInt(payload.designer_weight) || 0;
     payload.creative_weight = parseInt(payload.creative_weight) || 0;
 
@@ -409,13 +407,6 @@ document.getElementById('b-quest-modal-form').addEventListener('submit', async (
 
 const BQuestService = { async getQuestById(id) { const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single(); return error ? null : data; } };
 
-function fillFormData(data) {
-    const map = { 'b-quest-modal-account': data.account_name, 'b-quest-modal-opportunity': data.opportunity_name, 'b-quest-modal-taskname': data.task_name, 'b-quest-modal-link': data.link, 'b-quest-modal-publish-date': data.publish_date, 'b-quest-modal-detail': data.detail, 'b-quest-modal-designer-status': data.designer_status, 'b-quest-modal-designer-type': data.designer_type, 'b-quest-modal-designer-work': data.designer, 'b-quest-modal-designer-deadline': data.designer_deadline, 'b-quest-modal-designer-weight': data.designer_weight, 'b-quest-modal-creative-status': data.creative_status, 'b-quest-modal-creative-type': data.creative_type, 'b-quest-modal-creative-work': data.creative, 'b-quest-modal-creative-deadline': data.creative_deadline, 'b-quest-modal-creative-weight': data.creative_weight };
-    for (let id in map) { const field = document.getElementById(id); if (field) field.value = map[id] || ''; }
-    if(data.designer_assign) document.getElementById('badge-designer').innerText = data.designer_assign;
-    if(data.creative_assign) document.getElementById('badge-creative').innerText = data.creative_assign;
-}
-
 async function openSearchOverlay(fieldName, targetId) {
     const overlay = document.getElementById('bq-search-overlay');
     const container = document.getElementById('uni-list-container');
@@ -429,6 +420,5 @@ async function openSearchOverlay(fieldName, targetId) {
         container.appendChild(btn);
     });
 }
-
 function closeSearchOverlay() { document.getElementById('bq-search-overlay').style.display = 'none'; }
-initModalEventListeners();
+['designer', 'creative'].forEach(r => { document.getElementById(`b-quest-modal-\${r}-deadline`).onchange = () => checkCapacity(r); });
