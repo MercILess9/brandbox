@@ -1,18 +1,15 @@
 <style>
     :root {
-        --sys-main: #bdc432; /* สีเขียว Lime */
+        --sys-main: #bdc432; 
         --sys-dark: #111111;
-        --sys-grey: #adb5bd; /* สีเทาสำหรับไอคอน */
+        --sys-grey: #adb5bd; 
         --sys-white: #ffffff;
-        --header-height: 105px;
+        --header-height: 110px; /* เพิ่มขึ้นนิดนึงตามความกว้างเมนู */
     }
 
-    /* ตัวหุ้ม Header ทั้งหมด */
     .sys-header-wrapper {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: var(--header-height);
         background: var(--sys-white);
         border-bottom: 1.5px solid #eeeeee;
@@ -22,7 +19,6 @@
         font-family: 'Outfit', 'Sarabun', sans-serif;
     }
 
-    /* --- แถบบน: Logo & User --- */
     .sys-top-bar {
         flex: 1;
         display: flex;
@@ -36,98 +32,40 @@
         align-items: center;
         text-decoration: none !important;
         color: var(--sys-dark);
-        transition: 0.2s;
-    }
-    .sys-brand-zone:hover { opacity: 0.8; }
-
-    .sys-logo-img {
-        height: 35px; /* ปรับขนาดโลโก้ให้เล็กลงตามสั่ง */
-        width: auto;
     }
 
-    .sys-divider {
-        width: 1.5px;
-        height: 25px;
-        background: #ddd;
-        margin: 0 15px;
-    }
+    .sys-logo-img { height: 35px; width: auto; }
+    .sys-divider { width: 1.5px; height: 25px; background: #ddd; margin: 0 15px; }
+    .sys-project-name { font-weight: 800; font-size: 1.25rem; text-transform: uppercase; }
 
-    .sys-project-name {
-        font-weight: 800;
-        font-size: 1.25rem;
-        letter-spacing: -0.5px;
-        text-transform: uppercase;
-    }
+    .sys-user-zone { display: flex; align-items: center; gap: 15px; }
+    #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
+    .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; }
 
-    .sys-user-zone {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    #user-display {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #888;
-    }
-
-    /* ปุ่มไอคอนคนสีเทา */
-    .btn-user-profile {
-        background: none;
-        border: none;
-        padding: 0;
-        color: var(--sys-grey); /* สีเทาตามโจทย์ */
-        font-size: 1.8rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        transition: 0.2s;
-    }
-    .btn-user-profile:hover { color: var(--sys-main); }
-
-    /* ปรับแต่ง Dropdown */
-    .dropdown-menu {
-        border: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        border-radius: 12px;
-        padding: 8px;
-        min-width: 180px;
-    }
-    .dropdown-item {
-        border-radius: 8px;
-        padding: 10px 15px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--sys-dark);
-    }
-    .dropdown-item:hover { background: #f8fbef; color: var(--sys-main); }
-
-    /* --- แถบล่าง: เมนูแนวนอน (Green Bar) --- */
+    /* --- แถบล่าง: เมนูแนวนอน (ปรับตามสั่ง) --- */
     #sys-menu-bar {
-        height: 35px;
+        height: 40px;           /* 🚩 ปรับความสูงเป็น 40px */
         background: var(--sys-main);
-        display: flex;           /* บังคับแนวนอน */
-        flex-direction: row;     /* เรียงซ้ายไปขวา */
+        display: flex;
+        flex-direction: row;
         align-items: center;
         padding: 0 30px;
-        gap: 5px;
+        gap: 2px;               /* ชิดกันนิดนึงเพื่อให้เห็นแถบ Active ต่อเนื่อง */
     }
 
     .sys-menu-link {
         color: var(--sys-dark) !important;
         text-decoration: none !important;
-        font-size: 0.72rem;
-        font-weight: 800;
+        font-size: 0.85rem;      /* 🚩 ชื่อเมนูใหญ่ขึ้น */
+        font-weight: 700;        /* 🚩 ตัวหนาขึ้น */
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 4px 15px;
-        border-radius: 4px;
-        opacity: 0.7;
+        padding: 0 20px;         /* เพิ่มระยะคลิกซ้ายขวา */
+        height: 100%;            /* ให้สูงเต็มแถว 40px */
+        display: flex;
+        align-items: center;
         transition: 0.2s;
-        white-space: nowrap;
+        opacity: 0.6;            /* เมนูที่ไม่เลือกจะจางลง */
+        border-bottom: 3px solid transparent; /* เตรียมพื้นที่ไว้ให้ขีดตอน Active */
     }
 
     .sys-menu-link:hover {
@@ -135,12 +73,15 @@
         background: rgba(0,0,0,0.05);
     }
 
-    /* ไฮไลท์ว่าอยู่เมนูไหน */
+    /* 🚩 วิธีทำให้ดูออกว่าอยู่เมนูไหน (Active State) */
     .sys-menu-link.active {
-        opacity: 1;
-        background: rgba(0,0,0,0.1);
-        box-shadow: inset 0 -2px 0 var(--sys-dark);
+        opacity: 1 !important;
+        background: rgba(0,0,0,0.1);          /* พื้นหลังเข้มขึ้น */
+        border-bottom: 3px solid var(--sys-dark); /* 🚩 ขีดเส้นใต้หนาๆ สีดำ */
+        color: #000 !important;
     }
+
+    .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
 </style>
 
 <div class="sys-header-wrapper">
@@ -152,24 +93,15 @@
         </a>
 
         <div class="sys-user-zone">
-            <span id="user-display">thitiphon@brand-strom.com</span>
-            
+            <span id="user-display">Loading...</span>
             <div class="dropdown">
-                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown">
                     <i class="bi bi-person-circle"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <a class="dropdown-item" href="/profiles.html">
-                            <i class="bi bi-person-gear"></i> Profiles
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider opacity-50"></li>
-                    <li>
-                        <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logout()">
-                            <i class="bi bi-box-arrow-right"></i> Log Out
-                        </a>
-                    </li>
+                    <li><a class="dropdown-item" href="/profiles.html"><i class="bi bi-person-gear"></i> Profiles</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Log Out</a></li>
                 </ul>
             </div>
         </div>
