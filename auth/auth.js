@@ -41,29 +41,39 @@ async function handleLogin(email, password) {
     }
 }
 
-/**
- * 2. ฟังก์ชันสมัครสมาชิก (Signup)
- */
-async function handleSignup(email, password, fullName) {
+// ใน /auth/auth.js (เพิ่ม/ปรับส่วน Signup)
+async function handleSignup(email, password, metadata) {
     try {
+        Swal.fire({ 
+            title: 'Creating Account...', 
+            allowOutsideClick: false, 
+            didOpen: () => Swal.showLoading() 
+        });
+
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
-                data: {
-                    full_name: fullName,
-                    role: 'staff' // กำหนด Role เริ่มต้น
-                }
+                // ใช้ window.location.origin เพื่อให้ชัวร์ว่า redirect กลับมาถูกที่
+                emailRedirectTo: window.location.origin + '/auth/login.html', 
+                data: metadata // โยนก้อนข้อมูล Emp ID, Role, etc. เข้าไปตรงนี้
             }
         });
 
         if (error) throw error;
 
-        notify("สมัครสมาชิกสำเร็จ", "กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน", "success");
+        Swal.fire({ 
+            icon: "success", 
+            title: "Registration Complete!", 
+            text: "Please check your email for confirmation." 
+        }).then(() => { 
+            window.location.href = "/auth/login.html"; 
+        });
+
         return data;
 
-    } catch (error) {
-        notify("สมัครไม่สำเร็จ", error.message, "error");
+    } catch (err) {
+        Swal.fire("Failed", err.message, "error");
         return null;
     }
 }
