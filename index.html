@@ -3,7 +3,6 @@
     <title>B-STROM | Portal Hub</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script src="/system/config.js" defer></script>
     <script src="/system/system.js" defer></script>
     
@@ -11,8 +10,8 @@
         :root {
             --brand-white: #ffffff;
             --brand-dark: #1a1a1a;
-            --brand-lime: #bdc432; /* สีเขียว Brand */
-            --card-light: #f8f9fa; /* สีอ่อนตอนปกติ */
+            --brand-lime: #bdc432;
+            --card-active: #ececec; /* เพิ่มความเข้มจากเดิมให้ดูออกว่ากดได้ */
             --font-main: 'Outfit', 'Inter', sans-serif;
         }
 
@@ -28,99 +27,90 @@
         .portal-container {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 50px 20px;
+            padding: 40px 20px;
         }
 
         /* --- Logo --- */
-        .logo-section { margin-bottom: 40px; }
-        .main-logo { height: 40px; width: auto; }
+        .logo-section { margin-bottom: 35px; }
+        .main-logo { height: 35px; width: auto; }
 
-        /* --- Hero Text (ขนาดกะทัดรัด) --- */
+        /* --- Hero Text (Compact) --- */
         .hero-section {
             text-align: left;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             border-left: 4px solid var(--brand-lime);
-            padding-left: 25px;
+            padding-left: 20px;
         }
-        .text-top { font-size: 0.95rem; font-weight: 500; color: #888; margin-bottom: 4px; letter-spacing: 1.5px; }
-        .text-main { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 12px; text-transform: uppercase; }
-        .text-highlight { font-size: 1.1rem; font-weight: 600; color: var(--brand-lime); margin-bottom: 6px; }
-        .text-footer { font-size: 0.8rem; font-weight: 600; letter-spacing: 3px; color: #bbb; text-transform: uppercase; }
+        .text-top { font-size: 0.9rem; font-weight: 500; color: #888; margin-bottom: 4px; letter-spacing: 1px; }
+        .text-main { font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 10px; text-transform: uppercase; }
+        .text-highlight { font-size: 1rem; font-weight: 600; color: var(--brand-lime); margin-bottom: 4px; }
+        .text-footer { font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; color: #ccc; text-transform: uppercase; }
 
-        /* --- Project Grid (Icon + Label) --- */
+        /* --- Project Grid (4 Columns) --- */
         .project-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr); /* บังคับ 4 คอลัมน์บนจอคอม */
+            gap: 15px;
         }
 
         .project-card {
-            background: var(--card-light); /* เริ่มต้นสีอ่อน */
-            border: 1px solid #eee;
-            border-radius: 16px;
-            height: 180px;
+            background: var(--card-active); /* สีเข้มขึ้นเพื่อให้ชัดเจน */
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            height: 140px; /* ลดความสูงกล่องลง */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-decoration: none !important;
             color: var(--brand-dark);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
             position: relative;
         }
 
-        /* เอฟเฟกต์ตอนชี้ (Hover) */
+        /* Hover Effect */
         .project-card:hover {
-            background: var(--brand-lime); /* เปลี่ยนเป็นสีเขียว Brand */
+            background: var(--brand-lime);
             border-color: var(--brand-lime);
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(189, 196, 50, 0.25);
-            color: #000; /* เปลี่ยนสีตัวอักษรให้เข้มชัดบนสีเขียว */
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(189, 196, 50, 0.2);
+            color: #000;
         }
 
         .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            transition: transform 0.3s ease;
-        }
-
-        .project-card:hover .card-icon {
-            transform: scale(1.1);
+            font-size: 2rem; /* ย่อไอคอนลงหน่อย */
+            margin-bottom: 10px;
         }
 
         .card-title {
-            font-size: 1.6rem;
+            font-size: 1.2rem; /* ปรับขนาดตัวอักษรให้เข้ากับกล่องเล็ก */
             font-weight: 800;
             letter-spacing: -0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .card-status {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
-        /* การ์ดที่ยังไม่เปิด */
+        /* การ์ดที่ยังไม่เปิด (Coming Soon) */
         .coming-soon-card {
             background: #fff;
-            border: 1px dashed #ddd;
-            color: #ccc;
+            border: 1px dashed #eee;
+            color: #ddd;
             cursor: default;
         }
-        .coming-soon-card:hover {
-            transform: none;
-            background: #fff;
-            box-shadow: none;
-            border-color: #ddd;
-            color: #ccc;
-        }
+        .coming-soon-card .card-icon, 
+        .coming-soon-card .card-title { opacity: 0.4; }
+        .coming-soon-card:hover { transform: none; background: #fff; box-shadow: none; border-color: #eee; color: #ddd; }
 
-        @media (max-width: 768px) {
-            .text-main { font-size: 1.8rem; }
-        }
+        /* Responsive สำหรับมือถือ/แท็บเล็ต */
+        @media (max-width: 992px) { .project-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 576px) { .project-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -142,25 +132,25 @@
             <a href="/b-quest/b-quest-list" class="project-card">
                 <div class="card-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
                 <div class="card-title">B-QUEST</div>
-                <div class="card-status">ENTER SYSTEM</div>
+                <div class="card-status">ENTER</div>
             </a>
 
             <div class="project-card coming-soon-card">
                 <div class="card-icon"><i class="bi bi-graph-up-arrow"></i></div>
                 <div class="card-title">DASHBOARD</div>
-                <div class="card-status">COMING SOON</div>
+                <div class="card-status">SOON</div>
             </div>
 
             <div class="project-card coming-soon-card">
                 <div class="card-icon"><i class="bi bi-person-badge"></i></div>
                 <div class="card-title">B-ACCOUNT</div>
-                <div class="card-status">COMING SOON</div>
+                <div class="card-status">SOON</div>
             </div>
 
             <div class="project-card coming-soon-card">
                 <div class="card-icon"><i class="bi bi-wallet2"></i></div>
                 <div class="card-title">FINANCE</div>
-                <div class="card-status">COMING SOON</div>
+                <div class="card-status">SOON</div>
             </div>
 
         </div>
@@ -168,7 +158,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // รันระบบ Layout กลาง
             await initLayout({
                 projectName: "BRANDSTROM X",
                 menus: []
