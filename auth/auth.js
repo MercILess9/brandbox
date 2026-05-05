@@ -78,19 +78,34 @@ async function handleSignup(email, password, metadata) {
     }
 }
 
-/**
- * 3. ฟังก์ชันลืมรหัสผ่าน (Forgot Password)
- */
+// ใน /auth/auth.js
 async function handleForgotPassword(email) {
     try {
+        Swal.fire({ 
+            title: 'Processing...', 
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading() 
+        });
+
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/auth/reset-password.html',
+            // ส่งกลับไปที่หน้าตั้งรหัสผ่านใหม่
+            redirectTo: window.location.origin + '/auth/forgot-password.html', 
         });
 
         if (error) throw error;
 
-        notify("ส่งอีเมลแล้ว", "กรุณาเช็คอีเมลเพื่อตั้งรหัสผ่านใหม่", "info");
-    } catch (error) {
-        notify("เกิดข้อผิดพลาด", error.message, "error");
+        Swal.fire({
+            icon: "success",
+            title: "Link Sent!",
+            text: "Please check your email to reset password.",
+            confirmButtonColor: "rgb(45, 71, 57)"
+        });
+
+    } catch (err) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: err.message
+        });
     }
 }
