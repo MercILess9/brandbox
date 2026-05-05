@@ -1,127 +1,117 @@
 /**
  * B-STROM SYSTEM CORE ENGINE (2026)
- * "The Security Guard & The UI Architect"
+ * [FIXED: Redirect Loop Version]
  */
 
-// 1. เตรียมตัวแปร Global
 let supabaseClient;
 
+// 1. Initial Supabase ทันทีที่โหลดไฟล์
+if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_KEY !== 'undefined') {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
 /**
- * [Main Function] เริ่มต้นระบบทั้งหมด
- * @param {Object} config - { projectName: "...", menus: [{name: '...', link: '...'}] }
+ * [Main Function]
  */
 async function initLayout(config = {}) {
-    // 🚩 กู้ภัยหน้าขาว: เช็คว่าตัวแปรจาก config.js โหลดมาหรือยัง
-    if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_KEY === 'undefined') {
-        console.error("❌ Error: config.js missing or variables undefined!");
-        document.body.classList.add('auth-ready'); 
-        return;
-    }
-
-    // 🚩 เริ่มเดินเครื่อง Supabase Client ทันที
     if (!supabaseClient) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    }
-
-    // ฉีด Assets พื้นฐาน (CSS/JS/Viewport)
-    injectAssets();
-    
-    // ตรวจสอบสิทธิ์การเข้าถึง (Auth Guard)
-    await initAuthGuard();
-
-    // เช็คว่าเป็นหน้าแรก (Index) หรือไม่
-    const path = window.location.pathname;
-    const isIndex = path.endsWith('/') || path.includes('index.html');
-
-    if (isIndex) {
-        console.log("🚀 Portal Mode: Skipping Header fetch");
         document.body.classList.add('auth-ready');
         return;
     }
 
-    // สำหรับหน้าทำงานอื่นๆ -> ไปดึงไฟล์ header.html มาโชว์
+    injectAssets();
+    
+    // รอเช็ค Auth ให้จบก่อนค่อยทำอย่างอื่น
+    await initAuthGuard();
+
+    const path = window.location.pathname.toLowerCase();
+    // เช็คว่าเป็นหน้าแรกหรือไม่ (รองรับทั้ง / , /index.html)
+    const isIndex = path === '/' || path.endsWith('/index.html') || path.endsWith('/');
+
+    if (isIndex) {
+        document.body.classList.add('auth-ready');
+        return;
+    }
+
+    // หน้าอื่นๆ ที่ไม่ใช่ Index ให้ดึง Header
     await renderSystemUI(config);
 }
 
 /**
- * [Auth Guard] ระบบเฝ้าประตู
+ * [Auth Guard] ระบบเฝ้าประตู (จุดแก้บั๊ก Loop)
  */
 async function initAuthGuard() {
-    if (!supabaseClient) return;
-
     const { data: { session } } = await supabaseClient.auth.getSession();
-    const path = window.location.pathname;
+    const path = window.location.pathname.toLowerCase();
     
-    // รายชื่อหน้าในโฟลเดอร์ /auth/ ที่ไม่ต้องไล่ไป Login
-    const isAuthPage = path.includes('login.html') || 
-                       path.includes('signup.html') || 
-                       path.includes('forgot-password.html');
+    // เช็คว่าปัจจุบันอยู่ในโฟลเดอร์ /auth/ หรือไม่
+    // วิธีนี้แม่นยำกว่าการเช็คชื่อไฟล์ เพราะครอบคลุมทุกหน้าที่เกี่ยวกับการล็อกอิน
+    const isAuthPage = path.includes('/auth/');
 
-    // กรณี 1: ยังไม่ได้ Login และไม่ใช่หน้า Auth -> ดีดไป Login
+    // --- LOGIC การเด้งหน้า ---
+    
+    // 1. ถ้าไม่มี Session และ "ไม่ได้" อยู่หน้า Auth -> ต้องไปหน้า Login
     if (!session && !isAuthPage) {
-        window.location.href = "/auth/login.html";
+        console.log("🔒 No session, redirecting to login...");
+        window.location.replace("/auth/login.html"); //ใช้ replace เพื่อไม่ให้เก็บ history การเด้ง
         return;
     }
 
-    // กรณี 2: Login แล้วแต่จะไปหน้า Login -> ดีดกลับเข้าหน้า Index
+    // 2. ถ้ามี Session แล้ว และ "ดัน" อยู่หน้า Auth -> ต้องไปหน้า Index
     if (session && isAuthPage) {
-        window.location.href = "/index.html";
+        console.log("✅ Already logged in, redirecting to home...");
+        window.location.replace("/index.html");
         return;
     }
 
-    // ตรวจสอบการ Logout จาก Tab อื่นๆ
-    supabaseClient.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_OUT') window.location.href = "/auth/login.html";
+    // ฟังการเปลี่ยนแปลงสถานะ (เช่น กด Logout จาก Tab อื่น)
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT') {
+            window.location.replace("/auth/login.html");
+        }
     });
 }
 
 /**
- * [UI Rendering] ดึงโครงสร้างจาก header.html มาใช้งาน
+ * [UI Rendering]
  */
 async function renderSystemUI(config) {
     try {
-        // 1. ไปดึงไฟล์ header.html (ใช้ Relative Path เพื่อความปลอดภัย)
-        const response = await fetch('system/header.html'); 
-        if (!response.ok) throw new Error("Could not find header.html");
-        
+        // ดึง header.html มาฉีด
+        const response = await fetch('/system/header.html'); 
+        if (!response.ok) throw new Error("Header not found");
         const headerHTML = await response.text();
-
-        // 2. ฉีด HTML เข้าไปใน Body บนสุด
         document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-        // 3. ปรับแต่งข้อมูล Project Name
+        // ใส่ชื่อโปรเจกต์
         const projectTitle = document.getElementById('project-title');
         if (projectTitle) projectTitle.innerText = config.projectName || 'SYSTEM';
 
-        // 4. จัดการลูปเมนูในแถบสีเขียว (sys-menubar)
+        // วาดเมนู
         const menuBar = document.getElementById('sys-menu-bar');
         if (config.menus && menuBar) {
             config.menus.forEach(menu => {
                 const isActive = window.location.pathname.includes(menu.link) ? 'active' : '';
-                const linkHTML = `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`;
-                menuBar.insertAdjacentHTML('beforeend', linkHTML);
+                menuBar.insertAdjacentHTML('beforeend', `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`);
             });
         }
 
-        // 5. ดึงชื่อ User มาโชว์
+        // โชว์ชื่อ User
         const { data: { user } } = await supabaseClient.auth.getUser();
-        const display = document.getElementById('user-display');
-        if (display && user) {
-            display.innerText = user.user_metadata.full_name || user.email;
+        if (user) {
+            const display = document.getElementById('user-display');
+            if (display) display.innerText = user.user_metadata.full_name || user.email;
         }
 
-        // ปลดล็อกหน้าขาว
         document.body.classList.add('auth-ready');
-
     } catch (err) {
-        console.error("❌ UI Render Error:", err);
-        // ถึงจะพังก็ต้องปลดล็อกหน้าขาวให้ User เห็นหน้าเว็บ
+        console.error(err);
         document.body.classList.add('auth-ready');
     }
 }
 
 /**
- * [Assets Injection] ฉีดของจำเป็นเข้า <head>
+ * [Assets Injection]
  */
 function injectAssets() {
     if (!document.querySelector('meta[name="viewport"]')) {
@@ -129,31 +119,15 @@ function injectAssets() {
         meta.name = "viewport"; meta.content = "width=device-width, initial-scale=1.0";
         document.head.appendChild(meta);
     }
-
-    const links = [
-        "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap",
-        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
-        "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-    ];
-
+    const links = ["https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"];
     links.forEach(url => {
         if (!document.querySelector(`link[href="${url}"]`)) {
             const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = url;
             document.head.appendChild(l);
         }
     });
-
-    // ตรวจสอบการโหลด SweetAlert2
-    if (typeof Swal === 'undefined' && !document.querySelector('script[src*="sweetalert2"]')) {
-        const s = document.createElement('script');
-        s.src = "https://cdn.jsdelivr.net/npm/sweetalert2@11";
-        document.head.appendChild(s);
-    }
 }
 
-/**
- * [Helpers]
- */
 function notify(title, text, icon = 'success') {
     if (typeof Swal !== 'undefined') {
         Swal.fire({ title, text, icon, timer: 2000, showConfirmButton: false });
@@ -163,7 +137,6 @@ function notify(title, text, icon = 'success') {
 }
 
 async function logout() {
-    if (!supabaseClient) return;
     await supabaseClient.auth.signOut();
-    window.location.href = "/auth/login.html";
+    window.location.replace("/auth/login.html");
 }
