@@ -1,21 +1,23 @@
-/**
- * B-STROM SYSTEM CORE ENGINE (2026)
- * "The Security Guard & The Architect"
- */
 
-// 1. ตรวจสอบว่า B_CONFIG โหลดมาหรือยัง (ต้องวาง config.js ก่อน system.js)
-if (typeof B_CONFIG === 'undefined') {
-    console.error("❌ Error: config.js not found. Please load config.js before system.js");
-}
-
-// 2. สร้าง Supabase Client ไว้เป็น Global
-const supabaseClient = supabase.createClient(B_CONFIG.URL, B_CONFIG.KEY);
+let supabaseClient;
 
 /**
  * [Main Function] เริ่มต้นระบบทั้งหมด
  * @param {Object} config - { projectName: "...", menus: [...] }
  */
 async function initLayout(config = {}) {
+    // 🚩 กู้ภัยหน้าขาว: เช็คว่าตัวแปรจาก config.js โหลดมาครบไหม
+    if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_KEY === 'undefined') {
+        console.error("❌ Error: config.js not found or variables missing!");
+        // ถ้าพัง ให้ฝืนแสดงหน้าจอ (ปลดล็อก opacity: 0) เพื่อให้เห็น Error บน Console
+        document.body.classList.add('auth-ready'); 
+        return;
+    }
+
+    if (!supabaseClient) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+
     // ฉีด Assets พื้นฐาน (CSS/JS/Viewport)
     injectAssets();
     
@@ -28,13 +30,12 @@ async function initLayout(config = {}) {
 
     if (isIndex) {
         console.log("🚀 Portal Mode: Skipping System UI");
-        // แสดงเนื้อหาทันทีสำหรับหน้า Index
+        // แสดงเนื้อหาทันทีสำหรับหน้า Index (ปลดล็อกหน้าขาว)
         document.body.classList.add('auth-ready');
         return;
     }
 
     // สำหรับหน้าทำงานอื่นๆ (เช่น B-Quest) ให้สร้าง Navbar/Sidebar
-    // ใช้ DOMContentLoaded เพื่อให้มั่นใจว่า Body พร้อมสำหรับการฉีด HTML
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => renderSystemUI(config));
     } else {
@@ -46,28 +47,29 @@ async function initLayout(config = {}) {
  * [Auth Guard] ระบบเฝ้าประตู
  */
 async function initAuthGuard() {
+    if (!supabaseClient) return;
+
     const { data: { session } } = await supabaseClient.auth.getSession();
     const path = window.location.pathname;
     
-    // รายชื่อหน้าในโฟลเดอร์ /auth/ ที่ไม่ต้องเช็ค Login
+    // รายชื่อหน้าในโฟลเดอร์ /auth/ ที่ "รปภ." ไม่ต้องไล่ไป Login
     const isAuthPage = path.includes('login.html') || 
                        path.includes('signup.html') || 
-                       path.includes('forgot-password.html') ||
-                       path.includes('reset-pass.html');
+                       path.includes('forgot-password.html');
 
-    // กรณี 1: ไม่มี Session และไม่ได้อยู่หน้า Auth -> ดีดไป Login
+    // กรณี 1: ยังไม่ได้ Login และพยายามเข้าหน้าทำงาน -> ดีดไป Login
     if (!session && !isAuthPage) {
         window.location.href = "/auth/login.html";
         return;
     }
 
-    // กรณี 2: มี Session แล้วแต่ดันทะลึ่งจะเข้าหน้า Login/Signup -> ดีดไป Index
+    // กรณี 2: Login แล้ว แต่จะกลับไปหน้า Login/Signup -> ดีดไป Index
     if (session && isAuthPage) {
         window.location.href = "/index.html";
         return;
     }
 
-    // ฟังเสียงการ Logout จาก Tab อื่นๆ หรือจากระบบ
+    // ตรวจสอบการ Logout จาก Tab อื่นๆ
     supabaseClient.auth.onAuthStateChange((event) => {
         if (event === 'SIGNED_OUT') {
             window.location.href = "/auth/login.html";
@@ -79,7 +81,7 @@ async function initAuthGuard() {
  * [Assets Injection] ฉีดของจำเป็นเข้า <head>
  */
 function injectAssets() {
-    // 1. Meta Viewport (สำหรับ Mobile Friendly)
+    // 1. Meta Viewport (สำหรับมือถือ)
     if (!document.querySelector('meta[name="viewport"]')) {
         const meta = document.createElement('meta');
         meta.name = "viewport";
@@ -87,7 +89,7 @@ function injectAssets() {
         document.head.appendChild(meta);
     }
 
-    // 2. CSS/Fonts (ถ้ายังไม่มีในหน้า)
+    // 2. CSS/Fonts
     const links = [
         "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap",
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
@@ -102,27 +104,18 @@ function injectAssets() {
         }
     });
 
-    // 3. Scripts (Swal/Bootstrap)
-    const scripts = [
-        "https://cdn.jsdelivr.net/npm/sweetalert2@11",
-        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    ];
-
-    scripts.forEach(url => {
-        const isSwal = url.includes('sweetalert2') && typeof Swal !== 'undefined';
-        if (!document.querySelector(`script[src="${url}"]`) && !isSwal) {
-            const s = document.createElement('script');
-            s.src = url;
-            document.head.appendChild(s);
-        }
-    });
+    // 3. Scripts (SweetAlert2)
+    if (typeof Swal === 'undefined' && !document.querySelector('script[src*="sweetalert2"]')) {
+        const s = document.createElement('script');
+        s.src = "https://cdn.jsdelivr.net/npm/sweetalert2@11";
+        document.head.appendChild(s);
+    }
 }
 
 /**
- * [UI Rendering] สร้าง Navbar และ Sidebar
+ * [UI Rendering] สร้าง Navbar (เฉพาะหน้าทำงาน ไม่รันใน Index)
  */
 function renderSystemUI(config) {
-    // Navbar
     const navHTML = `
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
             <div class="container-fluid">
@@ -139,7 +132,7 @@ function renderSystemUI(config) {
     document.body.insertAdjacentHTML('afterbegin', navHTML);
     document.body.style.paddingTop = "70px";
 
-    // ดึงชื่อ User มาโชว์ (ถ้ามี)
+    // ดึงชื่อ User มาโชว์
     supabaseClient.auth.getUser().then(({data}) => {
         const display = document.getElementById('user-display');
         if (display && data.user) {
@@ -147,16 +140,12 @@ function renderSystemUI(config) {
         }
     });
 
-    // Sidebar (ถ้าต้องการเพิ่มภายหลัง)
-    if (config.menus && config.menus.length > 0) {
-        console.log("🛠 Sidebar rendering logic goes here");
-    }
-
+    // แสดงหน้าจอเมื่อทุกอย่างพร้อม
     document.body.classList.add('auth-ready');
 }
 
 /**
- * [Helpers] ฟังก์ชันอำนวยความสะดวกเรียกใช้ได้ทุกหน้า
+ * [Helpers]
  */
 function notify(title, text, icon = 'success') {
     if (typeof Swal !== 'undefined') {
@@ -167,6 +156,7 @@ function notify(title, text, icon = 'success') {
 }
 
 async function logout() {
+    if (!supabaseClient) return;
     await supabaseClient.auth.signOut();
     window.location.href = "/auth/login.html";
 }
