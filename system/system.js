@@ -2,7 +2,9 @@
 // 1. GLOBAL CONFIG & CLIENT
 // ==========================================
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const publicPages = ["login.html", "register.html", "forgot-password.html"];
+
+// ปรับให้ไม่มี .html เพื่อให้ตรงกับค่าที่ได้จาก getCurrentPage()
+const publicPages = ["login", "register", "forgot-password"];
 
 // ==========================================
 // 2. GLOBAL UTILITIES
@@ -18,46 +20,63 @@ function formatDate(dateStr) {
     } catch (e) { return dateStr; }
 }
 
+/**
+ * จัดการ Path ให้ถูกต้องไม่ว่าจะอยู่ที่ Folder ไหน
+ */
 function getCorrectPath(target) {
     const root = window.location.origin;
-    if (target === "login.html") return `${root}/auth/login.html`;
-    if (target === "index.html") return `${root}/b-quest/b-quest-list.html`;
-    return `${root}/${target}`;
+    // ตัดเครื่องหมาย / นำหน้าออกถ้ามี เพื่อไม่ให้เกิด double slash
+    const cleanTarget = target.startsWith('/') ? target.slice(1) : target;
+
+    // Mapping พิเศษสำหรับหน้าหลักและหน้า Auth
+    if (cleanTarget === "login.html" || cleanTarget === "auth/login.html") {
+        return `${root}/auth/login.html`;
+    }
+    if (cleanTarget === "index.html" || cleanTarget === "") {
+        return `${root}/index.html`;
+    }
+    
+    // สำหรับไฟล์ในระบบ เช่น /system/header.html
+    return `${root}/${cleanTarget}`;
 }
 
+/**
+ * ดึงชื่อหน้าปัจจุบันโดยไม่มีนามสกุล และรองรับหน้า Root
+ */
 function getCurrentPage() {
-    let path = window.location.pathname.split("/").pop();
-    if (!path || path === "") path = "index";
-    return path.replace(".html", "");
-}
+    const path = window.location.pathname;
+    // ถ้าอยู่ที่หน้าแรกสุด ให้ถือว่าเป็น index
+    if (path === "/" || path === "") return "index";
 
+    // ดึงส่วนสุดท้ายของ URL และตัด .html ออก
+    const page = path.split("/").pop();
+    return page.replace(".html", "");
+}
 
 function safeRedirect(to) {
     const url = getCorrectPath(to);
-    if (window.location.href !== url) window.location.href = url;
+    // ป้องกันการโหลดซ้ำหน้าเดิม (Prevent Infinite Loop)
+    if (window.location.href !== url) {
+        window.location.href = url;
+    }
 }
 
 // ==========================================
-// 3. UI LOADER (🔥 แยกออกมา)
+// 3. UI LOADER
 // ==========================================
 const UILoader = {
     async loadModal(fileName) {
         console.log("📦 loadModal:", fileName);
-
         try {
+            // ใช้ Path ตรงจาก Root เสมอ
             const url = `${window.location.origin}/b-quest/${fileName}`;
-            console.log("📡 Fetch:", url);
-
             const resp = await fetch(url);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
             const html = await resp.text();
-
             const wrapper = document.createElement('div');
             wrapper.innerHTML = html;
-
             document.body.appendChild(wrapper);
-
         } catch (e) {
             console.error("❌ Load Modal Fail:", e);
         }
@@ -96,17 +115,18 @@ const System = {
         this.injectAssets();
 
         try {
-            const resp = await fetch(getCorrectPath('/system/header.html'));
+            // ดึง Header จาก Folder system โดยใช้ Path สัมบูรณ์
+            const resp = await fetch('/system/header.html');
+            if (!resp.ok) throw new Error("Header not found");
             const html = await resp.text();
 
             const header = document.createElement('header');
             header.className = "sticky-top shadow-sm";
             header.innerHTML = html;
-
             document.body.prepend(header);
 
             if (document.getElementById("project-title")) {
-                document.getElementById("project-title").innerText = config.projectName;
+                document.getElementById("project-title").innerText = config.projectName || "SYSTEM";
             }
 
             const menuBar = document.getElementById("sys-menu-bar");
@@ -114,27 +134,26 @@ const System = {
 
             if (menuBar && config.menus) {
                 menuBar.innerHTML = "";
-
                 config.menus.forEach(m => {
                     const a = document.createElement('a');
                     a.href = m.link;
-                    a.className = `sys-menu-link ${curr === m.link ? 'active' : ''}`;
+                    // เช็ค active โดยดูว่าชื่อหน้าปัจจุบันตรงกับ link ไหม
+                    const isActive = m.link.includes(curr);
+                    a.className = `sys-menu-link ${isActive ? 'active' : ''}`;
                     a.innerText = m.name;
                     menuBar.appendChild(a);
                 });
             }
 
             const { data: { session } } = await supabaseClient.auth.getSession();
-
             if (session) {
                 const profile = await this.getProfile(session.user.id);
-                const el = document.getElementById("user-display");
+                // เก็บ Profile ลง localStorage เพื่อให้หน้าอื่นดึงไปใช้ได้ง่าย
+                if (profile) localStorage.setItem('bq_user_profile', JSON.stringify(profile));
 
+                const el = document.getElementById("user-display");
                 if (el) {
-                    el.innerText =
-                        profile?.nick_name ||
-                        profile?.full_name ||
-                        session.user.email.split('@')[0];
+                    el.innerText = profile?.nick_name || profile?.full_name || session.user.email.split('@')[0];
                 }
             }
 
@@ -149,7 +168,6 @@ const System = {
             .select("*")
             .eq("id", userId)
             .single();
-
         return error ? null : data;
     },
 
@@ -157,6 +175,7 @@ const System = {
         await supabaseClient.auth.signOut();
         localStorage.clear();
         sessionStorage.clear();
+        safeRedirect("auth/login.html");
     },
 
     notify(title, type = "success") {
@@ -171,26 +190,41 @@ const System = {
     }
 };
 
-
+// ==========================================
+// 5. AUTH GUARD
+// ==========================================
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const page = getCurrentPage();
     const isPublic = publicPages.includes(page);
-    if (page === "index") {
-        if (!session) {
-            console.log("🚫 No session on Index, redirecting...");
-            safeRedirect("auth/login.html");
-            return;
-        }
+
+    console.log(`🛡️ Guard: Page [${page}] | Public [${isPublic}] | Session [${!!session}]`);
+
+    // 1. ถ้าอยู่หน้าแรก (index) แต่ไม่ได้ login -> ไปหน้า login
+    if (page === "index" && !session) {
+        console.log("🔒 Access denied: Index requires login.");
+        return safeRedirect("auth/login.html");
     }
 
-    if (!session && !isPublic) { safeRedirect("auth/login.html"); } 
-    else if (session && isPublic) { safeRedirect("index.html"); }
+    // 2. ถ้าเข้าหน้าปกติ (Private) แต่ไม่ได้ login -> ไปหน้า login
+    if (!isPublic && !session) {
+        console.log("🔒 Access denied: This page requires login.");
+        return safeRedirect("auth/login.html");
+    }
+
+    // 3. ถ้า Login แล้ว แต่ดันมาหน้า Public (เช่น login, register) -> ไปหน้า index
+    if (isPublic && session) {
+        console.log("🔓 Already logged in: Redirecting to Index.");
+        return safeRedirect("index.html");
+    }
+
+    // ฟังเหตุการณ์ Sign Out แบบ Real-time
     supabaseClient.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_OUT') safeRedirect("auth/login.html");
+        if (event === 'SIGNED_OUT') {
+            safeRedirect("auth/login.html");
+        }
     });
 }
 
-
-
+// รันระบบตรวจสอบสิทธิ์ทันที
 initAuthGuard();
