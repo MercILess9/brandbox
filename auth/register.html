@@ -119,7 +119,7 @@
         <button class="btn-main" type="submit">Sign Up</button>
     </form>
     
-    <div class="link">Already have an account? <a href="/login">Sign in</a></div>
+    <div class="link">Already have an account? <a href="/auth/login">Sign in</a></div>
 </div>
 
 <script>
@@ -156,7 +156,7 @@
                 email: email,
                 password: password,
                 options: {
-                    emailRedirectTo: `${SITE_URL}/login`, 
+                    emailRedirectTo: `${SITE_URL}/auth/login`, 
                     data: {
                         employee_id: document.getElementById("emp_id").value,
                         nick_name: document.getElementById("nick").value,
@@ -173,7 +173,7 @@
                 title: "Complete!", 
                 text: "Please check your email for confirmation." 
             }).then(() => { 
-                window.location.href = "/login"; 
+                window.location.href = "/auth/login"; 
             });
 
         } catch (err) {

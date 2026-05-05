@@ -97,7 +97,7 @@ const System = {
         this.injectAssets();
 
         try {
-            const resp = await fetch(getCorrectPath('header.html'));
+            const resp = await fetch(getCorrectPath('/system/header.html'));
             const html = await resp.text();
 
             const header = document.createElement('header');
