@@ -60,13 +60,7 @@ function formatDate(dateStr) {
     } catch (e) { return dateStr; }
 }
 
-// ==========================================
-// 3. CORE SYSTEM FUNCTIONS (แยกออกมาแล้ว)
-// ==========================================
 
-/**
- * ฉีด Assets พื้นฐานที่ทุกหน้าต้องใช้
- */
 function injectAssets() {
     const links = [
         "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap",
