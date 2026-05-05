@@ -180,9 +180,8 @@ async function initAuthGuard() {
     const page = getCurrentPage();
     const isPublic = publicPages.includes(page);
 
-    if (page === "index.html") {
-        session ? safeRedirect("index.html") : safeRedirect("login.html");
-        return;
+    if (page === "index.html" || page === "index") {
+        if (!session) safeRedirect("login.html"); return;
     }
 
     if (!session && !isPublic) safeRedirect("login.html");

@@ -2,121 +2,206 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-Quest System | Deployment Status</title>
+    <title>B-STROM | Portal Hub</title>
+    <script src="/system/config.js"></script>
+    <script src="/system/system.js"></script>
+    
     <style>
-        :root {
-            --primary-color: #0070f3;
-            --success-color: #10b981;
-            --bg-color: #f4f7fb;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background: #f1f5f9;
+            min-height: 100vh;
+            font-family: 'Inter', 'Sarabun', sans-serif;
         }
 
-        .container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        /* --- Hero Section --- */
+        .portal-hero {
+            padding: 60px 20px 40px;
             text-align: center;
-            max-width: 400px;
-            width: 90%;
         }
-
-        .logo {
-            font-size: 1.5rem;
+        .portal-hero h1 {
+            font-size: 2.2rem;
             font-weight: 800;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.025em;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .portal-hero p {
+            color: #64748b;
+            font-size: 1.1rem;
         }
 
-        .status-badge {
-            display: inline-flex;
+        /* --- Project Grid --- */
+        .project-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        /* --- Project Card --- */
+        .project-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none !important;
+            display: flex;
             align-items: center;
-            background-color: #ecfdf5;
-            color: var(--success-color);
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .status-dot {
-            height: 8px;
-            width: 8px;
-            background-color: var(--success-color);
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
+        .project-card:hover {
+            transform: translateY(-8px);
+            border-color: #bdc432;
+            box-shadow: 0 20px 25px -5px rgba(189, 196, 50, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
+        /* Icon Zone */
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #1e293b;
+            transition: 0.3s;
+        }
+        .project-card:hover .icon-box {
+            background: #bdc432;
+            color: #fff;
         }
 
-        h1 {
-            font-size: 1.5rem;
-            margin: 0 0 0.5rem 0;
+        /* Text Zone */
+        .project-info h3 {
+            font-size: 1.2rem;
             font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 4px 0;
+        }
+        .project-info p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin: 0;
         }
 
-        p {
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 2rem;
+        /* Coming Soon State */
+        .card-disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        .card-disabled:hover { transform: none; border-color: #e2e8f0; }
+        .badge-soon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f1f5f9;
+            color: #94a3b8;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 10px;
+            text-transform: uppercase;
         }
 
-        .footer {
-            font-size: 0.75rem;
-            color: #9ca3af;
-            border-top: 1px solid #f3f4f6;
-            padding-top: 1.5rem;
+        /* Floating Decoration */
+        .project-card::after {
+            content: "\f285"; /* Bootstrap Icon Chevron Right */
+            font-family: "bootstrap-icons";
+            position: absolute;
+            right: 30px;
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .project-card:not(.card-disabled):hover::after {
+            opacity: 1;
+            right: 25px;
+            color: #bdc432;
         }
 
-        .domain-tag {
-            font-family: monospace;
-            background: #f3f4f6;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="logo">B-QUEST</div>
-        
-        <div class="status-badge">
-            <span class="status-dot"></span>
-            System Operational
+        <div class="portal-hero">
+            <h1>Welcome back, <span id="portal-user-name">...</span></h1>
+            <p>Select a project to continue your work</p>
         </div>
 
-        <h1>Deployment Successful</h1>
-        <p>
-            The web environment is now live on <strong>Vercel</strong>. 
-            Finalizing connection to the corporate subdomain.
-        </p>
+        <div class="project-grid">
+            
+            <a href="#" class="project-card card-disabled">
+                <span class="badge-soon">Coming Soon</span>
+                <div class="icon-box"><i class="bi bi-speedometer2"></i></div>
+                <div class="project-info">
+                    <h3>Dashboard</h3>
+                    <p>Business Overview & Analytics</p>
+                </div>
+            </a>
 
-        <div class="footer">
-            Project: <strong>Database Migration</strong><br>
-            Environment: <span class="domain-tag">Production</span>
+            <a href="/b-quest/b-quest-list" class="project-card">
+                <div class="icon-box"><i class="bi bi-patch-check"></i></div>
+                <div class="project-info">
+                    <h3>B-QUEST</h3>
+                    <p>Creative & Designer Task Management</p>
+                </div>
+            </a>
+
+            <a href="#" class="project-card card-disabled">
+                <span class="badge-soon">Development</span>
+                <div class="icon-box"><i class="bi bi-person-lines-fill"></i></div>
+                <div class="project-info">
+                    <h3>B-ACCOUNT</h3>
+                    <p>Client & Account Directory</p>
+                </div>
+            </a>
+
+            <a href="#" class="project-card card-disabled">
+                <span class="badge-soon">Planned</span>
+                <div class="icon-box"><i class="bi bi-wallet2"></i></div>
+                <div class="project-info">
+                    <h3>Finance</h3>
+                    <p>Expense & Revenue Tracking</p>
+                </div>
+            </a>
+
+            <a href="#" class="project-card card-disabled">
+                <span class="badge-soon">Planned</span>
+                <div class="icon-box"><i class="bi bi-coin"></i></div>
+                <div class="project-info">
+                    <h3>Commision</h3>
+                    <p>Calculate & Manage Incentives</p>
+                </div>
+            </a>
+
         </div>
     </div>
 
+    <script>
+        // เมื่อโหลดหน้า ให้เรียกใช้ระบบ Layout ของ Portal
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. เรียกใช้ Layout กลาง
+            await System.initLayout({
+                projectName: "B-STROM PLATFORM",
+                menus: [] // หน้า Portal อาจจะไม่ต้องมีเมนูย่อย
+            });
+
+            // 2. ดึงชื่อ User มาโชว์ที่ Hero (ดึงจาก localStorage ที่เราคุยกันไว้)
+            const profile = JSON.parse(localStorage.getItem('bq_user_profile'));
+            if (profile) {
+                document.getElementById('portal-user-name').innerText = profile.nick_name || profile.full_name || "User";
+            }
+        });
+    </script>
 </body>
 </html>
