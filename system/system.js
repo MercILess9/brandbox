@@ -90,7 +90,7 @@ async function initAuthGuard() {
  */
 async function renderSystemUI(config) {
     try {
-        const response = await fetch('/system/header.html'); 
+        const response = await fetch('/system/header.html?v=1.1');
         if (!response.ok) throw new Error("Header template not found");
         const headerHTML = await response.text();
 

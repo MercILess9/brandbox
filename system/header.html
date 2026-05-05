@@ -1,0 +1,110 @@
+<style>
+    :root {
+        --sys-brand: #bdc432; /* สีเขียวเลมอน Brand ของพี่ */
+        --sys-dark: #111111;
+        --sys-grey: #adb5bd; 
+        --sys-white: #ffffff;
+        --header-height: 105px; 
+    }
+
+    .sys-header-wrapper {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: var(--header-height);
+        background: var(--sys-white);
+        border-bottom: 1.5px solid #eeeeee;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Outfit', 'Sarabun', sans-serif;
+    }
+
+    /* --- แถบบน: Logo & User --- */
+    .sys-top-bar {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 30px;
+    }
+
+    .sys-brand-zone {
+        display: flex;
+        align-items: center;
+        text-decoration: none !important;
+        color: var(--sys-dark);
+    }
+    .sys-logo-img { height: 32px; width: auto; }
+    .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
+    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
+
+    .sys-user-zone { display: flex; align-items: center; gap: 12px; }
+    #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
+    .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; padding: 0; }
+
+    /* --- แถบล่าง: เมนูสี Brand (White Active Style) --- */
+    #sys-menu-bar {
+        height: 40px;           /* กว้าง 40px ตามสั่ง */
+        background: var(--sys-brand); 
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 30px;
+        gap: 5px;
+    }
+
+    .sys-menu-link {
+        color: var(--sys-dark);  /* เมนูทั่วไปเป็นสีดำ */
+        text-decoration: none !important;
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0 20px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        transition: 0.3s;
+        opacity: 0.5;            /* เมนูทั่วไปทำให้จางไว้ก่อน */
+        border-bottom: 4px solid transparent;
+    }
+
+    .sys-menu-link:hover {
+        opacity: 0.8;
+    }
+
+    /* 🚩 ไฮไลท์เมนูที่ใช้งานอยู่ (Active) */
+    .sys-menu-link.active {
+        color: var(--sys-white) !important;      /* 🚩 ตัวหนังสือสีขาวตามสั่ง */
+        opacity: 1 !important;                   /* ชัดเจน 100% */
+        border-bottom: 4px solid var(--sys-white); /* 🚩 เส้นใต้สีขาวตามสั่ง */
+    }
+
+    .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
+</style>
+
+<div class="sys-header-wrapper">
+    <div class="sys-top-bar">
+        <a href="/index.html" class="sys-brand-zone">
+            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
+            <div class="sys-divider"></div>
+            <span class="sys-project-name" id="project-title">B-QUEST</span>
+        </a>
+
+        <div class="sys-user-zone">
+            <span id="user-display">Loading...</span>
+            <div class="dropdown">
+                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/profiles.html"><i class="bi bi-person-gear"></i> Profiles</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <nav id="sys-menu-bar">
+        </nav>
+</div>
