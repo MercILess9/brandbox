@@ -1,8 +1,4 @@
-/**
- * B-STROM AUTH LOGIC
- */
 
-// 1. ฟังก์ชันเข้าสู่ระบบ
 async function handleLogin(email, password) {
     try {
         if (typeof Swal !== 'undefined') {

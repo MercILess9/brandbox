@@ -1,7 +1,4 @@
-/**
- * B-STROM SYSTEM CORE ENGINE (2026)
- * [UPDATE: Hide Header on Auth Pages]
- */
+
 
 let supabaseClient;
 
@@ -10,9 +7,7 @@ if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_KEY !== 'undefined') 
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
-/**
- * [Main Function]
- */
+
 async function initLayout(config = {}) {
     if (!supabaseClient) {
         document.body.classList.add('auth-ready');
@@ -43,9 +38,7 @@ async function initLayout(config = {}) {
     await renderSystemUI(config);
 }
 
-/**
- * [Auth Guard] ระบบเฝ้าประตู
- */
+
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const path = window.location.pathname.toLowerCase();
@@ -68,9 +61,7 @@ async function initAuthGuard() {
     });
 }
 
-/**
- * [UI Rendering] ดึงโครงสร้างจาก header.html มาใช้งาน
- */
+
 async function renderSystemUI(config) {
     try {
         const response = await fetch('/system/header.html'); 
@@ -79,9 +70,8 @@ async function renderSystemUI(config) {
 
         document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-        // ใส่ชื่อโปรเจกต์
         const projectTitle = document.getElementById('project-title');
-        if (projectTitle) projectTitle.innerText = config.projectName || 'SYSTEM';
+        if (projectTitle) projectTitle.innerText = config.projectName;
 
         // วาดเมนูสีเขียว
         const menuBar = document.getElementById('sys-menu-bar');
@@ -98,7 +88,6 @@ async function renderSystemUI(config) {
             const display = document.getElementById('user-display');
             if (display) display.innerText = user.user_metadata.full_name || user.email;
         }
-
         document.body.classList.add('auth-ready');
 
     } catch (err) {
@@ -107,9 +96,7 @@ async function renderSystemUI(config) {
     }
 }
 
-/**
- * [Assets Injection]
- */
+
 function injectAssets() {
     if (!document.querySelector('meta[name="viewport"]')) {
         const meta = document.createElement('meta');
