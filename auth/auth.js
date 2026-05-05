@@ -1,11 +1,4 @@
-/**
- * B-STROM AUTHENTICATION LOGIC
- * จัดการเรื่อง Login, Signup และ Password Reset
- */
 
-/**
- * 1. ฟังก์ชันเข้าสู่ระบบ (Login)
- */
 async function handleLogin(email, password) {
     try {
         // แสดง Loading นิดนึงให้ดูโปร
