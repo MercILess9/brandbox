@@ -427,7 +427,7 @@
 
     async function initPage() {
         try {
-            await System.initLayout(B_QUEST_CONFIG);
+            await initLayout(B_QUEST_CONFIG);
             await loadMasterData();
             fetchQuests(true);
         } catch (e) { console.error(e); }
