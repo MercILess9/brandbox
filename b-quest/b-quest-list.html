@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>B-QUEST | Task Missions</title>
+    <title>B-QUEST</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/system/config.js"></script>
@@ -20,23 +20,10 @@
             --c-panel-bg: #fcfcfc;
         }
 
-        body { 
-            font-family: 'Outfit', 'Sarabun', sans-serif; 
-            background-color: var(--c-bg); 
-            color: var(--c-text-main); 
-            padding-bottom: 120px; 
-            margin: 0; 
-            /* ระยะ padding-top จะถูกจัดการโดย system.js อัตโนมัติ */
-        }
+        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--c-bg); color: var(--c-text-main); padding-bottom: 120px; margin: 0; }
 
-        /* --- Filter Zone: ปรับ Top ให้หลบ Header สีเขียวของเรา --- */
-        .flt-wrapper { 
-            background: #fff; padding: 15px 30px; 
-            border-bottom: 1px solid #e2e8f0; 
-            position: sticky; 
-            top: 105px; /* หลบแถบขาว+แถบเขียว */
-            z-index: 100; 
-        }
+        /* --- Filter Zone --- */
+        .flt-wrapper { background: #fff; padding: 15px 30px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .flt-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .flt-search { position: relative; width: 380px; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
@@ -52,13 +39,18 @@
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
 
         .flt-advanced-zone { 
-            max-height: 0; overflow: hidden; 
+            max-height: 0; 
+            overflow: hidden; 
             transition: max-height 0.4s ease-out, opacity 0.3s ease; 
-            opacity: 0; border-top: 1px dashed transparent;
+            opacity: 0;
+            border-top: 1px dashed transparent;
         }
         .flt-advanced-zone.show { 
-            max-height: 200px; opacity: 1;
-            margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee;
+            max-height: 200px; 
+            opacity: 1;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #eee;
         }
         .flt-advanced-row { display: flex; align-items: center; gap: 12px; justify-content: center; flex-wrap: nowrap; }
         
@@ -99,11 +91,11 @@
         .bqc-btn-link { background: var(--c-text-main); border: none; border-radius: 10px; padding: 6px 15px; font-size: 0.75rem; font-weight: 600; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
         
         .bqc-layout-row { display: flex; gap: 20px; }
-        .bqc-col-30 { width: 33.33%; }
-        .bqc-col-40 { width: 33.33%; }
+        .bqc-col-30 { width: 30%; }
+        .bqc-col-40 { width: 40%; }
         .bqc-panel-label { font-size: 0.85rem; font-weight: 700; color: var(--c-slate); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
         
-        .bqc-panel { background: var(--c-panel-bg); border: 1px solid #f1f5f9; border-radius: 24px; padding: 20px; height: 160px; overflow-y: auto; }
+        .bqc-panel { background: var(--c-panel-bg); border: 1px solid #f1f5f9; border-radius: 24px; padding: 20px; height: 160px; }
         .bqc-panel-empty { border: 2px dashed #f1f5f9; background: transparent; border-radius: 24px; height: 160px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-weight: 600; letter-spacing: 1px; }
 
         .bqc-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--c-slate); }
@@ -122,7 +114,7 @@
     <div class="flt-row">
         <div class="flt-search">
             <i class="bi bi-search"></i>
-            <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search mission name, account, designer...">
+            <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search...">
         </div>
         <div class="flt-date-group">
             <input type="date" class="flt-date-input" id="startDate">
@@ -162,22 +154,14 @@
 </button>
 
 <script>
-    // --- 1. Global Config & State ---
-    const B_QUEST_CONFIG = {
-        projectName: "QUEST",
-        itemsPerPage: 15,
-        listTypes: ["Layout", "Graphic", "Video", "Copy", "Presentation", "Other"],
-        menus: [
-            { name: "List View", link: "/b-quest/b-quest-list.html" },
-            { name: "Create Quest", link: "javascript:openTaskModal(null, dataList)" }
-        ]
-    };
-
     const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'designer_assign', 'creative_assign', 'owner'];
-    let dataList = []; let assignList = []; 
-    let currentPage = 0; let isFetching = false; let hasMore = true;
+    let dataList = [];     
+    let assignList = [];   
+    let currentPage = 0;
+    let isFetching = false;
+    let hasMore = true;
 
-    // --- 2. Filter & Master Data Logic ---
+    // --- Helpers ---
     function setupDefaultOptions(el, label) {
         if (!el) return;
         el.innerHTML = `<option value="">All ${label}</option>`;
@@ -185,7 +169,7 @@
 
     function updateHighlight(id) {
         const el = document.getElementById(id);
-        const box = el?.closest('.flt-select-box');
+        const box = el.closest('.flt-select-box');
         if (box) el.value !== "" ? box.classList.add('active-filter') : box.classList.remove('active-filter');
     }
 
@@ -198,6 +182,7 @@
         selectEl.appendChild(group);
     }
 
+    // --- Main Logic ---
     async function loadMasterData() {
         try {
             const [workRes, profileRes] = await Promise.all([
@@ -222,7 +207,7 @@
                 const unique = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
                 unique.forEach(name => ownerEl.add(new Option(name, name)));
             }
-        } catch (e) { console.error("MasterData Error:", e); }
+        } catch (e) { console.error(e); }
     }
 
     function renderFilterWork() {
@@ -250,9 +235,11 @@
         if (document.getElementById('pill-designer').classList.contains('active-role')) {
             appendRoleGroup(filterAssign, "Designers", assignList, 'role_designer', true, 'codename', 'codename');
         }
+
         if (document.getElementById('pill-creative').classList.contains('active-role')) {
             appendRoleGroup(filterAssign, "Creatives", assignList, 'role_creative', true, 'codename', 'codename');
         }
+
         filterAssign.value = currentSelection;
         updateHighlight('filterAssign');
     }
@@ -273,11 +260,10 @@
         fetchQuests();
     }
 
-    // --- 3. Data Fetching ---
     async function fetchQuests(isFirst = false) {
         if (isFetching || (!hasMore && !isFirst)) return;
         isFetching = true;
-        const limit = B_QUEST_CONFIG.itemsPerPage;
+        const limit = B_QUEST_CONFIG.itemsPerPage || 20;
         const from = currentPage * limit;
         const to = from + limit - 1;
 
@@ -322,16 +308,20 @@
             if (data.length < limit) hasMore = false;
             renderCards(data);
             currentPage++;
-        } catch (e) { console.error("Fetch Error:", e); } finally { isFetching = false; }
+        } catch (e) { console.error(e); } finally { isFetching = false; }
     }
 
-    // --- 4. Card Rendering ---
     function renderCards(data) {
         const container = document.getElementById("taskContainer");
+        // ไม่ต้องล้าง container ตรงนี้ เพราะเราใช้ระบบ Infinite Scroll (append ข้อมูลต่อท้าย)
         
         data.forEach(task => {
+            // --- 1. เช็คสถานะการเปิด Card (Designer / Creative) ---
             const hasD = !!task.designer && task.designer !== '-' && task.designer !== '';
             const hasC = !!task.creative && task.creative !== '-' && task.creative !== '';
+            
+            // --- 2. เช็ค Status รวม (ถ้าเปิด Card ไหน ต้อง Done ทุก Card ที่เปิดถึงจะเป็นสีเทา) ---
+            // ถ้าไม่เปิดเลย หรือที่เปิดอยู่ยังไม่ Done จะเป็นสีน้ำเงิน (Progress)
             const isDone = (hasD || hasC) && 
                         (!hasD || task.designer_status === 'Done') && 
                         (!hasC || task.creative_status === 'Done');
@@ -350,14 +340,15 @@
 
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                             <div class="bqc-dl-col">
-                                ${hasD ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${task.designer_deadline || '-'}</span>` : ''}
+                                ${hasD ? `<span class="bqc-dl-label">Designer</span><span class="bqc-tag bqc-tag-des">${formatDate(task.designer_deadline)}</span>` : ''}
                             </div>
                             <div class="bqc-dl-col">
-                                ${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${task.creative_deadline || '-'}</span>` : ''}
+                                ${hasC ? `<span class="bqc-dl-label">Creative</span><span class="bqc-tag bqc-tag-cre">${formatDate(task.creative_deadline)}</span>` : ''}
                             </div>
                         </div>
 
                         <div class="bqc-actions">
+                            <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}', dataList)">Edit</button>
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 15px;">
@@ -374,10 +365,10 @@
                             <div class="bqc-meta-row">
                                 <div class="d-flex gap-2">
                                     <div class="bqc-meta-pill"><span class="bqc-meta-label">Owner</span><span class="bqc-meta-val ms-2">${task.owner || '-'}</span></div>
-                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Publish</span><span class="bqc-meta-val ms-2">${task.publish_date || '-'}</span></div>
+                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Publish</span><span class="bqc-meta-val ms-2">${formatDate(task.publish_date)}</span></div>
                                     ${task.link ? `<a href="${task.link}" target="_blank" class="bqc-btn-link"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
-                                <div class="bqc-last-update"><i class="bi bi-clock-history"></i> Last Update : ${task.last_update ? new Date(task.last_update).toLocaleString() : '-'}</div>
+                                <div class="bqc-last-update"><i class="bi bi-clock-history"></i> Last Update : ${formatDate(task.last_update)}</div>
                             </div>
 
                             <div class="bqc-layout-row">
@@ -388,8 +379,8 @@
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.designer_status}</span></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type || '-'}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer || '-'}</span></div>
-                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.designer_assign || '-'}</span></div>
-                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${task.designer_deadline || '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.designer_assign && task.designer_assign !== '-') ? task.designer_assign : '-'}</span></div>
+                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div>
                                         </div>
                                     ` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
                                 </div>
@@ -401,15 +392,15 @@
                                             <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.creative_status}</span></div>
                                             <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type || '-'}</span></div>
                                             <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative || '-'}</span></div>
-                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${task.creative_assign || '-'}</span></div>
-                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${task.creative_deadline || '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.creative_assign && task.creative_assign !== '-') ? task.creative_assign : '-'}</span></div>
+                                            <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div>
                                         </div>
                                     ` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
                                 </div>
 
                                 <div class="bqc-col-40">
                                     <div class="bqc-panel-label"><i class="bi bi-justify-left"></i> DETAIL</div>
-                                    <div class="bqc-panel">
+                                    <div class="bqc-panel" style="overflow-y: auto; color: #64748b; font-size: 0.85rem; line-height: 1.5;">
                                         ${task.detail ? task.detail.replace(/\n/g, '<br>') : 'No details provided.'}
                                     </div>
                                 </div>
@@ -422,7 +413,6 @@
         });
     }
 
-    // --- 5. Initialization ---
     function resetAdvanced() {
         ['filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
             const el = document.getElementById(id);
@@ -434,19 +424,12 @@
 
     async function initPage() {
         try {
-            // สั่งรันเครื่องยนต์หลัก
             await initLayout(B_QUEST_CONFIG);
-            // โหลดข้อมูล Master (Work / Profiles)
             await loadMasterData();
-            // ดึงข้อมูลการ์ด
             fetchQuests(true);
-        } catch (e) { 
-            console.error("Init Error:", e);
-            document.body.classList.add('auth-ready');
-        }
+        } catch (e) { console.error(e); }
     }
 
-    // Event Listeners
     document.getElementById('toggleFilters').addEventListener('click', () => {
         document.getElementById('advancedFilterZone').classList.toggle('show');
     });
@@ -460,14 +443,12 @@
 
     document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
 
-    // Infinite Scroll
     const observer = new IntersectionObserver(entries => { 
         if(entries[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
-    }, { rootMargin: '200px' });
+    }, { rootMargin: '100px' });
     observer.observe(document.getElementById('load-more-trigger'));
 
     initPage();
 </script>
-
 </body>
 </html>
