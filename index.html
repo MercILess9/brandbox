@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-STROM | Portal Hub</title>
+    <title>B-STROM BOX</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/system/config.js" defer></script>
@@ -13,8 +12,8 @@
         :root {
             --brand-white: #ffffff;
             --brand-dark: #1a1a1a;
-            --brand-lime: #bdc432; /* สีเขียวเดิม */
-            --bg-light: #f8f9fa;
+            --brand-lime: #bdc432;
+            --brand-gray: #f4f4f4;
             --font-main: 'Outfit', 'Inter', sans-serif;
         }
 
@@ -28,129 +27,118 @@
         }
 
         .portal-container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 60px 20px;
+            padding: 50px 20px;
         }
 
         /* --- Logo Section --- */
         .logo-section {
-            text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
         .main-logo {
-            height: 50px;
+            height: 40px;
             width: auto;
-            /* ถอด filter invert ออกเพื่อให้แสดงสีจริงของโลโก้ */
         }
 
-        /* --- Hero Text Section (Light Mode) --- */
+        /* --- Hero Text Section (ปรับเล็กลง) --- */
         .hero-section {
             text-align: left;
-            margin-bottom: 60px;
-            border-left: 5px solid var(--brand-lime);
-            padding-left: 30px;
+            margin-bottom: 50px;
+            border-left: 4px solid var(--brand-lime);
+            padding-left: 25px;
         }
         .text-top {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 500;
-            letter-spacing: 2px;
-            color: #666;
-            margin-bottom: 5px;
+            letter-spacing: 1.5px;
+            color: #888;
+            margin-bottom: 4px;
         }
         .text-main {
-            font-size: 3.5rem;
+            font-size: 2.2rem; /* ปรับเล็กลงจากเดิม */
             font-weight: 800;
-            line-height: 1.1;
+            line-height: 1.2;
             color: var(--brand-dark);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-transform: uppercase;
         }
         .text-highlight {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 1.1rem; /* ปรับเล็กลง */
+            font-weight: 600;
             color: var(--brand-lime);
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         .text-footer {
-            font-size: 1.1rem;
+            font-size: 0.85rem; /* ปรับเล็กลง */
             font-weight: 600;
             letter-spacing: 3px;
-            color: #999;
+            color: #bbb;
             text-transform: uppercase;
         }
 
-        /* --- Project Grid --- */
+        /* --- Project Grid (เน้นชื่อโปรเจกต์) --- */
         .project-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
 
         .project-card {
-            background: #ffffff;
-            border: 1px solid #eee;
-            border-radius: 20px;
-            padding: 35px;
+            background: var(--brand-gray);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            height: 160px; /* กำหนดความสูงให้เท่ากัน */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-decoration: none !important;
-            color: var(--brand-dark);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            overflow: hidden;
         }
 
-        .project-card:hover {
+        /* การ์ดที่ใช้งานได้ */
+        .active-card {
+            background: var(--brand-dark);
+            color: white;
+        }
+        .active-card:hover {
+            transform: translateY(-5px);
             border-color: var(--brand-lime);
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
-        .card-icon {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            color: var(--brand-dark);
-        }
-
-        .project-card:hover .card-icon {
-            color: var(--brand-lime);
+        /* การ์ดที่ยังไม่เปิด */
+        .coming-soon-card {
+            background: #fff;
+            border: 1px dashed #ddd;
+            color: #ccc;
+            cursor: default;
         }
 
         .card-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 1.8rem; /* ชื่อโปรเจกต์เด่นๆ */
+            font-weight: 800;
             letter-spacing: -0.5px;
+            margin-bottom: 5px;
         }
 
-        .card-desc {
-            font-size: 0.95rem;
-            color: #777;
-            line-height: 1.5;
-        }
-
-        /* Status Badge */
-        .status-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 0.7rem;
-            background: #f0f0f0;
-            padding: 5px 12px;
-            border-radius: 20px;
-            color: #888;
+        .card-status {
+            font-size: 0.75rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .active-card .status-badge {
-            background: var(--brand-lime);
-            color: #fff;
+        .active-card .card-status {
+            color: var(--brand-lime);
         }
 
         @media (max-width: 768px) {
-            .text-main { font-size: 2.2rem; }
-            .portal-container { padding: 40px 20px; }
+            .text-main { font-size: 1.8rem; }
+            .card-title { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -171,32 +159,31 @@
         <div class="project-grid">
             
             <a href="/b-quest/b-quest-list" class="project-card active-card">
-                <span class="status-badge">ACTIVE</span>
-                <div class="card-icon"><i class="bi bi-patch-check-fill"></i></div>
                 <div class="card-title">B-QUEST</div>
-                <div class="card-desc">Creative & Designer Task Management System</div>
+                <div class="card-status">ENTER SYSTEM</div>
             </a>
 
-            <a href="#" class="project-card">
-                <span class="status-badge">COMING SOON</span>
-                <div class="card-icon"><i class="bi bi-layers"></i></div>
+            <div class="project-card coming-soon-card">
                 <div class="card-title">DASHBOARD</div>
-                <div class="card-desc">Data Analytics & Performance Tracking</div>
-            </a>
+                <div class="card-status">COMING SOON</div>
+            </div>
 
-            <a href="#" class="project-card">
-                <span class="status-badge">DEVELOPMENT</span>
-                <div class="card-icon"><i class="bi bi-person-bounding-box"></i></div>
+            <div class="project-card coming-soon-card">
                 <div class="card-title">B-ACCOUNT</div>
-                <div class="card-desc">Client Management & Partner Directory</div>
-            </a>
+                <div class="card-status">COMING SOON</div>
+            </div>
+
+            <div class="project-card coming-soon-card">
+                <div class="card-title">FINANCE</div>
+                <div class="card-status">COMING SOON</div>
+            </div>
 
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // เรียกใช้ระบบ Layout กลาง
+            // เรียกใช้ระบบ Layout
             await initLayout({
                 projectName: "BRANDSTROM X",
                 menus: []
