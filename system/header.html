@@ -1,10 +1,10 @@
 <style>
     :root {
-        --sys-main: #bdc432; 
+        --sys-brand: #bdc432; /* สีเขียวเลมอนของพี่ ห้ามเปลี่ยน */
         --sys-dark: #111111;
-        --sys-grey: #adb5bd; 
+        --sys-grey: #adb5bd; /* สีเทาสำหรับไอคอนคน */
         --sys-white: #ffffff;
-        --header-height: 110px; /* เพิ่มขึ้นนิดนึงตามความกว้างเมนู */
+        --header-height: 105px; 
     }
 
     .sys-header-wrapper {
@@ -19,6 +19,7 @@
         font-family: 'Outfit', 'Sarabun', sans-serif;
     }
 
+    /* --- แถบบน: Logo & User --- */
     .sys-top-bar {
         flex: 1;
         display: flex;
@@ -33,52 +34,50 @@
         text-decoration: none !important;
         color: var(--sys-dark);
     }
+    .sys-logo-img { height: 32px; width: auto; } /* ปรับโลโก้ให้เล็กลงนิดนึง */
+    .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
+    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; letter-spacing: -0.5px; }
 
-    .sys-logo-img { height: 35px; width: auto; }
-    .sys-divider { width: 1.5px; height: 25px; background: #ddd; margin: 0 15px; }
-    .sys-project-name { font-weight: 800; font-size: 1.25rem; text-transform: uppercase; }
-
-    .sys-user-zone { display: flex; align-items: center; gap: 15px; }
+    .sys-user-zone { display: flex; align-items: center; gap: 12px; }
     #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
-    .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; }
+    .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; padding: 0; }
 
-    /* --- แถบล่าง: เมนูแนวนอน (ปรับตามสั่ง) --- */
+    /* --- แถบล่าง: เมนูแนวนอน 40px (สี Brand) --- */
     #sys-menu-bar {
-        height: 40px;           /* 🚩 ปรับความสูงเป็น 40px */
-        background: var(--sys-main);
+        height: 40px;
+        background: var(--sys-brand); /* สีเลมอนที่พี่ห้ามเปลี่ยน */
         display: flex;
         flex-direction: row;
         align-items: center;
         padding: 0 30px;
-        gap: 2px;               /* ชิดกันนิดนึงเพื่อให้เห็นแถบ Active ต่อเนื่อง */
+        gap: 0; /* ให้ปุ่มชิดกัน */
     }
 
     .sys-menu-link {
         color: var(--sys-dark) !important;
         text-decoration: none !important;
-        font-size: 0.85rem;      /* 🚩 ชื่อเมนูใหญ่ขึ้น */
-        font-weight: 700;        /* 🚩 ตัวหนาขึ้น */
+        font-size: 0.85rem;
+        font-weight: 800;
         text-transform: uppercase;
-        padding: 0 20px;         /* เพิ่มระยะคลิกซ้ายขวา */
-        height: 100%;            /* ให้สูงเต็มแถว 40px */
+        padding: 0 25px;
+        height: 100%;
         display: flex;
         align-items: center;
-        transition: 0.2s;
-        opacity: 0.6;            /* เมนูที่ไม่เลือกจะจางลง */
-        border-bottom: 3px solid transparent; /* เตรียมพื้นที่ไว้ให้ขีดตอน Active */
+        transition: 0.3s;
+        opacity: 0.4; /* เมนูที่ไม่เลือกจะจางลง */
+        border-bottom: 4px solid transparent; /* เตรียมพื้นที่เส้นใต้ */
     }
 
     .sys-menu-link:hover {
-        opacity: 1;
-        background: rgba(0,0,0,0.05);
+        opacity: 0.8;
+        background: rgba(255,255,255,0.1);
     }
 
-    /* 🚩 วิธีทำให้ดูออกว่าอยู่เมนูไหน (Active State) */
+    /* 🚩 จุดสังเกต: วิธีทำให้ดูออกว่าอยู่เมนูไหน */
     .sys-menu-link.active {
-        opacity: 1 !important;
-        background: rgba(0,0,0,0.1);          /* พื้นหลังเข้มขึ้น */
-        border-bottom: 3px solid var(--sys-dark); /* 🚩 ขีดเส้นใต้หนาๆ สีดำ */
+        opacity: 1 !important; /* ตัวหนังสือเข้มชัด */
         color: #000 !important;
+        border-bottom: 4px solid var(--sys-white); /* 🚩 เส้นใต้สีขาว หนา 4px ดูสะอาดและแพงกว่าสีดำ */
     }
 
     .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
