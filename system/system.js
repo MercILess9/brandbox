@@ -62,27 +62,44 @@ function formatDate(dateStr) {
 
 
 function injectAssets() {
+    // 🚩 1. ฉีด Meta Viewport (สำหรับมือถือ)
+    if (!document.querySelector('meta[name="viewport"]')) {
+        const meta = document.createElement('meta');
+        meta.name = "viewport";
+        meta.content = "width=device-width, initial-scale=1.0";
+        document.head.appendChild(meta);
+        console.log("📱 Viewport injected via System");
+    }
+
+    // 🚩 2. รายการ CSS / Fonts
     const links = [
         "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap",
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
         "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
     ];
 
+    // 🚩 3. รายการ JS Libraries
     const scripts = [
         "https://cdn.jsdelivr.net/npm/sweetalert2@11",
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     ];
 
+    // วนลูปฉีด Links
     links.forEach(url => {
         if (!document.querySelector(`link[href="${url}"]`)) {
             const l = document.createElement('link');
-            l.rel = 'stylesheet'; l.href = url;
+            l.rel = 'stylesheet'; 
+            l.href = url;
             document.head.appendChild(l);
         }
     });
 
+    // วนลูปฉีด Scripts
     scripts.forEach(url => {
-        if (!document.querySelector(`script[src="${url}"]`)) {
+        // กันการฉีดซ้ำถ้ามี Swal อยู่แล้ว (เช่นในหน้า Login)
+        const isSwalExisting = url.includes('sweetalert2') && typeof Swal !== 'undefined';
+        
+        if (!document.querySelector(`script[src="${url}"]`) && !isSwalExisting) {
             const s = document.createElement('script');
             s.src = url;
             document.head.appendChild(s);
