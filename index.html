@@ -1,6 +1,6 @@
 <head>
     <meta charset="UTF-8">
-    <title>B-STROM | Portal Hub</title>
+    <title>B-STROM | Global Portal</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/system/config.js" defer></script>
@@ -8,165 +8,198 @@
     
     <style>
         :root {
-            --brand-white: #ffffff;
-            --brand-dark: #1a1a1a;
-            --brand-lime: #bdc432; /* สีเขียว Brand */
-            --card-default: transparent; /* สีพื้นหลังปกติ */
-            --card-border: var(--brand-lime); /* สีขอบ */
-            --font-main: 'Outfit', 'Inter', sans-serif;
+            --brand-lime: #bdc432;
+            --brand-dark: #111111;
+            --brand-gray: #fcfcfc;
+            --text-muted: #888888;
+            --border-color: #eeeeee;
+            --font-main: 'Outfit', sans-serif;
         }
 
         body {
-            background-color: var(--brand-white);
+            background-color: #ffffff;
             color: var(--brand-dark);
             margin: 0;
-            padding: 0;
             font-family: var(--font-main);
-            min-height: 100vh;
-        }
-
-        .portal-container {
-            max-width: 1200px; /* ขยายให้กว้างขึ้น */
-            margin: 0 auto;
-            padding: 50px 20px;
-        }
-
-        /* --- New Hero Layout --- */
-        .hero-layout {
             display: flex;
-            align-items: center; /* จัดให้อยู่กึ่งกลางแนวดิ่ง */
-            gap: 40px; /* ระยะห่างระหว่างโลโก้กับข้อความ */
-            margin-bottom: 50px;
+            align-items: center;
+            min-height: 100vh; /* จัดกึ่งกลางหน้าจอแนวตั้ง */
         }
 
-        .logo-section {
-            flex: 0 0 200px; /* กำหนดขนาดโลโก้คงที่ */
+        .container-fluid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
         }
 
-        .main-logo {
+        /* --- Header Section (Logo Left, Text Right) --- */
+        .portal-header {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 80px; /* เว้นระยะห่างจาก Grid */
+        }
+
+        .logo-box {
+            flex: 0 0 180px; /* ล็อกขนาดโลโก้ */
+            border-right: 1px solid var(--border-color);
+            padding-right: 60px;
+        }
+
+        .logo-box img {
             width: 100%;
             height: auto;
+            filter: grayscale(1); /* ทำโลโก้เป็นขาวดำให้ดูหรู พอ Hover แล้วค่อยมีสีก็ได้ */
+            transition: 0.3s;
+        }
+        .portal-header:hover .logo-box img { filter: grayscale(0); }
+
+        .hero-content {
+            flex: 1;
         }
 
-        .hero-section {
-            flex: 1; /* ข้อความใช้พื้นที่ที่เหลือ */
-            text-align: left;
-            border-left: 4px solid var(--brand-lime);
-            padding-left: 20px;
+        .hero-content .top-label {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            color: var(--brand-lime);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
 
-        .text-top { font-size: 0.9rem; font-weight: 500; color: #888; margin-bottom: 4px; letter-spacing: 1px; }
-        .text-main { font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 10px; text-transform: uppercase; }
-        .text-highlight { font-size: 1rem; font-weight: 600; color: var(--brand-lime); margin-bottom: 4px; }
-        .text-footer { font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; color: #ccc; text-transform: uppercase; }
+        .hero-content h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0 0 15px 0;
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 0;
+            max-width: 500px;
+            line-height: 1.6;
+        }
 
         /* --- Project Grid (4 Columns) --- */
-        .project-grid {
+        .app-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 คอลัมน์บนจอคอม */
-            gap: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
         }
 
-        .project-card {
-            background: var(--card-default);
-            border: 2px solid var(--card-border); /* มีกรอบสีเขียว */
-            border-radius: 12px;
-            height: 140px; /* ขนาดกล่องเล็กตามที่ต้องการ */
+        .app-card {
+            position: relative;
+            height: 150px; /* ปรับเล็กลงตามบรีฟ */
+            border: 2px solid var(--brand-lime); /* กรอบเขียวตั้งต้น */
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-decoration: none !important;
             color: var(--brand-dark);
-            transition: all 0.2s ease; /* ปรับให้ไวขึ้น */
-            position: relative;
+            background: transparent;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            overflow: hidden;
         }
 
-        /* Hover Effect (เติมสีพื้นหลังเต็ม) */
-        .project-card:hover {
-            background: var(--brand-lime); /* เติม BG เต็ม */
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(189, 196, 50, 0.2);
-            color: #000; /* สีตัวอักษรเข้มบนสีเขียว */
+        /* Hover Effect: เติมสีเขียวเต็มใบ */
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--brand-lime);
+            transform: translateY(100%); /* ซ่อนไว้ข้างล่าง */
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: -1;
         }
 
-        .card-icon {
-            font-size: 2rem;
+        .app-card:hover {
+            transform: translateY(-8px);
+            color: #000;
+            box-shadow: 0 20px 40px rgba(189, 196, 50, 0.2);
+        }
+
+        .app-card:hover::before {
+            transform: translateY(0); /* ดันสีเขียวขึ้นมาเต็มใบ */
+        }
+
+        .app-card i {
+            font-size: 2.2rem;
             margin-bottom: 10px;
+            transition: 0.3s;
         }
 
-        .card-title {
-            font-size: 1.2rem;
+        .app-card span {
+            font-size: 1.1rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 2px;
+            letter-spacing: 1px;
         }
 
-        .card-status {
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+        /* --- Disabled State (Coming Soon) --- */
+        .app-card.disabled {
+            border: 1px solid #eee;
+            background: #fafafa;
+            color: #ccc;
+            cursor: default;
+        }
+        .app-card.disabled::before { display: none; }
+        .app-card.disabled:hover { transform: none; box-shadow: none; }
+        .app-card.disabled .status-tag {
+            font-size: 0.6rem;
+            margin-top: 5px;
+            font-weight: 600;
             opacity: 0.5;
         }
 
-        /* การ์ดที่ยังไม่เปิด (Coming Soon) - ไม่มีขอบ */
-        .coming-soon-card {
-            background: #fff;
-            border: 1px dashed #eee; /* ใช้ขอบเส้นประแทน */
-            color: #ddd;
-            cursor: default;
-        }
-        .coming-soon-card .card-icon, 
-        .coming-soon-card .card-title { opacity: 0.4; }
-        .coming-soon-card:hover { transform: none; background: #fff; box-shadow: none; border-color: #eee; color: #ddd; }
-
         /* Responsive */
-        @media (max-width: 992px) { .project-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .hero-layout { flex-direction: column; text-align: center; gap: 20px; } .hero-section { border-left: none; border-top: 4px solid var(--brand-lime); padding: 10px 0 0; } }
-        @media (max-width: 576px) { .project-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 992px) {
+            .portal-header { flex-direction: column; text-align: center; gap: 30px; }
+            .logo-box { border-right: none; padding-right: 0; border-bottom: 1px solid #eee; padding-bottom: 30px; }
+            .app-grid { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body>
 
-    <div class="portal-container">
-        <div class="hero-layout">
-            <div class="logo-section">
-                <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="main-logo" alt="BRANDSTROM X">
+    <div class="container-fluid">
+        <header class="portal-header">
+            <div class="logo-box">
+                <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" alt="Brandstrom X">
             </div>
-            
-            <div class="hero-section">
-                <div class="text-top">AT BRANDSTROM X,</div>
-                <div class="text-main">YOUR BUSINESS CHALLENGE <br> IS OUR STARTING POINT.</div>
-                <div class="text-highlight">WE ARE A FLEXI SOLUTION PARTNERSHIP.</div>
-                <div class="text-footer">DIGITAL MARKETING AGENCY</div>
+            <div class="hero-content">
+                <div class="top-label">Brandstrom X Operations</div>
+                <h1>YOUR BUSINESS CHALLENGE<br>IS OUR STARTING POINT.</h1>
+                <p>We are a flexi solution partnership providing end-to-end digital marketing agency services.</p>
             </div>
-        </div>
+        </header>
 
-        <div class="project-grid">
+        <div class="app-grid">
             
-            <a href="/b-quest/b-quest-list" class="project-card">
-                <div class="card-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
-                <div class="card-title">B-QUEST</div>
-                <div class="card-status">ENTER</div>
+            <a href="/b-quest/b-quest-list" class="app-card">
+                <i class="bi bi-rocket-takeoff-fill"></i>
+                <span>B-QUEST</span>
             </a>
 
-            <div class="project-card coming-soon-card">
-                <div class="card-icon"><i class="bi bi-graph-up-arrow"></i></div>
-                <div class="card-title">DASHBOARD</div>
-                <div class="card-status">SOON</div>
+            <div class="app-card disabled">
+                <i class="bi bi-pie-chart-fill"></i>
+                <span>DASHBOARD</span>
+                <div class="status-tag">COMING SOON</div>
             </div>
 
-            <div class="project-card coming-soon-card">
-                <div class="card-icon"><i class="bi bi-person-badge"></i></div>
-                <div class="card-title">B-ACCOUNT</div>
-                <div class="card-status">SOON</div>
+            <div class="app-card disabled">
+                <i class="bi bi-person-vcard-fill"></i>
+                <span>B-ACCOUNT</span>
+                <div class="status-tag">COMING SOON</div>
             </div>
 
-            <div class="project-card coming-soon-card">
-                <div class="card-icon"><i class="bi bi-wallet2"></i></div>
-                <div class="card-title">FINANCE</div>
-                <div class="card-status">SOON</div>
+            <div class="app-card disabled">
+                <i class="bi bi-wallet2"></i>
+                <span>FINANCE</span>
+                <div class="status-tag">COMING SOON</div>
             </div>
 
         </div>
