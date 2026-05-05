@@ -6,6 +6,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script src="system/config.js"></script>
     <script src="system/system.js"></script>
     
@@ -13,14 +14,14 @@
         :root {
             --brand-lime: #bdc432;
             --brand-dark: #111111;
-            --border-color: #995656;
+            --border-color: #eeeeee;
             --font-main: 'Outfit', sans-serif;
         }
 
-        /* กันหน้าจอแวบ (Flash of Unauthenticated Content) */
+        /* เอฟเฟกต์กันหน้าขาว: จะ Fade In เมื่อระบบเช็ค Auth เสร็จ (class auth-ready) */
         body { 
             opacity: 0; 
-            transition: opacity 0.4s ease-in-out; 
+            transition: opacity 0.5s ease-in-out; 
             background-color: #ffffff;
             color: var(--brand-dark);
             margin: 0;
@@ -47,7 +48,7 @@
         }
 
         .logo-box {
-            flex: 0 0 180px; /* ขนาดโลโก้ */
+            flex: 0 0 180px; 
             border-right: 1.5px solid var(--border-color);
             padding-right: 50px;
         }
@@ -55,7 +56,6 @@
         .logo-box img {
             width: 100%;
             height: auto;
-            transition: 0.3s;
         }
 
         .hero-content {
@@ -72,19 +72,19 @@
         }
 
         .hero-content h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            line-height: 1.2;
-            margin: 0 0 10px 0;
-            letter-spacing: -0.5px;
+            line-height: 1.1;
+            margin: 0 0 15px 0;
+            letter-spacing: -1px;
         }
 
         .hero-content p {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #888;
             margin: 0;
             max-width: 550px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         /* --- Project Grid (4 Columns) --- */
@@ -96,8 +96,8 @@
 
         .app-card {
             position: relative;
-            height: 145px; /* กล่องเล็กตามบรีฟ */
-            border: 2px solid var(--brand-lime); /* กรอบเขียว Brand */
+            height: 150px; /* ขนาดกะทัดรัด */
+            border: 2px solid var(--brand-lime); 
             border-radius: 16px;
             display: flex;
             flex-direction: column;
@@ -106,45 +106,46 @@
             text-decoration: none !important;
             color: var(--brand-dark);
             background: transparent;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             overflow: hidden;
             z-index: 1;
         }
 
-        /* Hover Effect: เติมพื้นหลังสีเขียวเต็มใบ */
+        /* Hover Effect: สีเขียววิ่งขึ้นมาเติมเต็มจากด้านล่าง */
         .app-card::before {
             content: '';
             position: absolute;
             bottom: 0; left: 0; width: 100%; height: 0;
             background: var(--brand-lime);
-            transition: height 0.3s ease;
+            transition: height 0.4s ease;
             z-index: -1;
         }
 
         .app-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-10px);
             color: #000;
-            box-shadow: 0 15px 30px rgba(189, 196, 50, 0.25);
+            box-shadow: 0 20px 40px rgba(189, 196, 50, 0.2);
         }
 
         .app-card:hover::before {
-            height: 100%; /* เติมสีเขียวขึ้นมาเต็ม */
+            height: 100%;
         }
 
         .app-card i {
-            font-size: 2.2rem;
-            margin-bottom: 8px;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            transition: 0.3s;
         }
 
         .app-card span {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        /* --- Disabled State (Coming Soon) --- */
+        /* --- Disabled State --- */
         .app-card.disabled {
-            border: 1px dashed #ddd; /* เปลี่ยนกรอบเป็นเส้นประ */
+            border: 1px dashed #ddd;
             color: #ccc;
             cursor: default;
         }
@@ -153,10 +154,10 @@
         
         .status-tag {
             font-size: 0.65rem;
-            margin-top: 4px;
+            margin-top: 5px;
             font-weight: 700;
             opacity: 0.6;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         /* Responsive */
@@ -175,18 +176,18 @@
     <div class="container-portal">
         <header class="portal-header">
             <div class="logo-box">
-                <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" alt="Brandstrom X">
+                <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" alt="Brandstrom X Logo">
             </div>
             <div class="hero-content">
-                <div class="top-label">At Brandstrom X,</div>
+                <div class="top-label">Brandstrom X Operations</div>
                 <h1>YOUR BUSINESS CHALLENGE<br>IS OUR STARTING POINT.</h1>
-                <p>We are a flexi solution partnership. We provide end-to-end digital marketing agency services to help your business grow.</p>
+                <p>We are a flexi solution partnership providing end-to-end digital marketing agency services to help your business thrive in the digital era.</p>
             </div>
         </header>
 
         <div class="app-grid">
             
-            <a href="/b-quest/b-quest-list.html" class="app-card">
+            <a href="b-quest/b-quest-list.html" class="app-card">
                 <i class="bi bi-rocket-takeoff-fill"></i>
                 <span>B-QUEST</span>
                 <div class="status-tag">ENTER SYSTEM</div>
@@ -214,8 +215,6 @@
     </div>
 
     <script>
-        // เรียกใช้งานระบบ Layout และการเช็ค Auth
-        // เนื่องจากไม่มี defer เราเรียกต่อท้ายตรงนี้ได้เลย
         initLayout({
             projectName: "BRANDSTROM X"
         });

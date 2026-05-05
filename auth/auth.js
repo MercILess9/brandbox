@@ -1,10 +1,13 @@
+/**
+ * B-STROM AUTH LOGIC
+ */
 
+// 1. ฟังก์ชันเข้าสู่ระบบ
 async function handleLogin(email, password) {
     try {
-        // แสดง Loading นิดนึงให้ดูโปร
         if (typeof Swal !== 'undefined') {
             Swal.fire({
-                title: 'กำลังตรวจสอบ...',
+                title: 'Authenticating...',
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); }
             });
@@ -17,39 +20,29 @@ async function handleLogin(email, password) {
 
         if (error) throw error;
 
-        // ถ้าสำเร็จ
-        notify("สำเร็จ", "กำลังเข้าสู่ระบบ...", "success");
+        notify("Success", "Welcome back!", "success");
         
-        // ดีดไปหน้าหลัก (Timeout นิดนึงให้ User เห็นแจ้งเตือน)
         setTimeout(() => {
             window.location.href = "/index.html";
-        }, 1500);
-
-        return data;
+        }, 1000);
 
     } catch (error) {
         console.error('Login Error:', error.message);
-        notify("เข้าสู่ระบบไม่สำเร็จ", error.message, "error");
-        return null;
+        notify("Failed", error.message, "error");
     }
 }
 
-// ใน /auth/auth.js (เพิ่ม/ปรับส่วน Signup)
+// 2. ฟังก์ชันสมัครสมาชิก
 async function handleSignup(email, password, metadata) {
     try {
-        Swal.fire({ 
-            title: 'Creating Account...', 
-            allowOutsideClick: false, 
-            didOpen: () => Swal.showLoading() 
-        });
+        Swal.fire({ title: 'Creating Account...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
-                // ใช้ window.location.origin เพื่อให้ชัวร์ว่า redirect กลับมาถูกที่
                 emailRedirectTo: window.location.origin + '/auth/login.html', 
-                data: metadata // โยนก้อนข้อมูล Emp ID, Role, etc. เข้าไปตรงนี้
+                data: metadata 
             }
         });
 
@@ -60,28 +53,21 @@ async function handleSignup(email, password, metadata) {
             title: "Registration Complete!", 
             text: "Please check your email for confirmation." 
         }).then(() => { 
-            window.location.href = "/auth/login.html"; 
+            window.location.href = "login.html"; 
         });
-
-        return data;
 
     } catch (err) {
         Swal.fire("Failed", err.message, "error");
-        return null;
     }
 }
 
-// ใน /auth/auth.js
+// 3. ฟังก์ชันขอลิงก์ลืมรหัสผ่าน
 async function handleForgotPassword(email) {
     try {
-        Swal.fire({ 
-            title: 'Processing...', 
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading() 
-        });
+        Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            // ส่งกลับไปที่หน้าตั้งรหัสผ่านใหม่
+            // สำคัญ: ต้องระบุ redirectTo ให้ถูกต้อง
             redirectTo: window.location.origin + '/auth/forgot-password.html', 
         });
 
@@ -95,10 +81,26 @@ async function handleForgotPassword(email) {
         });
 
     } catch (err) {
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: err.message
+        Swal.fire("Error", err.message, "error");
+    }
+}
+
+// 4. ฟังก์ชันอัปเดตรหัสผ่านใหม่ (สำหรับใช้ในหน้า forgot-password.html ตอนเป็นโหมด Reset)
+async function handleUpdatePassword(newPassword) {
+    try {
+        Swal.fire({ title: 'Updating...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        const { error } = await supabaseClient.auth.updateUser({
+            password: newPassword
         });
+
+        if (error) throw error;
+
+        Swal.fire("Success!", "Password updated successfully.", "success").then(() => {
+            window.location.href = "login.html";
+        });
+
+    } catch (err) {
+        Swal.fire("Error", err.message, "error");
     }
 }
