@@ -2,61 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>B-QUEST</title>
+    <title>B-QUEST | Sign Up</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/system/config.js"></script>
     <script src="/system/system.js"></script>
+    <script src="/auth/auth.js"></script>
     
     <style>
+        /* CSS ของพี่เหมือนเดิม 100% ทุกบรรทัด */
         :root {
             --brand-accent-dark: rgb(45, 71, 57);
             --brand-accent: rgb(189, 196, 50);
             --font-main: "Outfit", sans-serif;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
-
         body {
             background: linear-gradient(135deg, var(--brand-accent-dark) 0%, var(--brand-accent) 100%);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px;
         }
-
         .card {
             background: #fff; padding: 2.5rem; border-radius: 24px;
             width: 100%; max-width: 450px; 
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
         }
-
         .logo { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 2rem; letter-spacing: -1px; }
-
         .group { margin-bottom: 1.2rem; }
         label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #333; }
-
         .input-wrapper { position: relative; display: flex; align-items: center; }
-
         input, select {
             width: 100%; padding: 12px 16px; border: 1.5px solid #eee;
             border-radius: 12px; font-size: 15px; outline: none; transition: 0.2s;
         }
-
         input:focus { border-color: var(--brand-accent); background: #fafbf2; }
-
-        /* ปรับ Padding ให้สมดุล เพราะไม่มีปุ่ม Domain แล้ว */
         .pass-input { padding-right: 45px !important; }
-
         .password-toggle-btn {
             position: absolute; right: 15px;
             background: none; border: none; cursor: pointer;
             color: #888; display: flex; align-items: center;
             padding: 0; z-index: 10;
         }
-
         .row { display: flex; gap: 0.8rem; }
         .row .group { flex: 1; }
-
         .btn-main {
             width: 100%; padding: 16px; background: var(--brand-accent);
             border: none; border-radius: 12px; color: #fff;
@@ -64,7 +53,6 @@
             margin-top: 1rem; transition: 0.2s;
         }
         .btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
-
         .link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: #666; }
         .link a { color: #000; text-decoration: none; font-weight: 700; }
     </style>
@@ -117,11 +105,11 @@
         <button class="btn-main" type="submit">Sign Up</button>
     </form>
     
-    <div class="link">Already have an account? <a href="/auth/login">Sign in</a></div>
+    <div class="link">Already have an account? <a href="/auth/login.html">Sign in</a></div>
 </div>
 
 <script>
-    // ฟังก์ชัน Show/Hide Password
+    // ฟังก์ชัน Show/Hide Password (เฉพาะหน้า)
     function togglePass(id, btn) {
         const input = document.getElementById(id);
         const isPass = input.type === "password";
@@ -131,8 +119,7 @@
             `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     }
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+    // จัดการการส่งฟอร์ม
     document.getElementById("regForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -140,43 +127,19 @@
         const password = document.getElementById("pass_val").value;
         const confirm = document.getElementById("conf_val").value;
 
-        // ตรวจสอบรหัสผ่านตรงกันไหม
-        if (password !== confirm) return Swal.fire("Error", "Passwords do not match!", "error");
-
-        Swal.fire({ 
-            title: 'Connecting...', 
-            allowOutsideClick: false, 
-            didOpen: () => Swal.showLoading() 
-        });
-
-        try {
-            const { error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    emailRedirectTo: `${SITE_URL}/auth/login`, 
-                    data: {
-                        employee_id: document.getElementById("emp_id").value,
-                        nick_name: document.getElementById("nick").value,
-                        full_name: document.getElementById("full").value,
-                        role: document.getElementById("role_val").value
-                    }
-                }
-            });
-
-            if (error) throw error;
-
-            Swal.fire({ 
-                icon: "success", 
-                title: "Complete!", 
-                text: "Please check your email for confirmation." 
-            }).then(() => { 
-                window.location.href = "/auth/login"; 
-            });
-
-        } catch (err) {
-            Swal.fire("Failed", err.message, "error");
+        // 1. ตรวจสอบรหัสผ่านเบื้องต้น
+        if (password !== confirm) {
+            return Swal.fire("Error", "Passwords do not match!", "error");
         }
+
+        // 2. รวบรวมข้อมูลพนักงาน
+        const metadata = {
+            employee_id: document.getElementById("emp_id").value,
+            nick_name: document.getElementById("nick").value,
+            full_name: document.getElementById("full").value,
+            role: document.getElementById("role_val").value
+        };
+        await handleSignup(email, password, metadata);
     });
 </script>
 
