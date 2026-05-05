@@ -85,44 +85,26 @@ async function initAuthGuard() {
     }
 }
 
-/**
- * [UI Rendering] ดึงโครงสร้างจาก header.html มาใช้งาน
- */
 async function renderSystemUI(config) {
-    try {
-        const response = await fetch('/system/header.html?v=1.1');
-        if (!response.ok) throw new Error("Header template not found");
-        const headerHTML = await response.text();
+    const response = await fetch('/system/header.html?v=' + Date.now());
+    const headerHTML = await response.text();
+    document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-        // ฉีด HTML เข้าไปที่ส่วนบนสุดของ Body
-        document.body.insertAdjacentHTML('afterbegin', headerHTML);
+    // 1. ดึงชื่อโปรเจกต์จาก Config (เช่น "B-QUEST")
+    if (config.projectName) {
+        document.getElementById('project-title').innerText = config.projectName;
+    }
 
-        // ตั้งชื่อโปรเจกต์
-        const projectTitle = document.getElementById('project-title');
-        if (projectTitle) projectTitle.innerText = config.projectName || 'SYSTEM';
-
-        // จัดการเมนูสีเขียว
-        const menuBar = document.getElementById('sys-menu-bar');
-        if (config.menus && menuBar) {
-            menuBar.innerHTML = '';
-            config.menus.forEach(menu => {
-                const isActive = window.location.pathname.includes(menu.link) ? 'active' : '';
-                menuBar.insertAdjacentHTML('beforeend', `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`);
-            });
-        }
-
-        // ดึงชื่อ User มาแสดง
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user) {
-            const display = document.getElementById('user-display');
-            if (display) display.innerText = user.user_metadata.full_name || user.email;
-        }
-
-        // ปลดล็อกหน้าขาว (Fade-in)
-        document.body.classList.add('auth-ready');
-    } catch (err) {
-        console.error("❌ UI Fail:", err);
-        document.body.classList.add('auth-ready');
+    // 2. ดึงรายการเมนูจาก Config มาสร้าง (List, Assignment)
+    const menuBar = document.getElementById('sys-menu-bar');
+    if (config.menus && menuBar) {
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        
+        menuBar.innerHTML = config.menus.map(menu => {
+            // เช็กว่า link ใน config ตรงกับหน้าที่เปิดอยู่ไหมเพื่อใส่ class 'active'
+            const isActive = (currentPath === menu.link) ? 'active' : '';
+            return `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`;
+        }).join('');
     }
 }
 
