@@ -1,7 +1,3 @@
-/**
- * B-STROM SYSTEM CORE ENGINE (2026)
- * [FIXED: notify is defined & Master Helpers]
- */
 
 let supabaseClient;
 
@@ -10,10 +6,7 @@ if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_KEY !== 'undefined') 
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
-/**
- * 🚩 GLOBAL HELPER: แจ้งเตือน (SweetAlert2)
- * ใส่ไว้ที่นี่เพื่อให้ auth.js และหน้าอื่นๆ เรียกใช้ได้ทันที
- */
+
 function notify(title, text, icon = 'success') {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
@@ -30,10 +23,7 @@ function notify(title, text, icon = 'success') {
     }
 }
 
-/**
- * 🚩 GLOBAL HELPER: จัดการรูปแบบวันที่
- * เปลี่ยนจาก 2026-05-05 เป็น 05 พ.ค. 69
- */
+
 function formatDate(dateStr) {
     if (!dateStr || dateStr === '-' || dateStr === '') return '-';
     try {
@@ -136,9 +126,6 @@ async function renderSystemUI(config) {
     }
 }
 
-/**
- * [Assets Injection] ฉีด CSS และ JS ที่จำเป็น
- */
 function injectAssets() {
     const links = [
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
@@ -151,19 +138,23 @@ function injectAssets() {
         }
     });
 
-    // ฉีด Bootstrap JS Bundle เพื่อให้ Dropdown/Collapse ทำงาน
     if (!document.querySelector('script[src*="bootstrap.bundle"]')) {
         const s = document.createElement('script');
         s.src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js";
         document.head.appendChild(s);
     }
-}
 
-/**
- * [Helpers] ออกจากระบบ
- */
-async function logout() {
-    if (!supabaseClient) return;
-    await supabaseClient.auth.signOut();
-    window.location.replace("/auth/login.html");
+    if (!document.querySelector('#sys-core-layout')) {
+        const s = document.createElement('style');
+        s.id = 'sys-core-layout';
+        s.innerText = `
+            body { 
+                padding-top: 105px !important; 
+            }
+            .flt-wrapper { 
+                top: 105px !important; 
+            }
+        `;
+        document.head.appendChild(s);
+    }
 }
