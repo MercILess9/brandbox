@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>B-QUEST | Master Dashboard</title>
+    <<meta charset="UTF-8">
+    <title>B-STROM</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
+    <script src="/system/config.js" defer></script>
+    <script src="/system/system.js" defer></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/system/config.js"></script>
-<script src="/system/system.js"></script>
-<script src="b-quest.js"></script>
+    <script src="b-quest.js" defer></script>
+
+    <script src="b-quest-modal.js" defer></script>
 
 
     <style>
@@ -156,8 +155,6 @@
 <button class="fab-add" onclick="openTaskModal(null, dataList)" title="B-QUEST Form">
     <i class="bi bi-plus-lg"></i>
 </button>
-
-<script src="b-quest-modal.js"></script>
 
 <script>
     const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'designer_assign', 'creative_assign', 'owner'];

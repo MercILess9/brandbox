@@ -68,16 +68,15 @@ function formatDate(dateStr) {
  * ฉีด Assets พื้นฐานที่ทุกหน้าต้องใช้
  */
 function injectAssets() {
-    // รายการ CSS / Fonts
     const links = [
         "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap",
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
         "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
     ];
 
-    // รายการ JS Libraries (เช่น SweetAlert)
     const scripts = [
-        "https://cdn.jsdelivr.net/npm/sweetalert2@11"
+        "https://cdn.jsdelivr.net/npm/sweetalert2@11",
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     ];
 
     links.forEach(url => {
