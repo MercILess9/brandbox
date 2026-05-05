@@ -44,12 +44,19 @@ function getCorrectPath(target) {
  * ดึงชื่อหน้าปัจจุบันโดยไม่มีนามสกุล และรองรับหน้า Root
  */
 function getCurrentPage() {
-    const path = window.location.pathname;
-    // ถ้าอยู่ที่หน้าแรกสุด ให้ถือว่าเป็น index
-    if (path === "/" || path === "") return "index";
+    let path = window.location.pathname;
 
-    // ดึงส่วนสุดท้ายของ URL และตัด .html ออก
-    const page = path.split("/").pop();
+    // ถ้า path เป็น / หรือว่างเปล่า หรือลงท้ายด้วย index ให้ถือว่าเป็นหน้า index
+    if (path === "/" || path === "" || path.endsWith("/index") || path.endsWith("/index.html")) {
+        return "index";
+    }
+
+    // ดึงชื่อไฟล์ตัวสุดท้ายออกมา เช่น "b-quest-list"
+    let page = path.split("/").pop();
+    
+    // ถ้าดันไม่มีชื่อไฟล์ (กรณี URL แปลกๆ) ให้ default เป็น index
+    if (!page) return "index";
+
     return page.replace(".html", "");
 }
 
@@ -190,39 +197,39 @@ const System = {
     }
 };
 
-// ==========================================
-// 5. AUTH GUARD
-// ==========================================
+
+
+// 2. ปรับการเช็คสิทธิ์ (เพิ่ม Log เพื่อให้พี่เช็คใน F12 ได้)
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    const page = getCurrentPage();
+    const page = getCurrentPage(); 
     const isPublic = publicPages.includes(page);
 
-    console.log(`🛡️ Guard: Page [${page}] | Public [${isPublic}] | Session [${!!session}]`);
+    // พี่ลองกด F12 แล้วดูที่ Console นะครับ ถ้ามันขึ้น "Current Page: index" แสดงว่ามาถูกทาง
+    console.log(`🛡️ Guard Check -> Page: [${page}] | Public: [${isPublic}] | Session: [${!!session}]`);
 
-    // 1. ถ้าอยู่หน้าแรก (index) แต่ไม่ได้ login -> ไปหน้า login
-    if (page === "index" && !session) {
-        console.log("🔒 Access denied: Index requires login.");
-        return safeRedirect("auth/login.html");
+    // 🚩 ดักหน้าแรก (index)
+    if (page === "index") {
+        if (!session) {
+            console.log("🔒 Redirecting from Index to Login...");
+            return safeRedirect("auth/login.html");
+        }
     }
 
-    // 2. ถ้าเข้าหน้าปกติ (Private) แต่ไม่ได้ login -> ไปหน้า login
+    // 🚩 ดักหน้าทั่วไปที่ไม่ได้อยู่ใน publicPages
     if (!isPublic && !session) {
-        console.log("🔒 Access denied: This page requires login.");
+        console.log("🔒 Access denied, moving to Login...");
         return safeRedirect("auth/login.html");
     }
 
-    // 3. ถ้า Login แล้ว แต่ดันมาหน้า Public (เช่น login, register) -> ไปหน้า index
+    // 🚩 ถ้า Login แล้ว แต่จะเข้าหน้า Login อีก
     if (isPublic && session) {
-        console.log("🔓 Already logged in: Redirecting to Index.");
+        console.log("🔓 Already logged in, moving to Portal...");
         return safeRedirect("index.html");
     }
 
-    // ฟังเหตุการณ์ Sign Out แบบ Real-time
     supabaseClient.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_OUT') {
-            safeRedirect("auth/login.html");
-        }
+        if (event === 'SIGNED_OUT') safeRedirect("auth/login.html");
     });
 }
 
