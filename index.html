@@ -6,9 +6,8 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <script src="system/config.js"></script>
-    <script src="system/system.js"></script>
+    <script src="/system/config.js"></script>
+    <script src="/system/system.js"></script>
     
     <style>
         :root {
@@ -18,7 +17,6 @@
             --font-main: 'Outfit', sans-serif;
         }
 
-        /* เอฟเฟกต์กันหน้าขาว: จะ Fade In เมื่อระบบเช็ค Auth เสร็จ (class auth-ready) */
         body { 
             opacity: 0; 
             transition: opacity 0.5s ease-in-out; 
@@ -39,23 +37,24 @@
             width: 100%;
         }
 
-        /* --- Header Layout (Logo Left, Text Right) --- */
+        /* --- Header Layout (Logo ใหญ่ขึ้น) --- */
         .portal-header {
             display: flex;
             align-items: center;
-            gap: 50px;
-            margin-bottom: 60px;
+            gap: 60px;
+            margin-bottom: 80px;
         }
 
         .logo-box {
-            flex: 0 0 180px; 
+            flex: 0 0 260px; /* 🚩 ปรับ Logo ให้ใหญ่ขึ้นจาก 180px */
             border-right: 1.5px solid var(--border-color);
-            padding-right: 50px;
+            padding-right: 60px;
         }
 
         .logo-box img {
             width: 100%;
             height: auto;
+            display: block;
         }
 
         .hero-content {
@@ -63,42 +62,42 @@
         }
 
         .top-label {
-            font-size: 0.85rem;
-            letter-spacing: 3px;
+            font-size: 0.9rem;
+            letter-spacing: 4px;
             color: var(--brand-lime);
             font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .hero-content h1 {
-            font-size: 2.2rem;
+            font-size: 2.8rem; /* ขยายขนาดหัวข้อตามโลโก้ */
             font-weight: 800;
-            line-height: 1.1;
-            margin: 0 0 15px 0;
-            letter-spacing: -1px;
+            line-height: 1;
+            margin: 0 0 20px 0;
+            letter-spacing: -1.5px;
         }
 
         .hero-content p {
-            font-size: 1rem;
-            color: #888;
+            font-size: 1.1rem;
+            color: #666;
             margin: 0;
-            max-width: 550px;
+            max-width: 600px;
             line-height: 1.6;
         }
 
-        /* --- Project Grid (4 Columns) --- */
+        /* --- Project Grid --- */
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 25px;
         }
 
         .app-card {
             position: relative;
-            height: 150px; /* ขนาดกะทัดรัด */
-            border: 2px solid var(--brand-lime); 
-            border-radius: 16px;
+            height: 160px;
+            border: 2.5px solid var(--brand-lime); 
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -111,7 +110,6 @@
             z-index: 1;
         }
 
-        /* Hover Effect: สีเขียววิ่งขึ้นมาเติมเต็มจากด้านล่าง */
         .app-card::before {
             content: '';
             position: absolute;
@@ -124,7 +122,7 @@
         .app-card:hover {
             transform: translateY(-10px);
             color: #000;
-            box-shadow: 0 20px 40px rgba(189, 196, 50, 0.2);
+            box-shadow: 0 20px 40px rgba(189, 196, 50, 0.25);
         }
 
         .app-card:hover::before {
@@ -132,29 +130,44 @@
         }
 
         .app-card i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2.8rem;
+            margin-bottom: 12px;
             transition: 0.3s;
         }
 
         .app-card span {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 800;
             letter-spacing: 1px;
         }
 
-        /* --- Disabled State --- */
+        /* --- 🚩 Disabled State (ตอบสนองเมื่อชี้) --- */
         .app-card.disabled {
-            border: 1px dashed #ddd;
-            color: #ccc;
-            cursor: default;
+            border: 1px dashed #cccccc;
+            color: #bbbbbb;
+            cursor: not-allowed; /* เปลี่ยนหัวลูกศรเมาส์ */
+            background: #fafafa;
         }
+
+        .app-card.disabled:hover {
+            transform: translateY(-5px); /* ยกขึ้นนิดหน่อยพอให้รู้ว่าชี้อยู่ */
+            border-color: #999999;
+            color: #888888;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            animation: shake 0.4s ease-in-out; /* เอฟเฟกต์สั่น */
+        }
+
         .app-card.disabled::before { display: none; }
-        .app-card.disabled:hover { transform: none; box-shadow: none; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateY(-5px) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(-1deg); }
+            75% { transform: translateY(-5px) rotate(1deg); }
+        }
         
         .status-tag {
-            font-size: 0.65rem;
-            margin-top: 5px;
+            font-size: 0.7rem;
+            margin-top: 8px;
             font-weight: 700;
             opacity: 0.6;
             letter-spacing: 1.5px;
@@ -164,7 +177,7 @@
         @media (max-width: 992px) {
             .app-grid { grid-template-columns: repeat(2, 1fr); }
             .portal-header { flex-direction: column; text-align: center; gap: 30px; }
-            .logo-box { border-right: none; padding-right: 0; border-bottom: 1px solid #eee; padding-bottom: 30px; }
+            .logo-box { border-right: none; padding-right: 0; border-bottom: 1px solid #eee; padding-bottom: 30px; flex: 0 0 auto; width: 220px; }
         }
         @media (max-width: 576px) {
             .app-grid { grid-template-columns: 1fr; }
@@ -181,7 +194,7 @@
             <div class="hero-content">
                 <div class="top-label">Brandstrom X Operations</div>
                 <h1>YOUR BUSINESS CHALLENGE<br>IS OUR STARTING POINT.</h1>
-                <p>We are a flexi solution partnership providing end-to-end digital marketing agency services to help your business thrive in the digital era.</p>
+                <p>We provide flexi solutions and end-to-end digital services to help your business thrive in the 2026 digital era.</p>
             </div>
         </header>
 
@@ -193,19 +206,19 @@
                 <div class="status-tag">ENTER SYSTEM</div>
             </a>
 
-            <div class="app-card disabled">
+            <div class="app-card disabled" title="Currently Locked">
                 <i class="bi bi-pie-chart-fill"></i>
                 <span>DASHBOARD</span>
                 <div class="status-tag">COMING SOON</div>
             </div>
 
-            <div class="app-card disabled">
+            <div class="app-card disabled" title="Currently Locked">
                 <i class="bi bi-person-vcard-fill"></i>
                 <span>B-ACCOUNT</span>
                 <div class="status-tag">COMING SOON</div>
             </div>
 
-            <div class="app-card disabled">
+            <div class="app-card disabled" title="Currently Locked">
                 <i class="bi bi-wallet2"></i>
                 <span>FINANCE</span>
                 <div class="status-tag">COMING SOON</div>
