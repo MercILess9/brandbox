@@ -26,10 +26,11 @@ function getCorrectPath(target) {
 }
 
 function getCurrentPage() {
-    let page = window.location.pathname.split("/").pop() || "index.html";
-    if (!page.includes(".")) page += ".html";
-    return page;
+    let path = window.location.pathname.split("/").pop();
+    if (!path || path === "") path = "index";
+    return path.replace(".html", "");
 }
+
 
 function safeRedirect(to) {
     const url = getCorrectPath(to);
@@ -170,26 +171,26 @@ const System = {
     }
 };
 
-// ==========================================
-// 5. AUTH GUARD
-// ==========================================
+
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const page = getCurrentPage();
     const isPublic = publicPages.includes(page);
-
-    if (page === "index.html" || page === "index") {
-        if (!session) safeRedirect("/auth/login.html"); return;
+    if (page === "index") {
+        if (!session) {
+            console.log("🚫 No session on Index, redirecting...");
+            safeRedirect("auth/login.html");
+            return;
+        }
     }
 
-    if (!session && !isPublic) safeRedirect("login.html");
-    else if (session && isPublic) safeRedirect("index.html");
-
+    if (!session && !isPublic) { safeRedirect("auth/login.html"); } 
+    else if (session && isPublic) { safeRedirect("index.html"); }
     supabaseClient.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_OUT') safeRedirect("login.html");
-        else if (event === 'SIGNED_IN' && publicPages.includes(getCurrentPage()))
-            safeRedirect("index.html");
+        if (event === 'SIGNED_OUT') safeRedirect("auth/login.html");
     });
 }
+
+
 
 initAuthGuard();
