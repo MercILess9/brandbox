@@ -1,8 +1,8 @@
 <style>
     :root {
-        --sys-brand: #bdc432; /* สีเขียวเลมอนของพี่ ห้ามเปลี่ยน */
+        --sys-brand: #bdc432; /* สีเขียวเลมอน Brand ของพี่ */
         --sys-dark: #111111;
-        --sys-grey: #adb5bd; /* สีเทาสำหรับไอคอนคน */
+        --sys-grey: #adb5bd; 
         --sys-white: #ffffff;
         --header-height: 105px; 
     }
@@ -34,50 +34,49 @@
         text-decoration: none !important;
         color: var(--sys-dark);
     }
-    .sys-logo-img { height: 32px; width: auto; } /* ปรับโลโก้ให้เล็กลงนิดนึง */
+    .sys-logo-img { height: 32px; width: auto; }
     .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
-    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; letter-spacing: -0.5px; }
+    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
 
     .sys-user-zone { display: flex; align-items: center; gap: 12px; }
     #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
     .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; padding: 0; }
 
-    /* --- แถบล่าง: เมนูแนวนอน 40px (สี Brand) --- */
+    /* --- แถบล่าง: เมนูสี Brand (White Active Style) --- */
     #sys-menu-bar {
-        height: 40px;
-        background: var(--sys-brand); /* สีเลมอนที่พี่ห้ามเปลี่ยน */
+        height: 40px;           /* กว้าง 40px ตามสั่ง */
+        background: var(--sys-brand); 
         display: flex;
         flex-direction: row;
         align-items: center;
         padding: 0 30px;
-        gap: 0; /* ให้ปุ่มชิดกัน */
+        gap: 5px;
     }
 
     .sys-menu-link {
-        color: var(--sys-dark) !important;
+        color: var(--sys-dark);  /* เมนูทั่วไปเป็นสีดำ */
         text-decoration: none !important;
         font-size: 0.85rem;
         font-weight: 800;
         text-transform: uppercase;
-        padding: 0 25px;
+        padding: 0 20px;
         height: 100%;
         display: flex;
         align-items: center;
         transition: 0.3s;
-        opacity: 0.4; /* เมนูที่ไม่เลือกจะจางลง */
-        border-bottom: 4px solid transparent; /* เตรียมพื้นที่เส้นใต้ */
+        opacity: 0.5;            /* เมนูทั่วไปทำให้จางไว้ก่อน */
+        border-bottom: 4px solid transparent;
     }
 
     .sys-menu-link:hover {
         opacity: 0.8;
-        background: rgba(255,255,255,0.1);
     }
 
-    /* 🚩 จุดสังเกต: วิธีทำให้ดูออกว่าอยู่เมนูไหน */
+    /* 🚩 ไฮไลท์เมนูที่ใช้งานอยู่ (Active) */
     .sys-menu-link.active {
-        opacity: 1 !important; /* ตัวหนังสือเข้มชัด */
-        color: #000 !important;
-        border-bottom: 4px solid var(--sys-white); /* 🚩 เส้นใต้สีขาว หนา 4px ดูสะอาดและแพงกว่าสีดำ */
+        color: var(--sys-white) !important;      /* 🚩 ตัวหนังสือสีขาวตามสั่ง */
+        opacity: 1 !important;                   /* ชัดเจน 100% */
+        border-bottom: 4px solid var(--sys-white); /* 🚩 เส้นใต้สีขาวตามสั่ง */
     }
 
     .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
