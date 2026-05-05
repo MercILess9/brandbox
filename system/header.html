@@ -1,7 +1,8 @@
 <style>
     :root {
-        --sys-main: #bdc432; /* สีเขียว Lime ของพี่ */
+        --sys-main: #bdc432; 
         --sys-dark: #111111;
+        --sys-grey: #adb5bd; /* 🚩 สีเทาใหม่สำหรับไอคอน */
         --sys-white: #ffffff;
         --header-height: 105px;
     }
@@ -19,7 +20,6 @@
         flex-direction: column;
     }
 
-    /* แถบบน: Logo & User */
     .sys-top-bar {
         flex: 1;
         display: flex;
@@ -34,10 +34,9 @@
         text-decoration: none !important;
         transition: 0.3s;
     }
-    .sys-logo-link:hover { opacity: 0.8; }
     
     .sys-logo-img {
-        height: 45px;
+        height: 38px; /* 🚩 ปรับโลโก้ให้เล็กลงนิดนึงตามสั่ง */
         width: auto;
         margin-right: 15px;
     }
@@ -45,13 +44,12 @@
     .sys-project-name {
         font-family: 'Outfit', sans-serif;
         font-weight: 800;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         color: var(--sys-dark);
         letter-spacing: -0.5px;
         text-transform: uppercase;
     }
 
-    /* ฝั่งขวา: User & Menu */
     .sys-user-zone {
         display: flex;
         align-items: center;
@@ -59,25 +57,26 @@
     }
 
     #user-display {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         font-weight: 600;
-        color: #666;
+        color: #888;
     }
 
     .sys-profile-dropdown .btn-user {
         background: none;
         border: none;
         padding: 0;
-        color: var(--sys-dark);
+        color: var(--sys-grey); /* 🚩 เปลี่ยนเป็นสีเทาตามโจทย์ */
         font-size: 1.8rem;
         cursor: pointer;
         display: flex;
         align-items: center;
         transition: 0.2s;
     }
-    .sys-profile-dropdown .btn-user:hover { color: var(--sys-main); }
+    .sys-profile-dropdown .btn-user:hover { 
+        color: var(--sys-main); /* เวลาชี้ให้เปลี่ยนเป็นสีเขียว lime */
+    }
 
-    /* ปรับแต่ง Dropdown ของ Bootstrap ให้เข้ากับสไตล์เรา */
     .sys-profile-dropdown .dropdown-menu {
         border: none;
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -101,12 +100,7 @@
         background-color: #f8fbef;
         color: var(--sys-main);
     }
-    .sys-profile-dropdown .text-danger:hover {
-        background-color: #fff5f5;
-        color: #dc3545;
-    }
 
-    /* แถบล่าง: เมนูสีเขียว */
     #sys-menu-bar {
         height: 35px;
         background: var(--sys-main);
@@ -135,11 +129,11 @@
     <div class="sys-top-bar">
         <a href="/index.html" class="sys-logo-link">
             <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
-            <span class="sys-project-name" id="project-title">SYSTEM</span>
+            <span class="sys-project-name" id="project-title">B-QUEST</span>
         </a>
 
         <div class="sys-user-zone">
-            <span id="user-display">Loading...</span>
+            <span id="user-display">thitiphon@brand-strom.com</span>
 
             <div class="dropdown sys-profile-dropdown">
                 <button class="btn-user" type="button" data-bs-toggle="dropdown" aria-expanded="false">
