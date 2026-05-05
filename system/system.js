@@ -7,6 +7,17 @@ if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_KEY !== 'undefined') 
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
+function formatDate(dateStr) {
+    if (!dateStr || dateStr === '-' || dateStr === '') return '-';
+    try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr; 
+        return d.toLocaleDateString('th-TH', { 
+            day: '2-digit', month: 'short', year: '2-digit' 
+        });
+    } catch (e) { return '-'; }
+}
+
 
 async function initLayout(config = {}) {
     if (!supabaseClient) {
