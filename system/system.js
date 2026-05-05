@@ -20,10 +20,8 @@ function formatDate(dateStr) {
 
 function getCorrectPath(target) {
     const root = window.location.origin;
-
-    if (target === "login.html") return `${root}/login/login.html`;
+    if (target === "login.html") return `${root}/auth/login.html`;
     if (target === "index.html") return `${root}/b-quest/b-quest-list.html`;
-
     return `${root}/${target}`;
 }
 
