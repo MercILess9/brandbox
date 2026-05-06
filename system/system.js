@@ -140,23 +140,21 @@ function injectAssets() {
     }
 }
 
-window.handleLogout = async function() {
-    // ใส่ console.log ไว้เช็กด้วยว่าฟังก์ชันทำงานไหม
-    console.log("Logout function called!"); 
-
-    const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
-    if (!confirmLogout) return;
-
+// ฟังก์ชัน Logout แบบกดแล้วออกเลย ไม่ต้องถาม
+async function handleLogout() {
     try {
-        const { error } = await supabaseClient.auth.signOut();
-        if (error) throw error;
+        // 1. สั่ง Sign Out จาก Supabase ทันที
+        await supabaseClient.auth.signOut();
 
+        // 2. ล้างข้อมูลทุกอย่างใน Browser
         localStorage.clear();
         sessionStorage.clear();
+
+        // 3. ดีดกลับไปหน้า Login
         window.location.replace('/login.html');
-        
-    } catch (error) {
-        console.error("Logout Error:", error.message);
-        alert("ออกจากระบบไม่ได้: " + error.message);
+    } catch (err) {
+        console.error("Logout Error:", err);
+        // ถ้ามีปัญหาจริงๆ ค่อยเด้ง alert บอก
+        alert("เกิดข้อผิดพลาดในการออกจากระบบ");
     }
-};
+}
