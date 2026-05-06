@@ -100,3 +100,27 @@ async function handleUpdatePassword(newPassword) {
         Swal.fire("Error", err.message, "error");
     }
 }
+
+
+// ฟังก์ชันออกจากระบบ (Logout)
+window.handleLogout = async () => {
+    const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
+    if (!confirmLogout) return;
+
+    try {
+        // 1. สั่ง Supabase ให้เคลียร์ Session
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+
+        // 2. ล้างข้อมูลที่ค้างใน Browser (ป้องกันข้อมูลรั่วไหล)
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // 3. ส่งกลับไปหน้า Login แบบไม่ให้กด Back กลับมาได้
+        window.location.replace('/login.html');
+        
+    } catch (error) {
+        console.error("Logout Error:", error.message);
+        alert("ออกจากระบบไม่ได้: " + error.message);
+    }
+};

@@ -1,6 +1,6 @@
 <style>
     :root {
-        --sys-brand: #bdc432; 
+        --sys-brand: #bdc432; /* สีเขียวเลมอน Brand ของพี่ */
         --sys-dark: #111111;
         --sys-grey: #adb5bd; 
         --sys-white: #ffffff;
@@ -13,12 +13,13 @@
         height: var(--header-height);
         background: var(--sys-white);
         border-bottom: 1.5px solid #eeeeee;
-        z-index: 1000 !important; 
+        z-index: 1000 !important; /* ให้ Modal ทับได้ */
         display: flex;
         flex-direction: column;
         font-family: 'Outfit', 'Sarabun', sans-serif;
     }
 
+    /* --- แถบบน: Logo & User --- */
     .sys-top-bar {
         flex: 1;
         display: flex;
@@ -36,65 +37,50 @@
     #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
     .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; }
 
-    /* --- แถบเมนูสี Brand (40px) --- */
+    /* --- แถบล่าง: เมนูสี Brand (40px) --- */
     #sys-menu-bar {
         height: 40px;
         background: var(--sys-brand) !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center;
-        justify-content: space-between; /* 🚩 ดันเมนูกับ Setting แยกกัน */
-        padding: 0 10px 0 30px;
+        padding: 0 30px;
+        gap: 0;
     }
 
-    /* กลุ่มเมนูซ้าย */
-    .sys-nav-links {
+    /* จุดที่จะเอาเมนูจาก Config มาฉีดใส่ */
+    #sys-nav-inject {
         display: flex;
         height: 100%;
         align-items: center;
     }
 
     .sys-menu-link {
-        color: var(--sys-white) !important; /* 🚩 เมนูพื้นฐานเป็นสีขาวตามสั่ง */
+        color: var(--sys-dark) !important; /* เมนูทั่วไปเป็นสีดำจางๆ */
         text-decoration: none !important;
         font-size: 0.85rem;
         font-weight: 800;
         text-transform: uppercase;
-        padding: 0 20px;
+        padding: 0 25px;
         height: 100%;
         display: flex;
         align-items: center;
-        transition: 0.2s;
-        opacity: 0.5; /* 🚩 หน้าที่ไม่ได้เลือกจะจางลง */
+        transition: 0.3s;
+        opacity: 0.5; /* จางลงเพื่อให้ Active เด่น */
         border-bottom: 4px solid transparent;
     }
 
     .sys-menu-link:hover { opacity: 0.8; }
 
-    /* 🚩 เมนูที่ใช้อยู่: ขาวชัด + เส้นใต้ขาว */
+    /* 🚩 ไฮไลท์เมนูที่ใช้อยู่: ตัวหนังสือขาว + เส้นใต้ขาว ตามโจทย์ */
     .sys-menu-link.active {
-        opacity: 1 !important;
-        border-bottom: 4px solid var(--sys-white) !important;
+        color: var(--sys-white) !important;      /* ตัวหนังสือขาว */
+        opacity: 1 !important;                   /* ชัดเจน 100% */
+        border-bottom: 4px solid var(--sys-white) !important; /* เส้นใต้ขาว */
     }
-
-    /* 🚩 ไอคอน Setting ขวาสุด */
-    .sys-settings-zone {
-        height: 100%;
-        display: flex;
-        align-items: center;
-    }
-
-    .btn-sys-setting {
-        color: var(--sys-white);
-        font-size: 1.2rem;
-        padding: 0 20px;
-        opacity: 0.8;
-        transition: 0.2s;
-        text-decoration: none !important;
-    }
-    .btn-sys-setting:hover { opacity: 1; transform: rotate(45deg); }
 
     .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
+    .dropdown-item { font-weight: 600; font-size: 0.9rem; }
 </style>
 
 <div class="sys-header-wrapper">
@@ -114,31 +100,18 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/profiles.html"><i class="bi bi-person-gear"></i> Profiles</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="handleLogout()">Logout</a></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="handleLogout()">
+                            Log Out
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 
     <nav id="sys-menu-bar">
-        <div class="sys-nav-links" id="sys-nav-inject"></div>
-        
-        <div class="sys-settings-zone">
-            <a href="/settings.html" class="btn-sys-setting">
-                <i class="bi bi-gear-fill"></i>
-            </a>
-        </div>
+        <div id="sys-nav-inject">
+            </div>
     </nav>
 </div>
-
-<script>
-    // 🚩 ฟังก์ชัน Logout แบบล็อคเป้าให้ทำงานชัวร์
-    async function handleLogout() {
-        if(confirm('ยืนยันออกจากระบบ?')) {
-            const { error } = await supabaseClient.auth.signOut();
-            window.location.href = '/login.html';
-        }
-    }
-    // ส่งออกไปให้ภายนอกเรียกได้
-    window.handleLogout = handleLogout;
-</script>
