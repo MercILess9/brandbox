@@ -1,6 +1,6 @@
 <style>
     :root {
-        --sys-brand: #bdc432; /* สีเขียวเลมอน Brand ของพี่ */
+        --sys-brand: #bdc432;
         --sys-dark: #111111;
         --sys-grey: #adb5bd; 
         --sys-white: #ffffff;
@@ -13,13 +13,12 @@
         height: var(--header-height);
         background: var(--sys-white);
         border-bottom: 1.5px solid #eeeeee;
-        z-index: 1000 !important; /* ให้ Modal ทับได้ */
+        z-index: 1000 !important;
         display: flex;
         flex-direction: column;
         font-family: 'Outfit', 'Sarabun', sans-serif;
     }
 
-    /* --- แถบบน: Logo & User --- */
     .sys-top-bar {
         flex: 1;
         display: flex;
@@ -37,7 +36,6 @@
     #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
     .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; }
 
-    /* --- แถบล่าง: เมนูสี Brand (40px) --- */
     #sys-menu-bar {
         height: 40px;
         background: var(--sys-brand) !important;
@@ -48,7 +46,6 @@
         gap: 0;
     }
 
-    /* จุดที่จะเอาเมนูจาก Config มาฉีดใส่ */
     #sys-nav-inject {
         display: flex;
         height: 100%;
@@ -56,7 +53,7 @@
     }
 
     .sys-menu-link {
-        color: var(--sys-dark) !important; /* เมนูทั่วไปเป็นสีดำจางๆ */
+        color: var(--sys-dark) !important;
         text-decoration: none !important;
         font-size: 0.85rem;
         font-weight: 800;
@@ -66,17 +63,15 @@
         display: flex;
         align-items: center;
         transition: 0.3s;
-        opacity: 0.5; /* จางลงเพื่อให้ Active เด่น */
+        opacity: 0.5;
         border-bottom: 4px solid transparent;
     }
 
     .sys-menu-link:hover { opacity: 0.8; }
-
-    /* 🚩 ไฮไลท์เมนูที่ใช้อยู่: ตัวหนังสือขาว + เส้นใต้ขาว ตามโจทย์ */
     .sys-menu-link.active {
-        color: var(--sys-white) !important;      /* ตัวหนังสือขาว */
-        opacity: 1 !important;                   /* ชัดเจน 100% */
-        border-bottom: 4px solid var(--sys-white) !important; /* เส้นใต้ขาว */
+        color: var(--sys-white) !important;
+        opacity: 1 !important; 
+        border-bottom: 4px solid var(--sys-white) !important;
     }
 
     .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
