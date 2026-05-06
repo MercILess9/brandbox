@@ -9,36 +9,14 @@ const B_QUEST_CONFIG = {
     ]
 };
 
-
-
-async function handleDeleteTask(taskId) {
-    if (!taskId) return;
-
-    const res = await Swal.fire({ 
-        title: 'Delete Task?', 
-        text: "ยืนยันการลบภารกิจนี้ใช่หรือไม่?",
+async function handleDeleteTask(id) {
+    const res = await Swal.fire({
+        title: 'Delete Task?',
         icon: 'warning', 
         showCancelButton: true, 
-        confirmButtonColor: '#ef4444',
-        confirmButtonText: 'ลบข้อมูล',
-        cancelButtonText: 'ยกเลิก',
-        reverseButtons: true
-    });
-
+        confirmButtonColor: '#ef4444' });
     if (res.isConfirmed) { 
-        try {
-            const { error } = await supabaseClient
-                .from('b-quest-list')
-                .delete()
-                .eq('id', taskId);
-
-            if (error) throw error;
-            
-            // ลบสำเร็จแล้ว reload หน้าเว็บ
-            location.reload(); 
-        } catch (err) {
-            console.error("Delete Error:", err.message);
-            Swal.fire('Error', 'ไม่สามารถลบข้อมูลได้: ' + err.message, 'error');
-        }
+        await supabaseClient.from('b-quest-list').delete().eq('id', id); 
+        location.reload(); 
     }
 }
