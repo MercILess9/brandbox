@@ -65,13 +65,7 @@ const B_QUEST_MODAL_HTML = `
             <div class="bq-modern-header">
                 <div class="bq-header-title" id="b-quest-modal-label-text">Task <span>New</span></div>
                 <div class="bq-header-right">
-                    <div class="mb-2" style="font-size: 0.8rem; color: #888;">
-    <span class="bq-owner-top" id="modal-owner-display">-</span>
-    
-    <span class="mx-2">|</span> 
-    
-    <span>Last Update: <span id="modal-updated-at">-</span></span>
-</div>
+                    <span class="bq-owner-top" id="modal-owner-display">Owner: -</span>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
             </div>
@@ -236,8 +230,7 @@ const BQuestApp = (() => {
             const element = el(fields[key]); 
             if (element) element.value = data[key] || ''; 
         }
-        el('modal-owner-display').innerText = task.owner;
-        el('modal-updated-at').innerText = task.lastupdate;
+        el('modal-owner-display').innerText = `Owner: ${data.owner || '-'}`;
     }
 
     function updateStatusUI(selectEl) {
