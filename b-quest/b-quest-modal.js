@@ -162,7 +162,12 @@ const B_QUEST_MODAL_HTML = `
                 </div>
                 
                 <div class="bq-footer-actions">
-                    <button type="button" class="btn-bq-delete" id="btn-delete-task" onclick="BQuestApp.handleDeleteTask()">Delete Task</button>
+                    <button type="button" 
+        class="btn-bq-delete" 
+        id="btn-delete-task" 
+        onclick="handleDeleteTask(document.getElementById('b-quest-modal-id').value)">
+    Delete Task
+</button>
                     <button type="submit" class="btn-bq-create" id="btn-submit-text">Create Task</button>
                 </div>
             </form>
@@ -315,11 +320,6 @@ const BQuestApp = (() => {
         } catch (e) { console.error(e); }
     }
 
-    async function handleDeleteTask() {
-        const id = el('b-quest-modal-id').value;
-        const res = await Swal.fire({ title: 'Delete Task?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
-        if (res.isConfirmed) { await supabaseClient.from('b-quest-list').delete().eq('id', id); location.reload(); }
-    }
 
     return {
         async openModal(taskId = null, workData = []) {
