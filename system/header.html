@@ -81,6 +81,31 @@
 
     .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
     .dropdown-item { font-weight: 600; font-size: 0.9rem; }
+
+    .btn-primary {
+    background-color: #bdc432 !important;
+    border-color: #bdc432 !important;
+    color: #111111 !important; /* เปลี่ยนตัวหนังสือเป็นสีดำเพื่อให้ตัดกับสีเลมอน */
+}
+
+/* 2. 🚩 จุดสำคัญ: เปลี่ยน "แสงเรืองสีน้ำเงิน" (Focus Shadow) ตอนกด */
+.btn:focus, .btn:active, .btn-primary:focus, .btn-primary:active {
+    box-shadow: 0 0 0 0.25rem rgba(189, 196, 50, 0.4) !important; /* เงาสีเลมอนจางๆ */
+    outline: none !important;
+}
+
+/* 3. เปลี่ยนสีตอนเอาเมาส์ไปชี้ (Hover) ให้เข้มขึ้นนิดนึง */
+.btn-primary:hover {
+    background-color: #a5ac2a !important; /* เขียวเข้มขึ้นอีกนิด */
+    border-color: #a5ac2a !important;
+}
+
+/* 4. กรณีปุ่มอื่นๆ ที่ไม่ใช่ Primary แต่พี่ไม่อยากให้มีขอบน้ำเงิน */
+button:focus, a:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 </style>
 
 <div class="sys-header-wrapper">
