@@ -151,7 +151,7 @@ async function handleLogout() {
         sessionStorage.clear();
 
         // 3. ดีดกลับไปหน้า Login
-        window.location.replace('/login.html');
+        window.location.replace('auth/login.html');
     } catch (err) {
         console.error("Logout Error:", err);
         // ถ้ามีปัญหาจริงๆ ค่อยเด้ง alert บอก
