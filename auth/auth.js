@@ -101,25 +101,3 @@ async function handleUpdatePassword(newPassword) {
     }
 }
 
-
-// ในไฟล์ auth.js
-window.handleLogout = async function() {
-    // ใส่ console.log ไว้เช็กด้วยว่าฟังก์ชันทำงานไหม
-    console.log("Logout function called!"); 
-
-    const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
-    if (!confirmLogout) return;
-
-    try {
-        const { error } = await supabaseClient.auth.signOut();
-        if (error) throw error;
-
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.replace('/login.html');
-        
-    } catch (error) {
-        console.error("Logout Error:", error.message);
-        alert("ออกจากระบบไม่ได้: " + error.message);
-    }
-};
