@@ -1,27 +1,24 @@
 <style>
     :root {
-        --sys-brand: #bdc432; /* สีเขียวเลมอน Brand ของพี่ */
+        --sys-brand: #bdc432; 
         --sys-dark: #111111;
-        --sys-grey: #adb5bd; /* สีเทาสำหรับไอคอนคน */
+        --sys-grey: #adb5bd; 
         --sys-white: #ffffff;
         --header-height: 105px; 
     }
 
-    /* ตัวหุ้ม Header ทั้งหมด */
     .sys-header-wrapper {
         position: fixed;
         top: 0; left: 0; right: 0;
         height: var(--header-height);
         background: var(--sys-white);
         border-bottom: 1.5px solid #eeeeee;
-        /* 🚩 แก้ปัญหาหัวขาด: ปรับ z-index ให้ต่ำกว่า Modal (Bootstrap Modal คือ 1050) */
         z-index: 1000 !important; 
         display: flex;
         flex-direction: column;
         font-family: 'Outfit', 'Sarabun', sans-serif;
     }
 
-    /* --- แถบบน: Logo & User (สูงประมาณ 65px) --- */
     .sys-top-bar {
         flex: 1;
         display: flex;
@@ -30,89 +27,74 @@
         padding: 0 30px;
     }
 
-    .sys-brand-zone {
-        display: flex;
-        align-items: center;
-        text-decoration: none !important;
-        color: var(--sys-dark);
-        transition: 0.2s;
-    }
-    .sys-brand-zone:hover { opacity: 0.8; }
-
+    .sys-brand-zone { display: flex; align-items: center; text-decoration: none !important; color: var(--sys-dark); }
     .sys-logo-img { height: 32px; width: auto; }
     .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
-    
-    /* ชื่อโปรเจกต์ (รับค่าจาก config.projectName) */
-    .sys-project-name { 
-        font-weight: 800; 
-        font-size: 1.2rem; 
-        text-transform: uppercase; 
-        letter-spacing: -0.5px; 
-    }
+    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
 
     .sys-user-zone { display: flex; align-items: center; gap: 12px; }
     #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
+    .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; }
 
-    /* ปุ่มไอคอนคนสีเทา */
-    .btn-user-profile { 
-        background: none; border: none; padding: 0;
-        color: var(--sys-grey); font-size: 1.8rem; 
-        cursor: pointer; display: flex; align-items: center; 
-        transition: 0.2s;
-    }
-    .btn-user-profile:hover { color: var(--sys-brand); }
-
-    /* --- แถบล่าง: เมนูสี Brand (สูง 40px) --- */
+    /* --- แถบเมนูสี Brand (40px) --- */
     #sys-menu-bar {
         height: 40px;
         background: var(--sys-brand) !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center;
-        padding: 0 30px;
-        gap: 0;
+        justify-content: space-between; /* 🚩 ดันเมนูกับ Setting แยกกัน */
+        padding: 0 10px 0 30px;
+    }
+
+    /* กลุ่มเมนูซ้าย */
+    .sys-nav-links {
+        display: flex;
+        height: 100%;
+        align-items: center;
     }
 
     .sys-menu-link {
-        color: var(--sys-dark) !important;
+        color: var(--sys-white) !important; /* 🚩 เมนูพื้นฐานเป็นสีขาวตามสั่ง */
         text-decoration: none !important;
         font-size: 0.85rem;
         font-weight: 800;
         text-transform: uppercase;
-        padding: 0 25px;
+        padding: 0 20px;
         height: 100%;
         display: flex;
         align-items: center;
-        transition: 0.3s;
-        opacity: 0.5; /* เมนูที่ไม่เลือกจะดำจางๆ */
+        transition: 0.2s;
+        opacity: 0.5; /* 🚩 หน้าที่ไม่ได้เลือกจะจางลง */
         border-bottom: 4px solid transparent;
     }
 
     .sys-menu-link:hover { opacity: 0.8; }
 
-    /* 🚩 ไฮไลท์เมนูที่ใช้งานอยู่: ตัวหนังสือขาว + เส้นใต้ขาว */
+    /* 🚩 เมนูที่ใช้อยู่: ขาวชัด + เส้นใต้ขาว */
     .sys-menu-link.active {
-        color: var(--sys-white) !important;      /* ตัวหนังสือขาว */
-        opacity: 1 !important;                   /* ชัดเจน 100% */
-        border-bottom: 4px solid var(--sys-white) !important; /* เส้นใต้ขาว 4px */
+        opacity: 1 !important;
+        border-bottom: 4px solid var(--sys-white) !important;
     }
 
-    /* Dropdown ปรับแต่ง */
-    .dropdown-menu { 
-        border: none; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-        border-radius: 12px; 
-        padding: 8px; 
-        z-index: 1100; /* ให้ Dropdown ลอยเหนือ Header */
+    /* 🚩 ไอคอน Setting ขวาสุด */
+    .sys-settings-zone {
+        height: 100%;
+        display: flex;
+        align-items: center;
     }
-    .dropdown-item { 
-        border-radius: 8px; 
-        padding: 10px 15px; 
-        font-size: 0.9rem; 
-        font-weight: 600; 
-        color: var(--sys-dark);
+
+    .btn-sys-setting {
+        color: var(--sys-white);
+        font-size: 1.2rem;
+        padding: 0 20px;
+        opacity: 0.8;
+        transition: 0.2s;
+        text-decoration: none !important;
     }
-    .dropdown-item:hover { background: #f8fbef; color: var(--sys-brand); }
+    .btn-sys-setting:hover { opacity: 1; transform: rotate(45deg); }
+
+    .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
 </style>
 
 <div class="sys-header-wrapper">
@@ -125,24 +107,38 @@
 
         <div class="sys-user-zone">
             <span id="user-display">Loading...</span>
-            
             <div class="dropdown">
-                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown">
                     <i class="bi bi-person-circle"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/profiles.html"><i class="bi bi-person-gear"></i> Profiles</a></li>
-                    <li><hr class="dropdown-divider opacity-50"></li>
-                    <li>
-                        <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="window.logout()">
-                            <i class="bi bi-box-arrow-right"></i> Log Out
-                        </a>
-                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="handleLogout()">Logout</a></li>
                 </ul>
             </div>
         </div>
     </div>
 
     <nav id="sys-menu-bar">
-        </nav>
+        <div class="sys-nav-links" id="sys-nav-inject"></div>
+        
+        <div class="sys-settings-zone">
+            <a href="/settings.html" class="btn-sys-setting">
+                <i class="bi bi-gear-fill"></i>
+            </a>
+        </div>
+    </nav>
 </div>
+
+<script>
+    // 🚩 ฟังก์ชัน Logout แบบล็อคเป้าให้ทำงานชัวร์
+    async function handleLogout() {
+        if(confirm('ยืนยันออกจากระบบ?')) {
+            const { error } = await supabaseClient.auth.signOut();
+            window.location.href = '/login.html';
+        }
+    }
+    // ส่งออกไปให้ภายนอกเรียกได้
+    window.handleLogout = handleLogout;
+</script>

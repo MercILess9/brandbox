@@ -96,12 +96,11 @@ async function renderSystemUI(config) {
     }
 
     // 2. ดึงรายการเมนูจาก Config มาสร้าง (List, Assignment)
-    const menuBar = document.getElementById('sys-menu-bar');
+    // ใน system.js ส่วนของ renderSystemUI
+    const menuBar = document.getElementById('sys-nav-inject'); // 🚩 เปลี่ยน ID ตัวรับเป็นอันนี้
     if (config.menus && menuBar) {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-        
         menuBar.innerHTML = config.menus.map(menu => {
-            // เช็กว่า link ใน config ตรงกับหน้าที่เปิดอยู่ไหมเพื่อใส่ class 'active'
             const isActive = (currentPath === menu.link) ? 'active' : '';
             return `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`;
         }).join('');
