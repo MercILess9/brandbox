@@ -102,21 +102,20 @@ async function handleUpdatePassword(newPassword) {
 }
 
 
-// ฟังก์ชันออกจากระบบ (Logout)
-window.handleLogout = async () => {
+// ในไฟล์ auth.js
+window.handleLogout = async function() {
+    // ใส่ console.log ไว้เช็กด้วยว่าฟังก์ชันทำงานไหม
+    console.log("Logout function called!"); 
+
     const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
     if (!confirmLogout) return;
 
     try {
-        // 1. สั่ง Supabase ให้เคลียร์ Session
         const { error } = await supabaseClient.auth.signOut();
         if (error) throw error;
 
-        // 2. ล้างข้อมูลที่ค้างใน Browser (ป้องกันข้อมูลรั่วไหล)
         localStorage.clear();
         sessionStorage.clear();
-
-        // 3. ส่งกลับไปหน้า Login แบบไม่ให้กด Back กลับมาได้
         window.location.replace('/login.html');
         
     } catch (error) {
