@@ -1,11 +1,9 @@
 
 let supabaseClient;
 
-// 1. Initial Supabase Client
 if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_KEY !== 'undefined') {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
-
 
 function notify(title, text, icon = 'success') {
     if (typeof Swal !== 'undefined') {
@@ -17,9 +15,6 @@ function notify(title, text, icon = 'success') {
             showConfirmButton: false,
             confirmButtonColor: 'rgb(45, 71, 57)'
         });
-    } else {
-        // กรณี SweetAlert ยังไม่โหลด ให้ใช้ alert พื้นฐานแทน
-        alert(title + ": " + text);
     }
 }
 
@@ -35,11 +30,8 @@ function formatDate(dateStr) {
     } catch (e) { return '-'; }
 }
 
-/**
- * [Main Function] เริ่มต้นระบบทั้งหมด
- */
+
 async function initLayout(config = {}) {
-    // 1. ฉีด Assets (Bootstrap, Icons)
     injectAssets();
 
     if (!supabaseClient) {
@@ -48,9 +40,7 @@ async function initLayout(config = {}) {
         return;
     }
 
-    // 2. ตรวจสอบสิทธิ์ (Auth Guard)
     await initAuthGuard();
-
     const path = window.location.pathname.toLowerCase();
     const isAuthPage = path.includes('/auth/');
     const isIndex = path === '/' || path.endsWith('/index.html') || path.endsWith('/');
@@ -60,14 +50,10 @@ async function initLayout(config = {}) {
         document.body.classList.add('auth-ready');
         return;
     }
-
-    // 4. หน้าทำงานอื่นๆ (B-Quest, etc.) ให้โหลด UI ระบบ
     await renderSystemUI(config);
 }
 
-/**
- * [Auth Guard] ระบบเฝ้าประตู
- */
+
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const path = window.location.pathname.toLowerCase();
@@ -90,16 +76,15 @@ async function renderSystemUI(config) {
     const headerHTML = await response.text();
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-    // 1. ดึงชื่อโปรเจกต์จาก Config (เช่น "B-QUEST")
+    // 1. ดึงชื่อโปรเจกต์จาก Config
     if (config.projectName) {
         document.getElementById('project-title').innerText = config.projectName;
     }
 
-    // 2. ดึงรายการเมนูจาก Config มาสร้าง (List, Assignment)
-    // ใน system.js ส่วนของ renderSystemUI
-    const menuBar = document.getElementById('sys-nav-inject'); // 🚩 เปลี่ยน ID ตัวรับเป็นอันนี้
+    // 2. ดึงรายการเมนูจาก Config มาสร้าง
+    const menuBar = document.getElementById('sys-nav-inject');
     if (config.menus && menuBar) {
-        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        const currentPath = window.location.pathname.split('/').pop();
         menuBar.innerHTML = config.menus.map(menu => {
             const isActive = (currentPath === menu.link) ? 'active' : '';
             return `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`;
@@ -146,7 +131,7 @@ async function handleLogout() {
         await supabaseClient.auth.signOut();
         localStorage.clear();
         sessionStorage.clear();
-        window.location.replace('auth/login.html');
+        window.location.replace('/auth/login.html');
     } catch (err) {
         console.error("Logout Error:", err);
     }
