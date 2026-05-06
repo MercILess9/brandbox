@@ -6,6 +6,31 @@
         --sys-white: #ffffff;
         --header-height: 105px; 
     }
+    .sys-menu-link {
+    color: #ffffff !important; /* 🚩 เปลี่ยนตัวหนังสือเป็นสีขาวทั้งหมด */
+    text-decoration: none !important;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 0 25px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    transition: 0.3s;
+    opacity: 0.6; /* 🚩 เมนูที่ไม่ได้เลือก ให้จางลงหน่อยเพื่อไม่ให้แย่งสายตา */
+    border-bottom: 4px solid transparent; /* จองพื้นที่เส้นใต้ไว้ป้องกันเมนูกระตุก */
+}
+
+/* 🚩 เมนูที่เลือก (Active): ขาวชัดเจน 100% + มีเส้นใต้สีขาวหนา 4px */
+.sys-menu-link.active {
+    opacity: 1 !important; 
+    color: #ffffff !important;
+    border-bottom: 4px solid #ffffff !important; /* เส้นใต้สีขาว */
+}
+
+.sys-menu-link:hover {
+    opacity: 1; /* เวลาเอาเมาส์ชี้ให้สว่างขึ้น */
+}
 
     .sys-header-wrapper {
         position: fixed;

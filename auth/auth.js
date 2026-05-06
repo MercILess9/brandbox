@@ -15,7 +15,6 @@ async function handleLogin(email, password) {
         });
 
         if (error) throw error;
-
         notify("Success", "Welcome back!", "success");
         
         setTimeout(() => {
@@ -28,7 +27,6 @@ async function handleLogin(email, password) {
     }
 }
 
-// 2. ฟังก์ชันสมัครสมาชิก
 async function handleSignup(email, password, metadata) {
     try {
         Swal.fire({ title: 'Creating Account...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -57,13 +55,11 @@ async function handleSignup(email, password, metadata) {
     }
 }
 
-// 3. ฟังก์ชันขอลิงก์ลืมรหัสผ่าน
+
 async function handleForgotPassword(email) {
     try {
         Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            // สำคัญ: ต้องระบุ redirectTo ให้ถูกต้อง
             redirectTo: window.location.origin + '/auth/forgot-password.html', 
         });
 
