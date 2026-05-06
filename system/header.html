@@ -1,49 +1,26 @@
 <style>
     :root {
-        --sys-brand: #bdc432;
+        --sys-brand: #bdc432; /* สีเขียวเลมอน Brand */
         --sys-dark: #111111;
         --sys-grey: #adb5bd; 
         --sys-white: #ffffff;
         --header-height: 105px; 
     }
-    .sys-menu-link {
-    color: #ffffff !important; /* 🚩 เปลี่ยนตัวหนังสือเป็นสีขาวทั้งหมด */
-    text-decoration: none !important;
-    font-size: 0.85rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 0 25px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    transition: 0.3s;
-    opacity: 0.6; /* 🚩 เมนูที่ไม่ได้เลือก ให้จางลงหน่อยเพื่อไม่ให้แย่งสายตา */
-    border-bottom: 4px solid transparent; /* จองพื้นที่เส้นใต้ไว้ป้องกันเมนูกระตุก */
-}
 
-/* 🚩 เมนูที่เลือก (Active): ขาวชัดเจน 100% + มีเส้นใต้สีขาวหนา 4px */
-.sys-menu-link.active {
-    opacity: 1 !important; 
-    color: #ffffff !important;
-    border-bottom: 4px solid #ffffff !important; /* เส้นใต้สีขาว */
-}
-
-.sys-menu-link:hover {
-    opacity: 1; /* เวลาเอาเมาส์ชี้ให้สว่างขึ้น */
-}
-
+    /* โครงสร้างหลัก */
     .sys-header-wrapper {
         position: fixed;
         top: 0; left: 0; right: 0;
         height: var(--header-height);
         background: var(--sys-white);
         border-bottom: 1.5px solid #eeeeee;
-        z-index: 1000 !important;
+        z-index: 1000 !important; /* ให้ Modal ลอยทับได้ */
         display: flex;
         flex-direction: column;
         font-family: 'Outfit', 'Sarabun', sans-serif;
     }
 
+    /* แถบบน: Logo & User */
     .sys-top-bar {
         flex: 1;
         display: flex;
@@ -55,15 +32,16 @@
     .sys-brand-zone { display: flex; align-items: center; text-decoration: none !important; color: var(--sys-dark); }
     .sys-logo-img { height: 32px; width: auto; }
     .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
-    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
+    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; color: var(--sys-dark); }
 
     .sys-user-zone { display: flex; align-items: center; gap: 12px; }
     #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
     .btn-user-profile { background: none; border: none; color: var(--sys-grey); font-size: 1.8rem; cursor: pointer; }
 
+    /* --- 🚩 แถบเมนูสี Brand (สูง 40px) --- */
     #sys-menu-bar {
         height: 40px;
-        background: var(--sys-brand) !important;
+        background: var(--sys-brand) !important; /* บังคับสีเลมอน */
         display: flex !important;
         flex-direction: row !important;
         align-items: center;
@@ -77,8 +55,9 @@
         align-items: center;
     }
 
+    /* 🚩 ตัวหนังสือสีขาว (ใส่ !important กันโดนแทรกแซง) */
     .sys-menu-link {
-        color: var(--sys-dark) !important;
+        color: #ffffff !important; 
         text-decoration: none !important;
         font-size: 0.85rem;
         font-weight: 800;
@@ -87,21 +66,27 @@
         height: 100%;
         display: flex;
         align-items: center;
-        transition: 0.3s;
-        opacity: 0.5;
-        border-bottom: 4px solid transparent;
+        transition: 0.2s;
+        opacity: 0.6; /* หน้าที่ไม่ได้เลือก ให้จางลงเพื่อให้ Active เด่น */
+        border-bottom: 4px solid transparent; /* จองพื้นที่ไว้ไม่ให้เมนูกระตุกเวลา Active */
     }
 
-    .sys-menu-link:hover { opacity: 0.8; }
+    /* 🚩 เมื่อเอาเมาส์ชี้ */
+    .sys-menu-link:hover {
+        opacity: 1;
+        color: #ffffff !important;
+    }
+
+    /* 🚩 เมนูที่กำลังใช้งานอยู่ (Active) */
     .sys-menu-link.active {
-        color: var(--sys-white) !important;
-        opacity: 1 !important; 
-        border-bottom: 4px solid var(--sys-white) !important;
+        color: #ffffff !important;      /* ขาวชัดเจน */
+        opacity: 1 !important;           /* สว่าง 100% */
+        border-bottom: 4px solid #ffffff !important; /* เส้นใต้ขาวหนา 4px */
     }
 
-    .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; }
-    .dropdown-item { font-weight: 600; font-size: 0.9rem; }
-
+    /* Dropdown UI */
+    .dropdown-menu { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 12px; padding: 8px; }
+    .dropdown-item { border-radius: 8px; padding: 10px 15px; font-size: 0.9rem; font-weight: 600; }
 </style>
 
 <div class="sys-header-wrapper">
