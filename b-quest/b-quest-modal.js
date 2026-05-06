@@ -65,7 +65,13 @@ const B_QUEST_MODAL_HTML = `
             <div class="bq-modern-header">
                 <div class="bq-header-title" id="b-quest-modal-label-text">Task <span>New</span></div>
                 <div class="bq-header-right">
-                    <span class="bq-owner-top" id="modal-owner-display">Owner: -</span>
+                    <div class="mb-2" style="font-size: 0.8rem; color: #888;">
+    <span class="bq-owner-top" id="modal-owner-display">-</span>
+    
+    <span class="mx-2">|</span> 
+    
+    <span>Last Update: <span id="modal-updated-at">-</span></span>
+</div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
             </div>
@@ -230,7 +236,8 @@ const BQuestApp = (() => {
             const element = el(fields[key]); 
             if (element) element.value = data[key] || ''; 
         }
-        el('modal-owner-display').innerText = `Owner: ${data.owner || '-'}`;
+        el('modal-owner-display').innerText = task.owner;
+        el('modal-updated-at').innerText = task.lastupdate;
     }
 
     function updateStatusUI(selectEl) {
@@ -315,12 +322,6 @@ const BQuestApp = (() => {
         } catch (e) { console.error(e); }
     }
 
-    async function handleDeleteTask() {
-        const id = el('b-quest-modal-id').value;
-        const res = await Swal.fire({ title: 'Delete Task?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
-        if (res.isConfirmed) { await supabaseClient.from('b-quest-list').delete().eq('id', id); location.reload(); }
-    }
-
     return {
         async openModal(taskId = null, workData = []) {
             const form = el('b-quest-modal-form');
@@ -364,7 +365,6 @@ const BQuestApp = (() => {
                 el('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
                 el('btn-submit-text').innerText = 'Create Task';
                 show('btn-delete-task', false);
-                el('modal-owner-display').innerText = 'Owner: -';
                 State.roles.forEach(role => { el(`check-${role}`).checked = false; updateRoleUI(role); });
             }
             bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
