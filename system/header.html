@@ -27,7 +27,13 @@
         padding: 0 30px;
     }
 
-    .sys-brand-zone { display: flex; align-items: center; text-decoration: none !important; color: var(--sys-dark); }
+    .sys-brand-zone { 
+        display: flex; 
+        align-items: center; 
+        text-decoration: none !important; 
+        color: var(--sys-dark); 
+    }
+
     .sys-logo-img { height: 32px; width: auto; }
     .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
     .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
@@ -36,16 +42,11 @@
         height: 40px;
         background: var(--sys-brand) !important;
         display: flex !important;
-        flex-direction: row !important;
         align-items: center;
         padding: 0 30px;
     }
 
-    #sys-nav-inject {
-        display: flex;
-        height: 100%;
-        align-items: center;
-    }
+    #sys-nav-inject { display: flex; height: 100%; align-items: center; }
 
     .sys-menu-link {
         color: #ffffff !important;
@@ -62,11 +63,7 @@
         box-sizing: border-box;
     }
 
-
-    .sys-menu-link:hover {
-        color: var(--sys-hover) !important;
-        opacity: 1 !important;
-    }
+    .sys-menu-link:hover { color: var(--sys-hover) !important; }
 
     .sys-menu-link.active {
         color: #ffffff !important;
@@ -81,7 +78,7 @@
 <div class="sys-header-wrapper">
     <div class="sys-top-bar">
         <a href="/" class="sys-brand-zone">
-            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
+            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img">
             <div class="sys-divider"></div>
             <span class="sys-project-name" id="project-title">---</span>
         </a>
@@ -102,7 +99,6 @@
     </div>
 
     <nav id="sys-menu-bar">
-        <div id="sys-nav-inject">
-            </div>
+        <div id="sys-nav-inject"></div>
     </nav>
 </div>
