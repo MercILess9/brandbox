@@ -65,7 +65,7 @@ const B_QUEST_MODAL_HTML = `
             <div class="bq-modern-header">
                 <div class="bq-header-title" id="b-quest-modal-label-text">Task <span>New</span></div>
                 <div class="bq-header-right">
-                    <span class="bq-owner-top" id="modal-owner-display">Owner: -</span>
+                    <span class="bq-owner-top" id="modal-owner-display"></span>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
             </div>
