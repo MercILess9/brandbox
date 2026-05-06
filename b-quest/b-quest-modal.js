@@ -230,7 +230,7 @@ const BQuestApp = (() => {
             const element = el(fields[key]); 
             if (element) element.value = data[key] || ''; 
         }
-        el('modal-owner-display').innerText = `Owner: ${data.owner || '-'}`;
+        el('modal-owner-display').innerText = `${data.owner}`;
     }
 
     function updateStatusUI(selectEl) {
