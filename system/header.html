@@ -1,26 +1,25 @@
 <style>
     :root {
-        --sys-brand: #bdc432; 
+        --sys-brand: #bdc432; /* สีเขียวเลมอน Brand */
         --sys-white: #ffffff;
         --sys-dark: #111111;
         --header-height: 105px;
     }
 
-    /* รีเซ็ตพื้นฐานป้องกันเละ */
-    .sys-header-wrapper, .sys-header-wrapper * { box-sizing: border-box; }
-
+    /* 1. คง Layout เดิม: สูง 105px และ Fixed ไว้ด้านบน */
     .sys-header-wrapper {
         position: fixed;
         top: 0; left: 0; right: 0;
         height: var(--header-height);
-        background: #fff;
-        border-bottom: 1px solid #eee;
-        z-index: 1000;
+        background: var(--sys-white);
+        border-bottom: 1.5px solid #eeeeee;
+        z-index: 1000 !important; /* ให้ Modal ลอยทับได้ */
         display: flex;
         flex-direction: column;
+        font-family: 'Outfit', 'Sarabun', sans-serif;
     }
 
-    /* ส่วน Logo */
+    /* 2. ส่วน Logo & User (สูง 65px) */
     .sys-top-bar {
         height: 65px;
         display: flex;
@@ -29,68 +28,88 @@
         padding: 0 30px;
     }
 
-    .sys-brand-zone { display: flex; align-items: center; text-decoration: none; color: var(--sys-dark); }
-    .sys-logo-img { height: 32px; }
-    .sys-divider { width: 1px; height: 20px; background: #ddd; margin: 0 15px; }
+    .sys-brand-zone { display: flex; align-items: center; text-decoration: none !important; color: var(--sys-dark); }
+    .sys-logo-img { height: 32px; width: auto; }
+    .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
     .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
 
-    /* 🚩 ส่วนเมนู 40px (ตัวหนังสือขาวทั้งหมด) */
+    /* 3. ส่วนแถบเมนู (สูง 40px) */
     #sys-menu-bar {
         height: 40px;
         background: var(--sys-brand) !important;
-        display: flex;
-        padding: 0 20px;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
+        padding: 0 30px;
     }
 
-    #sys-nav-inject { display: flex; height: 100%; }
+    #sys-nav-inject {
+        display: flex;
+        height: 100%;
+        align-items: center;
+    }
 
+    /* 🚩 แก้ให้เป็นตัวหนังสือขาวทั้งหมด */
     .sys-menu-link {
+        color: #ffffff !important; /* บังคับขาว */
+        text-decoration: none !important;
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0 25px;
         height: 100%;
         display: flex;
         align-items: center;
-        padding: 0 20px;
-        text-decoration: none !important;
-        font-weight: 700;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        
-        /* บังคับตัวหนังสือขาว */
-        color: rgba(255, 255, 255, 0.6) !important; 
-        border-bottom: 4px solid transparent;
         transition: 0.2s;
+        opacity: 0.5; /* เมนูทั่วไปจะจางลงหน่อย */
+        border-bottom: 4px solid transparent; /* จองพื้นที่เส้นใต้ */
+        box-sizing: border-box;
     }
 
-    /* 🚩 เมื่อ Active: ขาวชัดเจน + ขีดใต้ขาว */
+    /* 🚩 เมื่อเมาส์ชี้ */
+    .sys-menu-link:hover {
+        opacity: 1;
+        color: #ffffff !important;
+    }
+
+    /* 🚩 เมนูที่กำลังใช้งานอยู่ (Active): ขาวชัดเจน + เส้นใต้ขาวหนา 4px */
     .sys-menu-link.active {
         color: #ffffff !important;
         opacity: 1 !important;
-        border-bottom: 4px solid #ffffff !important;
+        border-bottom: 4px solid #ffffff !important; /* เส้นใต้สีขาว */
     }
 
-    .sys-menu-link:hover { color: #fff !important; opacity: 1; }
-
-    /* Dropdown User */
-    .btn-user-profile { background: none; border: none; color: #adb5bd; font-size: 1.6rem; cursor: pointer; }
+    /* ส่วน User */
+    .sys-user-zone { display: flex; align-items: center; gap: 12px; }
+    #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
+    .btn-user-profile { background: none; border: none; color: #adb5bd; font-size: 1.8rem; cursor: pointer; }
 </style>
 
 <div class="sys-header-wrapper">
     <div class="sys-top-bar">
         <a href="/" class="sys-brand-zone">
-            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img">
+            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
             <div class="sys-divider"></div>
             <span class="sys-project-name" id="project-title">---</span>
         </a>
+
         <div class="sys-user-zone">
-            <span id="user-display" style="font-size:0.8rem; color:#888;">User...</span>
+            <span id="user-display">Loading...</span>
             <div class="dropdown">
-                <button class="btn-user-profile" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i></button>
+                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle"></i>
+                </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="handleLogout()">Logout</a></li>
+                    <li><a class="dropdown-item" href="/profiles.html">Profiles</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="handleLogout()">Logout</a></li>
                 </ul>
             </div>
         </div>
     </div>
+
     <nav id="sys-menu-bar">
-        <div id="sys-nav-inject"></div>
+        <div id="sys-nav-inject">
+            </div>
     </nav>
 </div>
