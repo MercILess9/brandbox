@@ -140,21 +140,14 @@ function injectAssets() {
     }
 }
 
-// ฟังก์ชัน Logout แบบกดแล้วออกเลย ไม่ต้องถาม
+
 async function handleLogout() {
     try {
-        // 1. สั่ง Sign Out จาก Supabase ทันที
         await supabaseClient.auth.signOut();
-
-        // 2. ล้างข้อมูลทุกอย่างใน Browser
         localStorage.clear();
         sessionStorage.clear();
-
-        // 3. ดีดกลับไปหน้า Login
         window.location.replace('auth/login.html');
     } catch (err) {
         console.error("Logout Error:", err);
-        // ถ้ามีปัญหาจริงๆ ค่อยเด้ง alert บอก
-        alert("เกิดข้อผิดพลาดในการออกจากระบบ");
     }
 }
