@@ -1,12 +1,12 @@
 <style>
     :root {
-        --sys-brand: #bdc432; /* สีเขียวเลมอน */
+        --sys-brand: #bdc432; 
         --sys-white: #ffffff;
         --sys-dark: #111111;
         --header-height: 105px;
     }
 
-    /* โครงสร้างหลัก 105px Fixed */
+    /* คง Layout เดิมของพี่ 105px */
     .sys-header-wrapper {
         position: fixed;
         top: 0; left: 0; right: 0;
@@ -28,7 +28,7 @@
         padding: 0 30px;
     }
 
-    /* แถบเมนูสีเขียว 40px */
+    /* ส่วนเมนู 40px */
     #sys-menu-bar {
         height: 40px;
         background: var(--sys-brand) !important;
@@ -41,7 +41,7 @@
         height: 100%;
     }
 
-    /* 🚩 เมนูปกติ: ขาวเต็ม 100% */
+    /* 🚩 ปรับตัวหนังสือให้ขาวและเตรียมเส้นใต้ */
     .sys-menu-link {
         height: 100%;
         display: flex;
@@ -51,27 +51,27 @@
         font-weight: 800;
         font-size: 0.85rem;
         text-transform: uppercase;
-        transition: all 0.2s ease;
+        transition: 0.2s;
         
-        color: #ffffff !important; /* ขาวชัดเจน */
-        opacity: 1 !important;      /* ไม่จาง */
-        border-bottom: 4px solid transparent; /* จองที่เส้นใต้ */
+        /* บังคับตัวหนังสือขาว */
+        color: #ffffff !important; 
+        opacity: 0.5; /* จางลงสำหรับเมนูที่ไม่ได้เลือก */
+        
+        /* 🚩 เตรียมเส้นใต้ไว้ข้างล่างสุดของแถบ 40px */
+        border-bottom: 4px solid transparent; 
         box-sizing: border-box !important;
     }
 
-    /* 🚩 เมื่อเมาส์ชี้ (Hover): เปลี่ยนเป็นสีดำเข้ม */
-    .sys-menu-link:hover {
-        color: var(--sys-dark) !important;
-        background: rgba(0,0,0,0.05); /* เพิ่มมิตินิดหน่อยตอนชี้ */
-    }
-
-    /* 🚩 เมื่อเป็นหน้าปัจจุบัน (Active): มีขีดใต้สีขาว */
+    /* 🚩 เมื่อคลาส active ทำงาน เส้นใต้ขาวหนา 4px จะโผล่ทันที */
     .sys-menu-link.active {
-        border-bottom: 4px solid #ffffff !important;
+        opacity: 1 !important;
         color: #ffffff !important;
+        border-bottom: 4px solid #ffffff !important;
     }
 
-    /* โลโก้และ User Profile */
+    .sys-menu-link:hover { opacity: 1; }
+
+    /* โซน User */
     .sys-brand-zone { display: flex; align-items: center; text-decoration: none; color: var(--sys-dark); }
     .sys-logo-img { height: 32px; }
     .sys-divider { width: 1px; height: 20px; background: #ddd; margin: 0 15px; }
