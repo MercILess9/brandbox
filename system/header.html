@@ -2,25 +2,24 @@
     :root {
         --sys-brand: #bdc432; 
         --sys-white: #ffffff;
-        --sys-dark-blue: #2c3e50; /* สีน้ำเงินเข้มโทนเทาตามที่พี่ต้องการ */
+        --sys-dark: #111111;
+        --sys-hover: #2c3e50; /* 🚩 สีน้ำเงินเทาเข้มสำหรับตอนชี้ */
         --header-height: 105px;
     }
 
-    /* 105px Fixed Layout เดิมเป๊ะ */
+    /* --- คง Layout เดิมของพี่ไว้ทุกประการ --- */
     .sys-header-wrapper {
         position: fixed;
         top: 0; left: 0; right: 0;
         height: var(--header-height);
-        background: #ffffff;
-        border-bottom: 1px solid #eee;
-        z-index: 1000;
+        background: var(--sys-white);
+        border-bottom: 1.5px solid #eeeeee;
+        z-index: 1000 !important;
         display: flex;
         flex-direction: column;
         font-family: 'Outfit', 'Sarabun', sans-serif;
-        box-sizing: border-box;
     }
 
-    /* ส่วนบน 65px */
     .sys-top-bar {
         height: 65px;
         display: flex;
@@ -29,76 +28,84 @@
         padding: 0 30px;
     }
 
-    /* ส่วนแถบเมนูสีเขียว 40px */
+    .sys-brand-zone { display: flex; align-items: center; text-decoration: none !important; color: var(--sys-dark); }
+    .sys-logo-img { height: 32px; width: auto; }
+    .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
+    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
+
     #sys-menu-bar {
         height: 40px;
         background: var(--sys-brand) !important;
-        display: flex;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
         padding: 0 30px;
-        overflow: hidden; /* กันเส้นใต้มุดหรือแลบออกข้างนอก */
     }
 
     #sys-nav-inject {
         display: flex;
         height: 100%;
+        align-items: center;
     }
 
-    /* 🚩 เมนูปกติ: ตัวขาวเต็ม 100% */
+    /* --- ปรับแต่งสีเมนูตามสั่ง --- */
     .sys-menu-link {
+        color: #ffffff !important; /* 🚩 ขาวเต็ม 100% */
+        opacity: 1 !important;    /* 🚩 ไม่จาง */
+        text-decoration: none !important;
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0 25px;
         height: 100%;
         display: flex;
         align-items: center;
-        padding: 0 25px;
-        text-decoration: none !important;
-        font-weight: 800;
-        font-size: 0.85rem;
-        text-transform: uppercase;
         transition: 0.2s;
-        
-        color: #ffffff !important; /* ขาวจั๊วะ */
-        opacity: 1 !important;      /* ไม่จาง */
-        border-bottom: 4px solid transparent; /* จองพื้นที่เส้นใต้ไว้ */
-        box-sizing: border-box !important;
+        border-bottom: 4px solid transparent; /* จองที่เส้นใต้ */
+        box-sizing: border-box; /* บังคับให้เส้นใต้อยู่ใน 40px */
     }
 
-    /* 🚩 เมื่อเมาส์ชี้ (Hover): เปลี่ยนเป็นสีน้ำเงินเทาเข้ม */
+    /* 🚩 เมื่อเมาส์ชี้: เปลี่ยนเป็นสีน้ำเงินเทาเข้ม */
     .sys-menu-link:hover {
-        color: var(--sys-dark-blue) !important;
-        background: rgba(255, 255, 255, 0.1); /* ไฮไลท์พื้นหลังจางๆ ให้รู้ว่าชี้อยู่ */
+        color: var(--sys-hover) !important;
+        opacity: 1 !important;
     }
 
-    /* 🚩 เมนูหน้าที่เปิดอยู่ (Active): มีเส้นใต้ขาว */
+    /* 🚩 เมนูที่กำลังใช้งานอยู่ (Active): มีเส้นใต้ขาวหนา 4px */
     .sys-menu-link.active {
         color: #ffffff !important;
-        border-bottom: 4px solid #ffffff !important; /* เส้นใต้ขาวหนา 4px */
+        border-bottom: 4px solid #ffffff !important;
     }
 
-    /* รายละเอียดเล็กๆ น้อยๆ */
-    .sys-brand-zone { display: flex; align-items: center; text-decoration: none; color: #111; }
-    .sys-logo-img { height: 32px; }
-    .sys-divider { width: 1px; height: 20px; background: #ddd; margin: 0 15px; }
-    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
-    #user-display { font-size: 0.8rem; color: #888; }
+    /* ส่วน User */
+    .sys-user-zone { display: flex; align-items: center; gap: 12px; }
+    #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
     .btn-user-profile { background: none; border: none; color: #adb5bd; font-size: 1.8rem; cursor: pointer; }
 </style>
 
 <div class="sys-header-wrapper">
     <div class="sys-top-bar">
         <a href="/" class="sys-brand-zone">
-            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img">
+            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
             <div class="sys-divider"></div>
             <span class="sys-project-name" id="project-title">---</span>
         </a>
+
         <div class="sys-user-zone">
-            <span id="user-display">User...</span>
+            <span id="user-display">Loading...</span>
             <div class="dropdown">
-                <button class="btn-user-profile" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i></button>
+                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle"></i>
+                </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="handleLogout()">Log Out</a></li>
+                    <li><a class="dropdown-item" href="/profiles.html">Profiles</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="handleLogout()">Logout</a></li>
                 </ul>
             </div>
         </div>
     </div>
+
     <nav id="sys-menu-bar">
         <div id="sys-nav-inject">
             </div>
