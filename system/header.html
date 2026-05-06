@@ -3,11 +3,10 @@
         --sys-brand: #bdc432; 
         --sys-white: #ffffff;
         --sys-dark: #111111;
-        --sys-hover: #2c3e50; /* 🚩 สีน้ำเงินเทาเข้มสำหรับตอนชี้ */
+        --sys-hover: #546eae
         --header-height: 105px;
     }
 
-    /* --- คง Layout เดิมของพี่ไว้ทุกประการ --- */
     .sys-header-wrapper {
         position: fixed;
         top: 0; left: 0; right: 0;
@@ -48,10 +47,9 @@
         align-items: center;
     }
 
-    /* --- ปรับแต่งสีเมนูตามสั่ง --- */
     .sys-menu-link {
-        color: #ffffff !important; /* 🚩 ขาวเต็ม 100% */
-        opacity: 1 !important;    /* 🚩 ไม่จาง */
+        color: #ffffff !important;
+
         text-decoration: none !important;
         font-size: 0.85rem;
         font-weight: 800;
@@ -61,11 +59,11 @@
         display: flex;
         align-items: center;
         transition: 0.2s;
-        border-bottom: 4px solid transparent; /* จองที่เส้นใต้ */
-        box-sizing: border-box; /* บังคับให้เส้นใต้อยู่ใน 40px */
+        border-bottom: 4px solid transparent;
+        box-sizing: border-box;
     }
 
-    /* 🚩 เมื่อเมาส์ชี้: เปลี่ยนเป็นสีน้ำเงินเทาเข้ม */
+
     .sys-menu-link:hover {
         color: var(--sys-hover) !important;
         opacity: 1 !important;
