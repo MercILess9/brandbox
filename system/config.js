@@ -1,5 +1,5 @@
 // domain
-const SITE_URL = 'https://b-quest-beta.vercel.app';
+const SITE_URL = 'https://bx.brandboxplatform.com';
 
 // supabase
 const SUPABASE_URL = 'https://hdulohaxociujwaziszy.supabase.co';
