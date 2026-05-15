@@ -54,20 +54,40 @@ async function initLayout(config = {}) {
 }
 
 
+function getBxUser() {
+    try { return JSON.parse(sessionStorage.getItem('bx_user')); }
+    catch { return null; }
+}
+
+async function loadUserProfile(userId) {
+    const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+    if (!error && data) {
+        sessionStorage.setItem('bx_user', JSON.stringify(data));
+    }
+    return data;
+}
+
 async function initAuthGuard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const path = window.location.pathname.toLowerCase();
     const isAuthPage = path.includes('/auth/');
 
-    // ถ้าไม่มี Session และ "ไม่ได้" อยู่หน้า Auth -> ไปหน้า Login
     if (!session && !isAuthPage) {
         window.location.replace("/auth/login.html");
         return;
     }
-    // ถ้ามี Session แล้ว และ "ดัน" อยู่หน้า Auth -> ไปหน้า Index
     if (session && isAuthPage) {
         window.location.replace("/index.html");
         return;
+    }
+
+    // โหลด profile ถ้ายังไม่มีใน sessionStorage
+    if (session && !getBxUser()) {
+        await loadUserProfile(session.user.id);
     }
 }
 
