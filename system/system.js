@@ -145,10 +145,10 @@ function injectAssets() {
         s.id = 'sys-core-layout';
         s.innerText = `
             body {
-                padding-top: 60px !important;
+                padding-top: 64px !important;
             }
             .flt-wrapper {
-                top: 60px !important;
+                top: 64px !important;
             }
         `;
         document.head.appendChild(s);

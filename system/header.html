@@ -3,7 +3,7 @@
         --sys-brand: #bdc432;
         --sys-white: #ffffff;
         --sys-dark: #111111;
-        --header-height: 60px;
+        --header-height: 64px;
     }
 
     .sys-header-wrapper {
@@ -14,18 +14,17 @@
         z-index: 1000;
         display: flex;
         align-items: stretch;
-        padding: 0 28px;
+        padding: 0 32px;
         justify-content: space-between;
         font-family: 'Outfit', 'Sarabun', sans-serif;
-        border-bottom: 3.5px solid var(--sys-brand);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        border-bottom: 11px solid var(--sys-brand);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
 
     /* ─── Brand zone ─── */
     .sys-brand-zone {
         display: flex;
         align-items: center;
-        gap: 0;
         text-decoration: none !important;
         pointer-events: none;
         user-select: none;
@@ -39,14 +38,14 @@
     .sys-divider {
         width: 1.5px;
         height: 18px;
-        background: #ddd;
-        margin: 0 16px;
+        background: #e0e0e0;
+        margin: 0 18px;
     }
 
     .sys-project-name {
         font-weight: 700;
-        font-size: 0.9rem;
-        letter-spacing: 0.1em;
+        font-size: 0.88rem;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: #222;
     }
@@ -54,40 +53,38 @@
     /* ─── Center menu ─── */
     #sys-nav-inject {
         display: flex;
-        align-items: stretch;
+        align-items: center;
         height: 100%;
-        gap: 0;
+        gap: 4px;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
     }
 
     .sys-menu-link {
-        color: #888 !important;
+        color: #999 !important;
         text-decoration: none !important;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        padding: 0 20px;
-        height: 100%;
+        padding: 6px 16px;
         display: flex;
         align-items: center;
-        transition: color 0.15s, border-bottom 0.15s;
-        border-bottom: 3.5px solid transparent;
-        margin-bottom: -3.5px;
-        box-sizing: border-box;
+        border-radius: 20px;
+        transition: color 0.15s, background 0.15s;
         cursor: pointer;
+        white-space: nowrap;
     }
 
     .sys-menu-link:hover {
-        color: #333 !important;
-        border-bottom: 3.5px solid #ddd;
+        color: #444 !important;
+        background: #f2f2f2;
     }
 
     .sys-menu-link.active {
-        color: #111 !important;
-        border-bottom: 3.5px solid var(--sys-brand);
+        color: #1a1a1a !important;
+        background: #eef1c2;
         font-weight: 800;
     }
 
@@ -100,11 +97,11 @@
     .btn-logout {
         background: none;
         border: none;
-        color: #aaa;
-        font-size: 1.2rem;
+        color: #bbb;
+        font-size: 1.15rem;
         cursor: pointer;
-        padding: 6px 8px;
-        border-radius: 8px;
+        padding: 7px 9px;
+        border-radius: 10px;
         transition: color 0.15s, background 0.15s;
         display: flex;
         align-items: center;
