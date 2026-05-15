@@ -144,11 +144,11 @@ function injectAssets() {
         const s = document.createElement('style');
         s.id = 'sys-core-layout';
         s.innerText = `
-            body { 
-                padding-top: 105px !important; 
+            body {
+                padding-top: 60px !important;
             }
-            .flt-wrapper { 
-                top: 105px !important; 
+            .flt-wrapper {
+                top: 60px !important;
             }
         `;
         document.head.appendChild(s);

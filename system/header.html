@@ -1,109 +1,139 @@
 <style>
     :root {
-        --sys-brand: #bdc432; 
+        --sys-brand: #bdc432;
         --sys-white: #ffffff;
         --sys-dark: #111111;
-        --sys-hover: #546eae;
-        --header-height: 105px;
+        --sys-hover: rgba(255,255,255,0.65);
+        --header-height: 60px;
     }
 
     .sys-header-wrapper {
         position: fixed;
         top: 0; left: 0; right: 0;
         height: var(--header-height);
-        background: var(--sys-white);
-        border-bottom: 1.5px solid #eeeeee;
-        z-index: 1000 !important;
+        background: var(--sys-brand);
+        z-index: 1000;
         display: flex;
-        flex-direction: column;
-        font-family: 'Outfit', 'Sarabun', sans-serif;
-    }
-
-    .sys-top-bar {
-        height: 65px;
-        display: flex;
+        align-items: center;
+        padding: 0 28px;
         justify-content: space-between;
-        align-items: center;
-        padding: 0 30px;
+        font-family: 'Outfit', 'Sarabun', sans-serif;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.13);
     }
 
-    .sys-brand-zone { display: flex; align-items: center; text-decoration: none !important; color: var(--sys-dark); }
-    .sys-logo-img { height: 32px; width: auto; }
-    .sys-divider { width: 1.5px; height: 20px; background: #ddd; margin: 0 15px; }
-    .sys-project-name { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
-
-    #sys-menu-bar {
-        height: 40px;
-        background: var(--sys-brand) !important;
-        display: flex !important;
-        flex-direction: row !important;
+    /* ─── Brand zone ─── */
+    .sys-brand-zone {
+        display: flex;
         align-items: center;
-        padding: 0 30px;
+        gap: 0;
+        text-decoration: none !important;
+        pointer-events: none;
+        user-select: none;
     }
 
+    .sys-logo-img {
+        height: 28px;
+        width: auto;
+        filter: brightness(0) invert(1);
+        opacity: 0.92;
+    }
+
+    .sys-divider {
+        width: 1.5px;
+        height: 18px;
+        background: rgba(255,255,255,0.4);
+        margin: 0 16px;
+    }
+
+    .sys-project-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #fff;
+        opacity: 0.95;
+    }
+
+    /* ─── Center menu ─── */
     #sys-nav-inject {
         display: flex;
-        height: 100%;
         align-items: center;
+        height: 100%;
+        gap: 2px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .sys-menu-link {
-        color: #ffffff !important;
-
+        color: rgba(255,255,255,0.82) !important;
         text-decoration: none !important;
-        font-size: 0.85rem;
-        font-weight: 800;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
-        padding: 0 25px;
+        padding: 0 18px;
         height: 100%;
         display: flex;
         align-items: center;
-        transition: 0.2s;
-        border-bottom: 4px solid transparent;
+        transition: color 0.18s, background 0.18s;
+        border-bottom: 3px solid transparent;
         box-sizing: border-box;
+        border-radius: 0;
     }
 
-
     .sys-menu-link:hover {
-        color: var(--sys-hover) !important;
-        opacity: 1 !important;
+        color: #fff !important;
+        background: rgba(255,255,255,0.12);
     }
 
     .sys-menu-link.active {
-        color: #ffffff !important;
-        border-bottom: 4px solid #ffffff !important;
+        color: #fff !important;
+        border-bottom: 3px solid rgba(255,255,255,0.9);
+        background: rgba(255,255,255,0.08);
     }
 
-    .sys-user-zone { display: flex; align-items: center; gap: 12px; }
-    #user-display { font-size: 0.85rem; font-weight: 600; color: #888; }
-    .btn-user-profile { background: none; border: none; color: #adb5bd; font-size: 1.8rem; cursor: pointer; }
+    /* ─── Right zone ─── */
+    .sys-user-zone {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-logout {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.75);
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 8px;
+        transition: color 0.18s, background 0.18s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .btn-logout:hover {
+        color: #fff;
+        background: rgba(255,255,255,0.15);
+    }
 </style>
 
 <div class="sys-header-wrapper">
-    <div class="sys-top-bar">
-        <a href="/" class="sys-brand-zone">
-            <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
-            <div class="sys-divider"></div>
-            <span class="sys-project-name" id="project-title">---</span>
-        </a>
 
-        <div class="sys-user-zone">
-            <span id="user-display">Loading...</span>
-            <div class="dropdown">
-                <button class="btn-user-profile" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/profiles.html">Profiles</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="handleLogout()">Logout</a></li>
-                </ul>
-            </div>
-        </div>
+    <div class="sys-brand-zone">
+        <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
+        <div class="sys-divider"></div>
+        <span class="sys-project-name" id="project-title">---</span>
     </div>
 
-    <nav id="sys-menu-bar">
-        <div id="sys-nav-inject">
-            </div>
-    </nav>
+    <div id="sys-nav-inject"></div>
+
+    <div class="sys-user-zone">
+        <button class="btn-logout" onclick="handleLogout()" title="Logout">
+            <i class="bi bi-box-arrow-right"></i>
+        </button>
+    </div>
+
 </div>
