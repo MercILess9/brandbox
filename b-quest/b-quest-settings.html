@@ -53,42 +53,50 @@
         .cap-input-wrap { display: flex; align-items: center; gap: 8px; }
         .cap-input { width: 70px; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 10px; font-size: 1rem; font-weight: 800; text-align: center; outline: none; transition: 0.2s; background: #fff; }
         .cap-input:focus { border-color: var(--c-accent); }
-        .cap-unit { font-size: 0.72rem; color: var(--c-muted); font-weight: 600; }
+        .cap-unit { display: none; }
         .btn-save-cap { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 10px; padding: 8px 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
         .btn-save-cap:hover { background: #0f172a; }
 
         /* Work List */
-        .work-tabs { display: flex; gap: 8px; }
-        .work-tab { border: 1px solid var(--c-border); background: #fff; border-radius: 10px; padding: 6px 18px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; color: var(--c-slate); }
-        .work-tab.active-des { background: var(--c-des-bg); border-color: var(--c-des-border); color: var(--c-des); }
-        .work-tab.active-cre { background: var(--c-cre-bg); border-color: var(--c-cre-border); color: var(--c-cre); }
-        .btn-add-work { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 10px; padding: 7px 16px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .btn-add-work:hover { background: #0f172a; }
+        .work-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .work-col { border: 1px solid var(--c-border); border-radius: 14px; overflow: hidden; }
+        .work-col-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--c-border); }
+        .work-col-header-des { background: var(--c-des-bg); border-color: var(--c-des-border); }
+        .work-col-header-cre { background: var(--c-cre-bg); border-color: var(--c-cre-border); }
+        .work-col-title { font-size: 0.78rem; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+        .work-col-title-des { color: var(--c-des); }
+        .work-col-title-cre { color: var(--c-cre); }
+        .btn-add-work { border: none; border-radius: 8px; padding: 5px 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-add-work-des { background: var(--c-des); color: #fff; }
+        .btn-add-work-des:hover { background: #2563eb; }
+        .btn-add-work-cre { background: var(--c-cre); color: #fff; }
+        .btn-add-work-cre:hover { background: #7c3aed; }
 
-        .work-list { margin-top: 0; }
-        .work-row { display: grid; grid-template-columns: 1fr 90px 80px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f8fafc; }
+        .work-col-inner { padding: 8px 12px; }
+        .work-col-subhead { display: grid; grid-template-columns: 1fr 56px 60px; gap: 6px; padding: 4px 4px 8px; border-bottom: 1px solid var(--c-border); margin-bottom: 2px; }
+        .work-col-subhead span { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .work-row { display: grid; grid-template-columns: 1fr 56px 60px; align-items: center; gap: 6px; padding: 5px 2px; border-bottom: 1px solid #f8fafc; }
         .work-row:last-child { border-bottom: none; }
-        .work-input { border: 1px solid transparent; border-radius: 8px; padding: 6px 10px; font-size: 0.83rem; font-weight: 600; color: var(--c-dark); background: transparent; outline: none; width: 100%; transition: 0.2s; font-family: inherit; }
+        .work-input { border: 1px solid transparent; border-radius: 7px; padding: 5px 8px; font-size: 0.8rem; font-weight: 600; color: var(--c-dark); background: transparent; outline: none; width: 100%; transition: 0.2s; font-family: inherit; }
         .work-input:hover { border-color: var(--c-border); background: var(--c-bg); }
         .work-input:focus { border-color: var(--c-accent); background: #fff; }
-        .work-weight-wrap { display: flex; align-items: center; gap: 6px; }
-        .work-weight { width: 52px; border: 1px solid transparent; border-radius: 8px; padding: 6px 8px; font-size: 0.83rem; font-weight: 700; text-align: center; outline: none; transition: 0.2s; background: transparent; font-family: inherit; }
+        .work-weight { width: 100%; border: 1px solid transparent; border-radius: 7px; padding: 5px 6px; font-size: 0.8rem; font-weight: 700; text-align: center; outline: none; transition: 0.2s; background: transparent; font-family: inherit; }
         .work-weight:hover { border-color: var(--c-border); background: var(--c-bg); }
         .work-weight:focus { border-color: var(--c-accent); background: #fff; }
-        .work-weight-unit { font-size: 0.68rem; color: var(--c-muted); font-weight: 600; }
-        .work-actions { display: flex; justify-content: flex-end; gap: 4px; }
-        .btn-work-save { background: var(--c-accent-light); color: #7a8500; border: none; border-radius: 7px; padding: 5px 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: none; }
+        .work-actions { display: flex; justify-content: flex-end; align-items: center; gap: 3px; }
+        .btn-work-save { background: var(--c-accent-light); color: #7a8500; border: none; border-radius: 6px; padding: 4px 9px; font-size: 0.68rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: none; white-space: nowrap; }
         .btn-work-save:hover { background: var(--c-accent); color: #fff; }
-        .btn-work-del { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px 7px; border-radius: 7px; font-size: 0.9rem; transition: 0.2s; display: flex; align-items: center; }
+        .btn-work-del { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; }
         .btn-work-del:hover { background: #fee2e2; color: #ef4444; }
 
-        .work-new-row { display: grid; grid-template-columns: 1fr 90px 80px; gap: 10px; padding: 12px 0 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
-        .work-new-input { border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 10px; font-size: 0.83rem; font-weight: 600; outline: none; transition: 0.2s; font-family: inherit; background: var(--c-bg); }
+        .work-new-row { display: grid; grid-template-columns: 1fr 56px 60px; gap: 6px; padding: 8px 2px 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
+        .work-new-input { border: 1px solid var(--c-border); border-radius: 7px; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; outline: none; transition: 0.2s; font-family: inherit; background: var(--c-bg); }
         .work-new-input:focus { border-color: var(--c-accent); background: #fff; }
-        .btn-confirm-add { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 8px; padding: 7px 14px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .btn-confirm-add { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 7px; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
         .btn-confirm-add:hover { background: #0f172a; }
 
-        .work-empty { padding: 30px; text-align: center; color: var(--c-muted); font-size: 0.82rem; font-weight: 600; }
+        .work-empty { padding: 24px; text-align: center; color: var(--c-muted); font-size: 0.8rem; font-weight: 600; }
 
         /* Member */
         .member-add-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--c-border); }
@@ -186,29 +194,45 @@
     <div class="section">
         <div class="section-header">
             <div class="section-title"><i class="bi bi-list-task"></i> Work List</div>
-            <div style="display:flex;gap:8px;align-items:center;">
-                <div class="work-tabs">
-                    <button class="work-tab active-des" id="tab-designer" onclick="switchWorkTab('Designer')">
-                        <i class="bi bi-brush me-1"></i>Designer
-                    </button>
-                    <button class="work-tab" id="tab-creative" onclick="switchWorkTab('Creative')">
-                        <i class="bi bi-rocket me-1"></i>Creative
-                    </button>
-                </div>
-                <button class="btn-add-work" onclick="showNewWorkRow()"><i class="bi bi-plus-lg"></i> Add</button>
-            </div>
         </div>
-        <div class="section-body" style="padding-top:12px;">
-            <div style="display:grid;grid-template-columns:1fr 90px 80px;gap:10px;padding:0 0 8px;border-bottom:1px solid var(--c-border);margin-bottom:4px;">
-                <div style="font-size:0.65rem;font-weight:800;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.6px;">Work Name</div>
-                <div style="font-size:0.65rem;font-weight:800;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.6px;text-align:center;">Weight</div>
-                <div></div>
-            </div>
-            <div id="work-list"></div>
-            <div id="new-work-row" style="display:none;" class="work-new-row">
-                <input type="text" class="work-new-input" id="new-work-name" placeholder="Work name...">
-                <input type="number" class="work-new-input" id="new-work-weight" placeholder="Weight" min="1" max="99" style="text-align:center;">
-                <button class="btn-confirm-add" onclick="confirmAddWork()"><i class="bi bi-check-lg"></i> Add</button>
+        <div class="section-body">
+            <div class="work-cols">
+                <!-- Designer -->
+                <div class="work-col">
+                    <div class="work-col-header work-col-header-des">
+                        <div class="work-col-title work-col-title-des"><i class="bi bi-brush"></i> Designer</div>
+                        <button class="btn-add-work btn-add-work-des" onclick="showNewWorkRow('Designer')"><i class="bi bi-plus-lg"></i> Add</button>
+                    </div>
+                    <div class="work-col-inner">
+                        <div class="work-col-subhead">
+                            <span>Work Name</span><span style="text-align:center;">Weight</span><span></span>
+                        </div>
+                        <div id="work-list-designer"></div>
+                        <div id="new-work-row-designer" style="display:none;" class="work-new-row">
+                            <input type="text" class="work-new-input" id="new-work-name-designer" placeholder="Work name...">
+                            <input type="number" class="work-new-input" id="new-work-weight-designer" placeholder="Wt" min="1" max="99" style="text-align:center;">
+                            <button class="btn-confirm-add" onclick="confirmAddWork('Designer')"><i class="bi bi-check-lg"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Creative -->
+                <div class="work-col">
+                    <div class="work-col-header work-col-header-cre">
+                        <div class="work-col-title work-col-title-cre"><i class="bi bi-rocket"></i> Creative</div>
+                        <button class="btn-add-work btn-add-work-cre" onclick="showNewWorkRow('Creative')"><i class="bi bi-plus-lg"></i> Add</button>
+                    </div>
+                    <div class="work-col-inner">
+                        <div class="work-col-subhead">
+                            <span>Work Name</span><span style="text-align:center;">Weight</span><span></span>
+                        </div>
+                        <div id="work-list-creative"></div>
+                        <div id="new-work-row-creative" style="display:none;" class="work-new-row">
+                            <input type="text" class="work-new-input" id="new-work-name-creative" placeholder="Work name...">
+                            <input type="number" class="work-new-input" id="new-work-weight-creative" placeholder="Wt" min="1" max="99" style="text-align:center;">
+                            <button class="btn-confirm-add" onclick="confirmAddWork('Creative')"><i class="bi bi-check-lg"></i></button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -261,7 +285,6 @@
     let membersInProject = [];
     let allProfiles = [];
     let selectedCodename = '';
-    let currentWorkTab = 'Designer';
     let workData = [];
 
     async function loadPage() {
@@ -307,59 +330,40 @@
     async function loadWorkList() {
         const { data } = await supabaseClient.from('b-quest-work').select('*').order('work');
         workData = data || [];
-        renderWorkList();
+        renderWorkCol('Designer');
+        renderWorkCol('Creative');
     }
 
-    function switchWorkTab(role) {
-        currentWorkTab = role;
-        document.getElementById('tab-designer').className = 'work-tab' + (role === 'Designer' ? ' active-des' : '');
-        document.getElementById('tab-creative').className = 'work-tab' + (role === 'Creative' ? ' active-cre' : '');
-        document.getElementById('new-work-row').style.display = 'none';
-        renderWorkList();
-    }
-
-    function renderWorkList() {
-        const container = document.getElementById('work-list');
-        const filtered = workData.filter(w => w.role === currentWorkTab);
+    function renderWorkCol(role) {
+        const id = role.toLowerCase();
+        const container = document.getElementById(`work-list-${id}`);
+        const filtered = workData.filter(w => w.role === role);
 
         if (!filtered.length) {
-            container.innerHTML = `<div class="work-empty">No work items yet</div>`;
+            container.innerHTML = `<div class="work-empty">No items yet</div>`;
             return;
         }
 
         container.innerHTML = filtered.map(w => `
-            <div class="work-row" id="wrow-${w.role}-${w.work}">
-                <input class="work-input" value="${w.work}" data-orig="${w.work}" data-role="${w.role}"
-                    oninput="markWorkDirty(this)">
-                <div class="work-weight-wrap">
-                    <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" data-orig="${w.weight}" data-role="${w.role}" data-work="${w.work}"
-                        oninput="markWorkDirty(this)">
-                    <span class="work-weight-unit">pts</span>
-                </div>
+            <div class="work-row">
+                <input class="work-input" value="${w.work}" data-orig="${w.work}" data-role="${w.role}" oninput="markWorkDirty(this)">
+                <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" data-orig="${w.weight}" data-role="${w.role}" data-work="${w.work}" oninput="markWorkDirty(this)">
                 <div class="work-actions">
-                    <button class="btn-work-save" id="wsave-${w.role}-${w.work}" onclick="saveWorkRow('${w.role}', '${w.work}', this)">
-                        <i class="bi bi-check-lg"></i> Save
-                    </button>
-                    <button class="btn-work-del" onclick="deleteWork('${w.role}', '${w.work}')">
-                        <i class="bi bi-trash3"></i>
-                    </button>
+                    <button class="btn-work-save" onclick="saveWorkRow('${w.role}', '${w.work}', this)"><i class="bi bi-check-lg"></i> Save</button>
+                    <button class="btn-work-del" onclick="deleteWork('${w.role}', '${w.work}')"><i class="bi bi-trash3"></i></button>
                 </div>
             </div>
         `).join('');
     }
 
     function markWorkDirty(input) {
-        const row = input.closest('.work-row');
-        const saveBtn = row.querySelector('.btn-work-save');
-        saveBtn.style.display = 'inline-block';
+        input.closest('.work-row').querySelector('.btn-work-save').style.display = 'inline-block';
     }
 
     async function saveWorkRow(origRole, origWork, btn) {
         const row = btn.closest('.work-row');
-        const nameInput = row.querySelector('.work-input');
-        const weightInput = row.querySelector('.work-weight');
-        const newName = nameInput.value.trim();
-        const newWeight = parseInt(weightInput.value);
+        const newName = row.querySelector('.work-input').value.trim();
+        const newWeight = parseInt(row.querySelector('.work-weight').value);
 
         if (!newName) return Swal.fire('Error', 'Work name cannot be empty', 'error');
         if (!newWeight || newWeight < 1) return Swal.fire('Error', 'Weight must be at least 1', 'error');
@@ -369,45 +373,41 @@
             .eq('role', origRole).eq('work', origWork);
 
         if (error) { Swal.fire('Error', error.message, 'error'); return; }
-
-        btn.style.display = 'none';
-        nameInput.dataset.orig = newName;
-        weightInput.dataset.orig = newWeight;
         await loadWorkList();
     }
 
     async function deleteWork(role, work) {
         const res = await Swal.fire({
-            title: `Delete "${work}"?`,
-            icon: 'warning', showCancelButton: true,
+            title: `Delete "${work}"?`, icon: 'warning', showCancelButton: true,
             confirmButtonColor: '#ef4444', confirmButtonText: 'Delete', cancelButtonText: 'Cancel'
         });
         if (!res.isConfirmed) return;
-
         const { error } = await supabaseClient.from('b-quest-work').delete().eq('role', role).eq('work', work);
         if (error) { Swal.fire('Error', error.message, 'error'); return; }
         await loadWorkList();
     }
 
-    function showNewWorkRow() {
-        const row = document.getElementById('new-work-row');
+    function showNewWorkRow(role) {
+        const id = role.toLowerCase();
+        const row = document.getElementById(`new-work-row-${id}`);
         row.style.display = row.style.display === 'none' ? 'grid' : 'none';
-        document.getElementById('new-work-name').value = '';
-        document.getElementById('new-work-weight').value = '';
-        document.getElementById('new-work-name').focus();
+        document.getElementById(`new-work-name-${id}`).value = '';
+        document.getElementById(`new-work-weight-${id}`).value = '';
+        document.getElementById(`new-work-name-${id}`).focus();
     }
 
-    async function confirmAddWork() {
-        const name = document.getElementById('new-work-name').value.trim();
-        const weight = parseInt(document.getElementById('new-work-weight').value);
+    async function confirmAddWork(role) {
+        const id = role.toLowerCase();
+        const name = document.getElementById(`new-work-name-${id}`).value.trim();
+        const weight = parseInt(document.getElementById(`new-work-weight-${id}`).value);
 
         if (!name) return Swal.fire('Error', 'Work name cannot be empty', 'error');
         if (!weight || weight < 1) return Swal.fire('Error', 'Weight must be at least 1', 'error');
 
-        const { error } = await supabaseClient.from('b-quest-work').insert([{ role: currentWorkTab, work: name, weight }]);
+        const { error } = await supabaseClient.from('b-quest-work').insert([{ role, work: name, weight }]);
         if (error) { Swal.fire('Error', error.message, 'error'); return; }
 
-        document.getElementById('new-work-row').style.display = 'none';
+        document.getElementById(`new-work-row-${id}`).style.display = 'none';
         await loadWorkList();
     }
 
@@ -435,26 +435,28 @@
         allProfiles = data || [];
     }
 
+    function renderAddDropdown(q = '') {
+        const dropdown = document.getElementById('add-dropdown');
+        const available = allProfiles.filter(p =>
+            !membersInProject.find(m => m.codename === p.codename) &&
+            p.codename.toLowerCase().includes(q.toLowerCase())
+        );
+        dropdown.innerHTML = available.length
+            ? available.map(p => `<div class="add-dropdown-item" onclick="selectMember('${p.codename}')">${p.codename}</div>`).join('')
+            : `<div class="add-dropdown-empty">No members found</div>`;
+        dropdown.classList.add('show');
+    }
+
     function setupAddSearch() {
         const input = document.getElementById('add-search-input');
         const dropdown = document.getElementById('add-dropdown');
 
+        input.addEventListener('focus', () => renderAddDropdown(input.value));
+
         input.addEventListener('input', () => {
-            const q = input.value.trim().toLowerCase();
             selectedCodename = '';
             document.getElementById('btn-add').disabled = true;
-
-            const available = allProfiles.filter(p =>
-                !membersInProject.find(m => m.codename === p.codename) &&
-                p.codename.toLowerCase().includes(q)
-            );
-
-            if (!q) { dropdown.classList.remove('show'); return; }
-
-            dropdown.innerHTML = available.length
-                ? available.map(p => `<div class="add-dropdown-item" onclick="selectMember('${p.codename}')">${p.codename}</div>`).join('')
-                : `<div class="add-dropdown-empty">No members found</div>`;
-            dropdown.classList.add('show');
+            renderAddDropdown(input.value.trim());
         });
 
         document.addEventListener('mousedown', (e) => {
