@@ -364,12 +364,14 @@ const BQuestApp = (() => {
 
                         show(`${role}-capacity-info`, false);
 
-                        // Disable card if user lacks edit permission for this role
+                        // Disable card inputs if user lacks edit permission for this role
                         const permKey = role === 'designer' ? 'edit_designer' : 'edit_creative';
                         const canEditRole = typeof canBquest === 'function' ? canBquest(permKey) : true;
                         const card = el(`card-${role}`);
-                        card.querySelectorAll('input, select, textarea, button').forEach(inp => inp.disabled = !canEditRole);
-                        if (!canEditRole) card.style.opacity = '0.6';
+                        card.querySelectorAll('input, select, textarea').forEach(inp => inp.disabled = !canEditRole);
+                        // keep toggle visible but disabled so user can see state
+                        el(`check-${role}`).disabled = !canEditRole;
+                        if (!canEditRole) card.style.opacity = '0.55';
                         else card.style.opacity = '';
                     });
                 }
@@ -381,12 +383,9 @@ const BQuestApp = (() => {
                 State.roles.forEach(role => {
                     el(`check-${role}`).checked = false;
                     updateRoleUI(role);
-                    const permKey = role === 'designer' ? 'edit_designer' : 'edit_creative';
-                    const canEditRole = typeof canBquest === 'function' ? canBquest(permKey) : true;
                     const card = el(`card-${role}`);
-                    card.querySelectorAll('input, select, textarea, button').forEach(inp => inp.disabled = !canEditRole);
-                    if (!canEditRole) card.style.opacity = '0.6';
-                    else card.style.opacity = '';
+                    card.querySelectorAll('input, select, textarea, button').forEach(inp => inp.disabled = false);
+                    card.style.opacity = '';
                 });
             }
             bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
