@@ -42,12 +42,16 @@ async function handleSignup(email, password, metadata) {
 
         if (error) throw error;
 
-        Swal.fire({ 
-            icon: "success", 
-            title: "Registration Complete!", 
-            text: "Please check your email for confirmation." 
-        }).then(() => { 
-            window.location.href = "login.html"; 
+        if (!data.user || data.user.identities?.length === 0) {
+            return Swal.fire("Failed", "This email is already registered. Please sign in instead.", "error");
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "Registration Complete!",
+            text: "Please check your email for confirmation."
+        }).then(() => {
+            window.location.href = "login.html";
         });
 
     } catch (err) {
