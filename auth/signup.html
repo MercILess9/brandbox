@@ -150,11 +150,14 @@
             return Swal.fire("Error", "Passwords do not match!", "error");
         }
 
+        const employee_id = document.getElementById("emp_id").value.trim();
+        const nick_name = document.getElementById("nick").value.trim();
         const metadata = {
-            employee_id: document.getElementById("emp_id").value,
-            nick_name: document.getElementById("nick").value,
-            full_name: document.getElementById("full").value,
-            role: document.getElementById("dept_val").value
+            employee_id,
+            nick_name,
+            codename: `${nick_name} (${employee_id})`,
+            full_name: document.getElementById("full").value.trim(),
+            department: document.getElementById("dept_val").value
         };
         await handleSignup(email, password, metadata);
     });

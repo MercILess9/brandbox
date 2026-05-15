@@ -51,7 +51,11 @@ async function handleSignup(email, password, metadata) {
         });
 
     } catch (err) {
-        Swal.fire("Failed", err.message, "error");
+        const msg = err.message?.toLowerCase() || '';
+        const friendly = msg.includes('already registered') || msg.includes('already been registered')
+            ? 'This email is already registered. Please sign in instead.'
+            : err.message;
+        Swal.fire("Failed", friendly, "error");
     }
 }
 
