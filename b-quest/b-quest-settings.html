@@ -16,83 +16,130 @@
             --c-accent-light: #f4f7a1;
             --c-dark: #1e293b;
             --c-bg: #f8fafc;
-            --c-text-muted: #94a3b8;
+            --c-muted: #94a3b8;
             --c-slate: #626e7f;
             --c-border: #e2e8f0;
+            --c-des: #3b82f6;
+            --c-des-bg: #eff6ff;
+            --c-des-border: #dbeafe;
+            --c-cre: #8b5cf6;
+            --c-cre-bg: #f5f3ff;
+            --c-cre-border: #ede9fe;
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
+        .settings-wrapper { max-width: 960px; margin: 0 auto; padding: 36px 20px 100px; }
 
-        .settings-wrapper { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+        /* Page Header */
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
 
-        /* --- Page Header --- */
-        .page-header { margin-bottom: 32px; }
-        .page-header h1 { font-size: 1.5rem; font-weight: 800; color: var(--c-dark); margin: 0; }
+        /* Section */
+        .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--c-border); }
+        .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { font-size: 1rem; }
+        .section-body { padding: 20px 24px; }
 
-        /* --- Add Member Bar --- */
-        .add-bar { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
-        .add-bar-label { font-size: 0.72rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
+        /* Capacity */
+        .cap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .cap-card { border: 1px solid var(--c-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .cap-card-des { border-color: var(--c-des-border); background: var(--c-des-bg); }
+        .cap-card-cre { border-color: var(--c-cre-border); background: var(--c-cre-bg); }
+        .cap-label { font-size: 0.78rem; font-weight: 800; }
+        .cap-label-des { color: var(--c-des); }
+        .cap-label-cre { color: var(--c-cre); }
+        .cap-sub { font-size: 0.72rem; color: var(--c-muted); margin-top: 2px; }
+        .cap-input-wrap { display: flex; align-items: center; gap: 8px; }
+        .cap-input { width: 70px; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 10px; font-size: 1rem; font-weight: 800; text-align: center; outline: none; transition: 0.2s; background: #fff; }
+        .cap-input:focus { border-color: var(--c-accent); }
+        .cap-unit { font-size: 0.72rem; color: var(--c-muted); font-weight: 600; }
+        .btn-save-cap { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 10px; padding: 8px 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .btn-save-cap:hover { background: #0f172a; }
 
+        /* Work List */
+        .work-tabs { display: flex; gap: 8px; }
+        .work-tab { border: 1px solid var(--c-border); background: #fff; border-radius: 10px; padding: 6px 18px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; color: var(--c-slate); }
+        .work-tab.active-des { background: var(--c-des-bg); border-color: var(--c-des-border); color: var(--c-des); }
+        .work-tab.active-cre { background: var(--c-cre-bg); border-color: var(--c-cre-border); color: var(--c-cre); }
+        .btn-add-work { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 10px; padding: 7px 16px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .btn-add-work:hover { background: #0f172a; }
+
+        .work-list { margin-top: 0; }
+        .work-row { display: grid; grid-template-columns: 1fr 90px 80px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f8fafc; }
+        .work-row:last-child { border-bottom: none; }
+        .work-input { border: 1px solid transparent; border-radius: 8px; padding: 6px 10px; font-size: 0.83rem; font-weight: 600; color: var(--c-dark); background: transparent; outline: none; width: 100%; transition: 0.2s; font-family: inherit; }
+        .work-input:hover { border-color: var(--c-border); background: var(--c-bg); }
+        .work-input:focus { border-color: var(--c-accent); background: #fff; }
+        .work-weight-wrap { display: flex; align-items: center; gap: 6px; }
+        .work-weight { width: 52px; border: 1px solid transparent; border-radius: 8px; padding: 6px 8px; font-size: 0.83rem; font-weight: 700; text-align: center; outline: none; transition: 0.2s; background: transparent; font-family: inherit; }
+        .work-weight:hover { border-color: var(--c-border); background: var(--c-bg); }
+        .work-weight:focus { border-color: var(--c-accent); background: #fff; }
+        .work-weight-unit { font-size: 0.68rem; color: var(--c-muted); font-weight: 600; }
+        .work-actions { display: flex; justify-content: flex-end; gap: 4px; }
+        .btn-work-save { background: var(--c-accent-light); color: #7a8500; border: none; border-radius: 7px; padding: 5px 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: none; }
+        .btn-work-save:hover { background: var(--c-accent); color: #fff; }
+        .btn-work-del { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px 7px; border-radius: 7px; font-size: 0.9rem; transition: 0.2s; display: flex; align-items: center; }
+        .btn-work-del:hover { background: #fee2e2; color: #ef4444; }
+
+        .work-new-row { display: grid; grid-template-columns: 1fr 90px 80px; gap: 10px; padding: 12px 0 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
+        .work-new-input { border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 10px; font-size: 0.83rem; font-weight: 600; outline: none; transition: 0.2s; font-family: inherit; background: var(--c-bg); }
+        .work-new-input:focus { border-color: var(--c-accent); background: #fff; }
+        .btn-confirm-add { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 8px; padding: 7px 14px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .btn-confirm-add:hover { background: #0f172a; }
+
+        .work-empty { padding: 30px; text-align: center; color: var(--c-muted); font-size: 0.82rem; font-weight: 600; }
+
+        /* Member */
+        .member-add-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--c-border); }
         .add-search-wrap { flex: 1; position: relative; }
         .add-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 12px; padding: 9px 14px 9px 36px; font-size: 0.85rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
         .add-search-input:focus { border-color: var(--c-accent); background: #fff; }
-        .add-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); font-size: 0.85rem; pointer-events: none; }
-        .add-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1px solid var(--c-border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
+        .add-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.85rem; pointer-events: none; }
+        .add-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1px solid var(--c-border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 200; max-height: 200px; overflow-y: auto; display: none; }
         .add-dropdown.show { display: block; }
         .add-dropdown-item { padding: 10px 16px; font-size: 0.85rem; font-weight: 600; color: var(--c-dark); cursor: pointer; transition: 0.15s; }
         .add-dropdown-item:hover { background: var(--c-accent-light); color: #7a8500; }
-        .add-dropdown-empty { padding: 16px; text-align: center; font-size: 0.8rem; color: var(--c-text-muted); }
-
-        .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 22px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+        .add-dropdown-empty { padding: 14px; text-align: center; font-size: 0.8rem; color: var(--c-muted); }
+        .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
         .btn-add-member:hover { background: #0f172a; }
         .btn-add-member:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* --- Table Search --- */
-        .table-toolbar { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--c-border); background: #fff; border-radius: 20px 20px 0 0; gap: 12px; }
-        .table-search-wrap { position: relative; flex: 1; max-width: 280px; }
+        /* Perm table */
+        .table-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .table-search-wrap { position: relative; flex: 1; max-width: 260px; }
         .table-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
         .table-search-input:focus { border-color: var(--c-accent); background: #fff; }
-        .table-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); font-size: 0.8rem; pointer-events: none; }
-        .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-text-muted); margin-left: auto; }
+        .table-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.8rem; pointer-events: none; }
+        .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-muted); margin-left: auto; }
 
-        /* --- Permission Table --- */
-        .perm-table-wrap { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; overflow: hidden; }
+        .perm-table-head { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 40px; background: var(--c-bg); border-radius: 10px; margin-bottom: 4px; }
+        .perm-col-label { font-size: 0.62rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
+        .perm-col-name { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.8px; padding-left: 8px; }
 
-        .perm-table-head { display: grid; grid-template-columns: 210px repeat(6, 1fr) 48px; align-items: center; padding: 0 20px; height: 44px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
-        .perm-col-name { font-size: 0.68rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
-        .perm-col-label { font-size: 0.62rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
-
-        .perm-row { display: grid; grid-template-columns: 210px repeat(6, 1fr) 48px; align-items: center; padding: 0 20px; height: 60px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; }
+        .perm-row { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 56px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; border-radius: 8px; }
         .perm-row:last-child { border-bottom: none; }
         .perm-row:hover { background: #fafbff; }
-
-        .perm-name-zone { display: flex; align-items: center; gap: 10px; }
-        .perm-avatar { width: 32px; height: 32px; background: var(--c-accent-light); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
-        .perm-codename { font-size: 0.83rem; font-weight: 700; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
+        .perm-name-zone { display: flex; align-items: center; gap: 9px; padding-left: 4px; }
+        .perm-avatar { width: 30px; height: 30px; background: var(--c-accent-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
+        .perm-codename { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
         .perm-check-cell { display: flex; justify-content: center; align-items: center; }
-
-        /* --- Toggle Switch --- */
-        .bq-toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .bq-toggle { position: relative; display: inline-block; width: 34px; height: 19px; }
         .bq-toggle input { opacity: 0; width: 0; height: 0; }
         .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e2e8f0; transition: .3s; border-radius: 34px; }
-        .bq-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .bq-slider:before { position: absolute; content: ""; height: 13px; width: 13px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
         input:checked + .bq-slider { background: var(--c-accent); }
-        input:checked + .bq-slider:before { transform: translateX(16px); }
-
-        /* --- Delete Button --- */
-        .btn-remove { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; font-size: 1rem; }
+        input:checked + .bq-slider:before { transform: translateX(15px); }
+        .btn-remove { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px; border-radius: 7px; transition: 0.2s; display: flex; align-items: center; font-size: 0.95rem; }
         .btn-remove:hover { background: #fee2e2; color: #ef4444; }
 
-        /* --- Empty State --- */
-        .perm-empty { padding: 60px 24px; text-align: center; color: var(--c-text-muted); }
-        .perm-empty i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.4; }
-        .perm-empty p { font-size: 0.85rem; font-weight: 600; margin: 0; }
+        .perm-empty { padding: 40px; text-align: center; color: var(--c-muted); }
+        .perm-empty i { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.4; }
+        .perm-empty p { font-size: 0.82rem; font-weight: 600; margin: 0; }
 
-        /* --- Loading Skeleton --- */
-        .skeleton-row { display: grid; grid-template-columns: 210px repeat(6, 1fr) 48px; align-items: center; padding: 0 20px; height: 60px; border-bottom: 1px solid #f8fafc; gap: 8px; }
+        .skeleton-row { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px; }
         .skeleton-block { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
-        @keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
     </style>
 </head>
 <body>
@@ -100,42 +147,110 @@
 <div class="settings-wrapper">
 
     <div class="page-header">
-        <h1><i class="bi bi-shield-lock me-2" style="color: var(--c-accent)"></i>B-QUEST Settings</h1>
+        <h1><i class="bi bi-gear-fill me-2" style="color:var(--c-accent)"></i>B-QUEST Settings</h1>
     </div>
 
-    <!-- Add Member -->
-    <div class="add-bar">
-        <span class="add-bar-label">Add Member</span>
-        <div class="add-search-wrap">
-            <i class="bi bi-search add-search-icon"></i>
-            <input type="text" id="add-search-input" class="add-search-input" placeholder="Search member..." autocomplete="off">
-            <div id="add-dropdown" class="add-dropdown"></div>
+    <!-- Section 1: Capacity -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-speedometer2"></i> Max Capacity</div>
+            <button class="btn-save-cap" onclick="saveCapacity()"><i class="bi bi-check-lg"></i> Save</button>
         </div>
-        <button class="btn-add-member" id="btn-add" onclick="addMember()" disabled>
-            <i class="bi bi-person-plus-fill"></i> Add
-        </button>
-    </div>
-
-    <!-- Permission Table -->
-    <div class="perm-table-wrap">
-        <div class="table-toolbar">
-            <div class="table-search-wrap">
-                <i class="bi bi-search table-search-icon"></i>
-                <input type="text" id="table-search" class="table-search-input" placeholder="Filter members...">
+        <div class="section-body">
+            <div class="cap-grid">
+                <div class="cap-card cap-card-des">
+                    <div>
+                        <div class="cap-label cap-label-des"><i class="bi bi-brush me-1"></i> Designer</div>
+                        <div class="cap-sub">Max workload per deadline</div>
+                    </div>
+                    <div class="cap-input-wrap">
+                        <input type="number" class="cap-input" id="cap-designer" min="1" max="99" value="10">
+                        <span class="cap-unit">pts</span>
+                    </div>
+                </div>
+                <div class="cap-card cap-card-cre">
+                    <div>
+                        <div class="cap-label cap-label-cre"><i class="bi bi-rocket me-1"></i> Creative</div>
+                        <div class="cap-sub">Max workload per deadline</div>
+                    </div>
+                    <div class="cap-input-wrap">
+                        <input type="number" class="cap-input" id="cap-creative" min="1" max="99" value="10">
+                        <span class="cap-unit">pts</span>
+                    </div>
+                </div>
             </div>
-            <span class="table-count" id="table-count"></span>
         </div>
-        <div class="perm-table-head">
-            <div class="perm-col-name">Member</div>
-            <div class="perm-col-label">New</div>
-            <div class="perm-col-label">Delete</div>
-            <div class="perm-col-label">Edit<br>Designer</div>
-            <div class="perm-col-label">Edit<br>Creative</div>
-            <div class="perm-col-label">Assign</div>
-            <div class="perm-col-label">Setting</div>
-            <div></div>
+    </div>
+
+    <!-- Section 2: Work List -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-list-task"></i> Work List</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <div class="work-tabs">
+                    <button class="work-tab active-des" id="tab-designer" onclick="switchWorkTab('Designer')">
+                        <i class="bi bi-brush me-1"></i>Designer
+                    </button>
+                    <button class="work-tab" id="tab-creative" onclick="switchWorkTab('Creative')">
+                        <i class="bi bi-rocket me-1"></i>Creative
+                    </button>
+                </div>
+                <button class="btn-add-work" onclick="showNewWorkRow()"><i class="bi bi-plus-lg"></i> Add</button>
+            </div>
         </div>
-        <div id="perm-list"></div>
+        <div class="section-body" style="padding-top:12px;">
+            <div style="display:grid;grid-template-columns:1fr 90px 80px;gap:10px;padding:0 0 8px;border-bottom:1px solid var(--c-border);margin-bottom:4px;">
+                <div style="font-size:0.65rem;font-weight:800;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.6px;">Work Name</div>
+                <div style="font-size:0.65rem;font-weight:800;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.6px;text-align:center;">Weight</div>
+                <div></div>
+            </div>
+            <div id="work-list"></div>
+            <div id="new-work-row" style="display:none;" class="work-new-row">
+                <input type="text" class="work-new-input" id="new-work-name" placeholder="Work name...">
+                <input type="number" class="work-new-input" id="new-work-weight" placeholder="Weight" min="1" max="99" style="text-align:center;">
+                <button class="btn-confirm-add" onclick="confirmAddWork()"><i class="bi bi-check-lg"></i> Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Members -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-people-fill"></i> Members & Permissions</div>
+        </div>
+        <div class="section-body">
+            <!-- Add -->
+            <div class="member-add-row">
+                <div class="add-search-wrap">
+                    <i class="bi bi-search add-search-icon"></i>
+                    <input type="text" id="add-search-input" class="add-search-input" placeholder="Search member to add..." autocomplete="off">
+                    <div id="add-dropdown" class="add-dropdown"></div>
+                </div>
+                <button class="btn-add-member" id="btn-add" onclick="addMember()" disabled>
+                    <i class="bi bi-person-plus-fill"></i> Add
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-toolbar">
+                <div class="table-search-wrap">
+                    <i class="bi bi-search table-search-icon"></i>
+                    <input type="text" id="table-search" class="table-search-input" placeholder="Filter members...">
+                </div>
+                <span class="table-count" id="table-count"></span>
+            </div>
+            <div class="perm-table-head">
+                <div class="perm-col-name">Member</div>
+                <div class="perm-col-label">New</div>
+                <div class="perm-col-label">Delete</div>
+                <div class="perm-col-label">Edit<br>Designer</div>
+                <div class="perm-col-label">Edit<br>Creative</div>
+                <div class="perm-col-label">Assign</div>
+                <div class="perm-col-label">Setting</div>
+                <div></div>
+            </div>
+            <div id="perm-list"></div>
+        </div>
     </div>
 
 </div>
@@ -146,11 +261,13 @@
     let membersInProject = [];
     let allProfiles = [];
     let selectedCodename = '';
+    let currentWorkTab = 'Designer';
+    let workData = [];
 
     async function loadPage() {
         await initLayout(B_QUEST_CONFIG);
         guardPermission();
-        await Promise.all([loadMembers(), loadAllProfiles()]);
+        await Promise.all([loadCapacity(), loadWorkList(), loadMembers(), loadAllProfiles()]);
         setupAddSearch();
         setupTableSearch();
     }
@@ -162,11 +279,144 @@
         if (!perms?.setting) window.location.replace('b-quest-list.html');
     }
 
+    /* ── Capacity ── */
+    async function loadCapacity() {
+        const { data } = await supabaseClient.from('b_quest_capacity').select('*');
+        if (!data) return;
+        data.forEach(row => {
+            const id = row.role === 'Designer' ? 'cap-designer' : 'cap-creative';
+            document.getElementById(id).value = row.max_capacity;
+        });
+    }
+
+    async function saveCapacity() {
+        const des = parseInt(document.getElementById('cap-designer').value);
+        const cre = parseInt(document.getElementById('cap-creative').value);
+        if (!des || !cre || des < 1 || cre < 1) return Swal.fire('Error', 'Capacity must be at least 1', 'error');
+
+        const { error } = await supabaseClient.from('b_quest_capacity').upsert([
+            { role: 'Designer', max_capacity: des },
+            { role: 'Creative', max_capacity: cre }
+        ], { onConflict: 'role' });
+
+        if (error) Swal.fire('Error', error.message, 'error');
+        else Swal.fire({ icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1200 });
+    }
+
+    /* ── Work List ── */
+    async function loadWorkList() {
+        const { data } = await supabaseClient.from('b-quest-work').select('*').order('work');
+        workData = data || [];
+        renderWorkList();
+    }
+
+    function switchWorkTab(role) {
+        currentWorkTab = role;
+        document.getElementById('tab-designer').className = 'work-tab' + (role === 'Designer' ? ' active-des' : '');
+        document.getElementById('tab-creative').className = 'work-tab' + (role === 'Creative' ? ' active-cre' : '');
+        document.getElementById('new-work-row').style.display = 'none';
+        renderWorkList();
+    }
+
+    function renderWorkList() {
+        const container = document.getElementById('work-list');
+        const filtered = workData.filter(w => w.role === currentWorkTab);
+
+        if (!filtered.length) {
+            container.innerHTML = `<div class="work-empty">No work items yet</div>`;
+            return;
+        }
+
+        container.innerHTML = filtered.map(w => `
+            <div class="work-row" id="wrow-${w.role}-${w.work}">
+                <input class="work-input" value="${w.work}" data-orig="${w.work}" data-role="${w.role}"
+                    oninput="markWorkDirty(this)">
+                <div class="work-weight-wrap">
+                    <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" data-orig="${w.weight}" data-role="${w.role}" data-work="${w.work}"
+                        oninput="markWorkDirty(this)">
+                    <span class="work-weight-unit">pts</span>
+                </div>
+                <div class="work-actions">
+                    <button class="btn-work-save" id="wsave-${w.role}-${w.work}" onclick="saveWorkRow('${w.role}', '${w.work}', this)">
+                        <i class="bi bi-check-lg"></i> Save
+                    </button>
+                    <button class="btn-work-del" onclick="deleteWork('${w.role}', '${w.work}')">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function markWorkDirty(input) {
+        const row = input.closest('.work-row');
+        const saveBtn = row.querySelector('.btn-work-save');
+        saveBtn.style.display = 'inline-block';
+    }
+
+    async function saveWorkRow(origRole, origWork, btn) {
+        const row = btn.closest('.work-row');
+        const nameInput = row.querySelector('.work-input');
+        const weightInput = row.querySelector('.work-weight');
+        const newName = nameInput.value.trim();
+        const newWeight = parseInt(weightInput.value);
+
+        if (!newName) return Swal.fire('Error', 'Work name cannot be empty', 'error');
+        if (!newWeight || newWeight < 1) return Swal.fire('Error', 'Weight must be at least 1', 'error');
+
+        const { error } = await supabaseClient.from('b-quest-work')
+            .update({ work: newName, weight: newWeight })
+            .eq('role', origRole).eq('work', origWork);
+
+        if (error) { Swal.fire('Error', error.message, 'error'); return; }
+
+        btn.style.display = 'none';
+        nameInput.dataset.orig = newName;
+        weightInput.dataset.orig = newWeight;
+        await loadWorkList();
+    }
+
+    async function deleteWork(role, work) {
+        const res = await Swal.fire({
+            title: `Delete "${work}"?`,
+            icon: 'warning', showCancelButton: true,
+            confirmButtonColor: '#ef4444', confirmButtonText: 'Delete', cancelButtonText: 'Cancel'
+        });
+        if (!res.isConfirmed) return;
+
+        const { error } = await supabaseClient.from('b-quest-work').delete().eq('role', role).eq('work', work);
+        if (error) { Swal.fire('Error', error.message, 'error'); return; }
+        await loadWorkList();
+    }
+
+    function showNewWorkRow() {
+        const row = document.getElementById('new-work-row');
+        row.style.display = row.style.display === 'none' ? 'grid' : 'none';
+        document.getElementById('new-work-name').value = '';
+        document.getElementById('new-work-weight').value = '';
+        document.getElementById('new-work-name').focus();
+    }
+
+    async function confirmAddWork() {
+        const name = document.getElementById('new-work-name').value.trim();
+        const weight = parseInt(document.getElementById('new-work-weight').value);
+
+        if (!name) return Swal.fire('Error', 'Work name cannot be empty', 'error');
+        if (!weight || weight < 1) return Swal.fire('Error', 'Weight must be at least 1', 'error');
+
+        const { error } = await supabaseClient.from('b-quest-work').insert([{ role: currentWorkTab, work: name, weight }]);
+        if (error) { Swal.fire('Error', error.message, 'error'); return; }
+
+        document.getElementById('new-work-row').style.display = 'none';
+        await loadWorkList();
+    }
+
+    /* ── Members ── */
     function showSkeleton() {
         const row = () => `
             <div class="skeleton-row">
-                <div class="skeleton-block" style="height:32px;width:130px;"></div>
-                ${[1,2,3,4,5,6,7].map(() => `<div class="skeleton-block" style="height:20px;width:36px;margin:auto;"></div>`).join('')}
+                <div class="skeleton-block" style="height:30px;width:120px;"></div>
+                ${[1,2,3,4,5,6,7].map(() => `<div class="skeleton-block" style="height:19px;width:34px;margin:auto;"></div>`).join('')}
             </div>`;
         document.getElementById('perm-list').innerHTML = row() + row() + row();
     }
@@ -181,12 +431,10 @@
     }
 
     async function loadAllProfiles() {
-        const { data, error } = await supabaseClient.from('profiles').select('codename, level').neq('level', 'god').order('codename');
-        if (error) return;
+        const { data } = await supabaseClient.from('profiles').select('codename, level').neq('level', 'god').order('codename');
         allProfiles = data || [];
     }
 
-    /* --- Add Search --- */
     function setupAddSearch() {
         const input = document.getElementById('add-search-input');
         const dropdown = document.getElementById('add-dropdown');
@@ -203,17 +451,13 @@
 
             if (!q) { dropdown.classList.remove('show'); return; }
 
-            if (!available.length) {
-                dropdown.innerHTML = `<div class="add-dropdown-empty">No members found</div>`;
-            } else {
-                dropdown.innerHTML = available.map(p => `
-                    <div class="add-dropdown-item" onclick="selectMember('${p.codename}')">${p.codename}</div>
-                `).join('');
-            }
+            dropdown.innerHTML = available.length
+                ? available.map(p => `<div class="add-dropdown-item" onclick="selectMember('${p.codename}')">${p.codename}</div>`).join('')
+                : `<div class="add-dropdown-empty">No members found</div>`;
             dropdown.classList.add('show');
         });
 
-        document.addEventListener('click', (e) => {
+        document.addEventListener('mousedown', (e) => {
             if (!e.target.closest('.add-search-wrap')) dropdown.classList.remove('show');
         });
     }
@@ -225,7 +469,6 @@
         document.getElementById('btn-add').disabled = false;
     }
 
-    /* --- Table Search --- */
     function setupTableSearch() {
         document.getElementById('table-search').addEventListener('input', (e) => {
             const q = e.target.value.trim().toLowerCase();
@@ -237,8 +480,7 @@
 
     function updateTableCount(shown, total) {
         document.getElementById('table-count').textContent = shown === total
-            ? `${total} members`
-            : `${shown} / ${total} members`;
+            ? `${total} members` : `${shown} / ${total} members`;
     }
 
     function renderTable(data) {
@@ -251,7 +493,6 @@
                 </div>`;
             return;
         }
-
         container.innerHTML = data.map(member => `
             <div class="perm-row" id="row-${member.id}">
                 <div class="perm-name-zone">
@@ -267,7 +508,7 @@
                     </label>
                 </div>`).join('')}
                 <div class="perm-check-cell">
-                    <button class="btn-remove" onclick="removeMember('${member.id}', '${member.codename}')" title="Remove">
+                    <button class="btn-remove" onclick="removeMember('${member.id}', '${member.codename}')">
                         <i class="bi bi-trash3"></i>
                     </button>
                 </div>
@@ -277,16 +518,14 @@
 
     async function addMember() {
         if (!selectedCodename) return;
-
         const { error } = await supabaseClient.from('b-quest-profiles').insert([{ codename: selectedCodename }]);
         if (error) { Swal.fire('Error', error.message, 'error'); return; }
-
         selectedCodename = '';
         document.getElementById('add-search-input').value = '';
         document.getElementById('btn-add').disabled = true;
         document.getElementById('table-search').value = '';
-
         await loadMembers();
+        await loadAllProfiles();
     }
 
     async function updatePermission(id, col, value) {
@@ -297,19 +536,15 @@
     async function removeMember(id, codename) {
         const res = await Swal.fire({
             title: `Remove "${codename}"?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Remove',
-            cancelButtonText: 'Cancel'
+            icon: 'warning', showCancelButton: true,
+            confirmButtonColor: '#ef4444', confirmButtonText: 'Remove', cancelButtonText: 'Cancel'
         });
         if (!res.isConfirmed) return;
-
         const { error } = await supabaseClient.from('b-quest-profiles').delete().eq('id', id);
         if (error) { Swal.fire('Error', error.message, 'error'); return; }
-
         document.getElementById('table-search').value = '';
         await loadMembers();
+        await loadAllProfiles();
     }
 
     loadPage();
