@@ -110,14 +110,7 @@
             <div class="perm-col-label">Setting</div>
             <div class="perm-col-label"></div>
         </div>
-        <div id="perm-list">
-            <!-- skeleton -->
-            ${[1,2,3].map(() => `
-            <div class="skeleton-row">
-                <div class="skeleton-block" style="height:34px; width:140px;"></div>
-                ${[1,2,3,4,5,6,7].map(() => `<div class="skeleton-block" style="height:20px; width:36px; margin: auto;"></div>`).join('')}
-            </div>`).join('')}
-        </div>
+        <div id="perm-list"></div>
     </div>
 
 </div>
@@ -142,7 +135,17 @@
         }
     }
 
+    function showSkeleton() {
+        const skeletonRow = () => `
+            <div class="skeleton-row">
+                <div class="skeleton-block" style="height:34px; width:140px;"></div>
+                ${[1,2,3,4,5,6,7].map(() => `<div class="skeleton-block" style="height:20px; width:36px; margin:auto;"></div>`).join('')}
+            </div>`;
+        document.getElementById('perm-list').innerHTML = skeletonRow() + skeletonRow() + skeletonRow();
+    }
+
     async function loadMembers() {
+        showSkeleton();
         const { data, error } = await supabaseClient
             .from('b-quest-profiles')
             .select('*')
