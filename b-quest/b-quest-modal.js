@@ -357,6 +357,7 @@ const BQuestApp = (() => {
             } else {
                 el('b-quest-modal-label-text').innerHTML = 'Task <span>New</span>';
                 el('btn-submit-text').innerText = 'Create Task';
+                el('modal-owner-display').innerText = getBxUser()?.codename || '-';
                 show('btn-delete-task', false);
                 State.roles.forEach(role => { el(`check-${role}`).checked = false; updateRoleUI(role); });
             }
@@ -403,7 +404,7 @@ const BQuestApp = (() => {
             });
 
             ['publish_date', 'detail', 'link'].forEach(f => { if(payload[f] === "") payload[f] = null; });
-            if (!isEdit) { delete payload.id; payload.owner = "Test (BX001)"; }
+            if (!isEdit) { delete payload.id; payload.owner = getBxUser()?.codename || '-'; }
             payload.last_update = new Date().toISOString();
 
             const { error } = isEdit 
