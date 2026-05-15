@@ -64,7 +64,7 @@ async function handleForgotPassword(email) {
     try {
         Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/auth/forgot-password.html', 
+            redirectTo: window.location.origin + '/auth/reset-password.html',
         });
 
         if (error) throw error;
