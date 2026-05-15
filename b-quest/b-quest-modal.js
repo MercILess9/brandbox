@@ -336,7 +336,7 @@ const BQuestApp = (() => {
             if (taskId) {
                 el('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
                 el('btn-submit-text').innerText = 'Save Changes';
-                show('btn-delete-task', true);
+                show('btn-delete-task', typeof canBquest === 'function' ? canBquest('delete') : false);
 
                 const data = await BQuestService.getQuestById(taskId);
                 if (data) {
