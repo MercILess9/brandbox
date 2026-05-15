@@ -405,7 +405,7 @@
                                 <div class="bqc-col-40">
                                     <div class="bqc-panel-label"><i class="bi bi-justify-left"></i> DETAIL</div>
                                     <div class="bqc-panel" style="overflow-y: auto; color: #64748b; font-size: 0.85rem; line-height: 1.5;">
-                                        ${task.detail ? task.detail.replace(/\n/g, '<br>') : 'No details provided.'}
+                                        ${task.detail ? task.detail.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') : 'No details provided.'}
                                     </div>
                                 </div>
                             </div>
