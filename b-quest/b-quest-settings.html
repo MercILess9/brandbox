@@ -566,7 +566,7 @@
         if (!selectedCodename) return;
         memberChanges[selectedCodename] = {
             codename: selectedCodename,
-            new: false, delete: false, edit_designer: false, edit_creative: false, assign: false, setting: false,
+            new: true, delete: false, edit_designer: false, edit_creative: false, assign: false, setting: false,
             _new: true
         };
         selectedCodename = '';
@@ -622,7 +622,7 @@
                     <div class="add-dropdown-avatar">${p.codename.substring(0,2).toUpperCase()}</div>
                     <div class="add-dropdown-info">
                         <span class="add-dropdown-codename">${p.codename}</span>
-                        <span class="add-dropdown-sub">${[p.full_name,p.department].filter(Boolean).join(' · ')}</span>
+                        <span class="add-dropdown-sub">${[p.full_name,p.department].filter(Boolean).join(' | ')}</span>
                     </div>
                 </div>`).join('')
             : `<div class="add-dropdown-empty">No members found</div>`;
