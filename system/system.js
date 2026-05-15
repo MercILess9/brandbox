@@ -96,12 +96,10 @@ async function renderSystemUI(config) {
     const headerHTML = await response.text();
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-    // 1. ดึงชื่อโปรเจกต์จาก Config
     if (config.projectName) {
         document.getElementById('project-title').innerText = config.projectName;
     }
 
-    // 2. ดึงรายการเมนูจาก Config มาสร้าง
     const menuBar = document.getElementById('sys-nav-inject');
     if (config.menus && menuBar) {
         const currentPath = window.location.pathname.split('/').pop();
@@ -109,6 +107,12 @@ async function renderSystemUI(config) {
             const isActive = (currentPath === menu.link) ? 'active' : '';
             return `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`;
         }).join('');
+    }
+
+    const user = getBxUser();
+    const userDisplay = document.getElementById('user-display');
+    if (userDisplay) {
+        userDisplay.innerText = user?.codename || user?.email || '-';
     }
 }
 
