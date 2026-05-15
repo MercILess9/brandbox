@@ -28,18 +28,21 @@
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
-        .settings-wrapper { max-width: 960px; margin: 0 auto; padding: 36px 20px 100px; }
+        .settings-wrapper { max-width: 960px; margin: 0 auto; padding: 36px 20px 120px; }
 
-        /* Page Header */
         .page-header { margin-bottom: 28px; }
         .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
 
-        /* Section */
         .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
         .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--c-border); }
         .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         .section-title i { font-size: 1rem; }
         .section-body { padding: 20px 24px; }
+
+        /* Dirty indicator */
+        .dirty-dot { width: 7px; height: 7px; background: #f59e0b; border-radius: 50%; display: none; }
+        .section.is-dirty .dirty-dot { display: inline-block; }
+        .section.is-dirty { border-color: #fde68a; }
 
         /* Capacity */
         .cap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -50,12 +53,8 @@
         .cap-label-des { color: var(--c-des); }
         .cap-label-cre { color: var(--c-cre); }
         .cap-sub { font-size: 0.72rem; color: var(--c-muted); margin-top: 2px; }
-        .cap-input-wrap { display: flex; align-items: center; gap: 8px; }
         .cap-input { width: 70px; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 10px; font-size: 1rem; font-weight: 800; text-align: center; outline: none; transition: 0.2s; background: #fff; }
         .cap-input:focus { border-color: var(--c-accent); }
-        .cap-unit { display: none; }
-        .btn-save-cap { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 10px; padding: 8px 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .btn-save-cap:hover { background: #0f172a; }
 
         /* Work List */
         .work-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -78,6 +77,8 @@
 
         .work-row { display: grid; grid-template-columns: 1fr 56px 60px; align-items: center; gap: 6px; padding: 5px 2px; border-bottom: 1px solid #f8fafc; }
         .work-row:last-child { border-bottom: none; }
+        .work-row.is-deleted { opacity: 0.4; background: #fff5f5; text-decoration: line-through; pointer-events: none; }
+        .work-row.is-new { background: #f0fdf4; }
         .work-input { border: 1px solid transparent; border-radius: 7px; padding: 5px 8px; font-size: 0.8rem; font-weight: 600; color: var(--c-dark); background: transparent; outline: none; width: 100%; transition: 0.2s; font-family: inherit; }
         .work-input:hover { border-color: var(--c-border); background: var(--c-bg); }
         .work-input:focus { border-color: var(--c-accent); background: #fff; }
@@ -85,23 +86,22 @@
         .work-weight:hover { border-color: var(--c-border); background: var(--c-bg); }
         .work-weight:focus { border-color: var(--c-accent); background: #fff; }
         .work-actions { display: flex; justify-content: flex-end; align-items: center; gap: 3px; }
-        .btn-work-save { background: var(--c-accent-light); color: #7a8500; border: none; border-radius: 6px; padding: 4px 9px; font-size: 0.68rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: none; white-space: nowrap; }
-        .btn-work-save:hover { background: var(--c-accent); color: #fff; }
         .btn-work-del { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; }
         .btn-work-del:hover { background: #fee2e2; color: #ef4444; }
+        .btn-work-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 700; transition: 0.2s; display: none; }
+        .work-row.is-deleted .btn-work-undo { display: inline-block; pointer-events: all; }
 
         .work-new-row { display: grid; grid-template-columns: 1fr 56px 90px; gap: 6px; padding: 8px 2px 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
         .work-new-input { border: 1px solid var(--c-border); border-radius: 7px; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; outline: none; transition: 0.2s; font-family: inherit; background: var(--c-bg); }
         .work-new-input:focus { border-color: var(--c-accent); background: #fff; }
         .work-new-actions { display: flex; gap: 4px; justify-content: flex-end; }
-        .btn-confirm-add { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 7px; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .btn-confirm-add { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 7px; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-confirm-add:hover { background: #0f172a; }
         .btn-cancel-add { background: #f1f5f9; color: var(--c-muted); border: none; border-radius: 7px; padding: 6px 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-cancel-add:hover { background: #e2e8f0; color: var(--c-slate); }
-
+        .btn-cancel-add:hover { background: #e2e8f0; }
         .work-empty { padding: 24px; text-align: center; color: var(--c-muted); font-size: 0.8rem; font-weight: 600; }
 
-        /* Member */
+        /* Members */
         .member-add-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--c-border); }
         .add-search-wrap { flex: 1; position: relative; }
         .add-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 12px; padding: 9px 14px 9px 36px; font-size: 0.85rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
@@ -121,7 +121,6 @@
         .btn-add-member:hover { background: #0f172a; }
         .btn-add-member:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* Perm table */
         .table-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .table-search-wrap { position: relative; flex: 1; max-width: 260px; }
         .table-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
@@ -136,6 +135,9 @@
         .perm-row { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 56px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; border-radius: 8px; }
         .perm-row:last-child { border-bottom: none; }
         .perm-row:hover { background: #fafbff; }
+        .perm-row.is-new { background: #f0fdf4; }
+        .perm-row.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
+        .perm-row.is-deleted .btn-remove { pointer-events: all; }
         .perm-name-zone { display: flex; align-items: center; gap: 9px; padding-left: 4px; }
         .perm-avatar { width: 30px; height: 30px; background: var(--c-accent-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
         .perm-codename { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
@@ -156,6 +158,23 @@
         .skeleton-row { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px; }
         .skeleton-block { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+        /* FAB Save */
+        .fab-save {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--c-dark); color: var(--c-accent);
+            border: none; border-radius: 50px;
+            padding: 14px 28px; font-size: 0.9rem; font-weight: 800;
+            cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 10px;
+            transform: translateY(80px); opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 999;
+        }
+        .fab-save.show { transform: translateY(0); opacity: 1; }
+        .fab-save:hover { background: #0f172a; transform: translateY(-2px); }
+        .fab-save.saving { opacity: 0.7; pointer-events: none; }
+        .fab-save i { font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -167,10 +186,12 @@
     </div>
 
     <!-- Section 1: Capacity -->
-    <div class="section">
+    <div class="section" id="section-capacity">
         <div class="section-header">
-            <div class="section-title"><i class="bi bi-speedometer2"></i> Max Capacity</div>
-            <button class="btn-save-cap" id="btn-save-cap" onclick="saveCapacity()" style="display:none;"><i class="bi bi-check-lg"></i> Save</button>
+            <div class="section-title">
+                <i class="bi bi-speedometer2"></i> Max Capacity
+                <span class="dirty-dot"></span>
+            </div>
         </div>
         <div class="section-body">
             <div class="cap-grid">
@@ -179,33 +200,29 @@
                         <div class="cap-label cap-label-des"><i class="bi bi-brush me-1"></i> Designer</div>
                         <div class="cap-sub">Max workload per deadline</div>
                     </div>
-                    <div class="cap-input-wrap">
-                        <input type="number" class="cap-input" id="cap-designer" min="1" max="99" value="10">
-                        <span class="cap-unit">pts</span>
-                    </div>
+                    <input type="number" class="cap-input" id="cap-designer" min="1" max="99" value="10">
                 </div>
                 <div class="cap-card cap-card-cre">
                     <div>
                         <div class="cap-label cap-label-cre"><i class="bi bi-rocket me-1"></i> Creative</div>
                         <div class="cap-sub">Max workload per deadline</div>
                     </div>
-                    <div class="cap-input-wrap">
-                        <input type="number" class="cap-input" id="cap-creative" min="1" max="99" value="10">
-                        <span class="cap-unit">pts</span>
-                    </div>
+                    <input type="number" class="cap-input" id="cap-creative" min="1" max="99" value="10">
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Section 2: Work List -->
-    <div class="section">
+    <div class="section" id="section-worklist">
         <div class="section-header">
-            <div class="section-title"><i class="bi bi-list-task"></i> Work List</div>
+            <div class="section-title">
+                <i class="bi bi-list-task"></i> Work List
+                <span class="dirty-dot"></span>
+            </div>
         </div>
         <div class="section-body">
             <div class="work-cols">
-                <!-- Designer -->
                 <div class="work-col">
                     <div class="work-col-header work-col-header-des">
                         <div class="work-col-title work-col-title-des"><i class="bi bi-brush"></i> Designer</div>
@@ -221,12 +238,11 @@
                             <input type="number" class="work-new-input" id="new-work-weight-designer" value="1" min="1" max="99" style="text-align:center;">
                             <div class="work-new-actions">
                                 <button class="btn-cancel-add" onclick="cancelAddWork('Designer')"><i class="bi bi-x"></i></button>
-                                <button class="btn-confirm-add" onclick="confirmAddWork('Designer')"><i class="bi bi-check-lg"></i></button>
+                                <button class="btn-confirm-add" onclick="stageNewWork('Designer')"><i class="bi bi-check-lg"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Creative -->
                 <div class="work-col">
                     <div class="work-col-header work-col-header-cre">
                         <div class="work-col-title work-col-title-cre"><i class="bi bi-rocket"></i> Creative</div>
@@ -242,7 +258,7 @@
                             <input type="number" class="work-new-input" id="new-work-weight-creative" value="1" min="1" max="99" style="text-align:center;">
                             <div class="work-new-actions">
                                 <button class="btn-cancel-add" onclick="cancelAddWork('Creative')"><i class="bi bi-x"></i></button>
-                                <button class="btn-confirm-add" onclick="confirmAddWork('Creative')"><i class="bi bi-check-lg"></i></button>
+                                <button class="btn-confirm-add" onclick="stageNewWork('Creative')"><i class="bi bi-check-lg"></i></button>
                             </div>
                         </div>
                     </div>
@@ -252,24 +268,24 @@
     </div>
 
     <!-- Section 3: Members -->
-    <div class="section">
+    <div class="section" id="section-members">
         <div class="section-header">
-            <div class="section-title"><i class="bi bi-people-fill"></i> Members & Permissions</div>
+            <div class="section-title">
+                <i class="bi bi-people-fill"></i> Members & Permissions
+                <span class="dirty-dot"></span>
+            </div>
         </div>
         <div class="section-body">
-            <!-- Add -->
             <div class="member-add-row">
                 <div class="add-search-wrap">
                     <i class="bi bi-search add-search-icon"></i>
                     <input type="text" id="add-search-input" class="add-search-input" placeholder="Search member to add..." autocomplete="off">
                     <div id="add-dropdown" class="add-dropdown"></div>
                 </div>
-                <button class="btn-add-member" id="btn-add" onclick="addMember()" disabled>
+                <button class="btn-add-member" id="btn-add" onclick="stageMember()" disabled>
                     <i class="bi bi-person-plus-fill"></i> Add
                 </button>
             </div>
-
-            <!-- Table -->
             <div class="table-toolbar">
                 <div class="table-search-wrap">
                     <i class="bi bi-search table-search-icon"></i>
@@ -293,18 +309,33 @@
 
 </div>
 
+<!-- FAB Save -->
+<button class="fab-save" id="fab-save" onclick="saveAll()">
+    <i class="bi bi-floppy2-fill"></i> Save Changes
+</button>
+
 <script>
     const PERM_COLS = ['new', 'delete', 'edit_designer', 'edit_creative', 'assign', 'setting'];
 
-    let membersInProject = [];
+    // ── State ──
+    let originalCapacity = {};
+    let originalWorkData = [];
+    let originalMembers  = [];
     let allProfiles = [];
     let selectedCodename = '';
-    let workData = [];
 
+    // buffers
+    let workChanges   = {}; // key: "role|work" → { origRole, origWork, newName, newWeight, _delete, _new }
+    let memberChanges = {}; // key: codename → { ...permData, _delete, _new }
+
+    let isDirty = false;
+
+    // ── Init ──
     async function loadPage() {
         await initLayout(B_QUEST_CONFIG);
         guardPermission();
         await Promise.all([loadCapacity(), loadWorkList(), loadMembers(), loadAllProfiles()]);
+        setupCapacityListeners();
         setupAddSearch();
         setupTableSearch();
     }
@@ -316,95 +347,110 @@
         if (!perms?.setting) window.location.replace('b-quest-list.html');
     }
 
-    /* ── Capacity ── */
+    function markDirty(sectionId) {
+        isDirty = true;
+        document.getElementById(sectionId).classList.add('is-dirty');
+        document.getElementById('fab-save').classList.add('show');
+    }
+
+    function clearDirty() {
+        isDirty = false;
+        workChanges = {};
+        memberChanges = {};
+        ['section-capacity','section-worklist','section-members'].forEach(id =>
+            document.getElementById(id).classList.remove('is-dirty')
+        );
+        document.getElementById('fab-save').classList.remove('show');
+    }
+
+    // ── Capacity ──
     async function loadCapacity() {
         const { data } = await supabaseClient.from('b_quest_capacity').select('*');
         if (!data) return;
         data.forEach(row => {
             const id = row.role === 'Designer' ? 'cap-designer' : 'cap-creative';
             document.getElementById(id).value = row.max_capacity;
+            originalCapacity[row.role] = row.max_capacity;
         });
+    }
+
+    function setupCapacityListeners() {
         ['cap-designer', 'cap-creative'].forEach(id => {
-            document.getElementById(id).addEventListener('input', () => {
-                document.getElementById('btn-save-cap').style.display = 'flex';
-            });
+            document.getElementById(id).addEventListener('input', () => markDirty('section-capacity'));
         });
     }
 
-    async function saveCapacity() {
-        const des = parseInt(document.getElementById('cap-designer').value);
-        const cre = parseInt(document.getElementById('cap-creative').value);
-        if (!des || !cre || des < 1 || cre < 1) return Swal.fire('Error', 'Capacity must be at least 1', 'error');
-
-        const { error } = await supabaseClient.from('b_quest_capacity').upsert([
-            { role: 'Designer', max_capacity: des },
-            { role: 'Creative', max_capacity: cre }
-        ], { onConflict: 'role' });
-
-        if (error) { Swal.fire('Error', error.message, 'error'); return; }
-        document.getElementById('btn-save-cap').style.display = 'none';
-        Swal.fire({ icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1200 });
-    }
-
-    /* ── Work List ── */
+    // ── Work List ──
     async function loadWorkList() {
         const { data } = await supabaseClient.from('b-quest-work').select('*').order('work');
-        workData = data || [];
-        renderWorkCol('Designer');
-        renderWorkCol('Creative');
+        originalWorkData = data || [];
+        renderWorkFromBuffer();
     }
 
-    function renderWorkCol(role) {
-        const id = role.toLowerCase();
-        const container = document.getElementById(`work-list-${id}`);
-        const filtered = workData.filter(w => w.role === role);
+    function renderWorkFromBuffer() {
+        ['Designer','Creative'].forEach(role => {
+            const id = role.toLowerCase();
+            const container = document.getElementById(`work-list-${id}`);
 
-        if (!filtered.length) {
-            container.innerHTML = `<div class="work-empty">No items yet</div>`;
-            return;
-        }
+            // start from original, apply changes
+            let items = originalWorkData.filter(w => w.role === role).map(w => {
+                const key = `${w.role}|${w.work}`;
+                const ch = workChanges[key];
+                if (!ch) return { ...w, _state: 'clean' };
+                if (ch._delete) return { ...w, _state: 'deleted', _key: key };
+                return { role: w.role, work: ch.newName ?? w.work, weight: ch.newWeight ?? w.weight, _origWork: w.work, _state: 'edited', _key: key };
+            });
 
-        container.innerHTML = filtered.map(w => `
-            <div class="work-row">
-                <input class="work-input" value="${w.work}" data-orig="${w.work}" data-role="${w.role}" oninput="markWorkDirty(this)">
-                <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" data-orig="${w.weight}" data-role="${w.role}" data-work="${w.work}" oninput="markWorkDirty(this)">
-                <div class="work-actions">
-                    <button class="btn-work-save" onclick="saveWorkRow('${w.role}', '${w.work}', this)"><i class="bi bi-check-lg"></i> Save</button>
-                    <button class="btn-work-del" onclick="deleteWork('${w.role}', '${w.work}')"><i class="bi bi-trash3"></i></button>
+            // append new items
+            Object.values(workChanges).filter(c => c._new && c.origRole === role).forEach(c => {
+                items.push({ role: c.origRole, work: c.newName, weight: c.newWeight, _state: 'new', _key: `${c.origRole}|${c.newName}` });
+            });
+
+            if (!items.length) { container.innerHTML = `<div class="work-empty">No items yet</div>`; return; }
+
+            container.innerHTML = items.map(w => `
+                <div class="work-row ${w._state === 'deleted' ? 'is-deleted' : w._state === 'new' ? 'is-new' : ''}" data-key="${w._key || `${w.role}|${w.work}`}">
+                    <input class="work-input" value="${w.work}" oninput="onWorkEdit(this)">
+                    <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" oninput="onWorkEdit(this)">
+                    <div class="work-actions">
+                        <button class="btn-work-del" onclick="stageDeleteWork(this)" title="Remove"><i class="bi bi-trash3"></i></button>
+                        <button class="btn-work-undo" onclick="undoDeleteWork(this)">Undo</button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
-    }
-
-    function markWorkDirty(input) {
-        input.closest('.work-row').querySelector('.btn-work-save').style.display = 'inline-block';
-    }
-
-    async function saveWorkRow(origRole, origWork, btn) {
-        const row = btn.closest('.work-row');
-        const newName = row.querySelector('.work-input').value.trim();
-        const newWeight = parseInt(row.querySelector('.work-weight').value);
-
-        if (!newName) return Swal.fire('Error', 'Work name cannot be empty', 'error');
-        if (!newWeight || newWeight < 1) return Swal.fire('Error', 'Weight must be at least 1', 'error');
-
-        const { error } = await supabaseClient.from('b-quest-work')
-            .update({ work: newName, weight: newWeight })
-            .eq('role', origRole).eq('work', origWork);
-
-        if (error) { Swal.fire('Error', error.message, 'error'); return; }
-        await loadWorkList();
-    }
-
-    async function deleteWork(role, work) {
-        const res = await Swal.fire({
-            title: `Delete "${work}"?`, icon: 'warning', showCancelButton: true,
-            confirmButtonColor: '#ef4444', confirmButtonText: 'Delete', cancelButtonText: 'Cancel'
+            `).join('');
         });
-        if (!res.isConfirmed) return;
-        const { error } = await supabaseClient.from('b-quest-work').delete().eq('role', role).eq('work', work);
-        if (error) { Swal.fire('Error', error.message, 'error'); return; }
-        await loadWorkList();
+    }
+
+    function onWorkEdit(input) {
+        const row = input.closest('.work-row');
+        const key = row.dataset.key;
+        const [origRole, origWork] = key.split('|');
+        if (!workChanges[key]) workChanges[key] = { origRole, origWork };
+        const nameVal = row.querySelector('.work-input').value.trim();
+        const weightVal = parseInt(row.querySelector('.work-weight').value);
+        workChanges[key].newName = nameVal;
+        workChanges[key].newWeight = weightVal;
+        markDirty('section-worklist');
+    }
+
+    function stageDeleteWork(btn) {
+        const row = btn.closest('.work-row');
+        const key = row.dataset.key;
+        const [origRole, origWork] = key.split('|');
+        if (!workChanges[key]) workChanges[key] = { origRole, origWork };
+        workChanges[key]._delete = true;
+        row.classList.add('is-deleted');
+        markDirty('section-worklist');
+    }
+
+    function undoDeleteWork(btn) {
+        const row = btn.closest('.work-row');
+        const key = row.dataset.key;
+        if (workChanges[key]) delete workChanges[key]._delete;
+        if (Object.keys(workChanges[key] || {}).length <= 2) delete workChanges[key];
+        row.classList.remove('is-deleted');
+        if (!Object.keys(workChanges).length) document.getElementById('section-worklist').classList.remove('is-dirty');
+        checkDirty();
     }
 
     function showNewWorkRow(role) {
@@ -417,26 +463,23 @@
     }
 
     function cancelAddWork(role) {
-        const id = role.toLowerCase();
-        document.getElementById(`new-work-row-${id}`).style.display = 'none';
+        document.getElementById(`new-work-row-${role.toLowerCase()}`).style.display = 'none';
     }
 
-    async function confirmAddWork(role) {
+    function stageNewWork(role) {
         const id = role.toLowerCase();
         const name = document.getElementById(`new-work-name-${id}`).value.trim();
-        const weight = parseInt(document.getElementById(`new-work-weight-${id}`).value);
+        const weight = parseInt(document.getElementById(`new-work-weight-${id}`).value) || 1;
+        if (!name) return;
 
-        if (!name) return Swal.fire('Error', 'Work name cannot be empty', 'error');
-        if (!weight || weight < 1) return Swal.fire('Error', 'Weight must be at least 1', 'error');
-
-        const { error } = await supabaseClient.from('b-quest-work').insert([{ role, work: name, weight }]);
-        if (error) { Swal.fire('Error', error.message, 'error'); return; }
-
+        const key = `${role}|${name}`;
+        workChanges[key] = { origRole: role, origWork: name, newName: name, newWeight: weight, _new: true };
         document.getElementById(`new-work-row-${id}`).style.display = 'none';
-        await loadWorkList();
+        markDirty('section-worklist');
+        renderWorkFromBuffer();
     }
 
-    /* ── Members ── */
+    // ── Members ──
     function showSkeleton() {
         const row = () => `
             <div class="skeleton-row">
@@ -450,9 +493,9 @@
         showSkeleton();
         const { data, error } = await supabaseClient.from('b-quest-profiles').select('*').order('codename');
         if (error) { console.error(error); return; }
-        membersInProject = data || [];
-        renderTable(membersInProject);
-        updateTableCount(membersInProject.length, membersInProject.length);
+        originalMembers = data || [];
+        renderMembersFromBuffer();
+        updateTableCount(originalMembers.length, originalMembers.length);
     }
 
     async function loadAllProfiles() {
@@ -460,14 +503,118 @@
         allProfiles = data || [];
     }
 
+    function renderMembersFromBuffer(filter = '') {
+        const container = document.getElementById('perm-list');
+
+        // merge original + memberChanges
+        let rows = originalMembers.map(m => {
+            const ch = memberChanges[m.codename];
+            if (!ch) return { ...m, _state: 'clean' };
+            if (ch._delete) return { ...m, _state: 'deleted' };
+            return { ...m, ...ch, _state: 'edited' };
+        });
+
+        // append new
+        Object.values(memberChanges).filter(c => c._new).forEach(c => {
+            rows.push({ ...c, _state: 'new' });
+        });
+
+        if (filter) rows = rows.filter(m => m.codename.toLowerCase().includes(filter.toLowerCase()));
+
+        const visible = rows.filter(r => r._state !== 'deleted');
+        const total = originalMembers.length + Object.values(memberChanges).filter(c => c._new).length;
+        updateTableCount(visible.length, total);
+
+        if (!rows.length) {
+            container.innerHTML = `<div class="perm-empty"><i class="bi bi-people"></i><p>No members found</p></div>`;
+            return;
+        }
+
+        container.innerHTML = rows.map(member => `
+            <div class="perm-row ${member._state === 'new' ? 'is-new' : member._state === 'deleted' ? 'is-deleted' : ''}" data-codename="${member.codename}">
+                <div class="perm-name-zone">
+                    <div class="perm-avatar">${member.codename.substring(0,2).toUpperCase()}</div>
+                    <span class="perm-codename">${member.codename}${member._state === 'new' ? ' <span style="font-size:0.6rem;color:#16a34a;font-weight:800;">NEW</span>' : member._state === 'deleted' ? ' <span style="font-size:0.6rem;color:#ef4444;font-weight:800;">REMOVED</span>' : ''}</span>
+                </div>
+                ${PERM_COLS.map(col => `
+                <div class="perm-check-cell">
+                    <label class="bq-toggle">
+                        <input type="checkbox" ${member[col] ? 'checked' : ''} onchange="onPermChange('${member.codename}','${col}',this.checked)" ${member._state === 'deleted' ? 'disabled' : ''}>
+                        <span class="bq-slider"></span>
+                    </label>
+                </div>`).join('')}
+                <div class="perm-check-cell">
+                    ${member._state === 'deleted'
+                        ? `<button class="btn-remove" style="color:#f59e0b" onclick="undoRemoveMember('${member.codename}')" title="Undo"><i class="bi bi-arrow-counterclockwise"></i></button>`
+                        : `<button class="btn-remove" onclick="stageRemoveMember('${member.codename}')" title="Remove"><i class="bi bi-trash3"></i></button>`
+                    }
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function onPermChange(codename, col, value) {
+        if (!memberChanges[codename]) {
+            const orig = originalMembers.find(m => m.codename === codename);
+            memberChanges[codename] = orig ? { ...orig } : { codename, new: false, delete: false, edit_designer: false, edit_creative: false, assign: false, setting: false };
+        }
+        memberChanges[codename][col] = value;
+        markDirty('section-members');
+    }
+
+    function stageMember() {
+        if (!selectedCodename) return;
+        memberChanges[selectedCodename] = {
+            codename: selectedCodename,
+            new: false, delete: false, edit_designer: false, edit_creative: false, assign: false, setting: false,
+            _new: true
+        };
+        selectedCodename = '';
+        const input = document.getElementById('add-search-input');
+        input.value = '';
+        document.getElementById('btn-add').disabled = true;
+        markDirty('section-members');
+        renderMembersFromBuffer(document.getElementById('table-search').value);
+        loadAllProfiles().then(() => input.focus());
+    }
+
+    function stageRemoveMember(codename) {
+        if (!memberChanges[codename]) {
+            const orig = originalMembers.find(m => m.codename === codename);
+            memberChanges[codename] = orig ? { ...orig } : { codename };
+        }
+        memberChanges[codename]._delete = true;
+        markDirty('section-members');
+        renderMembersFromBuffer(document.getElementById('table-search').value);
+    }
+
+    function undoRemoveMember(codename) {
+        if (memberChanges[codename]?._new) {
+            delete memberChanges[codename];
+        } else {
+            delete memberChanges[codename]._delete;
+            if (Object.keys(memberChanges[codename]).length <= 1) delete memberChanges[codename];
+        }
+        checkDirty();
+        renderMembersFromBuffer(document.getElementById('table-search').value);
+    }
+
+    function checkDirty() {
+        const anyDirty = Object.keys(workChanges).length > 0 || Object.keys(memberChanges).length > 0;
+        if (!anyDirty) clearDirty();
+    }
+
+    // ── Search ──
     function renderAddDropdown(q = '') {
         const dropdown = document.getElementById('add-dropdown');
         const ql = q.toLowerCase();
+        const staged = Object.keys(memberChanges).filter(k => memberChanges[k]._new);
         const available = allProfiles.filter(p =>
-            !membersInProject.find(m => m.codename === p.codename) &&
+            !originalMembers.find(m => m.codename === p.codename) &&
+            !staged.includes(p.codename) &&
             (p.codename.toLowerCase().includes(ql) ||
-             (p.full_name || '').toLowerCase().includes(ql) ||
-             (p.department || '').toLowerCase().includes(ql))
+             (p.full_name||'').toLowerCase().includes(ql) ||
+             (p.department||'').toLowerCase().includes(ql))
         );
         dropdown.innerHTML = available.length
             ? available.map(p => `
@@ -475,7 +622,7 @@
                     <div class="add-dropdown-avatar">${p.codename.substring(0,2).toUpperCase()}</div>
                     <div class="add-dropdown-info">
                         <span class="add-dropdown-codename">${p.codename}</span>
-                        <span class="add-dropdown-sub">${[p.full_name, p.department].filter(Boolean).join(' · ')}</span>
+                        <span class="add-dropdown-sub">${[p.full_name,p.department].filter(Boolean).join(' · ')}</span>
                     </div>
                 </div>`).join('')
             : `<div class="add-dropdown-empty">No members found</div>`;
@@ -485,15 +632,13 @@
     function setupAddSearch() {
         const input = document.getElementById('add-search-input');
         const dropdown = document.getElementById('add-dropdown');
-
         input.addEventListener('focus', () => renderAddDropdown(input.value));
         input.addEventListener('input', () => {
             selectedCodename = '';
             document.getElementById('btn-add').disabled = true;
             renderAddDropdown(input.value.trim());
         });
-
-        document.addEventListener('mousedown', (e) => {
+        document.addEventListener('mousedown', e => {
             if (!e.target.closest('.add-search-wrap')) dropdown.classList.remove('show');
         });
     }
@@ -506,11 +651,8 @@
     }
 
     function setupTableSearch() {
-        document.getElementById('table-search').addEventListener('input', (e) => {
-            const q = e.target.value.trim().toLowerCase();
-            const filtered = membersInProject.filter(m => m.codename.toLowerCase().includes(q));
-            renderTable(filtered);
-            updateTableCount(filtered.length, membersInProject.length);
+        document.getElementById('table-search').addEventListener('input', e => {
+            renderMembersFromBuffer(e.target.value.trim());
         });
     }
 
@@ -519,70 +661,80 @@
             ? `${total} members` : `${shown} / ${total} members`;
     }
 
-    function renderTable(data) {
-        const container = document.getElementById('perm-list');
-        if (!data.length) {
-            container.innerHTML = `
-                <div class="perm-empty">
-                    <i class="bi bi-people"></i>
-                    <p>No members found</p>
-                </div>`;
-            return;
+    // ── Save All ──
+    async function saveAll() {
+        const btn = document.getElementById('fab-save');
+        btn.classList.add('saving');
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+
+        try {
+            const errors = [];
+
+            // 1. Capacity
+            if (document.getElementById('section-capacity').classList.contains('is-dirty')) {
+                const des = parseInt(document.getElementById('cap-designer').value);
+                const cre = parseInt(document.getElementById('cap-creative').value);
+                const { error } = await supabaseClient.from('b_quest_capacity').upsert([
+                    { role: 'Designer', max_capacity: des },
+                    { role: 'Creative', max_capacity: cre }
+                ], { onConflict: 'role' });
+                if (error) errors.push('Capacity: ' + error.message);
+            }
+
+            // 2. Work List
+            for (const [key, ch] of Object.entries(workChanges)) {
+                if (ch._new) {
+                    const { error } = await supabaseClient.from('b-quest-work')
+                        .insert([{ role: ch.origRole, work: ch.newName, weight: ch.newWeight }]);
+                    if (error) errors.push(`Work add "${ch.newName}": ` + error.message);
+                } else if (ch._delete) {
+                    const { error } = await supabaseClient.from('b-quest-work')
+                        .delete().eq('role', ch.origRole).eq('work', ch.origWork);
+                    if (error) errors.push(`Work delete "${ch.origWork}": ` + error.message);
+                } else {
+                    const { error } = await supabaseClient.from('b-quest-work')
+                        .update({ work: ch.newName, weight: ch.newWeight })
+                        .eq('role', ch.origRole).eq('work', ch.origWork);
+                    if (error) errors.push(`Work update "${ch.origWork}": ` + error.message);
+                }
+            }
+
+            // 3. Members
+            for (const [codename, ch] of Object.entries(memberChanges)) {
+                if (ch._new) {
+                    const { error } = await supabaseClient.from('b-quest-profiles').insert([{
+                        codename, new: ch.new, delete: ch.delete,
+                        edit_designer: ch.edit_designer, edit_creative: ch.edit_creative,
+                        assign: ch.assign, setting: ch.setting
+                    }]);
+                    if (error) errors.push(`Member add "${codename}": ` + error.message);
+                } else if (ch._delete) {
+                    const { error } = await supabaseClient.from('b-quest-profiles').delete().eq('codename', codename);
+                    if (error) errors.push(`Member remove "${codename}": ` + error.message);
+                } else {
+                    const { new: n, delete: d, edit_designer, edit_creative, assign, setting } = ch;
+                    const { error } = await supabaseClient.from('b-quest-profiles')
+                        .update({ new: n, delete: d, edit_designer, edit_creative, assign, setting })
+                        .eq('codename', codename);
+                    if (error) errors.push(`Member update "${codename}": ` + error.message);
+                }
+            }
+
+            if (errors.length) {
+                Swal.fire('Some errors occurred', errors.join('\n'), 'error');
+            } else {
+                Swal.fire({ icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1200 });
+            }
+
+            clearDirty();
+            await Promise.all([loadCapacity(), loadWorkList(), loadMembers(), loadAllProfiles()]);
+
+        } catch (e) {
+            Swal.fire('Error', e.message, 'error');
+        } finally {
+            btn.classList.remove('saving');
+            btn.innerHTML = '<i class="bi bi-floppy2-fill"></i> Save Changes';
         }
-        container.innerHTML = data.map(member => `
-            <div class="perm-row" id="row-${member.id}">
-                <div class="perm-name-zone">
-                    <div class="perm-avatar">${member.codename.substring(0, 2).toUpperCase()}</div>
-                    <span class="perm-codename">${member.codename}</span>
-                </div>
-                ${PERM_COLS.map(col => `
-                <div class="perm-check-cell">
-                    <label class="bq-toggle">
-                        <input type="checkbox" ${member[col] ? 'checked' : ''}
-                            onchange="updatePermission('${member.id}', '${col}', this.checked)">
-                        <span class="bq-slider"></span>
-                    </label>
-                </div>`).join('')}
-                <div class="perm-check-cell">
-                    <button class="btn-remove" onclick="removeMember('${member.id}', '${member.codename}')">
-                        <i class="bi bi-trash3"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    async function addMember() {
-        if (!selectedCodename) return;
-        const { error } = await supabaseClient.from('b-quest-profiles').insert([{ codename: selectedCodename }]);
-        if (error) { Swal.fire('Error', error.message, 'error'); return; }
-        selectedCodename = '';
-        const input = document.getElementById('add-search-input');
-        input.value = '';
-        document.getElementById('btn-add').disabled = true;
-        document.getElementById('table-search').value = '';
-        await loadMembers();
-        await loadAllProfiles();
-        input.focus();
-    }
-
-    async function updatePermission(id, col, value) {
-        const { error } = await supabaseClient.from('b-quest-profiles').update({ [col]: value }).eq('id', id);
-        if (error) { Swal.fire('Error', error.message, 'error'); await loadMembers(); }
-    }
-
-    async function removeMember(id, codename) {
-        const res = await Swal.fire({
-            title: `Remove "${codename}"?`,
-            icon: 'warning', showCancelButton: true,
-            confirmButtonColor: '#ef4444', confirmButtonText: 'Remove', cancelButtonText: 'Cancel'
-        });
-        if (!res.isConfirmed) return;
-        const { error } = await supabaseClient.from('b-quest-profiles').delete().eq('id', id);
-        if (error) { Swal.fire('Error', error.message, 'error'); return; }
-        document.getElementById('table-search').value = '';
-        await loadMembers();
-        await loadAllProfiles();
     }
 
     loadPage();
