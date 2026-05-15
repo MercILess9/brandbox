@@ -23,35 +23,52 @@
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
 
-        .settings-wrapper { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+        .settings-wrapper { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
 
         /* --- Page Header --- */
         .page-header { margin-bottom: 32px; }
-        .page-header h1 { font-size: 1.5rem; font-weight: 800; color: var(--c-dark); margin: 0 0 4px; }
-        .page-header p { font-size: 0.85rem; color: var(--c-text-muted); margin: 0; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 800; color: var(--c-dark); margin: 0; }
 
         /* --- Add Member Bar --- */
-        .add-bar { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
-        .add-bar-label { font-size: 0.75rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
-        .add-select { flex: 1; border: 1px solid var(--c-border); border-radius: 12px; padding: 9px 14px; font-size: 0.85rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; cursor: pointer; transition: 0.2s; }
-        .add-select:focus { border-color: var(--c-accent); background: #fff; }
+        .add-bar { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+        .add-bar-label { font-size: 0.72rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
+
+        .add-search-wrap { flex: 1; position: relative; }
+        .add-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 12px; padding: 9px 14px 9px 36px; font-size: 0.85rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
+        .add-search-input:focus { border-color: var(--c-accent); background: #fff; }
+        .add-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); font-size: 0.85rem; pointer-events: none; }
+        .add-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1px solid var(--c-border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
+        .add-dropdown.show { display: block; }
+        .add-dropdown-item { padding: 10px 16px; font-size: 0.85rem; font-weight: 600; color: var(--c-dark); cursor: pointer; transition: 0.15s; }
+        .add-dropdown-item:hover { background: var(--c-accent-light); color: #7a8500; }
+        .add-dropdown-empty { padding: 16px; text-align: center; font-size: 0.8rem; color: var(--c-text-muted); }
+
         .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 22px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
         .btn-add-member:hover { background: #0f172a; }
+        .btn-add-member:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* --- Table Search --- */
+        .table-toolbar { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--c-border); background: #fff; border-radius: 20px 20px 0 0; gap: 12px; }
+        .table-search-wrap { position: relative; flex: 1; max-width: 280px; }
+        .table-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
+        .table-search-input:focus { border-color: var(--c-accent); background: #fff; }
+        .table-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); font-size: 0.8rem; pointer-events: none; }
+        .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-text-muted); margin-left: auto; }
 
         /* --- Permission Table --- */
         .perm-table-wrap { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; overflow: hidden; }
 
-        .perm-table-head { display: grid; grid-template-columns: 200px repeat(7, 1fr); align-items: center; padding: 0 24px; height: 48px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
-        .perm-col-name { font-size: 0.7rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
-        .perm-col-label { font-size: 0.65rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.6px; text-align: center; }
+        .perm-table-head { display: grid; grid-template-columns: 210px repeat(6, 1fr) 48px; align-items: center; padding: 0 20px; height: 44px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
+        .perm-col-name { font-size: 0.68rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
+        .perm-col-label { font-size: 0.62rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
 
-        .perm-row { display: grid; grid-template-columns: 200px repeat(7, 1fr); align-items: center; padding: 0 24px; height: 62px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; }
+        .perm-row { display: grid; grid-template-columns: 210px repeat(6, 1fr) 48px; align-items: center; padding: 0 20px; height: 60px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; }
         .perm-row:last-child { border-bottom: none; }
         .perm-row:hover { background: #fafbff; }
 
         .perm-name-zone { display: flex; align-items: center; gap: 10px; }
-        .perm-avatar { width: 34px; height: 34px; background: var(--c-accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
-        .perm-codename { font-size: 0.85rem; font-weight: 700; color: var(--c-dark); }
+        .perm-avatar { width: 32px; height: 32px; background: var(--c-accent-light); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
+        .perm-codename { font-size: 0.83rem; font-weight: 700; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .perm-check-cell { display: flex; justify-content: center; align-items: center; }
 
@@ -73,7 +90,7 @@
         .perm-empty p { font-size: 0.85rem; font-weight: 600; margin: 0; }
 
         /* --- Loading Skeleton --- */
-        .skeleton-row { display: grid; grid-template-columns: 200px repeat(7, 1fr); align-items: center; padding: 0 24px; height: 62px; border-bottom: 1px solid #f8fafc; gap: 8px; }
+        .skeleton-row { display: grid; grid-template-columns: 210px repeat(6, 1fr) 48px; align-items: center; padding: 0 20px; height: 60px; border-bottom: 1px solid #f8fafc; gap: 8px; }
         .skeleton-block { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
@@ -83,23 +100,31 @@
 <div class="settings-wrapper">
 
     <div class="page-header">
-        <h1><i class="bi bi-shield-lock me-2" style="color: var(--c-accent)"></i>Permission Settings</h1>
-        <p>จัดการสิทธิ์การเข้าถึงของสมาชิกในโปรเจกต์ B-QUEST</p>
+        <h1><i class="bi bi-shield-lock me-2" style="color: var(--c-accent)"></i>B-QUEST Settings</h1>
     </div>
 
     <!-- Add Member -->
     <div class="add-bar">
         <span class="add-bar-label">Add Member</span>
-        <select id="select-profile" class="add-select">
-            <option value="">— Select member —</option>
-        </select>
-        <button class="btn-add-member" onclick="addMember()">
+        <div class="add-search-wrap">
+            <i class="bi bi-search add-search-icon"></i>
+            <input type="text" id="add-search-input" class="add-search-input" placeholder="Search member..." autocomplete="off">
+            <div id="add-dropdown" class="add-dropdown"></div>
+        </div>
+        <button class="btn-add-member" id="btn-add" onclick="addMember()" disabled>
             <i class="bi bi-person-plus-fill"></i> Add
         </button>
     </div>
 
     <!-- Permission Table -->
     <div class="perm-table-wrap">
+        <div class="table-toolbar">
+            <div class="table-search-wrap">
+                <i class="bi bi-search table-search-icon"></i>
+                <input type="text" id="table-search" class="table-search-input" placeholder="Filter members...">
+            </div>
+            <span class="table-count" id="table-count"></span>
+        </div>
         <div class="perm-table-head">
             <div class="perm-col-name">Member</div>
             <div class="perm-col-label">New</div>
@@ -108,7 +133,7 @@
             <div class="perm-col-label">Edit<br>Creative</div>
             <div class="perm-col-label">Assign</div>
             <div class="perm-col-label">Setting</div>
-            <div class="perm-col-label"></div>
+            <div></div>
         </div>
         <div id="perm-list"></div>
     </div>
@@ -119,70 +144,110 @@
     const PERM_COLS = ['new', 'delete', 'edit_designer', 'edit_creative', 'assign', 'setting'];
 
     let membersInProject = [];
+    let allProfiles = [];
+    let selectedCodename = '';
 
     async function loadPage() {
         await initLayout(B_QUEST_CONFIG);
         guardPermission();
-        await Promise.all([loadMembers(), loadProfileDropdown()]);
+        await Promise.all([loadMembers(), loadAllProfiles()]);
+        setupAddSearch();
+        setupTableSearch();
     }
 
     function guardPermission() {
         const user = getBxUser();
         if (user?.level === 'god') return;
         const perms = JSON.parse(sessionStorage.getItem('bx_bquest_perms') || 'null');
-        if (!perms?.setting) {
-            window.location.replace('b-quest-list.html');
-        }
+        if (!perms?.setting) window.location.replace('b-quest-list.html');
     }
 
     function showSkeleton() {
-        const skeletonRow = () => `
+        const row = () => `
             <div class="skeleton-row">
-                <div class="skeleton-block" style="height:34px; width:140px;"></div>
-                ${[1,2,3,4,5,6,7].map(() => `<div class="skeleton-block" style="height:20px; width:36px; margin:auto;"></div>`).join('')}
+                <div class="skeleton-block" style="height:32px;width:130px;"></div>
+                ${[1,2,3,4,5,6,7].map(() => `<div class="skeleton-block" style="height:20px;width:36px;margin:auto;"></div>`).join('')}
             </div>`;
-        document.getElementById('perm-list').innerHTML = skeletonRow() + skeletonRow() + skeletonRow();
+        document.getElementById('perm-list').innerHTML = row() + row() + row();
     }
 
     async function loadMembers() {
         showSkeleton();
-        const { data, error } = await supabaseClient
-            .from('b-quest-profiles')
-            .select('*')
-            .order('codename');
-
+        const { data, error } = await supabaseClient.from('b-quest-profiles').select('*').order('codename');
         if (error) { console.error(error); return; }
         membersInProject = data || [];
         renderTable(membersInProject);
+        updateTableCount(membersInProject.length, membersInProject.length);
     }
 
-    async function loadProfileDropdown() {
-        const { data, error } = await supabaseClient
-            .from('profiles')
-            .select('codename, level')
-            .neq('level', 'god')
-            .order('codename');
-
+    async function loadAllProfiles() {
+        const { data, error } = await supabaseClient.from('profiles').select('codename, level').neq('level', 'god').order('codename');
         if (error) return;
+        allProfiles = data || [];
+    }
 
-        const select = document.getElementById('select-profile');
-        select.innerHTML = '<option value="">— Select member —</option>';
+    /* --- Add Search --- */
+    function setupAddSearch() {
+        const input = document.getElementById('add-search-input');
+        const dropdown = document.getElementById('add-dropdown');
 
-        (data || []).forEach(p => {
-            if (!membersInProject.find(m => m.codename === p.codename)) {
-                select.appendChild(new Option(p.codename, p.codename));
+        input.addEventListener('input', () => {
+            const q = input.value.trim().toLowerCase();
+            selectedCodename = '';
+            document.getElementById('btn-add').disabled = true;
+
+            const available = allProfiles.filter(p =>
+                !membersInProject.find(m => m.codename === p.codename) &&
+                p.codename.toLowerCase().includes(q)
+            );
+
+            if (!q) { dropdown.classList.remove('show'); return; }
+
+            if (!available.length) {
+                dropdown.innerHTML = `<div class="add-dropdown-empty">No members found</div>`;
+            } else {
+                dropdown.innerHTML = available.map(p => `
+                    <div class="add-dropdown-item" onclick="selectMember('${p.codename}')">${p.codename}</div>
+                `).join('');
             }
+            dropdown.classList.add('show');
         });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.add-search-wrap')) dropdown.classList.remove('show');
+        });
+    }
+
+    function selectMember(codename) {
+        selectedCodename = codename;
+        document.getElementById('add-search-input').value = codename;
+        document.getElementById('add-dropdown').classList.remove('show');
+        document.getElementById('btn-add').disabled = false;
+    }
+
+    /* --- Table Search --- */
+    function setupTableSearch() {
+        document.getElementById('table-search').addEventListener('input', (e) => {
+            const q = e.target.value.trim().toLowerCase();
+            const filtered = membersInProject.filter(m => m.codename.toLowerCase().includes(q));
+            renderTable(filtered);
+            updateTableCount(filtered.length, membersInProject.length);
+        });
+    }
+
+    function updateTableCount(shown, total) {
+        document.getElementById('table-count').textContent = shown === total
+            ? `${total} members`
+            : `${shown} / ${total} members`;
     }
 
     function renderTable(data) {
         const container = document.getElementById('perm-list');
-
         if (!data.length) {
             container.innerHTML = `
                 <div class="perm-empty">
                     <i class="bi bi-people"></i>
-                    <p>ยังไม่มีสมาชิกในโปรเจกต์</p>
+                    <p>No members found</p>
                 </div>`;
             return;
         }
@@ -211,58 +276,40 @@
     }
 
     async function addMember() {
-        const select = document.getElementById('select-profile');
-        const codename = select.value;
-        if (!codename) return;
+        if (!selectedCodename) return;
 
-        const { error } = await supabaseClient
-            .from('b-quest-profiles')
-            .insert([{ codename }]);
+        const { error } = await supabaseClient.from('b-quest-profiles').insert([{ codename: selectedCodename }]);
+        if (error) { Swal.fire('Error', error.message, 'error'); return; }
 
-        if (error) {
-            Swal.fire('Error', error.message, 'error');
-            return;
-        }
+        selectedCodename = '';
+        document.getElementById('add-search-input').value = '';
+        document.getElementById('btn-add').disabled = true;
+        document.getElementById('table-search').value = '';
 
         await loadMembers();
-        await loadProfileDropdown();
-        select.value = '';
     }
 
     async function updatePermission(id, col, value) {
-        const { error } = await supabaseClient
-            .from('b-quest-profiles')
-            .update({ [col]: value })
-            .eq('id', id);
-
-        if (error) {
-            Swal.fire('Error', error.message, 'error');
-            await loadMembers();
-        }
+        const { error } = await supabaseClient.from('b-quest-profiles').update({ [col]: value }).eq('id', id);
+        if (error) { Swal.fire('Error', error.message, 'error'); await loadMembers(); }
     }
 
     async function removeMember(id, codename) {
         const res = await Swal.fire({
             title: `Remove "${codename}"?`,
-            text: 'สมาชิกคนนี้จะสูญเสียสิทธิ์ทั้งหมด',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             confirmButtonText: 'Remove',
             cancelButtonText: 'Cancel'
         });
-
         if (!res.isConfirmed) return;
 
-        const { error } = await supabaseClient
-            .from('b-quest-profiles')
-            .delete()
-            .eq('id', id);
-
+        const { error } = await supabaseClient.from('b-quest-profiles').delete().eq('id', id);
         if (error) { Swal.fire('Error', error.message, 'error'); return; }
 
+        document.getElementById('table-search').value = '';
         await loadMembers();
-        await loadProfileDropdown();
     }
 
     loadPage();
