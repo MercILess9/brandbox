@@ -174,7 +174,7 @@ const B_QUEST_MODAL_HTML = `
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 const BQuestApp = (() => {
-    const State = { capacities: { designer: 0, creative: 0 }, currentData: null, roles: ['designer', 'creative'] };
+    const State = { capacities: { designer: 0, creative: 0 }, maxCap: { designer: 10, creative: 10 }, currentData: null, roles: ['designer', 'creative'] };
     const el = id => document.getElementById(id);
     const show = (id, condition, display = 'block') => { const e = el(id); if(e) e.style.display = condition ? display : 'none'; };
 
@@ -182,6 +182,15 @@ const BQuestApp = (() => {
         async getQuestById(id) {
             const { data, error } = await supabaseClient.from('b-quest-list').select('*').eq('id', id).single();
             return error ? null : data;
+        },
+        async loadMaxCapacities() {
+            const { data } = await supabaseClient.from('b_quest_capacity').select('role, max_capacity');
+            if (data) {
+                data.forEach(row => {
+                    const key = row.role?.toLowerCase();
+                    if (key === 'designer' || key === 'creative') State.maxCap[key] = row.max_capacity ?? 10;
+                });
+            }
         }
     };
 
@@ -284,10 +293,11 @@ const BQuestApp = (() => {
             const { data } = await query;
             const total = (data || []).reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) + weight;
             
+            const maxCap = State.maxCap[role] ?? 10;
             State.capacities[role] = total;
             show(`${role}-capacity-info`, true);
-            info.innerText = `Use ${weight} | Capacity ${total}/10`;
-            info.style.color = (total <= 10) ? '#bdc432' : '#ef4444';
+            info.innerText = `Use ${weight} | Capacity ${total}/${maxCap}`;
+            info.style.color = (total <= maxCap) ? '#bdc432' : '#ef4444';
         } catch (e) { console.error(e); }
     }
 
@@ -321,6 +331,7 @@ const BQuestApp = (() => {
             form.reset(); form.classList.remove('was-validated');
             setupDropdowns(workData);
             State.currentData = null;
+            await BQuestService.loadMaxCapacities();
 
             if (taskId) {
                 el('b-quest-modal-label-text').innerHTML = 'Task <span>Edit</span>';
@@ -352,6 +363,14 @@ const BQuestApp = (() => {
                         }
 
                         show(`${role}-capacity-info`, false);
+
+                        // Disable card if user lacks edit permission for this role
+                        const permKey = role === 'designer' ? 'edit_designer' : 'edit_creative';
+                        const canEditRole = typeof canBquest === 'function' ? canBquest(permKey) : true;
+                        const card = el(`card-${role}`);
+                        card.querySelectorAll('input, select, textarea, button').forEach(inp => inp.disabled = !canEditRole);
+                        if (!canEditRole) card.style.opacity = '0.6';
+                        else card.style.opacity = '';
                     });
                 }
             } else {
@@ -359,7 +378,16 @@ const BQuestApp = (() => {
                 el('btn-submit-text').innerText = 'Create Task';
                 el('modal-owner-display').innerText = getBxUser()?.codename || '-';
                 show('btn-delete-task', false);
-                State.roles.forEach(role => { el(`check-${role}`).checked = false; updateRoleUI(role); });
+                State.roles.forEach(role => {
+                    el(`check-${role}`).checked = false;
+                    updateRoleUI(role);
+                    const permKey = role === 'designer' ? 'edit_designer' : 'edit_creative';
+                    const canEditRole = typeof canBquest === 'function' ? canBquest(permKey) : true;
+                    const card = el(`card-${role}`);
+                    card.querySelectorAll('input, select, textarea, button').forEach(inp => inp.disabled = !canEditRole);
+                    if (!canEditRole) card.style.opacity = '0.6';
+                    else card.style.opacity = '';
+                });
             }
             bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
         },
@@ -383,7 +411,7 @@ const BQuestApp = (() => {
                     const orig = State.currentData;
                     if (orig[role] === work && orig[`${role}_deadline`] === dl) return false;
                 }
-                return State.capacities[role] > 10;
+                return State.capacities[role] > (State.maxCap[role] ?? 10);
             };
 
             if (await isOverCap('designer') || await isOverCap('creative')) {

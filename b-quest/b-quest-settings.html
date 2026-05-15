@@ -378,6 +378,7 @@
     // ── Init ──
     async function loadPage() {
         await initLayout(B_QUEST_CONFIG);
+        await loadBquestPerms();
         guardPermission();
         await Promise.all([loadCapacity(), loadWorkList(), loadMembers(), loadAllProfiles()]);
         setupCapacityListeners();
