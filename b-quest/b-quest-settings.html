@@ -90,11 +90,14 @@
         .btn-work-del { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; }
         .btn-work-del:hover { background: #fee2e2; color: #ef4444; }
 
-        .work-new-row { display: grid; grid-template-columns: 1fr 56px 60px; gap: 6px; padding: 8px 2px 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
+        .work-new-row { display: grid; grid-template-columns: 1fr 56px 90px; gap: 6px; padding: 8px 2px 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
         .work-new-input { border: 1px solid var(--c-border); border-radius: 7px; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; outline: none; transition: 0.2s; font-family: inherit; background: var(--c-bg); }
         .work-new-input:focus { border-color: var(--c-accent); background: #fff; }
+        .work-new-actions { display: flex; gap: 4px; justify-content: flex-end; }
         .btn-confirm-add { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 7px; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
         .btn-confirm-add:hover { background: #0f172a; }
+        .btn-cancel-add { background: #f1f5f9; color: var(--c-muted); border: none; border-radius: 7px; padding: 6px 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-cancel-add:hover { background: #e2e8f0; color: var(--c-slate); }
 
         .work-empty { padding: 24px; text-align: center; color: var(--c-muted); font-size: 0.8rem; font-weight: 600; }
 
@@ -104,10 +107,15 @@
         .add-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 12px; padding: 9px 14px 9px 36px; font-size: 0.85rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
         .add-search-input:focus { border-color: var(--c-accent); background: #fff; }
         .add-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.85rem; pointer-events: none; }
-        .add-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1px solid var(--c-border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 200; max-height: 200px; overflow-y: auto; display: none; }
+        .add-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1px solid var(--c-border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 200; max-height: 240px; overflow-y: auto; display: none; }
         .add-dropdown.show { display: block; }
-        .add-dropdown-item { padding: 10px 16px; font-size: 0.85rem; font-weight: 600; color: var(--c-dark); cursor: pointer; transition: 0.15s; }
-        .add-dropdown-item:hover { background: var(--c-accent-light); color: #7a8500; }
+        .add-dropdown-item { padding: 9px 16px; cursor: pointer; transition: 0.15s; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f8fafc; }
+        .add-dropdown-item:last-child { border-bottom: none; }
+        .add-dropdown-item:hover { background: var(--c-accent-light); }
+        .add-dropdown-avatar { width: 28px; height: 28px; background: var(--c-accent-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
+        .add-dropdown-info { display: flex; flex-direction: column; min-width: 0; }
+        .add-dropdown-codename { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
+        .add-dropdown-sub { font-size: 0.7rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .add-dropdown-empty { padding: 14px; text-align: center; font-size: 0.8rem; color: var(--c-muted); }
         .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
         .btn-add-member:hover { background: #0f172a; }
@@ -162,7 +170,7 @@
     <div class="section">
         <div class="section-header">
             <div class="section-title"><i class="bi bi-speedometer2"></i> Max Capacity</div>
-            <button class="btn-save-cap" onclick="saveCapacity()"><i class="bi bi-check-lg"></i> Save</button>
+            <button class="btn-save-cap" id="btn-save-cap" onclick="saveCapacity()" style="display:none;"><i class="bi bi-check-lg"></i> Save</button>
         </div>
         <div class="section-body">
             <div class="cap-grid">
@@ -210,8 +218,11 @@
                         <div id="work-list-designer"></div>
                         <div id="new-work-row-designer" style="display:none;" class="work-new-row">
                             <input type="text" class="work-new-input" id="new-work-name-designer" placeholder="Work name...">
-                            <input type="number" class="work-new-input" id="new-work-weight-designer" placeholder="Wt" min="1" max="99" style="text-align:center;">
-                            <button class="btn-confirm-add" onclick="confirmAddWork('Designer')"><i class="bi bi-check-lg"></i></button>
+                            <input type="number" class="work-new-input" id="new-work-weight-designer" value="1" min="1" max="99" style="text-align:center;">
+                            <div class="work-new-actions">
+                                <button class="btn-cancel-add" onclick="cancelAddWork('Designer')"><i class="bi bi-x"></i></button>
+                                <button class="btn-confirm-add" onclick="confirmAddWork('Designer')"><i class="bi bi-check-lg"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,8 +239,11 @@
                         <div id="work-list-creative"></div>
                         <div id="new-work-row-creative" style="display:none;" class="work-new-row">
                             <input type="text" class="work-new-input" id="new-work-name-creative" placeholder="Work name...">
-                            <input type="number" class="work-new-input" id="new-work-weight-creative" placeholder="Wt" min="1" max="99" style="text-align:center;">
-                            <button class="btn-confirm-add" onclick="confirmAddWork('Creative')"><i class="bi bi-check-lg"></i></button>
+                            <input type="number" class="work-new-input" id="new-work-weight-creative" value="1" min="1" max="99" style="text-align:center;">
+                            <div class="work-new-actions">
+                                <button class="btn-cancel-add" onclick="cancelAddWork('Creative')"><i class="bi bi-x"></i></button>
+                                <button class="btn-confirm-add" onclick="confirmAddWork('Creative')"><i class="bi bi-check-lg"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -310,6 +324,11 @@
             const id = row.role === 'Designer' ? 'cap-designer' : 'cap-creative';
             document.getElementById(id).value = row.max_capacity;
         });
+        ['cap-designer', 'cap-creative'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                document.getElementById('btn-save-cap').style.display = 'flex';
+            });
+        });
     }
 
     async function saveCapacity() {
@@ -322,8 +341,9 @@
             { role: 'Creative', max_capacity: cre }
         ], { onConflict: 'role' });
 
-        if (error) Swal.fire('Error', error.message, 'error');
-        else Swal.fire({ icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1200 });
+        if (error) { Swal.fire('Error', error.message, 'error'); return; }
+        document.getElementById('btn-save-cap').style.display = 'none';
+        Swal.fire({ icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1200 });
     }
 
     /* ── Work List ── */
@@ -390,10 +410,15 @@
     function showNewWorkRow(role) {
         const id = role.toLowerCase();
         const row = document.getElementById(`new-work-row-${id}`);
-        row.style.display = row.style.display === 'none' ? 'grid' : 'none';
+        row.style.display = 'grid';
         document.getElementById(`new-work-name-${id}`).value = '';
-        document.getElementById(`new-work-weight-${id}`).value = '';
+        document.getElementById(`new-work-weight-${id}`).value = '1';
         document.getElementById(`new-work-name-${id}`).focus();
+    }
+
+    function cancelAddWork(role) {
+        const id = role.toLowerCase();
+        document.getElementById(`new-work-row-${id}`).style.display = 'none';
     }
 
     async function confirmAddWork(role) {
@@ -431,18 +456,28 @@
     }
 
     async function loadAllProfiles() {
-        const { data } = await supabaseClient.from('profiles').select('codename, level').neq('level', 'god').order('codename');
+        const { data } = await supabaseClient.from('profiles').select('codename, full_name, department, level').neq('level', 'god').order('codename');
         allProfiles = data || [];
     }
 
     function renderAddDropdown(q = '') {
         const dropdown = document.getElementById('add-dropdown');
+        const ql = q.toLowerCase();
         const available = allProfiles.filter(p =>
             !membersInProject.find(m => m.codename === p.codename) &&
-            p.codename.toLowerCase().includes(q.toLowerCase())
+            (p.codename.toLowerCase().includes(ql) ||
+             (p.full_name || '').toLowerCase().includes(ql) ||
+             (p.department || '').toLowerCase().includes(ql))
         );
         dropdown.innerHTML = available.length
-            ? available.map(p => `<div class="add-dropdown-item" onclick="selectMember('${p.codename}')">${p.codename}</div>`).join('')
+            ? available.map(p => `
+                <div class="add-dropdown-item" onclick="selectMember('${p.codename}')">
+                    <div class="add-dropdown-avatar">${p.codename.substring(0,2).toUpperCase()}</div>
+                    <div class="add-dropdown-info">
+                        <span class="add-dropdown-codename">${p.codename}</span>
+                        <span class="add-dropdown-sub">${[p.full_name, p.department].filter(Boolean).join(' · ')}</span>
+                    </div>
+                </div>`).join('')
             : `<div class="add-dropdown-empty">No members found</div>`;
         dropdown.classList.add('show');
     }
@@ -452,7 +487,6 @@
         const dropdown = document.getElementById('add-dropdown');
 
         input.addEventListener('focus', () => renderAddDropdown(input.value));
-
         input.addEventListener('input', () => {
             selectedCodename = '';
             document.getElementById('btn-add').disabled = true;
@@ -523,11 +557,13 @@
         const { error } = await supabaseClient.from('b-quest-profiles').insert([{ codename: selectedCodename }]);
         if (error) { Swal.fire('Error', error.message, 'error'); return; }
         selectedCodename = '';
-        document.getElementById('add-search-input').value = '';
+        const input = document.getElementById('add-search-input');
+        input.value = '';
         document.getElementById('btn-add').disabled = true;
         document.getElementById('table-search').value = '';
         await loadMembers();
         await loadAllProfiles();
+        input.focus();
     }
 
     async function updatePermission(id, col, value) {
