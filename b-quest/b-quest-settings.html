@@ -198,17 +198,27 @@
         .perm-table-head > :nth-child(8),
         .perm-row > :nth-child(8) { border-left: 1px solid var(--c-border); }
 
-        .perm-name-zone { display: flex; align-items: center; gap: 9px; padding-left: 4px; }
-        .perm-avatar { width: 30px; height: 30px; background: var(--c-accent-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
+        .perm-name-zone { display: flex; align-items: center; padding-left: 4px; }
         .perm-codename { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
         .perm-check-cell { display: flex; justify-content: center; align-items: center; }
 
-        .bq-toggle { position: relative; display: inline-block; width: 34px; height: 19px; }
-        .bq-toggle input { opacity: 0; width: 0; height: 0; }
-        .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e2e8f0; transition: .3s; border-radius: 34px; }
-        .bq-slider:before { position: absolute; content: ""; height: 13px; width: 13px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-        input:checked + .bq-slider { background: var(--c-accent); }
-        input:checked + .bq-slider:before { transform: translateX(15px); }
+        /* Role circle buttons */
+        .role-btn { width: 32px; height: 32px; border: 2px solid var(--c-border); border-radius: 50%; background: transparent; color: #cbd5e1; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+        .role-btn:hover:not(:disabled) { border-color: #94a3b8; color: var(--c-slate); background: #f8fafc; }
+        .role-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .role-btn.on-ae  { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+        .role-btn.on-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
+        .role-btn.on-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
+
+        /* Task / Admin checkboxes */
+        .bq-check { display: inline-flex; cursor: pointer; }
+        .bq-check input { display: none; }
+        .bq-check-box { width: 20px; height: 20px; border: 2px solid var(--c-border); border-radius: 5px; background: #fff; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: transparent; }
+        .bq-check:hover .bq-check-box { border-color: #94a3b8; }
+        .bq-check input:checked + .bq-check-box { background: var(--c-dark); border-color: var(--c-dark); color: var(--c-accent); }
+        .bq-check.admin input:checked + .bq-check-box { background: var(--c-cre); border-color: var(--c-cre); color: #fff; }
+        .bq-check input:disabled + .bq-check-box { opacity: 0.3; cursor: not-allowed; }
+
         .btn-remove { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px; border-radius: 7px; transition: 0.2s; display: flex; align-items: center; font-size: 0.95rem; }
         .btn-remove:hover { background: #fee2e2; color: #ef4444; }
 
@@ -420,7 +430,10 @@
     // ADMIN group: assign, setting
     const ROLE_COLS  = ['AE', 'Creative', 'Designer'];
     const ROLE_MAP   = { AE: 'ae', Creative: 'creative', Designer: 'designer' };
+    const ROLE_ICON  = { AE: 'bi-person-badge', Creative: 'bi-rocket', Designer: 'bi-brush' };
+    const ROLE_ON    = { AE: 'on-ae', Creative: 'on-cre', Designer: 'on-des' };
     const PERM_COLS  = ['new', 'edit', 'delete', 'assign', 'setting'];
+    const ADMIN_COLS = new Set(['assign', 'setting']);
 
     // ── State ──
     let originalCapacity = {};
@@ -642,23 +655,28 @@
                     ? ` <span style="font-size:0.6rem;color:#ef4444;font-weight:800;">REMOVED</span>`
                     : '';
 
-            // 3 role toggles
-            const roleToggles = ROLE_COLS.map(role => `
-                <div class="perm-check-cell">
-                    <label class="bq-toggle">
-                        <input type="checkbox" ${member[ROLE_MAP[role]] ? 'checked' : ''} onchange="onRoleChange('${member.codename}','${role}',this.checked)" ${disabled}>
-                        <span class="bq-slider"></span>
-                    </label>
-                </div>`).join('');
-
-            // 5 perm toggles (edit maps to edit_designer + edit_creative)
-            const permToggles = PERM_COLS.map(col => {
-                const checked = !!member[col];
+            // 3 role circle buttons
+            const roleToggles = ROLE_COLS.map(role => {
+                const on = !!member[ROLE_MAP[role]];
                 return `
                 <div class="perm-check-cell">
-                    <label class="bq-toggle">
+                    <button class="role-btn ${on ? ROLE_ON[role] : ''}"
+                            onclick="onRoleBtnClick(this,'${member.codename}','${role}')"
+                            title="${role}" ${disabled}>
+                        <i class="bi ${ROLE_ICON[role]}"></i>
+                    </button>
+                </div>`;
+            }).join('');
+
+            // 5 checkboxes: dark for TASK, purple for ADMIN
+            const permToggles = PERM_COLS.map(col => {
+                const checked = !!member[col];
+                const isAdmin = ADMIN_COLS.has(col);
+                return `
+                <div class="perm-check-cell">
+                    <label class="bq-check ${isAdmin ? 'admin' : ''}">
                         <input type="checkbox" ${checked ? 'checked' : ''} onchange="onPermChange('${member.codename}','${col}',this.checked)" ${disabled}>
-                        <span class="bq-slider"></span>
+                        <span class="bq-check-box"><i class="bi bi-check-lg"></i></span>
                     </label>
                 </div>`;
             }).join('');
@@ -666,7 +684,6 @@
             return `
             <div class="perm-row ${isNew ? 'is-new' : isDeleted ? 'is-deleted' : ''}" data-codename="${member.codename}">
                 <div class="perm-name-zone">
-                    <div class="perm-avatar">${member.codename.substring(0,2).toUpperCase()}</div>
                     <span class="perm-codename">${member.codename}${stateBadge}</span>
                 </div>
                 ${roleToggles}
@@ -689,6 +706,13 @@
                 : { codename, ae: false, creative: false, designer: false, new: false, edit: false, delete: false, assign: false, setting: false };
         }
         return memberChanges[codename];
+    }
+
+    function onRoleBtnClick(btn, codename, role) {
+        const onClass = ROLE_ON[role];
+        const newVal = !btn.classList.contains(onClass);
+        btn.classList.toggle(onClass, newVal);
+        onRoleChange(codename, role, newVal);
     }
 
     function onRoleChange(codename, role, checked) {
