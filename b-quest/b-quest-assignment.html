@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>B-QUEST | Assignment</title>
+    <title>B-QUEST | Assignment (Modern Layout)</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -21,13 +21,13 @@
             --c-border: #e2e8f0;
             --c-des: #3b82f6;
             --c-des-bg: #eff6ff;
-            --c-des-border: #dbeafe;
             --c-cre: #8b5cf6;
             --c-cre-bg: #f5f3ff;
-            --c-cre-border: #ede9fe;
+            --f-sarabun: 'Sarabun', sans-serif;
+            --f-inter: 'Inter', sans-serif;
         }
 
-        body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
+        body { font-family: var(--f-inter), var(--f-sarabun); background: var(--c-bg); color: var(--c-dark); margin: 0; }
         .assign-wrapper { max-width: 1300px; margin: 0 auto; padding: 36px 20px 120px; }
 
         .page-header { margin-bottom: 24px; }
@@ -48,8 +48,8 @@
         .pill-group { display: flex; gap: 6px; }
         .flt-pill { border: 1.5px solid var(--c-border); background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
         .flt-pill i { font-size: 0.8rem; }
-        .flt-pill.active-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
-        .flt-pill.active-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
+        .flt-pill.active-des { background: var(--c-des-bg); color: var(--c-des); border-color: #dbeafe; }
+        .flt-pill.active-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: #ede9fe; }
 
         /* Divider */
         .filter-divider { width: 1px; height: 22px; background: var(--c-border); flex-shrink: 0; }
@@ -70,56 +70,63 @@
         .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         .section-badge { background: var(--c-accent); color: var(--c-dark); border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
 
-        /* ── Card Row ── */
+        /* ── New Column Layout ── */
         .assign-card {
-            display: flex; align-items: flex-start; gap: 20px;
-            padding: 18px 24px;
-            border-bottom: 1px solid #f1f5f9;
+            display: flex; gap: 0; padding: 0; border-bottom: 1px solid var(--c-border);
             transition: background 0.15s;
         }
         .assign-card:last-child { border-bottom: none; }
         .assign-card:hover { background: #fafbff; }
 
-        /* Role pill */
-        .role-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
-        .role-pill-des { background: var(--c-des-bg); color: var(--c-des); border: 1px solid var(--c-des-border); }
-        .role-pill-cre { background: var(--c-cre-bg); color: var(--c-cre); border: 1px solid var(--c-cre-border); }
+        /* Base Col Style */
+        .as-col {
+            padding: 18px 20px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 90px; /* สูงประมาณ 3 บรรทัด */
+            box-sizing: border-box;
+            border-right: 1px solid #f1f5f9;
+        }
+        .as-col:last-child { border-right: none; }
 
-        /* Task block */
-        .task-block { flex: 1; min-width: 0; }
-        .task-top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
-        .task-name { font-size: 0.92rem; font-weight: 700; color: var(--c-dark); line-height: 1.3; }
-        .task-acc  { font-size: 0.75rem; color: var(--c-muted); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Role Badge (Floating top) */
+        .role-badge { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; font-weight: 800; border-radius: 4px; padding: 2px 7px; white-space: nowrap; margin-bottom: 6px; align-self: flex-start; }
+        .role-des { background: var(--c-des-bg); color: var(--c-des); }
+        .role-cre { background: var(--c-cre-bg); color: var(--c-cre); }
 
-        /* Meta chips row */
-        .task-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-        .meta-chip { display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; border-radius: 8px; padding: 3px 10px; font-size: 0.7rem; font-weight: 700; color: var(--c-slate); white-space: nowrap; }
-        .meta-chip i { font-size: 0.72rem; opacity: 0.7; }
-        .meta-chip.chip-dl { background: #fef9ec; color: #b45309; }
-        .meta-chip.chip-owner { background: #f0fdf4; color: #166534; }
+        /* 🚩 Col 1: Owner & Date */
+        .col-owner { flex: 0 0 160px; }
+        .owner-tag { background: #ecfdf5; color: #10b981; border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; font-weight: 700; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+        .deadline-chip { display: flex; align-items: center; gap: 4px; background: #fffbeb; color: #b45309; border-radius: 6px; padding: 2px 8px; font-size: 0.7rem; font-weight: 700; margin-top: auto; white-space: nowrap; align-self: flex-start; }
 
-        /* Detail */
-        .task-detail { font-size: 0.75rem; color: var(--c-slate); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 6px; }
-
-        /* Link badge */
-        .task-link { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; color: var(--c-accent); text-decoration: none; border: 1.5px solid var(--c-accent); border-radius: 6px; padding: 2px 9px; transition: 0.15s; }
+        /* 🚩 Col 2: Task Info (Main Col) */
+        .col-task { flex: 1; min-width: 0; }
+        .task-top { display: flex; flex-direction: column; gap: 2px; }
+        .task-name { font-size: 0.88rem; font-weight: 800; color: var(--c-dark); line-height: 1.3; margin-bottom: 1px; }
+        .task-acc  { font-size: 0.72rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .task-meta-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: auto; }
+        .meta-chip { background: #f1f5f9; border-radius: 20px; padding: 2px 9px; font-size: 0.68rem; font-weight: 700; color: var(--c-slate); }
+        .task-link { display: inline-flex; align-items: center; gap: 3px; font-size: 0.68rem; font-weight: 700; color: var(--c-accent); text-decoration: none; border: 1.5px solid var(--c-accent); border-radius: 6px; padding: 1px 7px; }
         .task-link:hover { background: var(--c-accent); color: #000; }
 
-        /* Assign block */
-        .assign-block { flex: 0 0 190px; padding-top: 2px; }
-        .assign-label { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .assign-select { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 8px 28px 8px 11px; font-size: 0.82rem; font-weight: 600; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
-        .assign-select:focus { border-color: var(--c-accent); background-color: #fff; }
+        /* 🚩 Col 3: Detail */
+        .col-detail { flex: 0 0 350px; font-family: var(--f-sarabun); }
+        .task-detail { font-size: 0.75rem; color: var(--c-slate); line-height: 1.6; height: 100%; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; justify-content: center; display: flex; align-items: center; }
+
+        /* 🚩 Col 4: Assign */
+        .col-assign { flex: 0 0 190px; }
+        .assign-select { width: 100%; border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 26px 7px 10px; font-size: 0.78rem; font-weight: 600; color: var(--c-dark); background: var(--c-bg); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+        .assign-select:focus { border-color: var(--c-accent); background-color: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.1); }
         .assign-select.is-saving { opacity: 0.45; pointer-events: none; }
 
-        /* Empty */
-        .empty-state { padding: 48px 24px; text-align: center; color: var(--c-muted); }
-        .empty-state i { font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 10px; }
-        .empty-state p { font-size: 0.82rem; font-weight: 600; margin: 0; }
+        /* Empty / Skeleton */
+        .empty-state { padding: 60px 24px; text-align: center; color: var(--c-muted); }
+        .empty-state i { font-size: 2.2rem; opacity: 0.3; display: block; margin-bottom: 12px; }
+        .empty-state p { font-size: 0.85rem; font-weight: 600; margin: 0; }
 
-        /* Skeleton */
-        .skeleton-card { display: flex; align-items: flex-start; gap: 20px; padding: 18px 24px; border-bottom: 1px solid #f1f5f9; }
-        .skel { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
+        .skeleton-card { display: flex; gap: 0; padding: 0; border-bottom: 1px solid var(--c-border); }
+        .skel-col { padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 90px; border-right: 1px solid #f1f5f9; box-sizing: border-box; }
+        .skel { background: #f1f5f9; border-radius: 4px; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
     </style>
 </head>
@@ -131,51 +138,32 @@
         <h1><i class="bi bi-person-lines-fill me-2" style="color:var(--c-accent)"></i>B-QUEST Assignment</h1>
     </div>
 
-    <!-- Filter Bar -->
     <div class="filter-bar">
         <div class="filter-search-wrap">
             <i class="bi bi-search"></i>
             <input type="text" class="filter-search" id="filterSearch" placeholder="Search task, account...">
         </div>
-
         <div class="filter-divider"></div>
-
         <div class="pill-group">
-            <button id="pill-des" class="flt-pill active-des" onclick="togglePill('des')">
-                <i class="bi bi-brush"></i> Designer
-            </button>
-            <button id="pill-cre" class="flt-pill active-cre" onclick="togglePill('cre')">
-                <i class="bi bi-rocket"></i> Creative
-            </button>
+            <button id="pill-des" class="flt-pill active-des" onclick="togglePill('des')"><i class="bi bi-brush"></i> Designer</button>
+            <button id="pill-cre" class="flt-pill active-cre" onclick="togglePill('cre')"><i class="bi bi-rocket"></i> Creative</button>
         </div>
-
         <div class="filter-divider"></div>
-
         <div class="filter-select-wrap" id="wrap-filterWork">
             <span class="filter-select-tag">Work</span>
-            <select class="filter-select" id="filterWork" onchange="onSelectChange('filterWork')">
-                <option value="">All</option>
-            </select>
+            <select class="filter-select" id="filterWork" onchange="onSelectChange('filterWork')"><option value="">All</option></select>
         </div>
-
         <div class="filter-select-wrap" id="wrap-filterType">
             <span class="filter-select-tag">Type</span>
-            <select class="filter-select" id="filterType" onchange="onSelectChange('filterType')">
-                <option value="">All</option>
-            </select>
+            <select class="filter-select" id="filterType" onchange="onSelectChange('filterType')"><option value="">All</option></select>
         </div>
-
         <div class="filter-select-wrap" id="wrap-filterOwner">
             <span class="filter-select-tag">Owner</span>
-            <select class="filter-select" id="filterOwner" onchange="onSelectChange('filterOwner')">
-                <option value="">All</option>
-            </select>
+            <select class="filter-select" id="filterOwner" onchange="onSelectChange('filterOwner')"><option value="">All</option></select>
         </div>
-
         <button class="btn-reset" onclick="resetFilters()">RESET</button>
     </div>
 
-    <!-- Zone: Unassigned -->
     <div class="section">
         <div class="section-header">
             <div class="section-title">
@@ -209,10 +197,7 @@
     }
 
     async function loadProfiles() {
-        const { data } = await supabaseClient
-            .from('b-quest-setting')
-            .select('codename, designer, creative')
-            .order('codename');
+        const { data } = await supabaseClient.from('b-quest-setting').select('codename, designer, creative').order('codename');
         if (!data) return;
         designers = data.filter(p => p.designer).map(p => p.codename);
         creatives = data.filter(p => p.creative).map(p => p.codename);
@@ -225,189 +210,106 @@
 
     async function loadQuests() {
         document.getElementById('list-rows').innerHTML = skeletonHTML();
-
-        const { data, error } = await supabaseClient
-            .from('b-quest-list')
-            .select('id, task_name, account_name, opportunity_name, detail, link, owner, designer, creative, designer_type, creative_type, designer_deadline, creative_deadline, designer_assign, creative_assign')
-            .order('last_update', { ascending: false });
-
+        const { data, error } = await supabaseClient.from('b-quest-list').select('id, task_name, account_name, opportunity_name, detail, link, owner, designer, creative, designer_type, creative_type, designer_deadline, creative_deadline, designer_assign, creative_assign').order('last_update', { ascending: false });
         if (error) { console.error(error); return; }
-
         allRows = [];
         (data || []).forEach(q => {
             const hasD = q.designer && q.designer !== '-' && q.designer !== '';
             const hasC = q.creative  && q.creative  !== '-' && q.creative  !== '';
-            // only unassigned slots
-            if (hasD && (!q.designer_assign || q.designer_assign === '-'))
-                allRows.push({ role: 'Designer', quest: q });
-            if (hasC && (!q.creative_assign  || q.creative_assign  === '-'))
-                allRows.push({ role: 'Creative',  quest: q });
+            if (hasD && (!q.designer_assign || q.designer_assign === '-')) allRows.push({ role: 'Designer', quest: q });
+            if (hasC && (!q.creative_assign  || q.creative_assign  === '-')) allRows.push({ role: 'Creative', quest: q });
         });
-
-        // Build owner list from allRows
         ownerList = [...new Set(allRows.map(r => r.quest.owner).filter(o => o && o !== '-'))].sort();
         populateFilterOwner();
-
         applyFilters();
     }
 
     // ── Populate filters ──
-    function populateFilterWork() {
-        rebuildWorkFilter();
-    }
-
+    function populateFilterWork() { rebuildWorkFilter(); }
     function rebuildWorkFilter() {
-        const sel = document.getElementById('filterWork');
-        const prev = sel.value;
-        sel.innerHTML = '<option value="">All</option>';
-
+        const sel = document.getElementById('filterWork'); const prev = sel.value; sel.innerHTML = '<option value="">All</option>';
         const desActive = document.getElementById('pill-des').classList.contains('active-des');
         const creActive = document.getElementById('pill-cre').classList.contains('active-cre');
-
-        const desWorks = workList.filter(w => w.role === 'Designer');
-        const creWorks = workList.filter(w => w.role === 'Creative');
-
-        if (desActive && desWorks.length) {
-            const g = document.createElement('optgroup');
-            g.label = '── Designer ──';
-            desWorks.forEach(w => g.appendChild(new Option(w.work, w.work)));
-            sel.appendChild(g);
-        }
-        if (creActive && creWorks.length) {
-            const g = document.createElement('optgroup');
-            g.label = '── Creative ──';
-            creWorks.forEach(w => g.appendChild(new Option(w.work, w.work)));
-            sel.appendChild(g);
-        }
-
-        // restore if still valid
-        if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
-        updateSelectHighlight('filterWork');
+        const desWorks = workList.filter(w => w.role === 'Designer'); const creWorks = workList.filter(w => w.role === 'Creative');
+        if (desActive && desWorks.length) { const g = document.createElement('optgroup'); g.label = '── Designer ──'; desWorks.forEach(w => g.appendChild(new Option(w.work, w.work))); sel.appendChild(g); }
+        if (creActive && creWorks.length) { const g = document.createElement('optgroup'); g.label = '── Creative ──'; creWorks.forEach(w => g.appendChild(new Option(w.work, w.work))); sel.appendChild(g); }
+        if ([...sel.options].some(o => o.value === prev)) sel.value = prev; updateSelectHighlight('filterWork');
     }
-
-    function populateFilterType() {
-        const sel = document.getElementById('filterType');
-        sel.innerHTML = '<option value="">All</option>';
-        B_QUEST_CONFIG.listTypes.forEach(t => sel.appendChild(new Option(t, t)));
-    }
-
-    function populateFilterOwner() {
-        const sel = document.getElementById('filterOwner');
-        const prev = sel.value;
-        sel.innerHTML = '<option value="">All</option>';
-        ownerList.forEach(o => sel.appendChild(new Option(o, o)));
-        if ([...sel.options].some(op => op.value === prev)) sel.value = prev;
-        updateSelectHighlight('filterOwner');
-    }
+    function populateFilterType() { const sel = document.getElementById('filterType'); sel.innerHTML = '<option value="">All</option>'; B_QUEST_CONFIG.listTypes.forEach(t => sel.appendChild(new Option(t, t))); }
+    function populateFilterOwner() { const sel = document.getElementById('filterOwner'); const prev = sel.value; sel.innerHTML = '<option value="">All</option>'; ownerList.forEach(o => sel.appendChild(new Option(o, o))); if ([...sel.options].some(op => op.value === prev)) sel.value = prev; updateSelectHighlight('filterOwner'); }
 
     // ── Filter logic ──
-    function togglePill(role) {
-        const btn = document.getElementById('pill-' + role);
-        const cls = role === 'des' ? 'active-des' : 'active-cre';
-        btn.classList.toggle(cls);
-        rebuildWorkFilter();
-        applyFilters();
-    }
-
-    function onSelectChange(id) {
-        updateSelectHighlight(id);
-        applyFilters();
-    }
-
-    function updateSelectHighlight(id) {
-        const wrap = document.getElementById('wrap-' + id);
-        wrap.classList.toggle('active', !!document.getElementById(id).value);
-    }
-
-    function setupSearch() {
-        let timer;
-        document.getElementById('filterSearch').addEventListener('input', () => {
-            clearTimeout(timer);
-            timer = setTimeout(applyFilters, 250);
-        });
-    }
+    function togglePill(role) { const btn = document.getElementById('pill-' + role); btn.classList.toggle(role === 'des' ? 'active-des' : 'active-cre'); rebuildWorkFilter(); applyFilters(); }
+    function onSelectChange(id) { updateSelectHighlight(id); applyFilters(); }
+    function updateSelectHighlight(id) { const wrap = document.getElementById('wrap-' + id); wrap.classList.toggle('active', !!document.getElementById(id).value); }
+    function setupSearch() { let timer; document.getElementById('filterSearch').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(applyFilters, 250); }); }
 
     function applyFilters() {
-        const q      = document.getElementById('filterSearch').value.trim().toLowerCase();
-        const work   = document.getElementById('filterWork').value;
-        const type   = document.getElementById('filterType').value;
-        const owner  = document.getElementById('filterOwner').value;
-        const desOn  = document.getElementById('pill-des').classList.contains('active-des');
-        const creOn  = document.getElementById('pill-cre').classList.contains('active-cre');
+        const qInput = document.getElementById('filterSearch').value.trim().toLowerCase();
+        const workInput = document.getElementById('filterWork').value;
+        const typeInput = document.getElementById('filterType').value;
+        const ownerInput = document.getElementById('filterOwner').value;
+        const desOn = document.getElementById('pill-des').classList.contains('active-des');
+        const creOn = document.getElementById('pill-cre').classList.contains('active-cre');
 
         const rows = allRows.filter(r => {
             if (r.role === 'Designer' && !desOn) return false;
             if (r.role === 'Creative'  && !creOn) return false;
-
-            const rWork = r.role === 'Designer' ? r.quest.designer      : r.quest.creative;
-            const rType = r.role === 'Designer' ? r.quest.designer_type  : r.quest.creative_type;
-
-            if (work  && rWork !== work)   return false;
-            if (type  && rType !== type)   return false;
-            if (owner && r.quest.owner !== owner) return false;
-
-            if (q) {
-                const hay = [r.quest.task_name, r.quest.account_name, r.quest.opportunity_name, rWork, rType, r.quest.owner].join(' ').toLowerCase();
-                if (!hay.includes(q)) return false;
-            }
+            const rWork = r.role === 'Designer' ? r.quest.designer : r.quest.creative;
+            const rType = r.role === 'Designer' ? r.quest.designer_type : r.quest.creative_type;
+            if (workInput && rWork !== workInput) return false;
+            if (typeInput && rType !== typeInput) return false;
+            if (ownerInput && r.quest.owner !== ownerInput) return false;
+            if (qInput) { const hay = [r.quest.task_name, r.quest.account_name, r.quest.opportunity_name, rWork, rType, r.quest.owner].join(' ').toLowerCase(); if (!hay.includes(qInput)) return false; }
             return true;
         });
-
         document.getElementById('badge-count').textContent = rows.length;
-
         renderRows(rows);
     }
 
-    // ── Render ──
+    // ── Render (4 Columns) ──
     function renderRows(rows) {
         const container = document.getElementById('list-rows');
-
-        if (!rows.length) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="bi bi-inbox"></i>
-                    <p>No unassigned items</p>
-                </div>`;
-            return;
-        }
+        if (!rows.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>No unassigned items</p></div>`; return; }
 
         container.innerHTML = rows.map(r => {
-            const q       = r.quest;
-            const rWork   = r.role === 'Designer' ? q.designer           : q.creative;
-            const rType   = r.role === 'Designer' ? q.designer_type      : q.creative_type;
-            const rDL     = r.role === 'Designer' ? q.designer_deadline  : q.creative_deadline;
-            const options = r.role === 'Designer' ? designers            : creatives;
-            const rowKey  = `${q.id}__${r.role}`;
-            const isDes   = r.role === 'Designer';
+            const q = r.quest;
+            const isDes = r.role === 'Designer';
+            const rWork = isDes ? q.designer : q.creative;
+            const rType = isDes ? q.designer_type : q.creative_type;
+            const rDL = isDes ? q.designer_deadline : q.creative_deadline;
+            const options = isDes ? designers : creatives;
 
-            const opts = [`<option value="">— Unassigned —</option>`]
-                .concat(options.map(name => `<option value="${name}">${name}</option>`))
-                .join('');
+            const opts = [`<option value="">— Unassigned —</option>`].concat(options.map(name => `<option value="${name}">${name}</option>`)).join('');
 
             return `
-            <div class="assign-card" id="row-${rowKey}">
+            <div class="assign-card" id="row-${q.id}__${r.role}">
 
-                <div class="task-block">
-                    <div class="task-top">
-                        <span class="role-pill ${isDes ? 'role-pill-des' : 'role-pill-cre'}">
-                            <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i>
-                            ${r.role}
-                        </span>
-                        <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
-                        <div class="task-meta">
-                            ${rWork  ? `<span class="meta-chip"><i class="bi bi-layers"></i>${esc(rWork)}</span>` : ''}
-                            ${rType  ? `<span class="meta-chip"><i class="bi bi-tag"></i>${esc(rType)}</span>` : ''}
-                            ${q.owner ? `<span class="meta-chip chip-owner"><i class="bi bi-person"></i>${esc(q.owner)}</span>` : ''}
-                            ${rDL    ? `<span class="meta-chip chip-dl"><i class="bi bi-calendar"></i>${formatDate(rDL)}</span>` : ''}
-                        </div>
-                    </div>
-                    <div class="task-acc">${esc(q.account_name) || ''}${q.opportunity_name ? ` | ${esc(q.opportunity_name)}` : ''}</div>
-                    ${q.detail ? `<div class="task-detail">${esc(q.detail)}</div>` : ''}
-                    ${q.link   ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i>Link</a>` : ''}
+                <div class="as-col col-owner">
+                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}">
+                        <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i>${r.role.toUpperCase()}
+                    </span>
+                    ${q.owner ? `<div class="owner-tag" title="${esc(q.owner)}">${esc(q.owner)}</div>` : '<div></div>'}
+                    ${rDL ? `<div class="deadline-chip"><i class="bi bi-calendar3"></i>${formatDate(rDL, true)}</div>` : ''}
                 </div>
 
-                <div class="assign-block">
-                    <div class="assign-label">Assign to</div>
+                <div class="as-col col-task">
+                    <div class="task-top">
+                        <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
+                        <div class="task-acc">${esc(q.account_name) || ''}${q.opportunity_name ? ` | ${esc(q.opportunity_name)}` : ''}</div>
+                    </div>
+                    <div class="task-meta-row">
+                        ${rWork  ? `<span class="meta-chip">${esc(rWork)}</span>` : ''}
+                        ${rType  ? `<span class="meta-chip">${esc(rType)}</span>` : ''}
+                        ${q.link   ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i></a>` : ''}
+                    </div>
+                </div>
+
+                <div class="as-col col-detail">
+                    ${q.detail ? `<div class="task-detail Sarabun">${esc(q.detail)}</div>` : '<div class="empty-detail"></div>'}
+                </div>
+
+                <div class="as-col col-assign">
                     <select class="assign-select"
                         data-quest-id="${q.id}"
                         data-role="${r.role}"
@@ -421,78 +323,30 @@
     }
 
     function skeletonHTML() {
-        const row = () => `
-            <div class="skeleton-card">
-                <div class="skel" style="height:26px;width:80px;border-radius:20px;flex-shrink:0;"></div>
-                <div style="flex:1;">
-                    <div class="skel" style="height:14px;width:220px;margin-bottom:7px;"></div>
-                    <div class="skel" style="height:10px;width:150px;margin-bottom:10px;"></div>
-                    <div style="display:flex;gap:6px;">
-                        <div class="skel" style="height:22px;width:80px;border-radius:8px;"></div>
-                        <div class="skel" style="height:22px;width:70px;border-radius:8px;"></div>
-                        <div class="skel" style="height:22px;width:60px;border-radius:8px;"></div>
-                    </div>
-                </div>
-                <div style="flex:0 0 190px;">
-                    <div class="skel" style="height:36px;border-radius:10px;"></div>
-                </div>
-            </div>`;
-        return row() + row() + row();
+        const row = () => `<div class="skeleton-card"><div class="skel-col col-owner"><div class="skel" style="height:15px;width:60px;"></div><div class="skel" style="height:22px;width:90px;border-radius:20px;"></div><div class="skel" style="height:16px;width:70px;"></div></div><div class="skel-col col-task"><div class="skel" style="height:15px;width:180px;"></div><div class="skel" style="height:10px;width:120px;"></div><div style="display:flex;gap:5px;margin-top:auto;"><div class="skel" style="height:18px;width:70px;border-radius:20px;"></div><div class="skel" style="height:18px;width:50px;border-radius:20px;"></div></div></div><div class="skel-col col-detail"><div class="skel" style="height:12px;width:100%;"></div><div class="skel" style="height:12px;width:90%;"></div><div class="skel" style="height:12px;width:80%;"></div></div><div class="skel-col col-assign"><div class="skel" style="height:32px;width:100%;border-radius:8px;"></div></div></div>`;
+        return row() + row() + row() + row();
     }
-
-    function esc(str) {
-        if (!str) return '';
-        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
+    function esc(str) { return str ? str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
 
     // ── Reset ──
     function resetFilters() {
-        document.getElementById('filterSearch').value = '';
-        document.getElementById('filterWork').value = '';
-        document.getElementById('filterType').value = '';
-        document.getElementById('filterOwner').value = '';
-        updateSelectHighlight('filterWork');
-        updateSelectHighlight('filterType');
-        updateSelectHighlight('filterOwner');
-
-        const desPill = document.getElementById('pill-des');
-        const crePill = document.getElementById('pill-cre');
-        if (!desPill.classList.contains('active-des')) desPill.classList.add('active-des');
-        if (!crePill.classList.contains('active-cre')) crePill.classList.add('active-cre');
-
-        rebuildWorkFilter();
-        applyFilters();
+        document.getElementById('filterSearch').value = ''; document.getElementById('filterWork').value = ''; document.getElementById('filterType').value = ''; document.getElementById('filterOwner').value = '';
+        updateSelectHighlight('filterWork'); updateSelectHighlight('filterType'); updateSelectHighlight('filterOwner');
+        const desPill = document.getElementById('pill-des'); const crePill = document.getElementById('pill-cre');
+        if (!desPill.classList.contains('active-des')) desPill.classList.add('active-des'); if (!crePill.classList.contains('active-cre')) crePill.classList.add('active-cre');
+        rebuildWorkFilter(); applyFilters();
     }
 
     // ── Assign ──
     async function onAssignChange(sel) {
-        const questId = sel.dataset.questId;
-        const role    = sel.dataset.role;
-        const newVal  = sel.value;
-        if (!newVal) return;
-
+        const questId = sel.dataset.questId; const role = sel.dataset.role; const newVal = sel.value; if (!newVal) return;
         sel.classList.add('is-saving');
-
         const field = role === 'Designer' ? 'designer_assign' : 'creative_assign';
-
-        const { error } = await supabaseClient
-            .from('b-quest-list')
-            .update({ [field]: newVal, last_update: new Date().toISOString() })
-            .eq('id', questId);
-
-        if (error) {
-            Swal.fire({ icon: 'error', title: 'Save failed', text: error.message, timer: 3000, showConfirmButton: false });
-            sel.value = '';
-            sel.classList.remove('is-saving');
-            return;
-        }
-
-        // Remove row from allRows then re-render
+        const { error } = await supabaseClient.from('b-quest-list').update({ [field]: newVal, last_update: new Date().toISOString() }).eq('id', questId);
+        if (error) { Swal.fire({ icon: 'error', title: 'Save failed', text: error.message, timer: 3000, showConfirmButton: false }); sel.value = ''; sel.classList.remove('is-saving'); return; }
         allRows = allRows.filter(r => !(String(r.quest.id) === String(questId) && r.role === role));
-        notify('Assigned', `${role} → ${newVal}`, 'success');
-        applyFilters();
+        notify('Assigned', `${role} → ${newVal}`, 'success'); applyFilters();
     }
-
     loadPage();
 </script>
 </body>
