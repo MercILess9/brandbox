@@ -41,25 +41,34 @@ const B_QUEST_MODAL_HTML = `
     #card-designer.active .role-card-header { background: #eff6ff; }
     #card-creative.active .role-card-header { background: #f5f3ff; }
 
-    .role-card-header { padding: 13px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 18px; transition: background 0.15s; }
-    .role-card-header:hover { background: #f8fafc; }
+    .role-card-header { padding: 13px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 18px; transition: background 0.15s, box-shadow 0.15s; }
+    .role-card:not(.active):not(.disabled) .role-card-header:hover { background: #f1f5f9; box-shadow: inset 0 -2px 0 #e2e8f0; }
     .role-card.active .role-card-header { border-radius: 18px 18px 0 0; }
-    .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; }
-    #card-designer .role-card-title i { color: #3b82f6; }
-    #card-creative .role-card-title i { color: #8b5cf6; }
+    .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 5px; }
+    #card-designer .role-card-title i.role-icon { color: #3b82f6; }
+    #card-creative .role-card-title i.role-icon { color: #8b5cf6; }
+    .bq-chevron { font-size: 0.65rem; color: #94a3b8; transition: transform 0.25s ease, opacity 0.2s; opacity: 0.5; }
+    .role-card.active .bq-chevron { transform: rotate(90deg); opacity: 0.8; }
 
-    /* Toggle + ON/OFF label */
+    /* Toggle */
     .bq-role-toggle-wrap { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
-    .bq-role-state { font-size: 0.58rem; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #cbd5e1; min-width: 20px; transition: color 0.2s; }
-    #card-designer .bq-role-state.on { color: #3b82f6; }
-    #card-creative .bq-role-state.on { color: #8b5cf6; }
 
     .role-card-body { max-height: 0; padding: 0 18px; transition: all 0.35s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 14px 16px 16px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
-    /* Assign badge & status */
-    .bq-assign-badge { background: #eff6ff; color: #3b82f6; padding: 2px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #dbeafe; display: none; margin-left: 4px; }
-    .bq-status-select { border: none; border-radius: 20px; font-size: 0.68rem; font-weight: 800; padding: 3px 12px; min-width: 100px; text-align-last: center; height: 26px; display: none; margin-left: auto; cursor: pointer; font-family: inherit; appearance: none; -webkit-appearance: none; letter-spacing: 0.3px; }
+    /* Assign badge — interactive pill in role card header */
+    .bq-assign-badge { display: none; align-items: center; gap: 5px; border-radius: 8px; padding: 3px 9px 3px 7px; font-size: 0.7rem; font-weight: 700; white-space: nowrap; transition: background 0.15s, border-color 0.15s; }
+    .bq-assign-badge.bq-ab-show { display: inline-flex; }
+    .bq-assign-badge.bq-ab-clickable { cursor: pointer; }
+    .bq-assign-badge.bq-ab-empty { background: transparent; border: 1.5px dashed #cbd5e1; color: #94a3b8; }
+    .bq-assign-badge.bq-ab-empty:hover { border-color: #94a3b8; color: #64748b; }
+    #card-designer .bq-assign-badge:not(.bq-ab-empty) { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    #card-designer .bq-assign-badge.bq-ab-clickable:not(.bq-ab-empty):hover { background: #dbeafe; }
+    #card-creative .bq-assign-badge:not(.bq-ab-empty) { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+    #card-creative .bq-assign-badge.bq-ab-clickable:not(.bq-ab-empty):hover { background: #ede9fe; }
+
+    /* Status select */
+    .bq-status-select { border: none; border-radius: 20px; font-size: 0.68rem; font-weight: 800; padding: 3px 12px; min-width: 90px; text-align-last: center; height: 26px; display: none; margin-left: auto; cursor: pointer; font-family: inherit; appearance: none; -webkit-appearance: none; letter-spacing: 0.3px; }
     #card-designer .bq-status-select.status-progress { background: #dbeafe; color: #1d4ed8; }
     #card-creative .bq-status-select.status-progress { background: #ede9fe; color: #6d28d9; }
     .bq-status-select.status-done { background: #e2e8f0; color: #64748b; }
@@ -86,19 +95,6 @@ const B_QUEST_MODAL_HTML = `
     #card-designer .bq-toggle input:checked + .bq-slider { background-color: #3b82f6; }
     #card-creative .bq-toggle input:checked + .bq-slider { background-color: #8b5cf6; }
     input:checked + .bq-slider:before { transform: translateX(16px); }
-
-    /* ── Assign Zone (shown only when user has assign perm & role is active) ── */
-    .bq-assign-zone { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eef2f7; }
-    .role-card.active .bq-assign-zone.can-assign { display: block; }
-    .bq-assign-row { display: flex; align-items: flex-end; gap: 9px; }
-    .bq-assign-icon { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
-    #card-designer .bq-assign-icon { background: #dbeafe; color: #3b82f6; }
-    #card-creative .bq-assign-icon { background: #ede9fe; color: #8b5cf6; }
-    .bq-assign-sel { width: 100%; height: 33px; border: 1.5px solid #e2e8f0; border-radius: 9px; background: #f8fafc; font-size: 0.78rem; font-weight: 600; color: #334155; padding: 0 10px; outline: none; cursor: pointer; font-family: inherit; transition: 0.2s; appearance: none; -webkit-appearance: none; }
-    #card-designer .bq-assign-sel:focus { border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-    #card-creative .bq-assign-sel:focus { border-color: #8b5cf6; background: #fff; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
-    #card-designer .bq-assign-sel.is-assigned { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; font-weight: 700; }
-    #card-creative .bq-assign-sel.is-assigned { border-color: #ddd6fe; background: #f5f3ff; color: #6d28d9; font-weight: 700; }
 
     /* Search overlay */
     .bq-search-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 10001; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
@@ -182,12 +178,11 @@ const B_QUEST_MODAL_HTML = `
                                 <div class="role-card-header">
                                     <div class="bq-role-toggle-wrap">
                                         <label class="bq-toggle"><input type="checkbox" id="check-designer" onchange="BQuestApp.updateRoleUI('designer')"><span class="bq-slider"></span></label>
-                                        <span class="bq-role-state" id="state-designer">OFF</span>
                                     </div>
-                                    <div class="role-card-title"><i class="bi bi-brush ms-1 me-1"></i> Designer</div>
+                                    <div class="role-card-title"><i class="bi bi-brush ms-1 me-1 role-icon"></i> Designer <i class="bi bi-chevron-right bq-chevron"></i></div>
                                     <span class="bq-assign-badge" id="badge-assign-designer"></span>
                                     <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status" onchange="BQuestApp.updateStatusUI(this)">
-                                        <option value="On Progress">● On Progress</option><option value="Done">✓ Done</option>
+                                        <option value="On Progress">On Progress</option><option value="Done">Done</option>
                                     </select>
                                 </div>
                                 <div class="role-card-body">
@@ -206,17 +201,6 @@ const B_QUEST_MODAL_HTML = `
                                     </div>
                                     <input type="hidden" id="b-quest-modal-designer-weight" name="designer_weight" value="0">
                                     <input type="hidden" id="b-quest-modal-designer-assign" name="designer_assign" value="">
-                                    <div class="bq-assign-zone" id="assign-zone-designer">
-                                        <div class="bq-assign-row">
-                                            <div class="bq-assign-icon"><i class="bi bi-person-fill"></i></div>
-                                            <div style="flex:1">
-                                                <label class="bq-label-modern" style="margin-bottom:5px"><i class="bi bi-arrow-right-short"></i> Assign to</label>
-                                                <select class="bq-assign-sel" id="b-quest-modal-designer-assign-sel">
-                                                    <option value="">— Unassigned —</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -224,12 +208,11 @@ const B_QUEST_MODAL_HTML = `
                                 <div class="role-card-header">
                                     <div class="bq-role-toggle-wrap">
                                         <label class="bq-toggle"><input type="checkbox" id="check-creative" onchange="BQuestApp.updateRoleUI('creative')"><span class="bq-slider"></span></label>
-                                        <span class="bq-role-state" id="state-creative">OFF</span>
                                     </div>
-                                    <div class="role-card-title"><i class="bi bi-rocket ms-1 me-1"></i> Creative</div>
+                                    <div class="role-card-title"><i class="bi bi-rocket ms-1 me-1 role-icon"></i> Creative <i class="bi bi-chevron-right bq-chevron"></i></div>
                                     <span class="bq-assign-badge" id="badge-assign-creative"></span>
                                     <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status" onchange="BQuestApp.updateStatusUI(this)">
-                                        <option value="On Progress">● On Progress</option><option value="Done">✓ Done</option>
+                                        <option value="On Progress">On Progress</option><option value="Done">Done</option>
                                     </select>
                                 </div>
                                 <div class="role-card-body">
@@ -248,17 +231,6 @@ const B_QUEST_MODAL_HTML = `
                                     </div>
                                     <input type="hidden" id="b-quest-modal-creative-weight" name="creative_weight" value="0">
                                     <input type="hidden" id="b-quest-modal-creative-assign" name="creative_assign" value="">
-                                    <div class="bq-assign-zone" id="assign-zone-creative">
-                                        <div class="bq-assign-row">
-                                            <div class="bq-assign-icon"><i class="bi bi-person-fill"></i></div>
-                                            <div style="flex:1">
-                                                <label class="bq-label-modern" style="margin-bottom:5px"><i class="bi bi-arrow-right-short"></i> Assign to</label>
-                                                <select class="bq-assign-sel" id="b-quest-modal-creative-assign-sel">
-                                                    <option value="">— Unassigned —</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -327,16 +299,6 @@ const BQuestApp = (() => {
             if(typeof B_QUEST_CONFIG !== 'undefined') B_QUEST_CONFIG.listTypes.forEach(t => typeSelect.add(new Option(t, t)));
 
             el(`b-quest-modal-${role}-deadline`).addEventListener('change', () => checkCapacity(role));
-
-            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
-            if (assignSel) {
-                assignSel.innerHTML = '<option value="">— Unassigned —</option>';
-                (State.assignProfiles[role] || []).forEach(name => assignSel.add(new Option(name, name)));
-                assignSel.onchange = () => {
-                    el(`b-quest-modal-${role}-assign`).value = assignSel.value;
-                    assignSel.classList.toggle('is-assigned', !!assignSel.value);
-                };
-            }
         });
     }
 
@@ -378,31 +340,58 @@ const BQuestApp = (() => {
 
     function updateRoleUI(role) {
         const isChecked = el(`check-${role}`).checked;
+        const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
         const card = el(`card-${role}`);
         const inputs = ['type', 'work', 'deadline'].map(s => el(`b-quest-modal-${role}-${s}`));
-
-        const stateEl = el(`state-${role}`);
-        if (stateEl) {
-            stateEl.textContent = isChecked ? 'ON' : 'OFF';
-            stateEl.className = 'bq-role-state' + (isChecked ? ' on' : '');
-        }
 
         if (isChecked) {
             card.classList.add('active'); card.classList.remove('disabled');
             inputs.forEach(input => input.required = true);
+            const currentAssign = el(`b-quest-modal-${role}-assign`).value || '';
+            refreshAssignBadge(role, currentAssign, canAssign);
         } else {
             card.classList.remove('active'); card.classList.add('disabled');
             inputs.forEach(input => { input.required = false; input.value = ''; });
             el(`b-quest-modal-${role}-weight`).value = '0';
             el(`b-quest-modal-${role}-assign`).value = '';
-            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
-            if (assignSel) { assignSel.value = ''; assignSel.classList.remove('is-assigned'); }
 
             const capEl = el(`${role}-capacity-info`);
             if (capEl) { capEl.className = 'bq-cap-info'; capEl.innerHTML = ''; }
-            show(`badge-assign-${role}`, false);
+            refreshAssignBadge(role, '', false);
             show(`b-quest-modal-${role}-status`, false);
         }
+    }
+
+    function refreshAssignBadge(role, name, canAssign) {
+        const badge = el(`badge-assign-${role}`);
+        if (!badge) return;
+        badge.className = 'bq-assign-badge';
+        badge.onclick = null;
+
+        const hasName = name && name !== '-' && name !== '';
+
+        if (canAssign) {
+            badge.classList.add('bq-ab-show', 'bq-ab-clickable');
+            badge.onclick = (e) => { e.stopPropagation(); BQuestApp.openAssignPicker(role); };
+            if (hasName) {
+                badge.innerHTML = `<i class="bi bi-person-fill" style="font-size:0.72rem"></i>${name}`;
+            } else {
+                badge.classList.add('bq-ab-empty');
+                badge.innerHTML = `<i class="bi bi-person-plus" style="font-size:0.72rem"></i> Assign`;
+            }
+        } else {
+            if (hasName) {
+                badge.classList.add('bq-ab-show');
+                badge.innerHTML = `<i class="bi bi-person-fill" style="font-size:0.72rem"></i>${name}`;
+            }
+            // no name + no perm = hidden
+        }
+    }
+
+    function setAssign(role, name) {
+        const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
+        el(`b-quest-modal-${role}-assign`).value = name;
+        refreshAssignBadge(role, name, canAssign);
     }
 
     async function checkCapacity(role) {
@@ -471,6 +460,37 @@ const BQuestApp = (() => {
         } catch (e) { console.error(e); }
     }
 
+    function openAssignPicker(role) {
+        const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
+        if (!canAssign) return;
+        const names = State.assignProfiles[role] || [];
+        const container = el('uni-list-container');
+        const searchInput = el('uni-search-input');
+
+        show('bq-search-overlay', true, 'flex');
+        searchInput.value = '';
+
+        const render = (filter = '') => {
+            container.innerHTML = '';
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'uni-item-modern w-100';
+            clearBtn.style.cssText = 'color:#94a3b8;display:flex;align-items:center;gap:8px;';
+            clearBtn.innerHTML = '<i class="bi bi-x-circle"></i> Unassigned';
+            clearBtn.onclick = () => { setAssign(role, ''); show('bq-search-overlay', false); };
+            container.appendChild(clearBtn);
+
+            names.filter(n => n.toLowerCase().includes(filter.toLowerCase())).forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = 'uni-item-modern w-100';
+                btn.textContent = name;
+                btn.onclick = () => { setAssign(role, name); show('bq-search-overlay', false); };
+                container.appendChild(btn);
+            });
+        };
+        render();
+        searchInput.oninput = e => render(e.target.value);
+    }
+
     return {
         async openModal(taskId = null, workData = []) {
             const form = el('b-quest-modal-form');
@@ -480,7 +500,6 @@ const BQuestApp = (() => {
             setupDropdowns(workData);
 
             const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
-            State.roles.forEach(role => el(`assign-zone-${role}`).classList.toggle('can-assign', canAssign));
 
             if (taskId) {
                 el('btn-submit-icon').className  = 'bi bi-floppy2-fill';
@@ -503,22 +522,7 @@ const BQuestApp = (() => {
                         updateStatusUI(statusEl);
 
                         const assignName = data[`${role}_assign`];
-                        const badge = el(`badge-assign-${role}`);
-                        if (assignName && assignName !== '-' && assignName !== '') {
-                            badge.innerText = assignName;
-                            show(badge.id, true, 'inline-block');
-                        } else {
-                            show(badge.id, false);
-                        }
-
-                        if (canAssign) {
-                            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
-                            const hiddenAssign = el(`b-quest-modal-${role}-assign`);
-                            if (assignSel && hiddenAssign) {
-                                assignSel.value = hiddenAssign.value || '';
-                                assignSel.classList.toggle('is-assigned', !!assignSel.value);
-                            }
-                        }
+                        refreshAssignBadge(role, assignName || '', canAssign);
 
                         const capEl = el(`${role}-capacity-info`);
                         if (capEl) { capEl.className = 'bq-cap-info'; capEl.innerHTML = ''; }
@@ -529,11 +533,6 @@ const BQuestApp = (() => {
                         card.querySelectorAll('input, select, textarea').forEach(inp => inp.disabled = !canEditRole);
                         el(`check-${role}`).disabled = !canEditRole;
                         card.style.opacity = canEditRole ? '' : '0.55';
-
-                        if (canAssign) {
-                            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
-                            if (assignSel) assignSel.disabled = false;
-                        }
                     });
                 }
             } else {
@@ -611,7 +610,7 @@ const BQuestApp = (() => {
             else Swal.fire('Error', error.message, 'error');
         },
 
-        updateRoleUI, updateStatusUI, openSearchOverlay,
+        updateRoleUI, updateStatusUI, openSearchOverlay, openAssignPicker,
         closeSearchOverlay: () => show('bq-search-overlay', false),
         handleDeleteTask
     };
