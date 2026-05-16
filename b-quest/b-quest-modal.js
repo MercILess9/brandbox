@@ -47,9 +47,6 @@ const B_QUEST_MODAL_HTML = `
     .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 5px; }
     #card-designer .role-card-title i.role-icon { color: #3b82f6; }
     #card-creative .role-card-title i.role-icon { color: #8b5cf6; }
-    .bq-chevron { font-size: 0.65rem; color: #94a3b8; transition: transform 0.25s ease, opacity 0.2s; opacity: 0.5; }
-    .role-card.active .bq-chevron { transform: rotate(90deg); opacity: 0.8; }
-
     /* Toggle */
     .bq-role-toggle-wrap { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
 
@@ -179,7 +176,7 @@ const B_QUEST_MODAL_HTML = `
                                     <div class="bq-role-toggle-wrap">
                                         <label class="bq-toggle"><input type="checkbox" id="check-designer" onchange="BQuestApp.updateRoleUI('designer')"><span class="bq-slider"></span></label>
                                     </div>
-                                    <div class="role-card-title"><i class="bi bi-brush ms-1 me-1 role-icon"></i> Designer <i class="bi bi-chevron-right bq-chevron"></i></div>
+                                    <div class="role-card-title"><i class="bi bi-brush ms-1 me-1 role-icon"></i> Designer</div>
                                     <span class="bq-assign-badge" id="badge-assign-designer"></span>
                                     <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status" onchange="BQuestApp.updateStatusUI(this)">
                                         <option value="On Progress">On Progress</option><option value="Done">Done</option>
@@ -209,7 +206,7 @@ const B_QUEST_MODAL_HTML = `
                                     <div class="bq-role-toggle-wrap">
                                         <label class="bq-toggle"><input type="checkbox" id="check-creative" onchange="BQuestApp.updateRoleUI('creative')"><span class="bq-slider"></span></label>
                                     </div>
-                                    <div class="role-card-title"><i class="bi bi-rocket ms-1 me-1 role-icon"></i> Creative <i class="bi bi-chevron-right bq-chevron"></i></div>
+                                    <div class="role-card-title"><i class="bi bi-rocket ms-1 me-1 role-icon"></i> Creative</div>
                                     <span class="bq-assign-badge" id="badge-assign-creative"></span>
                                     <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status" onchange="BQuestApp.updateStatusUI(this)">
                                         <option value="On Progress">On Progress</option><option value="Done">Done</option>
@@ -253,7 +250,7 @@ const B_QUEST_MODAL_HTML = `
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 const BQuestApp = (() => {
-    const State = { capacities: { designer: 0, creative: 0 }, maxCap: { designer: 10, creative: 10 }, assignProfiles: { designer: [], creative: [] }, currentData: null, roles: ['designer', 'creative'] };
+    const State = { capacities: { designer: 0, creative: 0 }, maxCap: { designer: 10, creative: 10 }, assignProfiles: { designer: [], creative: [] }, allowAssign: false, currentData: null, roles: ['designer', 'creative'] };
     const el = id => document.getElementById(id);
     const show = (id, condition, display = 'block') => { const e = el(id); if(e) e.style.display = condition ? display : 'none'; };
 
@@ -340,7 +337,7 @@ const BQuestApp = (() => {
 
     function updateRoleUI(role) {
         const isChecked = el(`check-${role}`).checked;
-        const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
+        const canAssign = State.allowAssign;
         const card = el(`card-${role}`);
         const inputs = ['type', 'work', 'deadline'].map(s => el(`b-quest-modal-${role}-${s}`));
 
@@ -499,7 +496,8 @@ const BQuestApp = (() => {
             await Promise.all([BQuestService.loadMaxCapacities(), BQuestService.loadProfiles()]);
             setupDropdowns(workData);
 
-            const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
+            const canAssign = !!(taskId && typeof canBquest === 'function' && canBquest('assign'));
+            State.allowAssign = canAssign;
 
             if (taskId) {
                 el('btn-submit-icon').className  = 'bi bi-floppy2-fill';
