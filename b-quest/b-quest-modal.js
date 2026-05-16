@@ -520,7 +520,7 @@ const BQuestApp = (() => {
                         updateStatusUI(statusEl);
 
                         const assignName = data[`${role}_assign`];
-                        refreshAssignBadge(role, assignName || '', canAssign);
+                        if (hasRoleData) refreshAssignBadge(role, assignName || '', canAssign);
 
                         const capEl = el(`${role}-capacity-info`);
                         if (capEl) { capEl.className = 'bq-cap-info'; capEl.innerHTML = ''; }
