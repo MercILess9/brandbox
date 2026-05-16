@@ -28,41 +28,53 @@
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
-        .assign-wrapper { max-width: 1100px; margin: 0 auto; padding: 36px 20px 120px; }
+        .assign-wrapper { max-width: 1160px; margin: 0 auto; padding: 36px 20px 120px; }
 
-        /* Page Header */
         .page-header { margin-bottom: 24px; }
         .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
 
-        /* Filter bar */
-        .filter-bar { background: #fff; border: 1px solid var(--c-border); border-radius: 16px; padding: 14px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .filter-search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 280px; }
+        /* ── Filter Bar ── */
+        .filter-bar {
+            background: #fff; border: 1px solid var(--c-border); border-radius: 16px;
+            padding: 14px 20px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .filter-search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 260px; }
         .filter-search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.82rem; pointer-events: none; }
         .filter-search { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; box-sizing: border-box; }
         .filter-search:focus { border-color: var(--c-accent); background: #fff; }
 
-        .filter-select-wrap { display: flex; align-items: center; border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; height: 36px; background: var(--c-bg); transition: 0.2s; }
-        .filter-select-wrap:focus-within { border-color: var(--c-accent); background: #fff; }
-        .filter-select-tag { background: #f1f5f9; color: var(--c-muted); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 10px; height: 100%; display: flex; align-items: center; border-right: 1px solid var(--c-border); white-space: nowrap; }
-        .filter-select { border: none; background: transparent; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 10px; outline: none; cursor: pointer; font-family: inherit; min-width: 100px; }
+        /* Role Pills */
+        .pill-group { display: flex; gap: 6px; }
+        .flt-pill { border: 1.5px solid var(--c-border); background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .flt-pill i { font-size: 0.8rem; }
+        .flt-pill.active-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
+        .flt-pill.active-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
+
+        /* Divider */
+        .filter-divider { width: 1px; height: 22px; background: var(--c-border); flex-shrink: 0; }
+
+        /* Select filters */
+        .filter-select-wrap { display: flex; align-items: center; border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; height: 34px; background: var(--c-bg); transition: 0.2s; }
+        .filter-select-tag { background: #f1f5f9; color: var(--c-muted); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 9px; height: 100%; display: flex; align-items: center; border-right: 1px solid var(--c-border); white-space: nowrap; }
+        .filter-select { border: none; background: transparent; font-size: 0.78rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; outline: none; cursor: pointer; font-family: inherit; min-width: 90px; }
         .filter-select-wrap.active { border-color: var(--c-accent); background: var(--c-accent-light); }
         .filter-select-wrap.active .filter-select-tag { background: var(--c-accent); color: var(--c-dark); border-right-color: var(--c-accent); }
 
         .filter-count { font-size: 0.75rem; font-weight: 700; color: var(--c-muted); margin-left: auto; white-space: nowrap; }
 
-        /* Section */
+        /* ── Section ── */
         .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
         .section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--c-border); }
         .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         .section-badge { background: var(--c-accent); color: var(--c-dark); border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
-        .section-badge-muted { background: #f1f5f9; color: var(--c-muted); }
 
-        /* Table */
-        .assign-table { width: 100%; }
-        .assign-thead { display: grid; grid-template-columns: 90px 1fr 130px 110px 100px 180px 110px; align-items: center; padding: 0 24px; height: 38px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
-        .assign-thead span { font-size: 0.62rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        /* ── Table ── */
+        /* cols: Role | Task+Account+Opp | Work | Type | Owner | Deadline | Assign */
+        .assign-thead { display: grid; grid-template-columns: 100px 1fr 130px 110px 110px 100px 170px; align-items: center; padding: 0 24px; height: 36px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
+        .assign-thead span { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .assign-row { display: grid; grid-template-columns: 90px 1fr 130px 110px 100px 180px 110px; align-items: center; padding: 0 24px; min-height: 56px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; }
+        .assign-row { display: grid; grid-template-columns: 100px 1fr 130px 110px 110px 100px 170px; align-items: center; padding: 0 24px; min-height: 60px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; }
         .assign-row:last-child { border-bottom: none; }
         .assign-row:hover { background: #fafbff; }
 
@@ -73,41 +85,28 @@
 
         /* Task info */
         .task-name { font-size: 0.85rem; font-weight: 700; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .task-sub { font-size: 0.72rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-sub  { font-size: 0.7rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .task-opp  { font-size: 0.7rem; color: var(--c-slate); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
 
         .work-tag { background: #f1f5f9; color: var(--c-slate); border-radius: 8px; padding: 3px 10px; font-size: 0.75rem; font-weight: 700; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
-        .type-tag { color: var(--c-muted); font-size: 0.78rem; font-weight: 600; }
+        .type-tag { color: var(--c-slate); font-size: 0.78rem; font-weight: 600; }
+        .owner-tag { color: var(--c-dark); font-size: 0.8rem; font-weight: 600; }
         .deadline-text { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
 
         /* Assign dropdown */
-        .assign-select-wrap { position: relative; }
-        .assign-select { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px; font-size: 0.82rem; font-weight: 600; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+        .assign-select { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 28px 7px 11px; font-size: 0.82rem; font-weight: 600; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
         .assign-select:focus { border-color: var(--c-accent); background-color: #fff; }
-        .assign-select.has-value { border-color: var(--c-accent); background-color: var(--c-accent-light); color: var(--c-dark); font-weight: 700; }
-        .assign-select.is-saving { opacity: 0.5; pointer-events: none; }
+        .assign-select.is-saving { opacity: 0.45; pointer-events: none; }
 
-        /* Assigned zone: dropdown highlight differently */
-        .zone-assigned .assign-select.has-value { background-color: #f0fdf4; border-color: #86efac; }
-
-        /* Saving spinner overlay on row */
-        .row-saving { position: relative; pointer-events: none; }
-        .row-saving::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.6); border-radius: 4px; }
-
-        /* Empty state */
+        /* Empty */
         .empty-state { padding: 48px 24px; text-align: center; color: var(--c-muted); }
-        .empty-state i { font-size: 2rem; opacity: 0.35; display: block; margin-bottom: 10px; }
+        .empty-state i { font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 10px; }
         .empty-state p { font-size: 0.82rem; font-weight: 600; margin: 0; }
 
         /* Skeleton */
-        .skeleton-row { display: grid; grid-template-columns: 90px 1fr 130px 110px 100px 180px 110px; align-items: center; padding: 0 24px; height: 56px; border-bottom: 1px solid #f8fafc; gap: 12px; }
+        .skeleton-row { display: grid; grid-template-columns: 100px 1fr 130px 110px 110px 100px 170px; align-items: center; padding: 0 24px; height: 60px; border-bottom: 1px solid #f8fafc; gap: 12px; }
         .skel { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-        /* Section collapse toggle */
-        .btn-section-toggle { background: none; border: none; color: var(--c-muted); cursor: pointer; padding: 4px 8px; border-radius: 8px; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; }
-        .btn-section-toggle:hover { background: var(--c-bg); color: var(--c-dark); }
-        .section-body { }
-        .section-body.collapsed { display: none; }
     </style>
 </head>
 <body>
@@ -124,94 +123,73 @@
             <i class="bi bi-search"></i>
             <input type="text" class="filter-search" id="filterSearch" placeholder="Search task, account...">
         </div>
-        <div class="filter-select-wrap" id="wrap-filterRole">
-            <span class="filter-select-tag">Role</span>
-            <select class="filter-select" id="filterRole" onchange="onFilterChange()">
-                <option value="">All</option>
-                <option value="Designer">Designer</option>
-                <option value="Creative">Creative</option>
-            </select>
+
+        <div class="filter-divider"></div>
+
+        <div class="pill-group">
+            <button id="pill-des" class="flt-pill active-des" onclick="togglePill('des')">
+                <i class="bi bi-brush"></i> Designer
+            </button>
+            <button id="pill-cre" class="flt-pill active-cre" onclick="togglePill('cre')">
+                <i class="bi bi-rocket"></i> Creative
+            </button>
         </div>
+
+        <div class="filter-divider"></div>
+
         <div class="filter-select-wrap" id="wrap-filterWork">
             <span class="filter-select-tag">Work</span>
-            <select class="filter-select" id="filterWork" onchange="onFilterChange()">
+            <select class="filter-select" id="filterWork" onchange="onSelectChange('filterWork')">
                 <option value="">All</option>
             </select>
         </div>
+
         <div class="filter-select-wrap" id="wrap-filterType">
             <span class="filter-select-tag">Type</span>
-            <select class="filter-select" id="filterType" onchange="onFilterChange()">
+            <select class="filter-select" id="filterType" onchange="onSelectChange('filterType')">
                 <option value="">All</option>
             </select>
         </div>
+
+        <div class="filter-select-wrap" id="wrap-filterOwner">
+            <span class="filter-select-tag">Owner</span>
+            <select class="filter-select" id="filterOwner" onchange="onSelectChange('filterOwner')">
+                <option value="">All</option>
+            </select>
+        </div>
+
         <span class="filter-count" id="filterCount"></span>
     </div>
 
     <!-- Zone: Unassigned -->
-    <div class="section" id="section-unassigned">
+    <div class="section">
         <div class="section-header">
             <div class="section-title">
                 <i class="bi bi-hourglass-split" style="color:#f59e0b"></i>
                 Unassigned
-                <span class="section-badge" id="badge-unassigned">0</span>
-            </div>
-            <button class="btn-section-toggle" onclick="toggleSection('unassigned')" id="toggle-unassigned" title="Toggle">
-                <i class="bi bi-chevron-up"></i>
-            </button>
-        </div>
-        <div class="section-body" id="body-unassigned">
-            <div class="assign-table">
-                <div class="assign-thead">
-                    <span>Role</span>
-                    <span>Task</span>
-                    <span>Work</span>
-                    <span>Type</span>
-                    <span>Deadline</span>
-                    <span>Assign to</span>
-                    <span></span>
-                </div>
-                <div id="list-unassigned"></div>
+                <span class="section-badge" id="badge-count">0</span>
             </div>
         </div>
-    </div>
-
-    <!-- Zone: Assigned -->
-    <div class="section" id="section-assigned">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="bi bi-check-circle-fill" style="color:#22c55e"></i>
-                Assigned
-                <span class="section-badge section-badge-muted" id="badge-assigned">0</span>
-            </div>
-            <button class="btn-section-toggle" onclick="toggleSection('assigned')" id="toggle-assigned" title="Toggle">
-                <i class="bi bi-chevron-up"></i>
-            </button>
+        <div class="assign-thead">
+            <span>Role</span>
+            <span>Task</span>
+            <span>Work</span>
+            <span>Type</span>
+            <span>Owner</span>
+            <span>Deadline</span>
+            <span>Assign to</span>
         </div>
-        <div class="section-body" id="body-assigned">
-            <div class="assign-table zone-assigned">
-                <div class="assign-thead">
-                    <span>Role</span>
-                    <span>Task</span>
-                    <span>Work</span>
-                    <span>Type</span>
-                    <span>Deadline</span>
-                    <span>Assigned to</span>
-                    <span></span>
-                </div>
-                <div id="list-assigned"></div>
-            </div>
-        </div>
+        <div id="list-rows"></div>
     </div>
 
 </div>
 
 <script>
-    // ── State ──
-    let allRows = [];          // flat list of {role, quest, currentAssign}
-    let designers = [];        // codenames with edit_designer
-    let creatives = [];        // codenames with edit_creative
-    let workList = [];
-    let filteredRows = [];
+    let allRows  = [];
+    let designers = [];
+    let creatives = [];
+    let workList  = [];
+    let ownerList = [];
 
     // ── Init ──
     async function loadPage() {
@@ -241,90 +219,99 @@
     }
 
     async function loadQuests() {
-        showSkeleton('unassigned');
-        showSkeleton('assigned');
+        document.getElementById('list-rows').innerHTML = skeletonHTML();
 
-        // Pull all quests that have at least one active slot (designer or creative !== null/'-')
         const { data, error } = await supabaseClient
             .from('b-quest-list')
-            .select('id, task_name, account_name, opportunity_name, designer, creative, designer_type, creative_type, designer_deadline, creative_deadline, designer_assign, creative_assign, designer_status, creative_status')
+            .select('id, task_name, account_name, opportunity_name, owner, designer, creative, designer_type, creative_type, designer_deadline, creative_deadline, designer_assign, creative_assign')
             .order('last_update', { ascending: false });
 
         if (error) { console.error(error); return; }
 
-        // Flatten into role-rows
         allRows = [];
         (data || []).forEach(q => {
             const hasD = q.designer && q.designer !== '-' && q.designer !== '';
-            const hasC = q.creative && q.creative !== '-' && q.creative !== '';
-            if (hasD) allRows.push({ role: 'Designer', quest: q, assign: q.designer_assign || '' });
-            if (hasC) allRows.push({ role: 'Creative',  quest: q, assign: q.creative_assign  || '' });
+            const hasC = q.creative  && q.creative  !== '-' && q.creative  !== '';
+            // only unassigned slots
+            if (hasD && (!q.designer_assign || q.designer_assign === '-'))
+                allRows.push({ role: 'Designer', quest: q });
+            if (hasC && (!q.creative_assign  || q.creative_assign  === '-'))
+                allRows.push({ role: 'Creative',  quest: q });
         });
+
+        // Build owner list from allRows
+        ownerList = [...new Set(allRows.map(r => r.quest.owner).filter(o => o && o !== '-'))].sort();
+        populateFilterOwner();
 
         applyFilters();
     }
 
+    // ── Populate filters ──
     function populateFilterWork() {
+        rebuildWorkFilter();
+    }
+
+    function rebuildWorkFilter() {
         const sel = document.getElementById('filterWork');
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">All</option>';
+
+        const desActive = document.getElementById('pill-des').classList.contains('active-des');
+        const creActive = document.getElementById('pill-cre').classList.contains('active-cre');
+
         const desWorks = workList.filter(w => w.role === 'Designer');
         const creWorks = workList.filter(w => w.role === 'Creative');
 
-        if (desWorks.length) {
+        if (desActive && desWorks.length) {
             const g = document.createElement('optgroup');
             g.label = '── Designer ──';
             desWorks.forEach(w => g.appendChild(new Option(w.work, w.work)));
             sel.appendChild(g);
         }
-        if (creWorks.length) {
+        if (creActive && creWorks.length) {
             const g = document.createElement('optgroup');
             g.label = '── Creative ──';
             creWorks.forEach(w => g.appendChild(new Option(w.work, w.work)));
             sel.appendChild(g);
         }
+
+        // restore if still valid
+        if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+        updateSelectHighlight('filterWork');
     }
 
     function populateFilterType() {
         const sel = document.getElementById('filterType');
+        sel.innerHTML = '<option value="">All</option>';
         B_QUEST_CONFIG.listTypes.forEach(t => sel.appendChild(new Option(t, t)));
     }
 
-    // ── Filter ──
-    function onFilterChange() {
-        ['filterRole','filterWork','filterType'].forEach(id => {
-            const wrap = document.getElementById('wrap-' + id);
-            wrap.classList.toggle('active', !!document.getElementById(id).value);
-        });
+    function populateFilterOwner() {
+        const sel = document.getElementById('filterOwner');
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">All</option>';
+        ownerList.forEach(o => sel.appendChild(new Option(o, o)));
+        if ([...sel.options].some(op => op.value === prev)) sel.value = prev;
+        updateSelectHighlight('filterOwner');
+    }
+
+    // ── Filter logic ──
+    function togglePill(role) {
+        const btn = document.getElementById('pill-' + role);
+        const cls = role === 'des' ? 'active-des' : 'active-cre';
+        btn.classList.toggle(cls);
+        rebuildWorkFilter();
         applyFilters();
     }
 
-    function applyFilters() {
-        const q = document.getElementById('filterSearch').value.trim().toLowerCase();
-        const role = document.getElementById('filterRole').value;
-        const work = document.getElementById('filterWork').value;
-        const type = document.getElementById('filterType').value;
+    function onSelectChange(id) {
+        updateSelectHighlight(id);
+        applyFilters();
+    }
 
-        filteredRows = allRows.filter(r => {
-            if (role && r.role !== role) return false;
-            const rWork = r.role === 'Designer' ? r.quest.designer : r.quest.creative;
-            const rType = r.role === 'Designer' ? r.quest.designer_type : r.quest.creative_type;
-            if (work && rWork !== work) return false;
-            if (type && rType !== type) return false;
-            if (q) {
-                const hay = [r.quest.task_name, r.quest.account_name, r.quest.opportunity_name, rWork, rType, r.assign].join(' ').toLowerCase();
-                if (!hay.includes(q)) return false;
-            }
-            return true;
-        });
-
-        const unassigned = filteredRows.filter(r => !r.assign || r.assign === '-');
-        const assigned   = filteredRows.filter(r => r.assign && r.assign !== '-');
-
-        document.getElementById('badge-unassigned').textContent = unassigned.length;
-        document.getElementById('badge-assigned').textContent   = assigned.length;
-        document.getElementById('filterCount').textContent      = `${filteredRows.length} items`;
-
-        renderRows('unassigned', unassigned);
-        renderRows('assigned',   assigned);
+    function updateSelectHighlight(id) {
+        const wrap = document.getElementById('wrap-' + id);
+        wrap.classList.toggle('active', !!document.getElementById(id).value);
     }
 
     function setupSearch() {
@@ -335,33 +322,62 @@
         });
     }
 
+    function applyFilters() {
+        const q      = document.getElementById('filterSearch').value.trim().toLowerCase();
+        const work   = document.getElementById('filterWork').value;
+        const type   = document.getElementById('filterType').value;
+        const owner  = document.getElementById('filterOwner').value;
+        const desOn  = document.getElementById('pill-des').classList.contains('active-des');
+        const creOn  = document.getElementById('pill-cre').classList.contains('active-cre');
+
+        const rows = allRows.filter(r => {
+            if (r.role === 'Designer' && !desOn) return false;
+            if (r.role === 'Creative'  && !creOn) return false;
+
+            const rWork = r.role === 'Designer' ? r.quest.designer      : r.quest.creative;
+            const rType = r.role === 'Designer' ? r.quest.designer_type  : r.quest.creative_type;
+
+            if (work  && rWork !== work)   return false;
+            if (type  && rType !== type)   return false;
+            if (owner && r.quest.owner !== owner) return false;
+
+            if (q) {
+                const hay = [r.quest.task_name, r.quest.account_name, r.quest.opportunity_name, rWork, rType, r.quest.owner].join(' ').toLowerCase();
+                if (!hay.includes(q)) return false;
+            }
+            return true;
+        });
+
+        document.getElementById('badge-count').textContent = rows.length;
+        document.getElementById('filterCount').textContent = `${rows.length} item${rows.length !== 1 ? 's' : ''}`;
+
+        renderRows(rows);
+    }
+
     // ── Render ──
-    function renderRows(zone, rows) {
-        const container = document.getElementById('list-' + zone);
-        const isAssigned = zone === 'assigned';
+    function renderRows(rows) {
+        const container = document.getElementById('list-rows');
 
         if (!rows.length) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <i class="bi bi-${isAssigned ? 'check-circle' : 'inbox'}"></i>
-                    <p>${isAssigned ? 'No assigned items' : 'All items assigned!'}</p>
+                    <i class="bi bi-inbox"></i>
+                    <p>No unassigned items</p>
                 </div>`;
             return;
         }
 
         container.innerHTML = rows.map(r => {
-            const q = r.quest;
-            const rWork     = r.role === 'Designer' ? q.designer      : q.creative;
-            const rType     = r.role === 'Designer' ? q.designer_type  : q.creative_type;
-            const rDeadline = r.role === 'Designer' ? q.designer_deadline : q.creative_deadline;
-            const rAssign   = r.assign || '';
-            const options   = r.role === 'Designer' ? designers : creatives;
-            const rowKey    = `${q.id}__${r.role}`;
+            const q        = r.quest;
+            const rWork    = r.role === 'Designer' ? q.designer       : q.creative;
+            const rType    = r.role === 'Designer' ? q.designer_type   : q.creative_type;
+            const rDL      = r.role === 'Designer' ? q.designer_deadline : q.creative_deadline;
+            const options  = r.role === 'Designer' ? designers : creatives;
+            const rowKey   = `${q.id}__${r.role}`;
 
             const opts = [`<option value="">— Unassigned —</option>`]
-                .concat(options.map(name =>
-                    `<option value="${name}" ${rAssign === name ? 'selected' : ''}>${name}</option>`
-                )).join('');
+                .concat(options.map(name => `<option value="${name}">${name}</option>`))
+                .join('');
 
             return `
             <div class="assign-row" id="row-${rowKey}">
@@ -371,116 +387,76 @@
                         ${r.role}
                     </span>
                 </div>
-                <div style="min-width:0; padding-right:12px;">
-                    <div class="task-name" title="${q.task_name || ''}">${q.task_name || 'Untitled'}</div>
-                    <div class="task-sub">${q.account_name || ''}</div>
+                <div style="min-width:0;padding-right:12px;">
+                    <div class="task-name" title="${esc(q.task_name)}">${esc(q.task_name) || 'Untitled'}</div>
+                    <div class="task-sub">${esc(q.account_name) || ''}</div>
+                    ${q.opportunity_name ? `<div class="task-opp">${esc(q.opportunity_name)}</div>` : ''}
                 </div>
-                <div><span class="work-tag" title="${rWork || ''}">${rWork || '-'}</span></div>
-                <div><span class="type-tag">${rType || '-'}</span></div>
-                <div><span class="deadline-text">${formatDate(rDeadline)}</span></div>
+                <div><span class="work-tag" title="${esc(rWork)}">${esc(rWork) || '-'}</span></div>
+                <div><span class="type-tag">${esc(rType) || '-'}</span></div>
+                <div><span class="owner-tag">${esc(q.owner) || '-'}</span></div>
+                <div><span class="deadline-text">${formatDate(rDL)}</span></div>
                 <div>
-                    <select class="assign-select ${rAssign ? 'has-value' : ''}"
+                    <select class="assign-select"
                         data-quest-id="${q.id}"
                         data-role="${r.role}"
-                        data-prev="${rAssign}"
-                        data-zone="${zone}"
                         onchange="onAssignChange(this)">
                         ${opts}
                     </select>
                 </div>
-                <div></div>
             </div>`;
         }).join('');
     }
 
-    function showSkeleton(zone) {
-        const skRow = () => `
+    function skeletonHTML() {
+        const row = () => `
             <div class="skeleton-row">
                 <div class="skel" style="height:26px;width:80px;border-radius:20px;"></div>
                 <div>
-                    <div class="skel" style="height:14px;width:160px;margin-bottom:6px;"></div>
-                    <div class="skel" style="height:11px;width:100px;"></div>
+                    <div class="skel" style="height:13px;width:160px;margin-bottom:5px;"></div>
+                    <div class="skel" style="height:10px;width:100px;"></div>
                 </div>
-                <div class="skel" style="height:26px;width:90px;border-radius:8px;"></div>
-                <div class="skel" style="height:14px;width:70px;"></div>
-                <div class="skel" style="height:14px;width:60px;"></div>
+                <div class="skel" style="height:24px;width:90px;"></div>
+                <div class="skel" style="height:13px;width:70px;"></div>
+                <div class="skel" style="height:13px;width:70px;"></div>
+                <div class="skel" style="height:13px;width:60px;"></div>
                 <div class="skel" style="height:34px;border-radius:10px;"></div>
-                <div></div>
             </div>`;
-        document.getElementById('list-' + zone).innerHTML = skRow() + skRow() + skRow();
+        return row() + row() + row();
     }
 
-    // ── Assign Change ──
+    function esc(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Assign ──
     async function onAssignChange(sel) {
         const questId = sel.dataset.questId;
         const role    = sel.dataset.role;
-        const prev    = sel.dataset.prev;
         const newVal  = sel.value;
-        const zone    = sel.dataset.zone;
+        if (!newVal) return;
 
-        // Assigned zone → confirm first
-        if (zone === 'assigned' && prev) {
-            const res = await Swal.fire({
-                title: 'เปลี่ยน Assign?',
-                html: `<span style="color:#64748b;font-size:0.9rem;">จาก <b>${prev || '—'}</b> → <b>${newVal || '— Unassigned —'}</b></span>`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#1e293b',
-                cancelButtonColor: '#94a3b8',
-                confirmButtonText: 'Confirm',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true,
-            });
-            if (!res.isConfirmed) {
-                sel.value = prev;
-                return;
-            }
-        }
-
-        await doSave(sel, questId, role, newVal, prev);
-    }
-
-    async function doSave(sel, questId, role, newVal, prev) {
         sel.classList.add('is-saving');
 
         const field = role === 'Designer' ? 'designer_assign' : 'creative_assign';
-        const saveVal = newVal || null;
 
         const { error } = await supabaseClient
             .from('b-quest-list')
-            .update({ [field]: saveVal, last_update: new Date().toISOString() })
+            .update({ [field]: newVal, last_update: new Date().toISOString() })
             .eq('id', questId);
 
         if (error) {
             Swal.fire({ icon: 'error', title: 'Save failed', text: error.message, timer: 3000, showConfirmButton: false });
-            sel.value = prev;
+            sel.value = '';
             sel.classList.remove('is-saving');
             return;
         }
 
-        // Update local state & re-render
-        const row = allRows.find(r => String(r.quest.id) === String(questId) && r.role === role);
-        if (row) {
-            row.assign = newVal;
-            if (role === 'Designer') row.quest.designer_assign = newVal;
-            else row.quest.creative_assign = newVal;
-        }
-
-        sel.dataset.prev = newVal;
-        sel.classList.remove('is-saving');
-        sel.classList.toggle('has-value', !!newVal);
-
+        // Remove row from allRows then re-render
+        allRows = allRows.filter(r => !(String(r.quest.id) === String(questId) && r.role === role));
+        notify('Assigned', `${role} → ${newVal}`, 'success');
         applyFilters();
-    }
-
-    // ── Section Toggle ──
-    function toggleSection(zone) {
-        const body = document.getElementById('body-' + zone);
-        const btn  = document.getElementById('toggle-' + zone);
-        const icon = btn.querySelector('i');
-        body.classList.toggle('collapsed');
-        icon.classList.toggle('bi-chevron-up',   !body.classList.contains('collapsed'));
-        icon.classList.toggle('bi-chevron-down',  body.classList.contains('collapsed'));
     }
 
     loadPage();
