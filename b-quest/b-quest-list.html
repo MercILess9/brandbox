@@ -243,29 +243,29 @@
         const currentSelection = filterWork.value;
         setupDefaultOptions(filterWork, "Work");
 
-        if (document.getElementById('pill-designer').classList.contains('active-role')) {
-            appendRoleGroup(filterWork, "Designer Work", dataList, 'role', 'Designer', 'work', 'work');
-        }
-        if (document.getElementById('pill-creative').classList.contains('active-role')) {
-            appendRoleGroup(filterWork, "Creative Work", dataList, 'role', 'Creative', 'work', 'work');
-        }
+        const desActive = document.getElementById('pill-designer').classList.contains('active-role');
+        const creActive = document.getElementById('pill-creative').classList.contains('active-role');
+        const showAll = !desActive && !creActive;
+
+        if (desActive || showAll) appendRoleGroup(filterWork, "Designer Work", dataList, 'role', 'Designer', 'work', 'work');
+        if (creActive || showAll) appendRoleGroup(filterWork, "Creative Work", dataList, 'role', 'Creative', 'work', 'work');
+
         filterWork.value = currentSelection;
         updateHighlight('filterWork');
     }
 
     function renderFilterAssign() {
-        const filterAssign = document.getElementById('filterAssign'); 
+        const filterAssign = document.getElementById('filterAssign');
         if (!filterAssign) return;
         const currentSelection = filterAssign.value;
         setupDefaultOptions(filterAssign, "Assign");
 
-        if (document.getElementById('pill-designer').classList.contains('active-role')) {
-            appendRoleGroup(filterAssign, "Designers", assignList, 'role_designer', true, 'codename', 'codename');
-        }
+        const desActive = document.getElementById('pill-designer').classList.contains('active-role');
+        const creActive = document.getElementById('pill-creative').classList.contains('active-role');
+        const showAll = !desActive && !creActive;
 
-        if (document.getElementById('pill-creative').classList.contains('active-role')) {
-            appendRoleGroup(filterAssign, "Creatives", assignList, 'role_creative', true, 'codename', 'codename');
-        }
+        if (desActive || showAll) appendRoleGroup(filterAssign, "Designers", assignList, 'role_designer', true, 'codename', 'codename');
+        if (creActive || showAll) appendRoleGroup(filterAssign, "Creatives", assignList, 'role_creative', true, 'codename', 'codename');
 
         filterAssign.value = currentSelection;
         updateHighlight('filterAssign');

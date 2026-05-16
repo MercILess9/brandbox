@@ -34,7 +34,7 @@
         .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
 
         .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--c-border); }
+        .section-header { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--c-border); }
         .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         .section-title i { font-size: 1rem; }
         .section-body { padding: 20px 24px; }
@@ -101,8 +101,12 @@
         .work-empty { padding: 24px; text-align: center; color: var(--c-muted); font-size: 0.8rem; font-weight: 600; }
 
         /* Members */
-        .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 7px; }
+        .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 7px; margin-left: auto; flex-shrink: 0; }
         .btn-add-member:hover { background: #0f172a; }
+        .section-header .table-search-wrap { max-width: 220px; flex: 1; }
+        .section-header .table-count { margin-left: 0; white-space: nowrap; font-size: 0.75rem; font-weight: 700; color: var(--c-muted); }
+        .perm-scroll-body { max-height: 560px; overflow-y: auto; }
+        .perm-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
         /* Add Member Modal */
         .am-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
