@@ -26,8 +26,13 @@
         display: flex;
         align-items: center;
         text-decoration: none !important;
-        pointer-events: none;
+        cursor: pointer;
         user-select: none;
+        transition: opacity 0.15s;
+    }
+
+    .sys-brand-zone:hover {
+        opacity: 0.75;
     }
 
     .sys-logo-img {
@@ -92,6 +97,15 @@
     .sys-user-zone {
         display: flex;
         align-items: center;
+        gap: 10px;
+    }
+
+    .sys-codename {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: #555;
+        text-transform: uppercase;
     }
 
     .btn-logout {
@@ -117,15 +131,16 @@
 
 <div class="sys-header-wrapper">
 
-    <div class="sys-brand-zone">
+    <a href="/index.html" class="sys-brand-zone">
         <img src="https://www.brandboxplatform.com/images/brandbox-logo.png" class="sys-logo-img" alt="Logo">
         <div class="sys-divider"></div>
         <span class="sys-project-name" id="project-title">---</span>
-    </div>
+    </a>
 
     <div id="sys-nav-inject"></div>
 
     <div class="sys-user-zone">
+        <span class="sys-codename" id="user-display"></span>
         <button class="btn-logout" onclick="handleLogout()" title="Logout">
             <i class="bi bi-box-arrow-right"></i>
         </button>
