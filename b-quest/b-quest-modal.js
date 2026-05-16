@@ -66,8 +66,8 @@ const B_QUEST_MODAL_HTML = `
     .bq-footer-actions { padding: 14px 28px; display: flex; justify-content: flex-end; gap: 10px; background: #fff; border-top: 1px solid #f1f5f9; }
     .btn-bq-delete { background: #fee2e2; color: #ef4444; border: none; padding: 0 20px; border-radius: 10px; font-weight: 700; height: 40px; font-size: 0.85rem; display: none; cursor: pointer; transition: 0.2s; }
     .btn-bq-delete:hover { background: #fecaca; }
-    .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 32px; border-radius: 10px; font-weight: 800; height: 40px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
-    .btn-bq-create:hover { background: #0f172a; }
+    .btn-bq-create { background: #1e293b; color: #bdc432; border: none; padding: 0 28px; border-radius: 10px; font-weight: 800; height: 40px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+    .btn-bq-create:hover { background: #0f172a; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
 </style>
 
 <div class="modal fade" id="b-quest-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -85,11 +85,12 @@ const B_QUEST_MODAL_HTML = `
             </div>
 
             <div class="bq-modern-header">
-                <div class="bq-header-title" id="b-quest-modal-label-text">Task <span>New</span></div>
-                <div class="bq-header-right">
+                <div class="bq-header-owner">
+                    <span class="bq-owner-label-text">Owner</span>
                     <span class="bq-owner-top" id="modal-owner-display"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+                <div id="b-quest-modal-label-text" style="display:none;"></div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <form id="b-quest-modal-form" novalidate>
