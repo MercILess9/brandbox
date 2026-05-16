@@ -28,10 +28,7 @@
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
-        .settings-wrapper { max-width: 960px; margin: 0 auto; padding: 36px 20px 120px; }
-
-        .page-header { margin-bottom: 28px; }
-        .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
+        .settings-wrapper { max-width: 1200px; margin: 0 auto; padding: 36px 20px 120px; }
 
         .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
         .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--c-border); }
@@ -145,27 +142,78 @@
         .btn-am-confirm:hover { background: #0f172a; }
         .btn-am-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .table-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        /* Members Table */
+        .table-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
         .table-search-wrap { position: relative; flex: 1; max-width: 260px; }
         .table-search-input { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
         .table-search-input:focus { border-color: var(--c-accent); background: #fff; }
         .table-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.8rem; pointer-events: none; }
         .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-muted); margin-left: auto; }
 
-        .perm-table-head { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 40px; background: var(--c-bg); border-radius: 10px; margin-bottom: 4px; }
-        .perm-col-label { font-size: 0.62rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
+        /* Grid: Name(180) | Role(148) | New(1fr) | EditDes(1fr) | EditCre(1fr) | Delete(1fr) | Assign(1fr) | Setting(1fr) | Actions(44) */
+        .perm-grid { grid-template-columns: 180px 148px repeat(6, 1fr) 44px; }
+
+        .perm-group-head {
+            display: grid;
+            grid-template-columns: 180px 148px repeat(6, 1fr) 44px;
+            align-items: center;
+            padding: 0 4px;
+            margin-bottom: 2px;
+        }
+        .group-label {
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; text-align: center;
+            padding: 4px 0; border-radius: 6px; margin: 0 3px;
+        }
+        .group-task { background: var(--c-des-bg); color: var(--c-des); }
+        .group-admin { background: var(--c-cre-bg); color: var(--c-cre); }
+
+        .perm-table-head {
+            display: grid;
+            grid-template-columns: 180px 148px repeat(6, 1fr) 44px;
+            align-items: center; padding: 0 4px;
+            height: 36px; background: var(--c-bg);
+            border-radius: 10px; margin-bottom: 4px;
+        }
+        .perm-col-label { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
         .perm-col-name { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.8px; padding-left: 8px; }
 
-        .perm-row { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 56px; border-bottom: 1px solid #f8fafc; transition: background 0.15s; border-radius: 8px; }
+        .perm-row {
+            display: grid;
+            grid-template-columns: 180px 148px repeat(6, 1fr) 44px;
+            align-items: center; padding: 0 4px;
+            min-height: 56px; border-bottom: 1px solid #f8fafc;
+            transition: background 0.15s; border-radius: 8px;
+        }
         .perm-row:last-child { border-bottom: none; }
         .perm-row:hover { background: #fafbff; }
         .perm-row.is-new { background: #f0fdf4; }
         .perm-row.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
         .perm-row.is-deleted .btn-remove { pointer-events: all; }
+
         .perm-name-zone { display: flex; align-items: center; gap: 9px; padding-left: 4px; }
         .perm-avatar { width: 30px; height: 30px; background: var(--c-accent-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #7a8500; flex-shrink: 0; }
         .perm-codename { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
         .perm-check-cell { display: flex; justify-content: center; align-items: center; }
+        .perm-role-cell { display: flex; align-items: center; padding: 6px 4px; }
+
+        /* Role pills */
+        .role-pills { display: flex; flex-wrap: wrap; gap: 3px; }
+        .role-pill {
+            font-size: 0.62rem; font-weight: 800; padding: 3px 8px;
+            border-radius: 20px; cursor: pointer; transition: all 0.15s;
+            border: 1.5px solid var(--c-border); color: var(--c-muted);
+            background: #fff; user-select: none; white-space: nowrap;
+        }
+        .role-pill:hover { border-color: #94a3b8; color: var(--c-slate); }
+        .role-pill.active-ae { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+        .role-pill.active-creative { background: var(--c-cre-bg); border-color: var(--c-cre-border); color: var(--c-cre); }
+        .role-pill.active-designer { background: var(--c-des-bg); border-color: var(--c-des-border); color: var(--c-des); }
+
+        /* Group separator: left border on Assign column (7th perm-check-cell = col 7 in grid) */
+        .perm-row > .perm-check-cell:nth-child(7),
+        .perm-table-head > .perm-col-label:nth-child(7) { border-left: 1px solid var(--c-border); }
+
         .bq-toggle { position: relative; display: inline-block; width: 34px; height: 19px; }
         .bq-toggle input { opacity: 0; width: 0; height: 0; }
         .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e2e8f0; transition: .3s; border-radius: 34px; }
@@ -179,7 +227,12 @@
         .perm-empty i { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.4; }
         .perm-empty p { font-size: 0.82rem; font-weight: 600; margin: 0; }
 
-        .skeleton-row { display: grid; grid-template-columns: 200px repeat(6, 1fr) 44px; align-items: center; padding: 0 4px; height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px; }
+        .skeleton-row {
+            display: grid;
+            grid-template-columns: 180px 148px repeat(6, 1fr) 44px;
+            align-items: center; padding: 0 4px;
+            height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px;
+        }
         .skeleton-block { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
@@ -204,10 +257,6 @@
 <body>
 
 <div class="settings-wrapper">
-
-    <div class="page-header">
-        <h1><i class="bi bi-gear-fill me-2" style="color:var(--c-accent)"></i>B-QUEST Settings</h1>
-    </div>
 
     <!-- Section 1: Capacity -->
     <div class="section" id="section-capacity">
@@ -310,16 +359,29 @@
                 </div>
                 <span class="table-count" id="table-count"></span>
             </div>
+
+            <!-- Group header row -->
+            <div class="perm-group-head">
+                <div></div>
+                <div></div>
+                <div class="group-label group-task" style="grid-column: 3 / 7">TASK</div>
+                <div class="group-label group-admin" style="grid-column: 7 / 9">ADMIN</div>
+                <div></div>
+            </div>
+
+            <!-- Column label row -->
             <div class="perm-table-head">
                 <div class="perm-col-name">Member</div>
+                <div class="perm-col-name" style="padding-left:6px;">Role</div>
                 <div class="perm-col-label">New</div>
-                <div class="perm-col-label">Delete</div>
                 <div class="perm-col-label">Edit<br>Designer</div>
                 <div class="perm-col-label">Edit<br>Creative</div>
+                <div class="perm-col-label">Delete</div>
                 <div class="perm-col-label">Assign</div>
                 <div class="perm-col-label">Setting</div>
                 <div></div>
             </div>
+
             <div id="perm-list"></div>
         </div>
     </div>
@@ -360,7 +422,11 @@
 </button>
 
 <script>
-    const PERM_COLS = ['new', 'delete', 'edit_designer', 'edit_creative', 'assign', 'setting'];
+    // Order: new | edit_designer | edit_creative | delete | assign | setting
+    // Groups: TASK = [0-3], ADMIN = [4-5]
+    const PERM_COLS = ['new', 'edit_designer', 'edit_creative', 'delete', 'assign', 'setting'];
+    const ROLES_LIST = ['AE', 'Creative', 'Designer'];
+    const ROLE_CLASS = { AE: 'active-ae', Creative: 'active-creative', Designer: 'active-designer' };
 
     // ── State ──
     let originalCapacity = {};
@@ -368,11 +434,8 @@
     let originalMembers  = [];
     let allProfiles = [];
 
-
-    // buffers
-    let workChanges   = {}; // key: "role|work" → { origRole, origWork, newName, newWeight, _delete, _new }
-    let memberChanges = {}; // key: codename → { ...permData, _delete, _new }
-
+    let workChanges   = {};
+    let memberChanges = {};
     let isDirty = false;
 
     // ── Init ──
@@ -438,7 +501,6 @@
             const id = role.toLowerCase();
             const container = document.getElementById(`work-list-${id}`);
 
-            // start from original, apply changes
             let items = originalWorkData.filter(w => w.role === role).map(w => {
                 const key = `${w.role}|${w.work}`;
                 const ch = workChanges[key];
@@ -447,7 +509,6 @@
                 return { role: w.role, work: ch.newName ?? w.work, weight: ch.newWeight ?? w.weight, _origWork: w.work, _state: 'edited', _key: key };
             });
 
-            // append new items
             Object.values(workChanges).filter(c => c._new && c.origRole === role).forEach(c => {
                 items.push({ role: c.origRole, work: c.newName, weight: c.newWeight, _state: 'new', _key: `${c.origRole}|${c.newName}` });
             });
@@ -526,10 +587,17 @@
     }
 
     // ── Members ──
+    function parseRoles(val) {
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string' && val) return val.split(',').map(r => r.trim()).filter(Boolean);
+        return [];
+    }
+
     function showSkeleton() {
         const row = () => `
             <div class="skeleton-row">
                 <div class="skeleton-block" style="height:30px;width:120px;"></div>
+                <div class="skeleton-block" style="height:22px;width:110px;"></div>
                 ${[1,2,3,4,5,6,7].map(() => `<div class="skeleton-block" style="height:19px;width:34px;margin:auto;"></div>`).join('')}
             </div>`;
         document.getElementById('perm-list').innerHTML = row() + row() + row();
@@ -539,7 +607,7 @@
         showSkeleton();
         const { data, error } = await supabaseClient.from('b-quest-profiles').select('*').order('codename');
         if (error) { console.error(error); return; }
-        originalMembers = data || [];
+        originalMembers = (data || []).map(m => ({ ...m, roles: parseRoles(m.roles) }));
         renderMembersFromBuffer();
         updateTableCount(originalMembers.length, originalMembers.length);
     }
@@ -552,17 +620,15 @@
     function renderMembersFromBuffer(filter = '') {
         const container = document.getElementById('perm-list');
 
-        // merge original + memberChanges
         let rows = originalMembers.map(m => {
             const ch = memberChanges[m.codename];
             if (!ch) return { ...m, _state: 'clean' };
             if (ch._delete) return { ...m, _state: 'deleted' };
-            return { ...m, ...ch, _state: 'edited' };
+            return { ...m, ...ch, roles: ch.roles ?? m.roles, _state: 'edited' };
         });
 
-        // append new
         Object.values(memberChanges).filter(c => c._new).forEach(c => {
-            rows.push({ ...c, _state: 'new' });
+            rows.push({ ...c, roles: c.roles || [], _state: 'new' });
         });
 
         if (filter) rows = rows.filter(m => m.codename.toLowerCase().includes(filter.toLowerCase()));
@@ -576,45 +642,83 @@
             return;
         }
 
-        container.innerHTML = rows.map(member => `
-            <div class="perm-row ${member._state === 'new' ? 'is-new' : member._state === 'deleted' ? 'is-deleted' : ''}" data-codename="${member.codename}">
+        container.innerHTML = rows.map(member => {
+            const roles = parseRoles(member.roles);
+            const isDeleted = member._state === 'deleted';
+            const isNew = member._state === 'new';
+
+            const rolePills = ROLES_LIST.map(r => {
+                const active = roles.includes(r);
+                return `<span class="role-pill ${active ? ROLE_CLASS[r] : ''}" onclick="toggleRole('${member.codename}','${r}',this)">${r}</span>`;
+            }).join('');
+
+            const stateBadge = isNew
+                ? ` <span style="font-size:0.6rem;color:#16a34a;font-weight:800;">NEW</span>`
+                : isDeleted
+                    ? ` <span style="font-size:0.6rem;color:#ef4444;font-weight:800;">REMOVED</span>`
+                    : '';
+
+            return `
+            <div class="perm-row ${isNew ? 'is-new' : isDeleted ? 'is-deleted' : ''}" data-codename="${member.codename}">
                 <div class="perm-name-zone">
                     <div class="perm-avatar">${member.codename.substring(0,2).toUpperCase()}</div>
-                    <span class="perm-codename">${member.codename}${member._state === 'new' ? ' <span style="font-size:0.6rem;color:#16a34a;font-weight:800;">NEW</span>' : member._state === 'deleted' ? ' <span style="font-size:0.6rem;color:#ef4444;font-weight:800;">REMOVED</span>' : ''}</span>
+                    <span class="perm-codename">${member.codename}${stateBadge}</span>
+                </div>
+                <div class="perm-role-cell">
+                    <div class="role-pills">${rolePills}</div>
                 </div>
                 ${PERM_COLS.map(col => `
                 <div class="perm-check-cell">
                     <label class="bq-toggle">
-                        <input type="checkbox" ${member[col] ? 'checked' : ''} onchange="onPermChange('${member.codename}','${col}',this.checked)" ${member._state === 'deleted' ? 'disabled' : ''}>
+                        <input type="checkbox" ${member[col] ? 'checked' : ''} onchange="onPermChange('${member.codename}','${col}',this.checked)" ${isDeleted ? 'disabled' : ''}>
                         <span class="bq-slider"></span>
                     </label>
                 </div>`).join('')}
                 <div class="perm-check-cell">
-                    ${member._state === 'deleted'
+                    ${isDeleted
                         ? `<button class="btn-remove" style="color:#f59e0b" onclick="undoRemoveMember('${member.codename}')" title="Undo"><i class="bi bi-arrow-counterclockwise"></i></button>`
                         : `<button class="btn-remove" onclick="stageRemoveMember('${member.codename}')" title="Remove"><i class="bi bi-trash3"></i></button>`
                     }
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
+    }
+
+    function getOrInitChange(codename) {
+        if (!memberChanges[codename]) {
+            const orig = originalMembers.find(m => m.codename === codename);
+            memberChanges[codename] = orig
+                ? { ...orig, roles: [...(orig.roles || [])] }
+                : { codename, new: false, delete: false, edit_designer: false, edit_creative: false, assign: false, setting: false, roles: [] };
+        }
+        if (!memberChanges[codename].roles) memberChanges[codename].roles = [];
+        return memberChanges[codename];
     }
 
     function onPermChange(codename, col, value) {
-        if (!memberChanges[codename]) {
-            const orig = originalMembers.find(m => m.codename === codename);
-            memberChanges[codename] = orig ? { ...orig } : { codename, new: false, delete: false, edit_designer: false, edit_creative: false, assign: false, setting: false };
-        }
-        memberChanges[codename][col] = value;
+        const ch = getOrInitChange(codename);
+        ch[col] = value;
         markDirty('section-members');
     }
 
+    function toggleRole(codename, role, el) {
+        const ch = getOrInitChange(codename);
+        const roles = [...ch.roles];
+        const idx = roles.indexOf(role);
+        if (idx >= 0) {
+            roles.splice(idx, 1);
+            el.className = 'role-pill';
+        } else {
+            roles.push(role);
+            el.className = `role-pill ${ROLE_CLASS[role]}`;
+        }
+        ch.roles = roles;
+        markDirty('section-members');
+    }
 
     function stageRemoveMember(codename) {
-        if (!memberChanges[codename]) {
-            const orig = originalMembers.find(m => m.codename === codename);
-            memberChanges[codename] = orig ? { ...orig } : { codename };
-        }
-        memberChanges[codename]._delete = true;
+        const ch = getOrInitChange(codename);
+        ch._delete = true;
         markDirty('section-members');
         renderMembersFromBuffer(document.getElementById('table-search').value);
     }
@@ -635,7 +739,6 @@
         if (!anyDirty) clearDirty();
     }
 
-    // ── Search ──
     // ── Add Member Modal ──
     let modalSelected = new Set();
 
@@ -714,7 +817,7 @@
             memberChanges[codename] = {
                 codename, new: true, delete: false,
                 edit_designer: false, edit_creative: false,
-                assign: false, setting: false, _new: true
+                assign: false, setting: false, roles: [], _new: true
             };
         });
         markDirty('section-members');
@@ -779,11 +882,14 @@
 
             // 3. Members
             for (const [codename, ch] of Object.entries(memberChanges)) {
+                const roles = ch.roles || [];
                 if (ch._new) {
                     const { error } = await supabaseClient.from('b-quest-profiles').insert([{
-                        codename, new: ch.new, delete: ch.delete,
+                        codename,
+                        new: ch.new, delete: ch.delete,
                         edit_designer: ch.edit_designer, edit_creative: ch.edit_creative,
-                        assign: ch.assign, setting: ch.setting
+                        assign: ch.assign, setting: ch.setting,
+                        roles
                     }]);
                     if (error) errors.push(`Member add "${codename}": ` + error.message);
                 } else if (ch._delete) {
@@ -792,7 +898,7 @@
                 } else {
                     const { new: n, delete: d, edit_designer, edit_creative, assign, setting } = ch;
                     const { error } = await supabaseClient.from('b-quest-profiles')
-                        .update({ new: n, delete: d, edit_designer, edit_creative, assign, setting })
+                        .update({ new: n, delete: d, edit_designer, edit_creative, assign, setting, roles })
                         .eq('codename', codename);
                     if (error) errors.push(`Member update "${codename}": ` + error.message);
                 }
