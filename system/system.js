@@ -47,6 +47,10 @@ async function initLayout(config = {}) {
 
     // 3. ถ้าเป็นหน้า Auth หรือ Index ไม่ต้องโหลด Header ระบบ
     if (isAuthPage || isIndex) {
+        // ล้าง permission cache ทุกครั้งที่กลับมาหน้า Index เพื่อให้ตอนเข้า project ใหม่จะ fetch ใหม่เสมอ
+        if (isIndex) {
+            sessionStorage.removeItem('bx_bquest_perms');
+        }
         document.body.classList.add('auth-ready');
         return;
     }
