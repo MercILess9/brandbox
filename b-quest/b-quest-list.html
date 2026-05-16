@@ -110,21 +110,22 @@
         .bqc-meta-label { font-size: 0.65rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .bqc-meta-val { font-size: 0.82rem; font-weight: 600; color: var(--c-slate); }
         .bqc-last-update { font-size: 0.7rem; color: var(--c-text-muted); font-weight: 500; display: flex; align-items: center; gap: 5px; }
-        .bqc-btn-link { background: var(--c-accent-light); border: 1px solid var(--c-accent); border-radius: 10px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: #7a8500; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-        .bqc-btn-link:hover { background: var(--c-accent); }
+        .bqc-btn-link { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .bqc-btn-link:hover { background: var(--c-bg); border-color: #cbd5e1; color: var(--c-text-main); }
+        .bqc-btn-edit { border-color: #e2e8f0 !important; color: var(--c-slate) !important; }
 
-        .bqc-layout-row { display: flex; gap: 16px; }
-        .bqc-col-30 { width: 30%; }
-        .bqc-col-40 { width: 40%; }
+        .bqc-layout-row { display: flex; gap: 16px; align-items: stretch; }
+        .bqc-col-30 { width: 30%; display: flex; flex-direction: column; }
+        .bqc-col-40 { width: 40%; display: flex; flex-direction: column; }
         .bqc-panel-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 7px; margin-bottom: 10px; }
         .bqc-panel-label-des { color: var(--c-des); }
         .bqc-panel-label-cre { color: var(--c-cre); }
         .bqc-panel-label-detail { color: var(--c-slate); }
 
-        .bqc-panel { background: #fff; border: 1px solid #eef2f7; border-radius: 14px; padding: 16px 18px; min-height: 148px; }
+        .bqc-panel { background: #fff; border: 1px solid #eef2f7; border-radius: 14px; padding: 16px 18px; flex: 1; }
         .bqc-panel-des { border-color: var(--c-des-border); border-left: 3px solid var(--c-des); }
         .bqc-panel-cre { border-color: var(--c-cre-border); border-left: 3px solid var(--c-cre); }
-        .bqc-panel-empty { border: 1.5px dashed #e2e8f0; background: transparent; border-radius: 14px; min-height: 148px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .bqc-panel-empty { border: 1.5px dashed #e2e8f0; background: transparent; border-radius: 14px; flex: 1; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
 
         .bqc-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.8rem; color: var(--c-slate); }
         .bqc-val { font-weight: 600; color: var(--c-text-main); }
@@ -383,8 +384,7 @@
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 15px;">
-                                    <li> <a class="dropdown-item py-2" href="b-quest-view.html?id=${task.id}"> <i class="bi bi-eye me-2"></i> View </a> </li>
-                                    ${canDel ? `<li><hr class="dropdown-divider opacity-50"></li><li> <a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="handleDeleteTask('${task.id}')"> <i class="bi bi-trash3 me-2"></i> Delete </a> </li>` : ''}
+                                    ${canDel ? `<li> <a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="handleDeleteTask('${task.id}')"> <i class="bi bi-trash3 me-2"></i> Delete </a> </li>` : ''}
                                 </ul>
                             </div>
                         </div>
