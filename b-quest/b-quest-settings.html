@@ -340,43 +340,42 @@
                 <i class="bi bi-people-fill"></i> Members & Permissions
                 <span class="dirty-dot"></span>
             </div>
+            <div class="table-search-wrap">
+                <i class="bi bi-search table-search-icon"></i>
+                <input type="text" id="table-search" class="table-search-input" placeholder="Filter members...">
+            </div>
+            <span class="table-count" id="table-count"></span>
             <button class="btn-add-member" onclick="openAddModal()">
                 <i class="bi bi-person-plus-fill"></i> Add Member
             </button>
         </div>
-        <div class="section-body">
-            <div class="table-toolbar">
-                <div class="table-search-wrap">
-                    <i class="bi bi-search table-search-icon"></i>
-                    <input type="text" id="table-search" class="table-search-input" placeholder="Filter members...">
+        <div class="section-body" style="padding: 0;">
+            <div class="perm-scroll-body" style="padding: 0 24px 20px;">
+                <div class="perm-thead-sticky">
+                    <!-- Group header row -->
+                    <div class="perm-group-head">
+                        <div></div>
+                        <div class="group-label group-role" style="grid-column: 2 / 5">ROLE</div>
+                        <div class="group-label group-task" style="grid-column: 5 / 8">TASK</div>
+                        <div class="group-label group-admin" style="grid-column: 8 / 10">ADMIN</div>
+                        <div></div>
+                    </div>
+                    <!-- Column label row -->
+                    <div class="perm-table-head">
+                        <div class="perm-col-name">Member</div>
+                        <div class="perm-col-label">AE</div>
+                        <div class="perm-col-label">Creative</div>
+                        <div class="perm-col-label">Designer</div>
+                        <div class="perm-col-label">New</div>
+                        <div class="perm-col-label">Edit</div>
+                        <div class="perm-col-label">Delete</div>
+                        <div class="perm-col-label">Assign</div>
+                        <div class="perm-col-label">Setting</div>
+                        <div></div>
+                    </div>
                 </div>
-                <span class="table-count" id="table-count"></span>
+                <div id="perm-list"></div>
             </div>
-
-            <!-- Group header row -->
-            <div class="perm-group-head">
-                <div></div>
-                <div class="group-label group-role" style="grid-column: 2 / 5">ROLE</div>
-                <div class="group-label group-task" style="grid-column: 5 / 8">TASK</div>
-                <div class="group-label group-admin" style="grid-column: 8 / 10">ADMIN</div>
-                <div></div>
-            </div>
-
-            <!-- Column label row -->
-            <div class="perm-table-head">
-                <div class="perm-col-name">Member</div>
-                <div class="perm-col-label">AE</div>
-                <div class="perm-col-label">Creative</div>
-                <div class="perm-col-label">Designer</div>
-                <div class="perm-col-label">New</div>
-                <div class="perm-col-label">Edit</div>
-                <div class="perm-col-label">Delete</div>
-                <div class="perm-col-label">Assign</div>
-                <div class="perm-col-label">Setting</div>
-                <div></div>
-            </div>
-
-            <div id="perm-list"></div>
         </div>
     </div>
 
