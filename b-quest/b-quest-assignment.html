@@ -281,7 +281,7 @@
         renderRows(rows);
     }
 
-    // ── Render (Zone Layout) ──
+    // ── Render ──
     function renderRows(rows) {
         const container = document.getElementById('list-rows');
         if (!rows.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>No unassigned items</p></div>`; return; }
@@ -294,43 +294,30 @@
             const rDL   = isDes ? q.designer_deadline : q.creative_deadline;
             const options = isDes ? designers : creatives;
             const opts = [`<option value="">— Unassigned —</option>`].concat(options.map(n => `<option value="${n}">${n}</option>`)).join('');
+            const acct = [esc(q.account_name), esc(q.opportunity_name)].filter(Boolean).join(' · ');
 
             return `
             <div class="assign-card ${isDes ? 'card-des' : 'card-cre'}" id="row-${q.id}__${r.role}">
 
-                <div class="as-zone zone-owner">
-                    ${q.owner ? `<span class="owner-chip" title="${esc(q.owner)}"><i class="bi bi-person-fill"></i> ${esc(q.owner)}</span>` : '<div></div>'}
-                    ${rDL ? `<div class="dl-chip ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</div>` : ''}
+                <div class="c-head">
+                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}"><i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i> ${r.role.toUpperCase()}</span>
+                    <span class="c-account">${acct}</span>
+                    ${rDL ? `<span class="dl-chip ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</span>` : ''}
                 </div>
 
-                <div class="zone-div"></div>
+                <div class="c-body">
+                    <div class="c-task-name">${esc(q.task_name) || 'Untitled'}</div>
+                    ${(rWork || rType) ? `<div class="c-chips">${rWork ? `<span class="meta-chip">${esc(rWork)}</span>` : ''}${rType ? `<span class="meta-chip">${esc(rType)}</span>` : ''}</div>` : ''}
+                    ${q.detail ? `<div class="c-detail">${esc(q.detail)}</div>` : ''}
+                </div>
 
-                <div class="as-zone zone-task">
-                    <div>
-                        <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
-                        ${(q.account_name || q.opportunity_name) ? `<div class="task-acc">${[esc(q.account_name), esc(q.opportunity_name)].filter(Boolean).join(' · ')}</div>` : ''}
+                <div class="c-foot">
+                    <div class="c-foot-left">
+                        ${q.owner ? `<span class="owner-chip"><i class="bi bi-person-fill"></i> ${esc(q.owner)}</span>` : ''}
+                        ${q.link  ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                     </div>
-                    <div class="task-meta-row">
-                        ${rWork ? `<span class="meta-chip">${esc(rWork)}</span>` : ''}
-                        ${rType ? `<span class="meta-chip">${esc(rType)}</span>` : ''}
-                        ${q.link ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
-                    </div>
-                </div>
-
-                <div class="zone-div"></div>
-
-                <div class="as-zone zone-detail">
-                    ${q.detail ? `<div class="task-detail">${esc(q.detail)}</div>` : '<div class="task-detail-empty">— No detail —</div>'}
-                </div>
-
-                <div class="zone-div"></div>
-
-                <div class="as-zone zone-assign">
-                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}">
-                        <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i> ${r.role.toUpperCase()}
-                    </span>
-                    <div class="assign-box-wrap">
-                        <div class="assign-label">Assign to</div>
+                    <div class="assign-wrap">
+                        <span class="assign-label">Assign to</span>
                         <select class="assign-select" data-quest-id="${q.id}" data-role="${r.role}" onchange="onAssignChange(this)">${opts}</select>
                     </div>
                 </div>
