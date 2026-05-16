@@ -102,17 +102,7 @@ async function renderSystemUI(config) {
 
     const menuBar = document.getElementById('sys-nav-inject');
     if (config.menus && menuBar) {
-        const currentPath = window.location.pathname.split('/').pop();
-        const perms = (() => { try { return JSON.parse(sessionStorage.getItem('bx_bquest_perms')); } catch { return null; } })();
-        menuBar.innerHTML = config.menus.filter(menu => {
-            if (!menu.perm) return true;
-            if (!perms) return false;
-            if (perms._god) return true;
-            return !!perms[menu.perm];
-        }).map(menu => {
-            const isActive = (currentPath === menu.link) ? 'active' : '';
-            return `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`;
-        }).join('');
+        await renderSystemMenu(config);
     }
 
     const user = getBxUser();
@@ -120,6 +110,30 @@ async function renderSystemUI(config) {
     if (userDisplay) {
         userDisplay.innerText = user?.codename || user?.email || '-';
     }
+}
+
+async function renderSystemMenu(config) {
+    const menuBar = document.getElementById('sys-nav-inject');
+    if (!config.menus || !menuBar) return;
+
+    let perms;
+    if (typeof config.getMenuPerms === 'function') {
+        perms = await config.getMenuPerms();
+    } else {
+        try { perms = JSON.parse(sessionStorage.getItem('bx_bquest_perms')); }
+        catch { perms = null; }
+    }
+
+    const currentPath = window.location.pathname.split('/').pop();
+    menuBar.innerHTML = config.menus.filter(menu => {
+        if (!menu.perm) return true;
+        if (!perms) return false;
+        if (perms._god) return true;
+        return !!perms[menu.perm];
+    }).map(menu => {
+        const isActive = (currentPath === menu.link) ? 'active' : '';
+        return `<a href="${menu.link}" class="sys-menu-link ${isActive}">${menu.name}</a>`;
+    }).join('');
 }
 
 function injectAssets() {

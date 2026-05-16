@@ -49,6 +49,8 @@ function guardBquestPage(perm) {
     if (!canBquest(perm)) window.location.replace('b-quest-list.html');
 }
 
+B_QUEST_CONFIG.getMenuPerms = loadBquestPerms;
+
 async function handleDeleteTask(id) {
     const res = await Swal.fire({
         title: 'Delete Task?',
