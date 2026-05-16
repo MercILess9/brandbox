@@ -14,7 +14,7 @@ async function loadBquestPerms() {
     if (!user) return null;
 
     if (user.level === 'god') {
-        const godPerms = { new: true, delete: true, edit_designer: true, edit_creative: true, assign: true, setting: true, _god: true };
+        const godPerms = { ae: true, creative: true, designer: true, new: true, edit: true, delete: true, assign: true, setting: true, _god: true };
         sessionStorage.setItem('bx_bquest_perms', JSON.stringify(godPerms));
         return godPerms;
     }
@@ -23,7 +23,7 @@ async function loadBquestPerms() {
     if (cached) return JSON.parse(cached);
 
     const { data } = await supabaseClient
-        .from('b-quest-profiles')
+        .from('b-quest-setting')
         .select('*')
         .eq('codename', user.codename)
         .single();

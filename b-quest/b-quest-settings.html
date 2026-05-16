@@ -28,7 +28,7 @@
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
-        .settings-wrapper { max-width: 1060px; margin: 0 auto; padding: 36px 20px 120px; }
+        .settings-wrapper { max-width: 1300px; margin: 0 auto; padding: 36px 20px 120px; }
 
         .page-header { margin-bottom: 28px; }
         .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
@@ -416,6 +416,7 @@
     // TASK group: new, edit (syncs edit_designer + edit_creative), delete
     // ADMIN group: assign, setting
     const ROLE_COLS  = ['AE', 'Creative', 'Designer'];
+    const ROLE_MAP   = { AE: 'ae', Creative: 'creative', Designer: 'designer' };
     const PERM_COLS  = ['new', 'edit', 'delete', 'assign', 'setting'];
 
     // ── State ──
@@ -590,9 +591,9 @@
 
     async function loadMembers() {
         showSkeleton();
-        const { data, error } = await supabaseClient.from('b-quest-profiles').select('*').order('codename');
+        const { data, error } = await supabaseClient.from('b-quest-setting').select('*').order('codename');
         if (error) { console.error(error); return; }
-        originalMembers = (data || []).map(m => ({ ...m, roles: parseRoles(m.roles) }));
+        originalMembers = data || [];
         renderMembersFromBuffer();
         updateTableCount(originalMembers.length, originalMembers.length);
     }
@@ -609,7 +610,7 @@
             const ch = memberChanges[m.codename];
             if (!ch) return { ...m, _state: 'clean' };
             if (ch._delete) return { ...m, _state: 'deleted' };
-            return { ...m, ...ch, roles: ch.roles ?? m.roles, _state: 'edited' };
+            return { ...m, ...ch, _state: 'edited' };
         });
 
         Object.values(memberChanges).filter(c => c._new).forEach(c => {
@@ -628,7 +629,6 @@
         }
 
         container.innerHTML = rows.map(member => {
-            const roles = parseRoles(member.roles);
             const isDeleted = member._state === 'deleted';
             const isNew = member._state === 'new';
             const disabled = isDeleted ? 'disabled' : '';
@@ -643,16 +643,14 @@
             const roleToggles = ROLE_COLS.map(role => `
                 <div class="perm-check-cell">
                     <label class="bq-toggle">
-                        <input type="checkbox" ${roles.includes(role) ? 'checked' : ''} onchange="onRoleChange('${member.codename}','${role}',this.checked)" ${disabled}>
+                        <input type="checkbox" ${member[ROLE_MAP[role]] ? 'checked' : ''} onchange="onRoleChange('${member.codename}','${role}',this.checked)" ${disabled}>
                         <span class="bq-slider"></span>
                     </label>
                 </div>`).join('');
 
             // 5 perm toggles (edit maps to edit_designer + edit_creative)
             const permToggles = PERM_COLS.map(col => {
-                const checked = col === 'edit'
-                    ? !!(member.edit_designer || member.edit_creative)
-                    : !!member[col];
+                const checked = !!member[col];
                 return `
                 <div class="perm-check-cell">
                     <label class="bq-toggle">
@@ -684,31 +682,21 @@
         if (!memberChanges[codename]) {
             const orig = originalMembers.find(m => m.codename === codename);
             memberChanges[codename] = orig
-                ? { ...orig, roles: [...(orig.roles || [])] }
-                : { codename, new: false, delete: false, edit_designer: false, edit_creative: false, assign: false, setting: false, roles: [] };
+                ? { ...orig }
+                : { codename, ae: false, creative: false, designer: false, new: false, edit: false, delete: false, assign: false, setting: false };
         }
-        if (!memberChanges[codename].roles) memberChanges[codename].roles = [];
         return memberChanges[codename];
     }
 
     function onRoleChange(codename, role, checked) {
         const ch = getOrInitChange(codename);
-        const roles = [...ch.roles];
-        const idx = roles.indexOf(role);
-        if (checked && idx < 0) roles.push(role);
-        if (!checked && idx >= 0) roles.splice(idx, 1);
-        ch.roles = roles;
+        ch[ROLE_MAP[role]] = checked;
         markDirty('section-members');
     }
 
     function onPermChange(codename, col, value) {
         const ch = getOrInitChange(codename);
-        if (col === 'edit') {
-            ch.edit_designer = value;
-            ch.edit_creative = value;
-        } else {
-            ch[col] = value;
-        }
+        ch[col] = value;
         markDirty('section-members');
     }
 
@@ -812,10 +800,10 @@
         modalSelected.forEach(codename => {
             memberChanges[codename] = {
                 codename,
-                new: false, delete: false,
-                edit_designer: false, edit_creative: false,
+                ae: false, creative: false, designer: false,
+                new: false, edit: false, delete: false,
                 assign: false, setting: false,
-                roles: [], _new: true
+                _new: true
             };
         });
         markDirty('section-members');
@@ -877,24 +865,25 @@
             // 3. Members
             for (const [codename, ch] of Object.entries(memberChanges)) {
                 const payload = {
+                    ae: ch.ae,
+                    creative: ch.creative,
+                    designer: ch.designer,
                     new: ch.new,
+                    edit: ch.edit,
                     delete: ch.delete,
-                    edit_designer: ch.edit_designer,
-                    edit_creative: ch.edit_creative,
                     assign: ch.assign,
-                    setting: ch.setting,
-                    roles: ch.roles || []
+                    setting: ch.setting
                 };
                 if (ch._new) {
-                    const { error } = await supabaseClient.from('b-quest-profiles')
+                    const { error } = await supabaseClient.from('b-quest-setting')
                         .insert([{ codename, ...payload }]);
                     if (error) errors.push(`Member add "${codename}": ` + error.message);
                 } else if (ch._delete) {
-                    const { error } = await supabaseClient.from('b-quest-profiles')
+                    const { error } = await supabaseClient.from('b-quest-setting')
                         .delete().eq('codename', codename);
                     if (error) errors.push(`Member remove "${codename}": ` + error.message);
                 } else {
-                    const { error } = await supabaseClient.from('b-quest-profiles')
+                    const { error } = await supabaseClient.from('b-quest-setting')
                         .update(payload).eq('codename', codename);
                     if (error) errors.push(`Member update "${codename}": ` + error.message);
                 }
