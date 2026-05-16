@@ -87,6 +87,19 @@ const B_QUEST_MODAL_HTML = `
     #card-creative .bq-toggle input:checked + .bq-slider { background-color: #8b5cf6; }
     input:checked + .bq-slider:before { transform: translateX(16px); }
 
+    /* ── Assign Zone (shown only when user has assign perm & role is active) ── */
+    .bq-assign-zone { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eef2f7; }
+    .role-card.active .bq-assign-zone.can-assign { display: block; }
+    .bq-assign-row { display: flex; align-items: flex-end; gap: 9px; }
+    .bq-assign-icon { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
+    #card-designer .bq-assign-icon { background: #dbeafe; color: #3b82f6; }
+    #card-creative .bq-assign-icon { background: #ede9fe; color: #8b5cf6; }
+    .bq-assign-sel { width: 100%; height: 33px; border: 1.5px solid #e2e8f0; border-radius: 9px; background: #f8fafc; font-size: 0.78rem; font-weight: 600; color: #334155; padding: 0 10px; outline: none; cursor: pointer; font-family: inherit; transition: 0.2s; appearance: none; -webkit-appearance: none; }
+    #card-designer .bq-assign-sel:focus { border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    #card-creative .bq-assign-sel:focus { border-color: #8b5cf6; background: #fff; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+    #card-designer .bq-assign-sel.is-assigned { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; font-weight: 700; }
+    #card-creative .bq-assign-sel.is-assigned { border-color: #ddd6fe; background: #f5f3ff; color: #6d28d9; font-weight: 700; }
+
     /* Search overlay */
     .bq-search-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 10001; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
     .bq-search-card { background: #fff; width: 480px; max-height: 80vh; border-radius: 22px; padding: 22px; display: flex; flex-direction: column; box-shadow: 0 24px 60px rgba(0,0,0,0.15); }
