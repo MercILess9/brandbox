@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>B-QUEST | Assignment (Modern Layout)</title>
+    <title>B-QUEST | Assignment (Luxury Zone Layout)</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -46,7 +46,7 @@
 
         /* Role Pills */
         .pill-group { display: flex; gap: 6px; }
-        .flt-pill { border: 1.5px solid var(--c-border); background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .flt-pill { border: 1.5px solid var(--c-border); background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
         .flt-pill i { font-size: 0.8rem; }
         .flt-pill.active-des { background: var(--c-des-bg); color: var(--c-des); border-color: #dbeafe; }
         .flt-pill.active-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: #ede9fe; }
@@ -70,52 +70,53 @@
         .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         .section-badge { background: var(--c-accent); color: var(--c-dark); border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
 
-        /* ── New Column Layout ── */
+        /* ── Luxury Zone Layout ── */
         .assign-card {
-            display: flex; gap: 0; padding: 0; border-bottom: 1px solid var(--c-border);
-            transition: background 0.15s;
+            display: flex; gap: 0; padding: 4px 0; border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s, box-shadow 0.15s;
         }
         .assign-card:last-child { border-bottom: none; }
         .assign-card:hover { background: #fafbff; }
 
-        /* Base Col Style */
-        .as-col {
-            padding: 18px 20px;
+        /* Elegant Open Zones (No border-right) */
+        .as-zone {
+            padding: 16px 20px;
             display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 90px; /* สูงประมาณ 3 บรรทัด */
+            min-height: 96px; /* คุมความสูงประมาณ 3 บรรทัด */
             box-sizing: border-box;
-            border-right: 1px solid #f1f5f9;
         }
-        .as-col:last-child { border-right: none; }
-
-        /* Role Badge (Floating top) */
-        .role-badge { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; font-weight: 800; border-radius: 4px; padding: 2px 7px; white-space: nowrap; margin-bottom: 6px; align-self: flex-start; }
-        .role-des { background: var(--c-des-bg); color: var(--c-des); }
-        .role-cre { background: var(--c-cre-bg); color: var(--c-cre); }
 
         /* 🚩 Col 1: Owner & Date */
-        .col-owner { flex: 0 0 160px; }
-        .owner-tag { background: #ecfdf5; color: #10b981; border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; font-weight: 700; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
-        .deadline-chip { display: flex; align-items: center; gap: 4px; background: #fffbeb; color: #b45309; border-radius: 6px; padding: 2px 8px; font-size: 0.7rem; font-weight: 700; margin-top: auto; white-space: nowrap; align-self: flex-start; }
+        .zone-owner { flex: 0 0 160px; }
+        .owner-tag { background: #ecfdf5; color: #10b981; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 700; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .deadline-chip { display: flex; align-items: center; gap: 4px; background: #fffbeb; color: #b45309; border-radius: 6px; padding: 3px 8px; font-size: 0.7rem; font-weight: 700; margin-top: auto; white-space: nowrap; align-self: flex-start; }
 
-        /* 🚩 Col 2: Task Info (Main Col) */
-        .col-task { flex: 1; min-width: 0; }
+        /* 🚩 Col 2: Task Info */
+        .zone-task { flex: 1; min-width: 0; padding-left: 10px; }
         .task-top { display: flex; flex-direction: column; gap: 2px; }
-        .task-name { font-size: 0.88rem; font-weight: 800; color: var(--c-dark); line-height: 1.3; margin-bottom: 1px; }
+        .task-name { font-size: 0.9rem; font-weight: 800; color: var(--c-dark); line-height: 1.3; margin-bottom: 1px; }
         .task-acc  { font-size: 0.72rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .task-meta-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: auto; }
-        .meta-chip { background: #f1f5f9; border-radius: 20px; padding: 2px 9px; font-size: 0.68rem; font-weight: 700; color: var(--c-slate); }
-        .task-link { display: inline-flex; align-items: center; gap: 3px; font-size: 0.68rem; font-weight: 700; color: var(--c-accent); text-decoration: none; border: 1.5px solid var(--c-accent); border-radius: 6px; padding: 1px 7px; }
+        .task-meta-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+        .meta-chip { background: #f1f5f9; border-radius: 20px; padding: 2px 10px; font-size: 0.68rem; font-weight: 700; color: var(--c-slate); }
+        .task-link { display: inline-flex; align-items: center; gap: 3px; font-size: 0.68rem; font-weight: 700; color: var(--c-accent); text-decoration: none; border: 1.5px solid var(--c-accent); border-radius: 6px; padding: 1px 7px; transition: 0.15s; }
         .task-link:hover { background: var(--c-accent); color: #000; }
 
         /* 🚩 Col 3: Detail */
-        .col-detail { flex: 0 0 350px; font-family: var(--f-sarabun); }
-        .task-detail { font-size: 0.75rem; color: var(--c-slate); line-height: 1.6; height: 100%; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; justify-content: center; display: flex; align-items: center; }
+        .zone-detail { flex: 0 0 360px; font-family: var(--f-sarabun); }
+        .task-detail { font-size: 0.75rem; color: var(--c-slate); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin: auto 0; }
 
-        /* 🚩 Col 4: Assign */
-        .col-assign { flex: 0 0 190px; }
-        .assign-select { width: 100%; border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 26px 7px 10px; font-size: 0.78rem; font-weight: 600; color: var(--c-dark); background: var(--c-bg); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+        /* 🚩 Col 4: Assign & Role (Rightmost Zone) */
+        .zone-assign { flex: 0 0 210px; align-items: flex-end; }
+        
+        /* Role Badge moved to rightmost top */
+        .role-badge { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; font-weight: 800; border-radius: 4px; padding: 2px 8px; white-space: nowrap; letter-spacing: 0.5px; }
+        .role-des { background: var(--c-des-bg); color: var(--c-des); border: 1px solid #dbeafe; }
+        .role-cre { background: var(--c-cre-bg); color: var(--c-cre); border: 1px solid #ede9fe; }
+
+        .assign-box-wrap { width: 100%; margin-top: auto; }
+        .assign-label { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-align: right; padding-right: 2px; }
+        .assign-select { width: 100%; border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 26px 7px 10px; font-size: 0.78rem; font-weight: 600; color: var(--c-dark); background: var(--c-bg); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; text-align-last: left; }
         .assign-select:focus { border-color: var(--c-accent); background-color: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.1); }
         .assign-select.is-saving { opacity: 0.45; pointer-events: none; }
 
@@ -124,8 +125,8 @@
         .empty-state i { font-size: 2.2rem; opacity: 0.3; display: block; margin-bottom: 12px; }
         .empty-state p { font-size: 0.85rem; font-weight: 600; margin: 0; }
 
-        .skeleton-card { display: flex; gap: 0; padding: 0; border-bottom: 1px solid var(--c-border); }
-        .skel-col { padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 90px; border-right: 1px solid #f1f5f9; box-sizing: border-box; }
+        .skeleton-card { display: flex; gap: 0; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+        .skel-zone { padding: 16px 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 96px; box-sizing: border-box; }
         .skel { background: #f1f5f9; border-radius: 4px; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
     </style>
@@ -267,7 +268,7 @@
         renderRows(rows);
     }
 
-    // ── Render (4 Columns) ──
+    // ── Render (4 Zones - Luxury Layout) ──
     function renderRows(rows) {
         const container = document.getElementById('list-rows');
         if (!rows.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>No unassigned items</p></div>`; return; }
@@ -285,15 +286,12 @@
             return `
             <div class="assign-card" id="row-${q.id}__${r.role}">
 
-                <div class="as-col col-owner">
-                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}">
-                        <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i>${r.role.toUpperCase()}
-                    </span>
+                <div class="as-zone zone-owner">
                     ${q.owner ? `<div class="owner-tag" title="${esc(q.owner)}">${esc(q.owner)}</div>` : '<div></div>'}
                     ${rDL ? `<div class="deadline-chip"><i class="bi bi-calendar3"></i>${formatDate(rDL, true)}</div>` : ''}
                 </div>
 
-                <div class="as-col col-task">
+                <div class="as-zone zone-task">
                     <div class="task-top">
                         <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
                         <div class="task-acc">${esc(q.account_name) || ''}${q.opportunity_name ? ` | ${esc(q.opportunity_name)}` : ''}</div>
@@ -301,21 +299,28 @@
                     <div class="task-meta-row">
                         ${rWork  ? `<span class="meta-chip">${esc(rWork)}</span>` : ''}
                         ${rType  ? `<span class="meta-chip">${esc(rType)}</span>` : ''}
-                        ${q.link   ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i></a>` : ''}
+                        ${q.link   ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                     </div>
                 </div>
 
-                <div class="as-col col-detail">
-                    ${q.detail ? `<div class="task-detail Sarabun">${esc(q.detail)}</div>` : '<div class="empty-detail"></div>'}
+                <div class="as-zone zone-detail">
+                    ${q.detail ? `<div class="task-detail">${esc(q.detail)}</div>` : '<div class="task-detail text-muted" style="opacity:0.4">— No detail —</div>'}
                 </div>
 
-                <div class="as-col col-assign">
-                    <select class="assign-select"
-                        data-quest-id="${q.id}"
-                        data-role="${r.role}"
-                        onchange="onAssignChange(this)">
-                        ${opts}
-                    </select>
+                <div class="as-zone zone-assign">
+                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}">
+                        <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i> ${r.role.toUpperCase()}
+                    </span>
+                    
+                    <div class="assign-box-wrap">
+                        <div class="assign-label">Assign to</div>
+                        <select class="assign-select"
+                            data-quest-id="${q.id}"
+                            data-role="${r.role}"
+                            onchange="onAssignChange(this)">
+                            ${opts}
+                        </select>
+                    </div>
                 </div>
 
             </div>`;
@@ -323,7 +328,7 @@
     }
 
     function skeletonHTML() {
-        const row = () => `<div class="skeleton-card"><div class="skel-col col-owner"><div class="skel" style="height:15px;width:60px;"></div><div class="skel" style="height:22px;width:90px;border-radius:20px;"></div><div class="skel" style="height:16px;width:70px;"></div></div><div class="skel-col col-task"><div class="skel" style="height:15px;width:180px;"></div><div class="skel" style="height:10px;width:120px;"></div><div style="display:flex;gap:5px;margin-top:auto;"><div class="skel" style="height:18px;width:70px;border-radius:20px;"></div><div class="skel" style="height:18px;width:50px;border-radius:20px;"></div></div></div><div class="skel-col col-detail"><div class="skel" style="height:12px;width:100%;"></div><div class="skel" style="height:12px;width:90%;"></div><div class="skel" style="height:12px;width:80%;"></div></div><div class="skel-col col-assign"><div class="skel" style="height:32px;width:100%;border-radius:8px;"></div></div></div>`;
+        const row = () => `<div class="skeleton-card"><div class="skel-zone zone-owner"><div class="skel" style="height:22px;width:90px;border-radius:20px;"></div><div class="skel" style="height:16px;width:70px;"></div></div><div class="skel-zone zone-task"><div class="skel" style="height:15px;width:180px;"></div><div class="skel" style="height:10px;width:120px;"></div><div style="display:flex;gap:5px;margin-top:auto;"><div class="skel" style="height:18px;width:70px;border-radius:20px;"></div><div class="skel" style="height:18px;width:50px;border-radius:20px;"></div></div></div><div class="skel-zone zone-detail"><div class="skel" style="height:12px;width:100%;"></div><div class="skel" style="height:12px;width:95%;"></div><div class="skel" style="height:12px;width:80%;"></div></div><div class="skel-zone zone-assign" style="align-items:flex-end;"><div class="skel" style="height:18px;width:75px;"></div><div class="skel" style="height:32px;width:100%;border-radius:8px;margin-top:auto;"></div></div></div>`;
         return row() + row() + row() + row();
     }
     function esc(str) { return str ? str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
