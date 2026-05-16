@@ -100,6 +100,14 @@
         .btn-cancel-add:hover { background: #e2e8f0; }
         .work-empty { padding: 24px; text-align: center; color: var(--c-muted); font-size: 0.8rem; font-weight: 600; }
 
+        /* Role filter pills */
+        .pill-group { display: flex; gap: 6px; flex-shrink: 0; }
+        .flt-pill { border: 1.5px solid var(--c-border); background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .flt-pill i { font-size: 0.8rem; }
+        .flt-pill.active-ae  { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+        .flt-pill.active-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
+        .flt-pill.active-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
+
         /* Members */
         .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; display: flex; align-items: center; gap: 7px; margin-left: auto; flex-shrink: 0; }
         .btn-add-member:hover { background: #0f172a; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
@@ -343,6 +351,11 @@
             <div class="section-title">
                 <i class="bi bi-people-fill"></i> Members & Permissions
                 <span class="dirty-dot"></span>
+            </div>
+            <div class="pill-group">
+                <button id="mpill-ae"  class="flt-pill" onclick="toggleMemberPill('ae')"><i class="bi bi-person-badge"></i> AE</button>
+                <button id="mpill-cre" class="flt-pill" onclick="toggleMemberPill('cre')"><i class="bi bi-rocket"></i> Creative</button>
+                <button id="mpill-des" class="flt-pill" onclick="toggleMemberPill('des')"><i class="bi bi-brush"></i> Designer</button>
             </div>
             <div class="table-search-wrap">
                 <i class="bi bi-search table-search-icon"></i>
@@ -629,6 +642,13 @@
 
         if (filter) rows = rows.filter(m => m.codename.toLowerCase().includes(filter.toLowerCase()));
 
+        const aeOn  = document.getElementById('mpill-ae')?.classList.contains('active-ae');
+        const creOn = document.getElementById('mpill-cre')?.classList.contains('active-cre');
+        const desOn = document.getElementById('mpill-des')?.classList.contains('active-des');
+        if (aeOn || creOn || desOn) {
+            rows = rows.filter(m => (aeOn && m.ae) || (creOn && m.creative) || (desOn && m.designer));
+        }
+
         const visible = rows.filter(r => r._state !== 'deleted');
         const total = originalMembers.length + Object.values(memberChanges).filter(c => c._new).length;
         updateTableCount(visible.length, total);
@@ -823,6 +843,12 @@
 
     function setupAddSearch() {
         document.getElementById('am-search').addEventListener('input', e => renderModalList(e.target.value.trim()));
+    }
+
+    function toggleMemberPill(role) {
+        const btn = document.getElementById('mpill-' + role);
+        btn.classList.toggle('active-' + role);
+        renderMembersFromBuffer(document.getElementById('table-search').value.trim());
     }
 
     function setupTableSearch() {
