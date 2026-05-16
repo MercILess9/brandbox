@@ -87,7 +87,7 @@
 
         /* Task block */
         .task-block { flex: 1; min-width: 0; }
-        .task-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+        .task-top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
         .task-name { font-size: 0.92rem; font-weight: 700; color: var(--c-dark); line-height: 1.3; }
         .task-acc  { font-size: 0.75rem; color: var(--c-muted); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -387,20 +387,21 @@
             return `
             <div class="assign-card" id="row-${rowKey}">
 
-                <span class="role-pill ${isDes ? 'role-pill-des' : 'role-pill-cre'}" style="margin-top:2px;">
-                    <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i>
-                    ${r.role}
-                </span>
-
                 <div class="task-block">
-                    <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
-                    <div class="task-acc">${esc(q.account_name) || ''}${q.opportunity_name ? ` | ${esc(q.opportunity_name)}` : ''}</div>
-                    <div class="task-meta">
-                        ${rWork  ? `<span class="meta-chip"><i class="bi bi-layers"></i>${esc(rWork)}</span>` : ''}
-                        ${rType  ? `<span class="meta-chip"><i class="bi bi-tag"></i>${esc(rType)}</span>` : ''}
-                        ${q.owner ? `<span class="meta-chip chip-owner"><i class="bi bi-person"></i>${esc(q.owner)}</span>` : ''}
-                        ${rDL    ? `<span class="meta-chip chip-dl"><i class="bi bi-calendar"></i>${formatDate(rDL)}</span>` : ''}
+                    <div class="task-top">
+                        <span class="role-pill ${isDes ? 'role-pill-des' : 'role-pill-cre'}">
+                            <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i>
+                            ${r.role}
+                        </span>
+                        <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
+                        <div class="task-meta">
+                            ${rWork  ? `<span class="meta-chip"><i class="bi bi-layers"></i>${esc(rWork)}</span>` : ''}
+                            ${rType  ? `<span class="meta-chip"><i class="bi bi-tag"></i>${esc(rType)}</span>` : ''}
+                            ${q.owner ? `<span class="meta-chip chip-owner"><i class="bi bi-person"></i>${esc(q.owner)}</span>` : ''}
+                            ${rDL    ? `<span class="meta-chip chip-dl"><i class="bi bi-calendar"></i>${formatDate(rDL)}</span>` : ''}
+                        </div>
                     </div>
+                    <div class="task-acc">${esc(q.account_name) || ''}${q.opportunity_name ? ` | ${esc(q.opportunity_name)}` : ''}</div>
                     ${q.detail ? `<div class="task-detail">${esc(q.detail)}</div>` : ''}
                     ${q.link   ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i>Link</a>` : ''}
                 </div>
