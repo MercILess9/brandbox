@@ -45,6 +45,17 @@ function canBquest(perm) {
     return !!p[perm];
 }
 
+// ตรวจสิทธิ์แก้ไข role card ใน modal
+// AE แก้ได้ทุก role, Designer/Creative แก้ได้เฉพาะ role ตัวเอง
+function canBquestEditRole(role) {
+    const p = getBquestPerms();
+    if (!p) return false;
+    if (p._god) return true;
+    if (!p.edit) return false;
+    if (p.ae) return true;
+    return !!p[role]; // role = 'designer' | 'creative'
+}
+
 function guardBquestPage(perm) {
     if (!canBquest(perm)) window.location.replace('b-quest-list.html');
 }

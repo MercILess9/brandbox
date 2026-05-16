@@ -220,7 +220,7 @@
         try {
             const [workRes, profileRes] = await Promise.all([
                 supabaseClient.from('b-quest-work').select('work, weight, role').order('work'),
-                supabaseClient.from('b-quest-profiles').select('codename, role_designer, role_creative').order('codename')
+                supabaseClient.from('b-quest-setting').select('codename, designer, creative').order('codename')
             ]);
 
             dataList = workRes.data || [];
@@ -270,8 +270,8 @@
         const creActive = document.getElementById('pill-creative').classList.contains('active-role');
         const showAll = !desActive && !creActive;
 
-        if (desActive || showAll) appendRoleGroup(filterAssign, "Designers", assignList, 'role_designer', true, 'codename', 'codename');
-        if (creActive || showAll) appendRoleGroup(filterAssign, "Creatives", assignList, 'role_creative', true, 'codename', 'codename');
+        if (desActive || showAll) appendRoleGroup(filterAssign, "Designers", assignList, 'designer', true, 'codename', 'codename');
+        if (creActive || showAll) appendRoleGroup(filterAssign, "Creatives", assignList, 'creative', true, 'codename', 'codename');
 
         filterAssign.value = currentSelection;
         updateHighlight('filterAssign');
@@ -344,7 +344,7 @@
     function renderCards(data) {
         const container = document.getElementById("taskContainer");
         // ไม่ต้องล้าง container ตรงนี้ เพราะเราใช้ระบบ Infinite Scroll (append ข้อมูลต่อท้าย)
-        const canEdit = canBquest('edit_designer') || canBquest('edit_creative');
+        const canEdit = canBquest('edit');
         const canDel  = canBquest('delete');
 
         data.forEach(task => {

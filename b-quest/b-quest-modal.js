@@ -387,9 +387,8 @@ const BQuestApp = (() => {
 
                         show(`${role}-capacity-info`, false);
 
-                        // Disable card inputs if user lacks edit permission for this role
-                        const permKey = role === 'designer' ? 'edit_designer' : 'edit_creative';
-                        const canEditRole = typeof canBquest === 'function' ? canBquest(permKey) : true;
+                        // AE แก้ได้ทั้ง 2 role, Designer/Creative แก้ได้เฉพาะ role ตัวเอง
+                        const canEditRole = typeof canBquestEditRole === 'function' ? canBquestEditRole(role) : true;
                         const card = el(`card-${role}`);
                         card.querySelectorAll('input, select, textarea').forEach(inp => inp.disabled = !canEditRole);
                         // keep toggle visible but disabled so user can see state

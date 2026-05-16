@@ -28,7 +28,7 @@
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
-        .assign-wrapper { max-width: 1160px; margin: 0 auto; padding: 36px 20px 120px; }
+        .assign-wrapper { max-width: 1300px; margin: 0 auto; padding: 36px 20px 120px; }
 
         .page-header { margin-bottom: 24px; }
         .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
@@ -209,12 +209,12 @@
 
     async function loadProfiles() {
         const { data } = await supabaseClient
-            .from('b-quest-profiles')
-            .select('codename, edit_designer, edit_creative')
+            .from('b-quest-setting')
+            .select('codename, designer, creative')
             .order('codename');
         if (!data) return;
-        designers = data.filter(p => p.edit_designer).map(p => p.codename);
-        creatives = data.filter(p => p.edit_creative).map(p => p.codename);
+        designers = data.filter(p => p.designer).map(p => p.codename);
+        creatives = data.filter(p => p.creative).map(p => p.codename);
     }
 
     async function loadWorkList() {
