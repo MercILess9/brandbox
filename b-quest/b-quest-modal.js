@@ -205,6 +205,18 @@ const B_QUEST_MODAL_HTML = `
                                         </div>
                                     </div>
                                     <input type="hidden" id="b-quest-modal-designer-weight" name="designer_weight" value="0">
+                                    <input type="hidden" id="b-quest-modal-designer-assign" name="designer_assign" value="">
+                                    <div class="bq-assign-zone" id="assign-zone-designer">
+                                        <div class="bq-assign-row">
+                                            <div class="bq-assign-icon"><i class="bi bi-person-fill"></i></div>
+                                            <div style="flex:1">
+                                                <label class="bq-label-modern" style="margin-bottom:5px"><i class="bi bi-arrow-right-short"></i> Assign to</label>
+                                                <select class="bq-assign-sel" id="b-quest-modal-designer-assign-sel">
+                                                    <option value="">— Unassigned —</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -235,6 +247,18 @@ const B_QUEST_MODAL_HTML = `
                                         </div>
                                     </div>
                                     <input type="hidden" id="b-quest-modal-creative-weight" name="creative_weight" value="0">
+                                    <input type="hidden" id="b-quest-modal-creative-assign" name="creative_assign" value="">
+                                    <div class="bq-assign-zone" id="assign-zone-creative">
+                                        <div class="bq-assign-row">
+                                            <div class="bq-assign-icon"><i class="bi bi-person-fill"></i></div>
+                                            <div style="flex:1">
+                                                <label class="bq-label-modern" style="margin-bottom:5px"><i class="bi bi-arrow-right-short"></i> Assign to</label>
+                                                <select class="bq-assign-sel" id="b-quest-modal-creative-assign-sel">
+                                                    <option value="">— Unassigned —</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -257,7 +281,7 @@ const B_QUEST_MODAL_HTML = `
 document.body.insertAdjacentHTML('beforeend', B_QUEST_MODAL_HTML);
 
 const BQuestApp = (() => {
-    const State = { capacities: { designer: 0, creative: 0 }, maxCap: { designer: 10, creative: 10 }, currentData: null, roles: ['designer', 'creative'] };
+    const State = { capacities: { designer: 0, creative: 0 }, maxCap: { designer: 10, creative: 10 }, assignProfiles: { designer: [], creative: [] }, currentData: null, roles: ['designer', 'creative'] };
     const el = id => document.getElementById(id);
     const show = (id, condition, display = 'block') => { const e = el(id); if(e) e.style.display = condition ? display : 'none'; };
 
@@ -274,6 +298,13 @@ const BQuestApp = (() => {
                     if (key === 'designer' || key === 'creative') State.maxCap[key] = row.max_capacity ?? 10;
                 });
             }
+        },
+        async loadProfiles() {
+            if (State.assignProfiles.designer.length || State.assignProfiles.creative.length) return;
+            const { data } = await supabaseClient.from('b-quest-setting').select('codename, designer, creative').order('codename');
+            if (!data) return;
+            State.assignProfiles.designer = data.filter(p => p.designer).map(p => p.codename);
+            State.assignProfiles.creative = data.filter(p => p.creative).map(p => p.codename);
         }
     };
 
@@ -296,6 +327,16 @@ const BQuestApp = (() => {
             if(typeof B_QUEST_CONFIG !== 'undefined') B_QUEST_CONFIG.listTypes.forEach(t => typeSelect.add(new Option(t, t)));
 
             el(`b-quest-modal-${role}-deadline`).addEventListener('change', () => checkCapacity(role));
+
+            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
+            if (assignSel) {
+                assignSel.innerHTML = '<option value="">— Unassigned —</option>';
+                (State.assignProfiles[role] || []).forEach(name => assignSel.add(new Option(name, name)));
+                assignSel.onchange = () => {
+                    el(`b-quest-modal-${role}-assign`).value = assignSel.value;
+                    assignSel.classList.toggle('is-assigned', !!assignSel.value);
+                };
+            }
         });
     }
 
@@ -316,7 +357,9 @@ const BQuestApp = (() => {
             'creative_type': 'b-quest-modal-creative-type',
             'creative': 'b-quest-modal-creative-work',
             'creative_deadline': 'b-quest-modal-creative-deadline',
-            'creative_weight': 'b-quest-modal-creative-weight'
+            'creative_weight': 'b-quest-modal-creative-weight',
+            'designer_assign': 'b-quest-modal-designer-assign',
+            'creative_assign': 'b-quest-modal-creative-assign'
         };
         for (let key in fields) {
             const element = el(fields[key]);
@@ -351,6 +394,9 @@ const BQuestApp = (() => {
             card.classList.remove('active'); card.classList.add('disabled');
             inputs.forEach(input => { input.required = false; input.value = ''; });
             el(`b-quest-modal-${role}-weight`).value = '0';
+            el(`b-quest-modal-${role}-assign`).value = '';
+            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
+            if (assignSel) { assignSel.value = ''; assignSel.classList.remove('is-assigned'); }
 
             const capEl = el(`${role}-capacity-info`);
             if (capEl) { capEl.className = 'bq-cap-info'; capEl.innerHTML = ''; }
@@ -429,9 +475,12 @@ const BQuestApp = (() => {
         async openModal(taskId = null, workData = []) {
             const form = el('b-quest-modal-form');
             form.reset(); form.classList.remove('was-validated');
-            setupDropdowns(workData);
             State.currentData = null;
-            await BQuestService.loadMaxCapacities();
+            await Promise.all([BQuestService.loadMaxCapacities(), BQuestService.loadProfiles()]);
+            setupDropdowns(workData);
+
+            const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
+            State.roles.forEach(role => el(`assign-zone-${role}`).classList.toggle('can-assign', canAssign));
 
             if (taskId) {
                 el('btn-submit-icon').className  = 'bi bi-floppy2-fill';
@@ -462,6 +511,15 @@ const BQuestApp = (() => {
                             show(badge.id, false);
                         }
 
+                        if (canAssign) {
+                            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
+                            const hiddenAssign = el(`b-quest-modal-${role}-assign`);
+                            if (assignSel && hiddenAssign) {
+                                assignSel.value = hiddenAssign.value || '';
+                                assignSel.classList.toggle('is-assigned', !!assignSel.value);
+                            }
+                        }
+
                         const capEl = el(`${role}-capacity-info`);
                         if (capEl) { capEl.className = 'bq-cap-info'; capEl.innerHTML = ''; }
 
@@ -471,6 +529,11 @@ const BQuestApp = (() => {
                         card.querySelectorAll('input, select, textarea').forEach(inp => inp.disabled = !canEditRole);
                         el(`check-${role}`).disabled = !canEditRole;
                         card.style.opacity = canEditRole ? '' : '0.55';
+
+                        if (canAssign) {
+                            const assignSel = el(`b-quest-modal-${role}-assign-sel`);
+                            if (assignSel) assignSel.disabled = false;
+                        }
                     });
                 }
             } else {
@@ -518,6 +581,7 @@ const BQuestApp = (() => {
             const payload = Object.fromEntries(new FormData(form).entries());
             const isEdit  = !!payload.id && payload.id.length > 10;
 
+            const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
             State.roles.forEach(role => {
                 if (!el(`check-${role}`).checked) {
                     payload[role] = null; payload[`${role}_type`] = null; payload[`${role}_deadline`] = null;
@@ -525,6 +589,13 @@ const BQuestApp = (() => {
                 } else {
                     payload[`${role}_weight`] = parseInt(payload[`${role}_weight`]) || 0;
                     if (!payload[`${role}_status`]) payload[`${role}_status`] = 'On Progress';
+                    if (!canAssign) {
+                        // preserve existing assign — don't overwrite from hidden input
+                        if (State.currentData) payload[`${role}_assign`] = State.currentData[`${role}_assign`] || null;
+                        else delete payload[`${role}_assign`];
+                    } else {
+                        if (!payload[`${role}_assign`]) payload[`${role}_assign`] = null;
+                    }
                 }
             });
 
