@@ -16,10 +16,8 @@ const B_QUEST_MODAL_HTML = `
     .bq-modern-body { padding: 20px 28px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
-    /* Right column — scrolls internally so modal height never shifts */
-    .bq-role-col { max-height: 430px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #e2e8f0 transparent; }
-    .bq-role-col::-webkit-scrollbar { width: 3px; }
-    .bq-role-col::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+    /* Right column — grows naturally; left glass-card stretches to match via flex */
+    .bq-role-col { height: 100%; }
 
     /* Left card */
     .bq-glass-card { background: #fff; border-radius: 18px; padding: 20px; border: 1px solid #eef2f7; height: 100%; display: flex; flex-direction: column; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.04); }
@@ -56,19 +54,15 @@ const B_QUEST_MODAL_HTML = `
     #card-designer .bq-role-state.on { color: #3b82f6; }
     #card-creative .bq-role-state.on { color: #8b5cf6; }
 
-    .bq-role-chevron { margin-left: auto; color: #cbd5e1; font-size: 0.8rem; transition: transform 0.3s ease, color 0.25s; }
-    .role-card.active .bq-role-chevron { transform: rotate(180deg); }
-    #card-designer.active .bq-role-chevron { color: #3b82f6; }
-    #card-creative.active .bq-role-chevron { color: #8b5cf6; }
-
     .role-card-body { max-height: 0; padding: 0 18px; transition: all 0.35s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 14px 16px 16px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
     /* Assign badge & status */
     .bq-assign-badge { background: #eff6ff; color: #3b82f6; padding: 2px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #dbeafe; display: none; margin-left: 4px; }
-    .bq-status-select { border: none; border-radius: 8px; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; min-width: 95px; text-align-last: center; height: 26px; display: none; margin-left: auto; cursor: pointer; font-family: inherit; }
-    .status-progress { background-color: #bdc432 !important; color: #3d4200 !important; }
-    .status-done { background-color: #94a3b8 !important; color: #fff !important; }
+    .bq-status-select { border: none; border-radius: 20px; font-size: 0.68rem; font-weight: 800; padding: 3px 12px; min-width: 100px; text-align-last: center; height: 26px; display: none; margin-left: auto; cursor: pointer; font-family: inherit; appearance: none; -webkit-appearance: none; letter-spacing: 0.3px; }
+    #card-designer .bq-status-select.status-progress { background: #dbeafe; color: #1d4ed8; }
+    #card-creative .bq-status-select.status-progress { background: #ede9fe; color: #6d28d9; }
+    .bq-status-select.status-done { background: #e2e8f0; color: #64748b; }
 
     /* ── Timeline Zone ── */
     .timeline-zone { background: #f8fafc; border: 1px solid #eef2f7; border-radius: 14px; padding: 12px 12px 10px; height: 100%; display: flex; flex-direction: column; gap: 6px; }
@@ -180,9 +174,8 @@ const B_QUEST_MODAL_HTML = `
                                     <div class="role-card-title"><i class="bi bi-brush ms-1 me-1"></i> Designer</div>
                                     <span class="bq-assign-badge" id="badge-assign-designer"></span>
                                     <select class="bq-status-select" id="b-quest-modal-designer-status" name="designer_status" onchange="BQuestApp.updateStatusUI(this)">
-                                        <option value="On Progress">On Progress</option><option value="Done">Done</option>
+                                        <option value="On Progress">● On Progress</option><option value="Done">✓ Done</option>
                                     </select>
-                                    <i class="bi bi-chevron-down bq-role-chevron"></i>
                                 </div>
                                 <div class="role-card-body">
                                     <div class="row g-3">
@@ -211,9 +204,8 @@ const B_QUEST_MODAL_HTML = `
                                     <div class="role-card-title"><i class="bi bi-rocket ms-1 me-1"></i> Creative</div>
                                     <span class="bq-assign-badge" id="badge-assign-creative"></span>
                                     <select class="bq-status-select" id="b-quest-modal-creative-status" name="creative_status" onchange="BQuestApp.updateStatusUI(this)">
-                                        <option value="On Progress">On Progress</option><option value="Done">Done</option>
+                                        <option value="On Progress">● On Progress</option><option value="Done">✓ Done</option>
                                     </select>
-                                    <i class="bi bi-chevron-down bq-role-chevron"></i>
                                 </div>
                                 <div class="role-card-body">
                                     <div class="row g-3">
