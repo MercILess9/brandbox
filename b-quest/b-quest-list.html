@@ -14,18 +14,20 @@
 
     
     <style>
-        :root { 
-            --c-progress: #4e73df; --c-done: #94a3b8; --c-bg: #f8fafc;
+        :root {
+            --c-done: #94a3b8; --c-bg: #f8fafc;
             --c-text-main: #1e293b; --c-text-muted: #94a3b8; --c-slate: #626e7f;
             --c-accent: #bdc432; --c-accent-light: #f4f7a1;
-            --c-role: #50adba; --radius-card: 20px;
-            --c-panel-bg: #fcfcfc;
+            --c-des: #3b82f6; --c-des-bg: #eff6ff; --c-des-border: #dbeafe;
+            --c-cre: #8b5cf6; --c-cre-bg: #f5f3ff; --c-cre-border: #ede9fe;
+            --radius-card: 20px; --c-panel-bg: #fcfcfc;
         }
 
         body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: var(--c-bg); color: var(--c-text-main); padding-bottom: 120px; margin: 0; }
 
         /* --- Filter Zone --- */
-        .flt-wrapper { background: #fff; padding: 15px 30px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .flt-wrapper { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .flt-inner { max-width: 1300px; margin: 0 auto; }
         .flt-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .flt-search { position: relative; width: 380px; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
@@ -34,11 +36,14 @@
         .flt-date-input { border: none; background: transparent; font-size: 0.82rem; color: var(--c-slate); outline: none; font-family: inherit; }
         
         .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; }
-        .flt-pill.active-role { background: var(--c-role); color: #fff; border-color: var(--c-role); }
-        .flt-pill.active-progress { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
+        #pill-designer.active-role { background: var(--c-des); color: #fff; border-color: var(--c-des); }
+        #pill-creative.active-role { background: var(--c-cre); color: #fff; border-color: var(--c-cre); }
+        .flt-pill.active-progress { background: var(--c-des); color: #fff; border-color: var(--c-des); }
         .flt-pill.active-done { background: var(--c-slate); color: #fff; border-color: var(--c-slate); }
 
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .flt-btn-today { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 14px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .flt-btn-today.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
 
         .flt-advanced-zone { 
             max-height: 0; 
@@ -78,7 +83,7 @@
         .bqc-dl-label { font-size: 0.55rem; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; margin-bottom: 4px; }
         .bqc-tag { border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; display: inline-block; border: 1px solid transparent; }
         .bqc-tag-des { background: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
-        .bqc-tag-cre { background: #f8fafc; color: #64748b; border-color: #f1f5f9; }
+        .bqc-tag-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
         
         .bqc-actions { width: 140px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; opacity: 0; transition: 0.2s; }
         .bqc-card:hover .bqc-actions { opacity: 1; }
@@ -97,8 +102,8 @@
         .bqc-col-40 { width: 40%; }
         .bqc-panel-label { font-size: 0.85rem; font-weight: 700; color: var(--c-slate); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
         
-        .bqc-panel { background: var(--c-panel-bg); border: 1px solid #f1f5f9; border-radius: 24px; padding: 20px; height: 160px; }
-        .bqc-panel-empty { border: 2px dashed #f1f5f9; background: transparent; border-radius: 24px; height: 160px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-weight: 600; letter-spacing: 1px; }
+        .bqc-panel { background: var(--c-panel-bg); border: 1px solid #f1f5f9; border-radius: 14px; padding: 20px; height: 160px; }
+        .bqc-panel-empty { border: 2px dashed #f1f5f9; background: transparent; border-radius: 14px; height: 160px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-weight: 600; letter-spacing: 1px; }
 
         .bqc-item { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.82rem; color: var(--c-slate); }
         .bqc-val { font-weight: 600; }
@@ -113,40 +118,43 @@
 <body>
 
 <section id="filter-zone" class="flt-wrapper">
-    <div class="flt-row">
-        <div class="flt-search">
-            <i class="bi bi-search"></i>
-            <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search...">
+    <div class="flt-inner">
+        <div class="flt-row">
+            <div class="flt-search">
+                <i class="bi bi-search"></i>
+                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search...">
+            </div>
+            <div class="flt-pill-group">
+                <button id="pill-designer" class="flt-pill active-role" onclick="togglePill(this, 'designer')">Designer</button>
+                <button id="pill-creative" class="flt-pill active-role" onclick="togglePill(this, 'creative')">Creative</button>
+            </div>
+            <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 5px;"></div>
+            <div class="flt-pill-group">
+                <button id="pill-progress" class="flt-pill active-progress" onclick="togglePill(this, 'progress')">Progress</button>
+                <button id="pill-done" class="flt-pill active-done" onclick="togglePill(this, 'done')">Done</button>
+            </div>
+            <button class="flt-btn-today" id="btnToday"><i class="bi bi-calendar-check"></i> Today</button>
+            <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
         </div>
-        <div class="flt-date-group">
-            <input type="date" class="flt-date-input" id="startDate">
-            <span style="color:#cbd5e1; padding: 0 5px;">-</span>
-            <input type="date" class="flt-date-input" id="endDate">
-        </div>
-        <div class="flt-pill-group">
-            <button id="pill-designer" class="flt-pill active-role" onclick="togglePill(this, 'designer')">Designer</button>
-            <button id="pill-creative" class="flt-pill active-role" onclick="togglePill(this, 'creative')">Creative</button>
-        </div>
-        <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 5px;"></div>
-        <div class="flt-pill-group">
-            <button id="pill-progress" class="flt-pill active-progress" onclick="togglePill(this, 'progress')">Progress</button>
-            <button id="pill-done" class="flt-pill active-done" onclick="togglePill(this, 'done')">Done</button>
-        </div>
-        <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
-    </div>
 
-    <div class="flt-advanced-zone" id="advancedFilterZone">
-        <div class="flt-advanced-row">
-            <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
-            <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
-            <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"></select></div>
-            <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"></select></div>
-            <button class="btn-reset" onclick="resetAdvanced()">RESET</button>
+        <div class="flt-advanced-zone" id="advancedFilterZone">
+            <div class="flt-advanced-row">
+                <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"></select></div>
+                <div class="flt-select-box"><span class="flt-select-tag">Owner</span><select class="flt-select-input" id="filterOwner"></select></div>
+                <div class="flt-date-group">
+                    <input type="date" class="flt-date-input" id="startDate">
+                    <span style="color:#cbd5e1; padding: 0 5px;">-</span>
+                    <input type="date" class="flt-date-input" id="endDate">
+                </div>
+                <button class="btn-reset" onclick="resetAdvanced()">RESET</button>
+            </div>
         </div>
     </div>
 </section>
 
-<main id="card-container" class="container-fluid px-5 mt-4">
+<main id="card-container" class="flt-inner" style="padding: 24px 20px 120px;">
     <div id="taskContainer" class="row"></div>
     <div id="load-more-trigger" style="height: 50px;"></div>
 </main>
@@ -424,6 +432,9 @@
             if(el) el.value = "";
             updateHighlight(id);
         });
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('btnToday').classList.remove('active');
         applyFilters();
     }
 
@@ -445,9 +456,30 @@
         document.getElementById('advancedFilterZone').classList.toggle('show');
     });
 
+    document.getElementById('btnToday').addEventListener('click', () => {
+        const today = new Date().toISOString().split('T')[0];
+        const s = document.getElementById('startDate');
+        const e = document.getElementById('endDate');
+        const btn = document.getElementById('btnToday');
+        if (s.value === today && e.value === today) {
+            s.value = ''; e.value = '';
+            btn.classList.remove('active');
+        } else {
+            s.value = today; e.value = today;
+            btn.classList.add('active');
+        }
+        applyFilters();
+    });
+
     ['startDate', 'endDate', 'filterWork', 'filterType', 'filterAssign', 'filterOwner'].forEach(id => {
         document.getElementById(id)?.addEventListener('change', () => {
-            if(id.startsWith('filter')) updateHighlight(id);
+            if (id.startsWith('filter')) updateHighlight(id);
+            if (id === 'startDate' || id === 'endDate') {
+                const today = new Date().toISOString().split('T')[0];
+                const s = document.getElementById('startDate').value;
+                const e = document.getElementById('endDate').value;
+                if (s !== today || e !== today) document.getElementById('btnToday').classList.remove('active');
+            }
             applyFilters();
         });
     });
