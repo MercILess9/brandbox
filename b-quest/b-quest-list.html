@@ -20,8 +20,8 @@
             --c-accent: #bdc432; --c-accent-light: #f4f7a1;
             --c-des: #3b82f6; --c-des-bg: #eff6ff; --c-des-border: #dbeafe;
             --c-cre: #8b5cf6; --c-cre-bg: #f5f3ff; --c-cre-border: #ede9fe;
-            --c-progress: #f59e0b; --c-progress-bg: #fffbeb; --c-progress-border: #fde68a;
-            --c-done: #10b981; --c-done-bg: #f0fdf4; --c-done-border: #a7f3d0;
+            --c-progress: #bdc432; --c-progress-bg: #f4f7a1; --c-progress-border: #d4dc6a;
+            --c-done: #94a3b8; --c-done-bg: #f1f5f9; --c-done-border: #e2e8f0;
             --radius-card: 20px; --c-panel-bg: #fcfcfc;
         }
 
@@ -37,23 +37,28 @@
         .flt-date-group { display: flex; align-items: center; background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 0 12px; height: 38px; }
         .flt-date-input { border: none; background: transparent; font-size: 0.82rem; color: var(--c-slate); outline: none; font-family: inherit; }
         
-        .flt-pill { border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 5px; }
+        .flt-pill { border: 1.5px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
         #pill-designer { color: var(--c-des); border-color: var(--c-des-border); }
         #pill-designer:hover { background: var(--c-des-bg); }
-        #pill-designer.active-role { background: var(--c-des); color: #fff; border-color: var(--c-des); }
+        #pill-designer.active-role { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
         #pill-creative { color: var(--c-cre); border-color: var(--c-cre-border); }
         #pill-creative:hover { background: var(--c-cre-bg); }
-        #pill-creative.active-role { background: var(--c-cre); color: #fff; border-color: var(--c-cre); }
-        #pill-progress { color: var(--c-progress); border-color: var(--c-progress-border); }
+        #pill-creative.active-role { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
+        #pill-progress { color: #7a8500; border-color: var(--c-progress-border); }
         #pill-progress:hover { background: var(--c-progress-bg); }
-        #pill-progress.active-progress { background: var(--c-progress); color: #fff; border-color: var(--c-progress); }
+        #pill-progress.active-progress { background: var(--c-progress-bg); color: #7a8500; border-color: var(--c-progress); }
         #pill-done { color: var(--c-done); border-color: var(--c-done-border); }
         #pill-done:hover { background: var(--c-done-bg); }
-        #pill-done.active-done { background: var(--c-done); color: #fff; border-color: var(--c-done); }
+        #pill-done.active-done { background: var(--c-done-bg); color: var(--c-slate); border-color: var(--c-done); }
 
-        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .flt-btn-adv:hover { background: var(--c-bg); border-color: #cbd5e1; }
+        .flt-btn-adv.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
         .flt-btn-today { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 14px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .flt-btn-today:hover { background: var(--c-bg); border-color: #cbd5e1; }
         .flt-btn-today.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
+        .bqc-btn-edit:hover { background: var(--c-accent) !important; border-color: var(--c-accent) !important; color: #1e293b !important; }
+        .bqc-btn-more:hover { color: var(--c-text-main); background: #f1f5f9; border-radius: 8px; }
 
         .flt-advanced-zone { 
             max-height: 0; 
@@ -145,16 +150,14 @@
                 <button id="pill-designer" class="flt-pill" onclick="togglePill(this, 'designer')"><i class="bi bi-brush"></i> Designer</button>
                 <button id="pill-creative" class="flt-pill" onclick="togglePill(this, 'creative')"><i class="bi bi-rocket"></i> Creative</button>
             </div>
-            <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 5px;"></div>
-            <div class="flt-pill-group">
-                <button id="pill-progress" class="flt-pill" onclick="togglePill(this, 'progress')"><i class="bi bi-hourglass-split"></i> Progress</button>
-                <button id="pill-done" class="flt-pill" onclick="togglePill(this, 'done')"><i class="bi bi-check-circle"></i> Done</button>
-            </div>
-            <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
+            <button class="flt-btn-adv active" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
         </div>
 
-        <div class="flt-advanced-zone" id="advancedFilterZone">
+        <div class="flt-advanced-zone show" id="advancedFilterZone">
             <div class="flt-advanced-row">
+                <button id="pill-progress" class="flt-pill active-progress" onclick="togglePill(this, 'progress')"><i class="bi bi-hourglass-split"></i> Progress</button>
+                <button id="pill-done" class="flt-pill" onclick="togglePill(this, 'done')"><i class="bi bi-check-circle"></i> Done</button>
+                <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 4px; flex-shrink:0;"></div>
                 <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
                 <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
                 <div class="flt-select-box"><span class="flt-select-tag">Assign</span><select class="flt-select-input" id="filterAssign"></select></div>
@@ -370,7 +373,7 @@
                         </div>
 
                         <div class="bqc-actions">
-                            ${canEdit ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="openTaskModal('${task.id}', dataList)">Edit</button>` : ''}
+                            ${canEdit ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3 bqc-btn-edit" onclick="openTaskModal('${task.id}', dataList)">Edit</button>` : ''}
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 15px;">
@@ -458,7 +461,10 @@
     }
 
     document.getElementById('toggleFilters').addEventListener('click', () => {
-        document.getElementById('advancedFilterZone').classList.toggle('show');
+        const zone = document.getElementById('advancedFilterZone');
+        const btn = document.getElementById('toggleFilters');
+        zone.classList.toggle('show');
+        btn.classList.toggle('active', zone.classList.contains('show'));
     });
 
     document.getElementById('btnToday').addEventListener('click', () => {
