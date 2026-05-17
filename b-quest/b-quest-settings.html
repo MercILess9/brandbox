@@ -109,11 +109,13 @@
         .flt-pill.active-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
 
         /* Members */
-        .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; display: flex; align-items: center; gap: 7px; margin-left: auto; flex-shrink: 0; }
+        .btn-add-member { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
         .btn-add-member:hover { background: #0f172a; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
         .btn-add-member:active { transform: translateY(0); box-shadow: none; }
+        .section-header .member-title-group { display: flex; align-items: center; gap: 10px; }
+        .section-header .member-controls { display: flex; align-items: center; gap: 10px; margin-left: auto; }
         .section-header .table-search-wrap { max-width: 220px; flex: 1; }
-        .section-header .table-count { margin-left: 0; white-space: nowrap; font-size: 0.75rem; font-weight: 700; color: var(--c-muted); }
+        .section-header .table-count { white-space: nowrap; font-size: 0.75rem; font-weight: 700; color: var(--c-muted); }
         .perm-scroll-body { max-height: 560px; overflow-y: auto; }
         .perm-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
