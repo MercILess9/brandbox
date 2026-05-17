@@ -44,7 +44,7 @@
         .usr-scroll-body { max-height: 600px; overflow-y: auto; }
         .usr-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
-        .usr-cols { grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 44px; }
+        .usr-cols { grid-template-columns: 160px 200px 100px 1fr repeat(5, 80px) 80px 44px; }
 
         .usr-table-head {
             display: grid;
@@ -87,7 +87,7 @@
         .usr-row > :nth-child(10) { border-left: 1px solid var(--c-border); }
 
         .usr-name-zone { display: flex; flex-direction: column; padding-left: 4px; min-width: 0; }
-        .usr-codename { font-size: 0.84rem; font-weight: 700; color: #16a34a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .usr-codename { font-size: 0.84rem; font-weight: 700; color: #508faf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Inline editable cells */
         .usr-nickfull { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; min-width: 0; }
@@ -97,7 +97,6 @@
             color: var(--c-dark); background: transparent; outline: none;
             width: 100%; transition: 0.15s; font-family: inherit;
         }
-        .inline-input.sm { font-size: 0.72rem; font-weight: 400; color: var(--c-muted); }
         .inline-input:hover { border-color: var(--c-border); background: var(--c-bg); }
         .inline-input:focus { border-color: var(--c-accent); background: #fff; }
 
@@ -127,7 +126,7 @@
 
         .skeleton-row {
             display: grid;
-            grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 44px;
+            grid-template-columns: 160px 200px 100px 1fr repeat(5, 80px) 80px 44px;
             align-items: center; padding: 0 4px;
             height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px;
         }
@@ -213,9 +212,9 @@
                 <!-- Column labels -->
                 <div class="usr-table-head usr-cols">
                     <div class="usr-col-name">Codename</div>
-                    <div class="usr-col-name">Nick Name / Full Name</div>
+                    <div class="usr-col-name">Full Name</div>
                     <div class="usr-col-label">Employee ID</div>
-                    <div class="usr-col-label" style="text-align:left; padding-left:8px;">Department</div>
+                    <div class="usr-col-label">Department</div>
                     <div class="usr-col-label">B-QUEST</div>
                     <div class="usr-col-label">Dashboard</div>
                     <div class="usr-col-label">B-ACCOUNT</div>
@@ -393,16 +392,16 @@
                 </div>
                 <div class="usr-nickfull">
                     <input class="inline-input" value="${(u.nick_name || '').replace(/"/g,'&quot;')}" placeholder="Nick Name" ${dis}
-                        onchange="onProfileChange('${u.codename}','nick_name',this.value)">
-                    <input class="inline-input sm" value="${(u.full_name || '').replace(/"/g,'&quot;')}" placeholder="Full Name" ${dis}
+                        onchange="onNickChange('${u.codename}',this.value)">
+                    <input class="inline-input" value="${(u.full_name || '').replace(/"/g,'&quot;')}" placeholder="Full Name" ${dis}
                         onchange="onProfileChange('${u.codename}','full_name',this.value)">
                 </div>
                 <div class="usr-empid-cell">
                     <input class="inline-input center" value="${(u.employee_id || '').replace(/"/g,'&quot;')}" placeholder="EMP ID" ${dis}
-                        onchange="onProfileChange('${u.codename}','employee_id',this.value)">
+                        onchange="onEmpIdChange('${u.codename}',this.value)">
                 </div>
                 <div class="usr-dept-cell">
-                    <input class="inline-input" value="${(u.department || '').replace(/"/g,'&quot;')}" placeholder="Department" ${dis}
+                    <input class="inline-input center" value="${(u.department || '').replace(/"/g,'&quot;')}" placeholder="Department" ${dis}
                         onchange="onProfileChange('${u.codename}','department',this.value)">
                 </div>
                 ${projectToggles}
@@ -431,14 +430,64 @@
     }
 
     // ── Profile Changes (inline) ──
-    let profileChanges = {}; // codename -> { nick_name, full_name, employee_id, department }
+    let profileChanges = {}; // codename -> { nick_name, full_name, employee_id, department, codename }
+
+    function buildCodename(nick, empid) {
+        const n = (nick || '').trim();
+        const e = (empid || '').trim();
+        if (!n) return '';
+        return e ? `${n} (${e})` : n;
+    }
+
+    function onNickChange(oldCodename, newNick) {
+        const u = allUsers.find(x => x.codename === oldCodename);
+        if (!u) return;
+        u.nick_name = newNick;
+        if (!profileChanges[oldCodename]) profileChanges[oldCodename] = { codename: oldCodename, _id: u.id };
+        profileChanges[oldCodename].nick_name = newNick;
+        // Update codename
+        const newCN = buildCodename(newNick, profileChanges[oldCodename].employee_id ?? u.employee_id);
+        if (newCN) {
+            profileChanges[oldCodename].codename = newCN;
+            u.codename = newCN;
+            // Update codename display in same row
+            const row = document.querySelector(`.usr-row[data-codename="${oldCodename}"]`);
+            if (row) {
+                row.dataset.codename = newCN;
+                const span = row.querySelector('.usr-codename');
+                if (span) span.textContent = newCN;
+            }
+        }
+        markDirty();
+    }
+
+    function onEmpIdChange(oldCodename, newEmpId) {
+        const u = allUsers.find(x => x.codename === oldCodename);
+        if (!u) return;
+        u.employee_id = newEmpId;
+        if (!profileChanges[oldCodename]) profileChanges[oldCodename] = { codename: oldCodename, _id: u.id };
+        profileChanges[oldCodename].employee_id = newEmpId;
+        // Update codename
+        const newCN = buildCodename(profileChanges[oldCodename].nick_name ?? u.nick_name, newEmpId);
+        if (newCN) {
+            profileChanges[oldCodename].codename = newCN;
+            u.codename = newCN;
+            const row = document.querySelector(`.usr-row[data-codename="${oldCodename}"]`);
+            if (row) {
+                row.dataset.codename = newCN;
+                const span = row.querySelector('.usr-codename');
+                if (span) span.textContent = newCN;
+            }
+        }
+        markDirty();
+    }
 
     function onProfileChange(codename, field, value) {
-        if (!profileChanges[codename]) profileChanges[codename] = { codename };
-        profileChanges[codename][field] = value;
-        // Update local allUsers so re-render keeps values
         const u = allUsers.find(x => x.codename === codename);
-        if (u) u[field] = value;
+        if (!u) return;
+        if (!profileChanges[codename]) profileChanges[codename] = { codename, _id: u.id };
+        profileChanges[codename][field] = value;
+        u[field] = value;
         markDirty();
     }
 
@@ -525,20 +574,21 @@
         try {
             const errors = [];
 
-            // 1. Save profile changes (nick_name, full_name, employee_id, department)
-            for (const [codename, ch] of Object.entries(profileChanges)) {
-                const u = allUsers.find(x => x.codename === codename);
-                if (!u) continue;
+            // 1. Save profile changes (codename, nick_name, full_name, employee_id, department)
+            for (const [origCodename, ch] of Object.entries(profileChanges)) {
+                const uid = ch._id;
+                if (!uid) continue;
                 const { error } = await supabaseClient
                     .from('profiles')
                     .update({
-                        nick_name:   ch.nick_name   ?? u.nick_name,
-                        full_name:   ch.full_name   ?? u.full_name,
-                        employee_id: ch.employee_id ?? u.employee_id,
-                        department:  ch.department  ?? u.department,
+                        codename:    ch.codename,
+                        nick_name:   ch.nick_name,
+                        full_name:   ch.full_name,
+                        employee_id: ch.employee_id,
+                        department:  ch.department,
                     })
-                    .eq('id', u.id);
-                if (error) errors.push(`Profile ${codename}: ${error.message}`);
+                    .eq('id', uid);
+                if (error) errors.push(`Profile ${origCodename}: ${error.message}`);
             }
 
             // 2. Save access changes
