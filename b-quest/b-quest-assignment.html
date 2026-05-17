@@ -65,42 +65,42 @@
         .btn-reset:hover { background: var(--c-bg); color: var(--c-dark); border-color: #cbd5e1; }
 
         /* ── Section ── */
-        .section { background: #eef0f4; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--c-border); background: #fff; }
+        .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--c-border); background: #fff; }
         .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         .section-badge { background: var(--c-accent); color: var(--c-dark); border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
 
         /* ── Card List ── */
-        #list-rows { padding: 12px 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+        #list-rows { padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 10px; }
 
         /* ── Assign Card — CSS Grid ── */
         .assign-card {
             display: grid;
-            grid-template-columns: 150px 1fr 256px 182px;
+            grid-template-columns: 112px 1fr 316px 168px;
             background: #fff;
-            border-radius: 12px;
-            border: 1px solid #e4e7ec;
+            border-radius: 14px;
+            border: 1px solid #e8eaf0;
             border-left: 3px solid;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
             overflow: hidden;
             transition: box-shadow 0.2s, transform 0.18s;
         }
         .assign-card.card-des { border-left-color: var(--c-des); }
         .assign-card.card-cre { border-left-color: var(--c-cre); }
-        .assign-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.1); transform: translateY(-1px); }
+        .assign-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); transform: translateY(-1px); }
 
         /* Zone */
-        .z { padding: 16px 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 86px; }
-        .z + .z { border-left: 1px solid #f3f4f6; }
+        .z { padding: 16px 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 88px; }
+        .z + .z { border-left: 1px solid #f1f3f7; }
 
         /* Col 1 — Owner */
-        .z-owner { padding-left: 18px; }
-        .owner-name { font-size: 0.85rem; font-weight: 700; color: #0f172a; line-height: 1.3; }
-        .dl-date { display: flex; align-items: center; gap: 4px; font-size: 0.68rem; font-weight: 600; }
-        .dl-date.dl-ok      { color: #b0b8c4; }
-        .dl-date.dl-warning { color: #d97706; }
-        .dl-date.dl-urgent  { color: #f97316; }
-        .dl-date.dl-overdue { color: #ef4444; }
+        .z-owner { padding: 14px 12px; align-items: center; text-align: center; justify-content: center; gap: 8px; background: #fafbfc; }
+        .owner-name { font-size: 0.82rem; font-weight: 700; color: #0f172a; line-height: 1.3; }
+        .dl-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 0.66rem; font-weight: 700; white-space: nowrap; }
+        .dl-tag.dl-ok      { background: #f1f5f9; color: #94a3b8; }
+        .dl-tag.dl-warning { background: #fef3c7; color: #d97706; }
+        .dl-tag.dl-urgent  { background: #ffedd5; color: #f97316; }
+        .dl-tag.dl-overdue { background: #fee2e2; color: #ef4444; }
 
         /* Col 2 — Task */
         .task-name { font-size: 0.88rem; font-weight: 800; color: #0f172a; line-height: 1.35; margin-bottom: 2px; }
@@ -116,11 +116,13 @@
         .detail-text { font-size: 0.73rem; color: #64748b; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3; overflow: hidden; }
 
         /* Col 4 — Assign */
-        .role-label { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.9px; display: flex; align-items: center; gap: 4px; }
-        .r-des { color: var(--c-des); }
-        .r-cre { color: var(--c-cre); }
-        .assign-select { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 10px; font-size: 0.77rem; font-weight: 500; color: #0f172a; background: #fafafa; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center; font-family: inherit; transition: 0.15s; margin-top: auto; }
-        .assign-select:hover { border-color: #cbd5e1; background: #fff; }
+        .card-des .z-assign { background: var(--c-des-bg); }
+        .card-cre .z-assign { background: var(--c-cre-bg); }
+        .role-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.9px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; }
+        .r-des { color: var(--c-des); background: #dbeafe; }
+        .r-cre { color: var(--c-cre); background: #ede9fe; }
+        .assign-select { width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; padding: 7px 10px; font-size: 0.77rem; font-weight: 600; color: #0f172a; background: #fff; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center; font-family: inherit; transition: 0.15s; margin-top: auto; }
+        .assign-select:hover { border-color: #cbd5e1; }
         .assign-select:focus { border-color: var(--c-accent); background: #fff; box-shadow: 0 0 0 2px rgba(189,196,50,0.15); }
         .assign-select.is-pending { border-color: var(--c-accent); background: #fefff5; }
 
@@ -332,7 +334,7 @@
 
                 <div class="z z-owner">
                     <div class="owner-name">${esc(q.owner) || '—'}</div>
-                    ${rDL ? `<div class="dl-date ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</div>` : '<div></div>'}
+                    ${rDL ? `<div class="dl-tag ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</div>` : ''}
                 </div>
 
                 <div class="z z-task">
@@ -371,9 +373,9 @@
     function skeletonHTML() {
         const row = (accent) => `
         <div class="assign-card ${accent}" style="pointer-events:none">
-            <div class="z z-owner" style="padding-left:18px">
-                <div class="skel" style="height:14px;width:86px;border-radius:3px"></div>
-                <div class="skel" style="height:11px;width:64px;border-radius:3px"></div>
+            <div class="z z-owner">
+                <div class="skel" style="height:13px;width:72px;border-radius:3px"></div>
+                <div class="skel" style="height:18px;width:68px;border-radius:20px;margin-top:2px"></div>
             </div>
             <div class="z z-task">
                 <div>
