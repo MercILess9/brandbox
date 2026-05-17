@@ -31,12 +31,34 @@
         body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; padding-bottom: 80px; }
 
         /* ── Control Bar ── */
-        .ctrl-bar { background: #fff; border-bottom: 1px solid var(--c-border); padding: 10px 20px; position: sticky; top: 0; z-index: 100; }
+        .ctrl-bar { background: #fff; border-bottom: 1px solid var(--c-border); padding: 10px 20px; position: sticky; top: 0; z-index: 200; }
         .ctrl-inner { max-width: 1300px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
-        .month-nav { display: flex; align-items: center; gap: 6px; }
+        .month-nav { display: flex; align-items: center; gap: 6px; position: relative; }
         .month-nav-btn { border: 1px solid var(--c-border); background: #fff; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--c-slate); transition: 0.15s; font-size: 0.82rem; }
         .month-nav-btn:hover { background: var(--c-bg); border-color: #cbd5e1; }
-        .month-label { font-size: 0.9rem; font-weight: 800; color: var(--c-dark); min-width: 140px; text-align: center; }
+
+        .month-label-btn { border: 1px solid var(--c-border); background: #fff; border-radius: 10px; padding: 0 14px; height: 32px; font-size: 0.88rem; font-weight: 800; color: var(--c-dark); cursor: pointer; min-width: 148px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.15s; font-family: inherit; }
+        .month-label-btn:hover { background: var(--c-bg); border-color: #cbd5e1; }
+        .month-label-btn.open { background: var(--c-accent-light); border-color: var(--c-accent); color: #5a6400; }
+
+        /* ── Month Picker Popover ── */
+        .month-picker {
+            display: none; position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            background: #fff; border: 1px solid var(--c-border); border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12); padding: 14px 16px; width: 240px; z-index: 300;
+        }
+        .month-picker.open { display: block; }
+        .mp-year { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .mp-year-btn { border: none; background: var(--c-bg); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; color: var(--c-slate); font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+        .mp-year-btn:hover { background: var(--c-border); }
+        .mp-year-label { font-size: 0.88rem; font-weight: 800; color: var(--c-dark); }
+        .mp-months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .mp-month { border: 1px solid transparent; background: transparent; border-radius: 8px; padding: 7px 4px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; text-align: center; transition: 0.15s; font-family: inherit; }
+        .mp-month:hover { background: var(--c-bg); border-color: var(--c-border); color: var(--c-dark); }
+        .mp-month.active { background: var(--c-dark); color: var(--c-accent); border-color: var(--c-dark); }
+        .mp-month.today { border-color: var(--c-accent); color: #5a6400; }
+        .mp-month.active.today { background: var(--c-dark); color: var(--c-accent); }
+
         .ctrl-sep { width: 1px; height: 22px; background: var(--c-border); }
         .btn-today { border: 1px solid var(--c-border); background: #fff; border-radius: 8px; padding: 0 14px; height: 32px; font-size: 0.74rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.15s; font-family: inherit; }
         .btn-today:hover { background: var(--c-bg); border-color: #cbd5e1; }
@@ -62,21 +84,24 @@
         .ov-card.ov-cre { border-color: var(--c-cre-border); background: var(--c-cre-bg); }
         .ov-card.ov-cre .ov-val { color: var(--c-cre); }
 
-        /* ── Work Types ── */
+        /* ── Two-col layout ── */
         .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .sub-col { border: 1px solid var(--c-border); border-radius: 14px; overflow: hidden; }
         .sub-col-head { display: flex; align-items: center; gap: 8px; padding: 11px 16px; font-size: 0.73rem; font-weight: 800; border-bottom: 1px solid var(--c-border); }
         .sub-col-head-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
         .sub-col-head-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
 
-        .wt-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
-        .wt-row { display: flex; align-items: center; gap: 10px; }
-        .wt-name { font-size: 0.8rem; font-weight: 600; color: var(--c-dark); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .wt-bar-wrap { flex: 2; background: var(--c-bg); border-radius: 20px; height: 7px; overflow: hidden; }
-        .wt-bar { height: 100%; border-radius: 20px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-        .wt-bar-des { background: var(--c-des); }
-        .wt-bar-cre { background: var(--c-cre); }
-        .wt-count { font-size: 0.8rem; font-weight: 800; color: var(--c-slate); min-width: 24px; text-align: right; }
+        /* ── Work Type Donut ── */
+        .wt-body { display: flex; align-items: center; gap: 16px; padding: 14px 16px; min-height: 160px; }
+        .wt-chart-area { position: relative; width: 130px; height: 130px; flex-shrink: 0; }
+        .wt-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+        .wt-center-val { font-size: 1.5rem; font-weight: 900; color: var(--c-dark); line-height: 1; }
+        .wt-center-lbl { font-size: 0.6rem; font-weight: 700; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 3px; }
+        .wt-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+        .wt-legend-item { display: flex; align-items: center; gap: 7px; }
+        .wt-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .wt-legend-name { font-size: 0.78rem; font-weight: 600; color: var(--c-dark); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .wt-legend-count { font-size: 0.78rem; font-weight: 800; color: var(--c-slate); flex-shrink: 0; }
 
         /* ── Person Summary ── */
         .ps-table-head { display: grid; grid-template-columns: 1fr 56px 60px; gap: 8px; padding: 8px 16px; background: var(--c-bg); font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -106,7 +131,23 @@
     <div class="ctrl-inner">
         <div class="month-nav">
             <button class="month-nav-btn" id="btn-prev"><i class="bi bi-chevron-left"></i></button>
-            <div class="month-label" id="month-label">—</div>
+
+            <button class="month-label-btn" id="month-label-btn">
+                <i class="bi bi-calendar3" style="font-size:0.8rem"></i>
+                <span id="month-label-text">—</span>
+                <i class="bi bi-chevron-down" style="font-size:0.65rem;opacity:0.6"></i>
+            </button>
+
+            <!-- Month Picker Popover -->
+            <div class="month-picker" id="month-picker">
+                <div class="mp-year">
+                    <button class="mp-year-btn" id="mp-prev-year"><i class="bi bi-chevron-left"></i></button>
+                    <span class="mp-year-label" id="mp-year-label">2026</span>
+                    <button class="mp-year-btn" id="mp-next-year"><i class="bi bi-chevron-right"></i></button>
+                </div>
+                <div class="mp-months" id="mp-months"></div>
+            </div>
+
             <button class="month-nav-btn" id="btn-next"><i class="bi bi-chevron-right"></i></button>
         </div>
         <div class="ctrl-sep"></div>
@@ -132,17 +173,17 @@
     <!-- 2. Work Types -->
     <div class="section">
         <div class="section-header">
-            <div class="section-title"><i class="bi bi-tags-fill"></i> Work Types</div>
+            <div class="section-title"><i class="bi bi-pie-chart-fill"></i> Work Types</div>
         </div>
         <div class="section-body">
             <div class="two-col">
                 <div class="sub-col">
                     <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                    <div class="wt-list" id="wt-des"><div class="col-empty">Loading...</div></div>
+                    <div id="wt-des"><div class="col-empty">Loading...</div></div>
                 </div>
                 <div class="sub-col">
                     <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                    <div class="wt-list" id="wt-cre"><div class="col-empty">Loading...</div></div>
+                    <div id="wt-cre"><div class="col-empty">Loading...</div></div>
                 </div>
             </div>
         </div>
@@ -197,9 +238,17 @@
 </div>
 
 <script>
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const DONUT_PALETTE = [
+        '#3b82f6','#06b6d4','#10b981','#f59e0b','#ef4444',
+        '#8b5cf6','#ec4899','#84cc16','#f97316','#64748b'
+    ];
+
     let curYear, curMonth;
     let chartDes = null, chartCre = null;
+    let chartWtDes = null, chartWtCre = null;
     let capDes = 0, capCre = 0;
+    let pickerYear; // year shown in picker
 
     // ── Month helpers ──
     function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
@@ -217,10 +266,51 @@
         updateLabel();
     }
     function updateLabel() {
-        const d = new Date(curYear, curMonth, 1);
-        document.getElementById('month-label').textContent =
-            d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        document.getElementById('month-label-text').textContent =
+            new Date(curYear, curMonth, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     }
+
+    // ── Month Picker ──
+    function openPicker() {
+        pickerYear = curYear;
+        renderPickerMonths();
+        document.getElementById('mp-year-label').textContent = pickerYear;
+        document.getElementById('month-picker').classList.add('open');
+        document.getElementById('month-label-btn').classList.add('open');
+    }
+    function closePicker() {
+        document.getElementById('month-picker').classList.remove('open');
+        document.getElementById('month-label-btn').classList.remove('open');
+    }
+    function renderPickerMonths() {
+        const now = new Date();
+        document.getElementById('mp-year-label').textContent = pickerYear;
+        document.getElementById('mp-months').innerHTML = MONTHS.map((name, i) => {
+            const isActive  = pickerYear === curYear && i === curMonth;
+            const isToday   = pickerYear === now.getFullYear() && i === now.getMonth();
+            const cls = [isActive ? 'active' : '', isToday ? 'today' : ''].join(' ');
+            return `<button class="mp-month ${cls}" data-m="${i}">${name}</button>`;
+        }).join('');
+        document.querySelectorAll('.mp-month').forEach(btn => {
+            btn.onclick = () => {
+                curYear  = pickerYear;
+                curMonth = parseInt(btn.dataset.m);
+                updateLabel();
+                closePicker();
+                loadData();
+            };
+        });
+    }
+
+    document.getElementById('month-label-btn').onclick = (e) => {
+        e.stopPropagation();
+        document.getElementById('month-picker').classList.contains('open') ? closePicker() : openPicker();
+    };
+    document.getElementById('mp-prev-year').onclick = (e) => { e.stopPropagation(); pickerYear--; renderPickerMonths(); };
+    document.getElementById('mp-next-year').onclick = (e) => { e.stopPropagation(); pickerYear++; renderPickerMonths(); };
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.month-nav')) closePicker();
+    });
 
     document.getElementById('btn-prev').onclick = () => {
         if (--curMonth < 0) { curMonth = 11; curYear--; }
@@ -264,11 +354,10 @@
         const cTasks = tasks.filter(t => t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign);
         const allIds = new Set([...dTasks, ...cTasks].map(t => t.id));
 
-        const active = tasks.filter(t =>
+        const activeUniq = new Set(tasks.filter(t =>
             (dTasks.find(d => d.id === t.id) && t.designer_status === 'On Progress') ||
             (cTasks.find(c => c.id === t.id) && t.creative_status === 'On Progress')
-        );
-        const activeUniq = new Set(active.map(t => t.id)).size;
+        ).map(t => t.id)).size;
 
         const done = [...allIds].filter(id => {
             const t = tasks.find(r => r.id === id);
@@ -276,9 +365,6 @@
             const cDone = !cTasks.find(c => c.id === id) || t.creative_status === 'Done';
             return dDone && cDone;
         }).length;
-
-        const desPersons = new Set(dTasks.map(t => t.designer_assign)).size;
-        const crePersons = new Set(cTasks.map(t => t.creative_assign)).size;
 
         document.getElementById('ov-grid').innerHTML = `
             <div class="ov-card">
@@ -294,17 +380,17 @@
                 <div class="ov-label">Done</div>
             </div>
             <div class="ov-card ov-des">
-                <div class="ov-val">${desPersons}</div>
+                <div class="ov-val">${new Set(dTasks.map(t => t.designer_assign)).size}</div>
                 <div class="ov-label">Designers Working</div>
             </div>
             <div class="ov-card ov-cre">
-                <div class="ov-val">${crePersons}</div>
+                <div class="ov-val">${new Set(cTasks.map(t => t.creative_assign)).size}</div>
                 <div class="ov-label">Creatives Working</div>
             </div>
         `;
     }
 
-    // ── Section 2: Work Types ──
+    // ── Section 2: Work Types (Donut) ──
     function renderWorkTypes(tasks) {
         const { start, end } = monthRange();
 
@@ -318,23 +404,70 @@
         const desEntries = countBy(tasks.filter(t => t.designer_deadline && t.designer_assign), 'designer_type', 'designer_deadline');
         const creEntries = countBy(tasks.filter(t => t.creative_deadline && t.creative_assign), 'creative_type', 'creative_deadline');
 
-        function renderWt(entries, cls, id) {
-            const el = document.getElementById(id);
-            if (!entries.length) { el.innerHTML = `<div class="col-empty">No data this month</div>`; return; }
-            const max = entries[0][1];
-            el.innerHTML = entries.map(([name, count]) => `
-                <div class="wt-row">
-                    <div class="wt-name">${name}</div>
-                    <div class="wt-bar-wrap">
-                        <div class="wt-bar wt-bar-${cls}" style="width:${Math.round(count / max * 100)}%"></div>
+        function renderDonut(entries, containerId, chartKey) {
+            const el = document.getElementById(containerId);
+            if (!entries.length) {
+                el.innerHTML = `<div class="col-empty">No data this month</div>`;
+                return;
+            }
+
+            const total = entries.reduce((s, [,n]) => s + n, 0);
+            const canvasId = `wt-chart-${containerId}`;
+            const colors   = entries.map((_, i) => DONUT_PALETTE[i % DONUT_PALETTE.length]);
+
+            el.innerHTML = `
+                <div class="wt-body">
+                    <div class="wt-chart-area">
+                        <canvas id="${canvasId}"></canvas>
+                        <div class="wt-center">
+                            <div class="wt-center-val">${total}</div>
+                            <div class="wt-center-lbl">tasks</div>
+                        </div>
                     </div>
-                    <div class="wt-count">${count}</div>
+                    <div class="wt-legend">
+                        ${entries.map(([name, count], i) => `
+                            <div class="wt-legend-item">
+                                <div class="wt-legend-dot" style="background:${colors[i]}"></div>
+                                <div class="wt-legend-name">${name}</div>
+                                <div class="wt-legend-count">${count}</div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-            `).join('');
+            `;
+
+            // destroy old chart
+            if (chartKey === 'des' && chartWtDes) { chartWtDes.destroy(); chartWtDes = null; }
+            if (chartKey === 'cre' && chartWtCre) { chartWtCre.destroy(); chartWtCre = null; }
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: entries.map(([n]) => n),
+                    datasets: [{ data: entries.map(([,n]) => n), backgroundColor: colors, borderWidth: 2, borderColor: '#fff', hoverOffset: 4 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: item => ` ${item.label}: ${item.parsed} (${Math.round(item.parsed / total * 100)}%)`
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (chartKey === 'des') chartWtDes = chart;
+            else chartWtCre = chart;
         }
 
-        renderWt(desEntries, 'des', 'wt-des');
-        renderWt(creEntries, 'cre', 'wt-cre');
+        renderDonut(desEntries, 'wt-des', 'des');
+        renderDonut(creEntries, 'wt-cre', 'cre');
     }
 
     // ── Section 3: Person Summary ──
@@ -356,20 +489,20 @@
         const desData = buildMap(tasks.filter(t => t.designer_deadline), 'designer_assign', 'designer_weight', 'designer_deadline');
         const creData = buildMap(tasks.filter(t => t.creative_deadline), 'creative_assign', 'creative_weight', 'creative_deadline');
 
-        function renderPs(entries, taskColor, weightColor, id) {
+        function renderPs(entries, taskColor, id) {
             const el = document.getElementById(id);
             if (!entries.length) { el.innerHTML = `<div class="col-empty">No data this month</div>`; return; }
             el.innerHTML = entries.map(([name, d]) => `
                 <div class="ps-row">
                     <div class="ps-name">${name}</div>
                     <div class="ps-num" style="color:${taskColor}">${d.tasks}</div>
-                    <div class="ps-num" style="color:${weightColor}">${d.weight}</div>
+                    <div class="ps-num" style="color:var(--c-dark)">${d.weight}</div>
                 </div>
             `).join('');
         }
 
-        renderPs(desData, 'var(--c-des)', 'var(--c-dark)', 'ps-des');
-        renderPs(creData, 'var(--c-cre)', 'var(--c-dark)', 'ps-cre');
+        renderPs(desData, 'var(--c-des)', 'ps-des');
+        renderPs(creData, 'var(--c-cre)', 'ps-cre');
     }
 
     // ── Section 4: Daily Capacity Timeline ──
@@ -398,25 +531,23 @@
         document.getElementById('cap-badge-des').textContent = capDes > 0 ? `Max ${capDes} / day` : '';
         document.getElementById('cap-badge-cre').textContent = capCre > 0 ? `Max ${capCre} / day` : '';
 
-        function makeChart(canvasId, data, cap, baseColor, overColor, isNew) {
+        function makeChart(canvasId, data, cap, baseColor, overColor, key) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             const bgs = data.map((v, i) => {
                 if (i === todayIdx) return cap > 0 && v > cap ? 'rgba(239,68,68,0.9)' : baseColor.replace('0.45', '0.85');
                 return cap > 0 && v > cap ? overColor : baseColor;
             });
 
-            if (isNew === 'des' && chartDes) { chartDes.destroy(); chartDes = null; }
-            if (isNew === 'cre' && chartCre) { chartCre.destroy(); chartCre = null; }
+            if (key === 'des' && chartDes) { chartDes.destroy(); chartDes = null; }
+            if (key === 'cre' && chartCre) { chartCre.destroy(); chartCre = null; }
 
-            const datasets = [
-                {
-                    label: 'Weight',
-                    data,
-                    backgroundColor: bgs,
-                    borderRadius: 3,
-                    order: 2
-                }
-            ];
+            const datasets = [{
+                label: 'Weight',
+                data,
+                backgroundColor: bgs,
+                borderRadius: 3,
+                order: 2
+            }];
 
             if (cap > 0) {
                 datasets.push({
@@ -450,11 +581,7 @@
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: {
-                                font: { size: 9 },
-                                maxRotation: 0,
-                                color: ctx => ctx.index === todayIdx ? '#ef4444' : '#94a3b8'
-                            }
+                            ticks: { font: { size: 9 }, maxRotation: 0, color: ctx => ctx.index === todayIdx ? '#ef4444' : '#94a3b8' }
                         },
                         y: {
                             beginAtZero: true,
@@ -465,7 +592,7 @@
                 }
             });
 
-            if (isNew === 'des') chartDes = chart;
+            if (key === 'des') chartDes = chart;
             else chartCre = chart;
         }
 
