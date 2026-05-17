@@ -103,6 +103,17 @@
         .wt-legend-name { font-size: 0.78rem; font-weight: 600; color: var(--c-dark); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .wt-legend-count { font-size: 0.78rem; font-weight: 800; color: var(--c-slate); flex-shrink: 0; }
 
+        /* ── Work Breakdown ── */
+        .wb-table-head { display: grid; grid-template-columns: 1fr 56px 70px; gap: 8px; padding: 8px 16px; background: var(--c-bg); font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .wb-table-head span:not(:first-child) { text-align: center; }
+        .wb-row { display: grid; grid-template-columns: 1fr 56px 70px; gap: 8px; align-items: center; padding: 8px 16px; border-top: 1px solid #f8fafc; transition: background 0.15s; }
+        .wb-row:hover { background: #fafbff; }
+        .wb-row.wb-zero { opacity: 0.4; }
+        .wb-name { font-size: 0.82rem; font-weight: 600; color: var(--c-dark); }
+        .wb-num { font-size: 0.82rem; font-weight: 800; text-align: center; }
+        .wb-weight-bar { height: 4px; background: var(--c-bg); border-radius: 4px; margin-top: 3px; overflow: hidden; }
+        .wb-weight-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
         /* ── Person Summary ── */
         .ps-table-head { display: grid; grid-template-columns: 1fr 56px 60px; gap: 8px; padding: 8px 16px; background: var(--c-bg); font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .ps-table-head span:not(:first-child) { text-align: center; }
@@ -189,7 +200,28 @@
         </div>
     </div>
 
-    <!-- 3. Person Summary -->
+    <!-- 3. Work Breakdown (from b-quest-work) -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-table"></i> Work Breakdown</div>
+        </div>
+        <div class="section-body">
+            <div class="two-col">
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                    <div class="wb-table-head"><span>Work</span><span>Tasks</span><span>Weight</span></div>
+                    <div id="wb-des"><div class="col-empty">Loading...</div></div>
+                </div>
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                    <div class="wb-table-head"><span>Work</span><span>Tasks</span><span>Weight</span></div>
+                    <div id="wb-cre"><div class="col-empty">Loading...</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Person Summary -->
     <div class="section">
         <div class="section-header">
             <div class="section-title"><i class="bi bi-people-fill"></i> Person Summary</div>
@@ -210,7 +242,7 @@
         </div>
     </div>
 
-    <!-- 4. Daily Capacity -->
+    <!-- 5. Daily Capacity -->
     <div class="section">
         <div class="section-header">
             <div class="section-title"><i class="bi bi-bar-chart-fill"></i> Daily Capacity</div>
@@ -248,7 +280,8 @@
     let chartDes = null, chartCre = null;
     let chartWtDes = null, chartWtCre = null;
     let capDes = 0, capCre = 0;
-    let pickerYear; // year shown in picker
+    let pickerYear;
+    let workList = [];
 
     // ── Month helpers ──
     function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
@@ -329,19 +362,22 @@
     async function loadData() {
         const { start, end } = monthRange();
 
-        const [tasksRes, capRes] = await Promise.all([
+        const [tasksRes, capRes, workRes] = await Promise.all([
             supabaseClient.from('b-quest-list').select('*')
                 .or(`and(designer_deadline.gte.${start},designer_deadline.lte.${end}),and(creative_deadline.gte.${start},creative_deadline.lte.${end})`),
-            supabaseClient.from('b_quest_capacity').select('*')
+            supabaseClient.from('b_quest_capacity').select('*'),
+            supabaseClient.from('b-quest-work').select('*').order('work')
         ]);
 
         const tasks = tasksRes.data || [];
         const caps  = capRes.data  || [];
+        workList    = workRes.data  || [];
         capDes = caps.find(c => c.role === 'Designer')?.max_capacity || 0;
         capCre = caps.find(c => c.role === 'Creative')?.max_capacity || 0;
 
         renderOverview(tasks);
         renderWorkTypes(tasks);
+        renderWorkBreakdown(tasks);
         renderPersons(tasks);
         renderTimeline(tasks);
     }
@@ -470,7 +506,48 @@
         renderDonut(creEntries, 'wt-cre', 'cre');
     }
 
-    // ── Section 3: Person Summary ──
+    // ── Section 3: Work Breakdown (b-quest-work × tasks) ──
+    function renderWorkBreakdown(tasks) {
+        const { start, end } = monthRange();
+
+        const dTasks = tasks.filter(t => t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign);
+        const cTasks = tasks.filter(t => t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign);
+
+        function buildBreakdown(works, role, taskList, typeField, weightField) {
+            return works
+                .filter(w => w.role === role)
+                .map(w => {
+                    const matched = taskList.filter(t => t[typeField] === w.work);
+                    const totalWeight = matched.reduce((s, t) => s + (t[weightField] || 0), 0);
+                    return { work: w.work, baseWeight: w.weight, tasks: matched.length, totalWeight };
+                })
+                .sort((a, b) => b.tasks - a.tasks || b.totalWeight - a.totalWeight);
+        }
+
+        const desBreakdown = buildBreakdown(workList, 'Designer', dTasks, 'designer_type', 'designer_weight');
+        const creBreakdown = buildBreakdown(workList, 'Creative', cTasks, 'creative_type', 'creative_weight');
+
+        function renderWb(rows, color, fillColor, id) {
+            const el = document.getElementById(id);
+            if (!rows.length) { el.innerHTML = `<div class="col-empty">No work types configured</div>`; return; }
+            const maxWeight = Math.max(...rows.map(r => r.totalWeight), 1);
+            el.innerHTML = rows.map(r => `
+                <div class="wb-row${r.tasks === 0 ? ' wb-zero' : ''}">
+                    <div>
+                        <div class="wb-name">${r.work}</div>
+                        ${r.tasks > 0 ? `<div class="wb-weight-bar"><div class="wb-weight-fill" style="width:${Math.round(r.totalWeight / maxWeight * 100)}%;background:${fillColor}"></div></div>` : ''}
+                    </div>
+                    <div class="wb-num" style="color:${r.tasks > 0 ? color : 'var(--c-muted)'}">${r.tasks}</div>
+                    <div class="wb-num" style="color:${r.totalWeight > 0 ? 'var(--c-dark)' : 'var(--c-muted)'}">${r.totalWeight > 0 ? r.totalWeight : '—'}</div>
+                </div>
+            `).join('');
+        }
+
+        renderWb(desBreakdown, 'var(--c-des)', 'rgba(59,130,246,0.35)', 'wb-des');
+        renderWb(creBreakdown, 'var(--c-cre)', 'rgba(139,92,246,0.35)', 'wb-cre');
+    }
+
+    // ── Section 5: Person Summary ──
     function renderPersons(tasks) {
         const { start, end } = monthRange();
 
