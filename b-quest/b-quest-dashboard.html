@@ -524,8 +524,8 @@
                 .sort((a, b) => b.tasks - a.tasks || b.totalWeight - a.totalWeight);
         }
 
-        const desBreakdown = buildBreakdown(workList, 'Designer', dTasks, 'designer_type', 'designer_weight');
-        const creBreakdown = buildBreakdown(workList, 'Creative', cTasks, 'creative_type', 'creative_weight');
+        const desBreakdown = buildBreakdown(workList, 'Designer', dTasks, 'designer', 'designer_weight');
+        const creBreakdown = buildBreakdown(workList, 'Creative', cTasks, 'creative', 'creative_weight');
 
         function renderWb(rows, color, fillColor, id) {
             const el = document.getElementById(id);
