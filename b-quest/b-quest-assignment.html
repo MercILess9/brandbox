@@ -70,69 +70,59 @@
         .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         .section-badge { background: var(--c-accent); color: var(--c-dark); border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
 
-        /* ── Column Header ── */
-        .col-header { display: flex; align-items: center; border-bottom: 1px solid var(--c-border); background: #f8fafc; }
-        .ch { padding: 7px 16px; font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.8px; flex-shrink: 0; }
-        .ch-owner { flex: 0 0 162px; padding-left: 20px; }
-        .ch-task   { flex: 1; }
-        .ch-detail { flex: 0 0 290px; }
-        .ch-assign { flex: 0 0 210px; }
-        .ch-div    { width: 1px; background: var(--c-border); margin: 0; height: 30px; }
-
-        /* ── Zone Row Layout ── */
+        /* ── Zone Layout ── */
         .assign-card {
             display: flex; align-items: stretch;
             border-bottom: 1px solid #f1f5f9;
-            position: relative; transition: background 0.15s;
+            position: relative; transition: background 0.12s;
         }
         .assign-card:last-child { border-bottom: none; }
-        .assign-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+        .assign-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
         .assign-card.card-des::before { background: var(--c-des); }
         .assign-card.card-cre::before { background: var(--c-cre); }
-        .assign-card:hover { background: #fafbfe; }
+        .assign-card:hover { background: #fbfcff; }
 
-        /* Zone base */
-        .z { padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; min-height: 90px; }
-        .z-div { width: 1px; background: #f1f5f9; flex-shrink: 0; margin: 12px 0; }
+        .z { padding: 16px 18px; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; min-height:88px; }
+        .z-div { width:1px; background:#f1f5f9; flex-shrink:0; margin:14px 0; }
 
         /* Col 1 — Owner */
-        .z-owner { flex: 0 0 162px; padding-left: 20px; }
-        .owner-name { font-size: 0.84rem; font-weight: 800; color: var(--c-dark); display: flex; align-items: center; gap: 6px; line-height: 1.3; }
-        .owner-name i { color: #10b981; font-size: 0.9rem; }
-        .dl-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; padding: 3px 9px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; align-self: flex-start; }
-        .dl-overdue { background: #fef2f2; color: #dc2626; }
-        .dl-urgent  { background: #fff7ed; color: #ea580c; }
-        .dl-warning { background: #fffbeb; color: #b45309; }
-        .dl-ok      { background: #f0fdf4; color: #16a34a; }
+        .z-owner { flex: 0 0 158px; padding-left: 22px; }
+        .owner-name { font-size:0.85rem; font-weight:700; color:#0f172a; line-height:1.3; }
+        .dl-date { display:flex; align-items:center; gap:4px; font-size:0.68rem; font-weight:600; }
+        .dl-date.dl-ok      { color:#b0b8c4; }
+        .dl-date.dl-warning { color:#d97706; }
+        .dl-date.dl-urgent  { color:#f97316; }
+        .dl-date.dl-overdue { color:#ef4444; }
 
         /* Col 2 — Task */
-        .z-task { flex: 1; min-width: 0; }
-        .task-name { font-size: 0.88rem; font-weight: 800; color: var(--c-dark); line-height: 1.35; }
-        .task-sub  { font-size: 0.7rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .task-tags { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-        .meta-chip { background: #f1f5f9; border-radius: 20px; padding: 2px 9px; font-size: 0.65rem; font-weight: 700; color: var(--c-slate); }
-        .task-link { display: inline-flex; align-items: center; gap: 3px; font-size: 0.65rem; font-weight: 700; color: var(--c-accent); text-decoration: none; border: 1.5px solid var(--c-accent); border-radius: 6px; padding: 1px 7px; transition: 0.15s; }
-        .task-link:hover { background: var(--c-accent); color: #000; }
+        .z-task { flex:1; min-width:0; }
+        .task-name { font-size:0.88rem; font-weight:800; color:#0f172a; line-height:1.35; }
+        .task-sub { font-size:0.69rem; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+        .task-tags { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+        .meta-chip { background:#f1f5f9; border-radius:4px; padding:2px 8px; font-size:0.62rem; font-weight:600; color:#64748b; }
+        .task-link { display:inline-flex; align-items:center; gap:2px; font-size:0.62rem; font-weight:600; color:var(--c-accent); text-decoration:none; opacity:0.8; transition:0.12s; }
+        .task-link:hover { opacity:1; }
 
         /* Col 3 — Detail */
-        .z-detail { flex: 0 0 290px; justify-content: center; font-family: var(--f-sarabun); }
-        .detail-text { font-size: 0.74rem; color: var(--c-slate); line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding-left: 10px; border-left: 2px solid #e2e8f0; }
+        .z-detail { flex: 0 0 290px; justify-content:center; font-family:var(--f-sarabun); }
+        .detail-text { font-size:0.73rem; color:#64748b; line-height:1.7; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 
         /* Col 4 — Assign */
-        .z-assign { flex: 0 0 210px; }
-        .role-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.62rem; font-weight: 800; border-radius: 6px; padding: 3px 9px; white-space: nowrap; letter-spacing: 0.4px; }
-        .role-des { background: var(--c-des-bg); color: var(--c-des); border: 1px solid #dbeafe; }
-        .role-cre { background: var(--c-cre-bg); color: var(--c-cre); border: 1px solid #ede9fe; }
-        .assign-select { width: 100%; border: 1.5px solid var(--c-border); border-radius: 10px; padding: 7px 28px 7px 10px; font-size: 0.76rem; font-weight: 600; color: var(--c-dark); background: var(--c-bg); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; font-family: inherit; transition: 0.2s; margin-top: auto; }
-        .assign-select:focus { border-color: var(--c-accent); background-color: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.12); }
-        .assign-select.is-pending { border-color: #f59e0b !important; background-color: #fffbeb !important; }
+        .z-assign { flex: 0 0 196px; }
+        .role-label { font-size:0.58rem; font-weight:800; text-transform:uppercase; letter-spacing:0.9px; display:flex; align-items:center; gap:4px; }
+        .r-des { color: var(--c-des); }
+        .r-cre { color: var(--c-cre); }
+        .assign-select { width:100%; border:1px solid #e2e8f0; border-radius:8px; padding:7px 10px; font-size:0.77rem; font-weight:500; color:#0f172a; background:#fafafa; outline:none; cursor:pointer; appearance:none; -webkit-appearance:none; text-align:center; text-align-last:center; font-family:inherit; transition:0.15s; margin-top:auto; }
+        .assign-select:hover { border-color:#cbd5e1; background:#fff; }
+        .assign-select:focus { border-color:var(--c-accent); background:#fff; box-shadow:0 0 0 2px rgba(189,196,50,0.15); }
+        .assign-select.is-pending { border-color:var(--c-accent); background:#fefff5; }
 
         /* Empty / Skeleton */
         .empty-state { padding: 60px 24px; text-align: center; color: var(--c-muted); }
         .empty-state i { font-size: 2.2rem; opacity: 0.3; display: block; margin-bottom: 12px; }
         .empty-state p { font-size: 0.85rem; font-weight: 600; margin: 0; }
-        .skel { background: #e2e8f0; border-radius: 4px; animation: shimmer 1.4s infinite; }
-        @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .skel { background: #eef0f3; border-radius: 4px; animation: shimmer 1.4s infinite; }
+        @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.45} }
 
         /* ── Floating Save Bar ── */
         .save-bar {
@@ -199,15 +189,6 @@
                 Unassigned
                 <span class="section-badge" id="badge-count">0</span>
             </div>
-        </div>
-        <div class="col-header">
-            <div class="ch ch-owner">Owner</div>
-            <div class="ch-div"></div>
-            <div class="ch ch-task">Task</div>
-            <div class="ch-div"></div>
-            <div class="ch ch-detail">Detail</div>
-            <div class="ch-div"></div>
-            <div class="ch ch-assign">Assign</div>
         </div>
         <div id="list-rows"></div>
     </div>
@@ -343,19 +324,19 @@
             <div class="assign-card ${isDes ? 'card-des' : 'card-cre'}" id="row-${q.id}__${r.role}">
 
                 <div class="z z-owner">
-                    ${q.owner ? `<div class="owner-name"><i class="bi bi-person-circle"></i> ${esc(q.owner)}</div>` : '<div></div>'}
-                    ${rDL ? `<div class="dl-chip ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</div>` : '<div></div>'}
+                    ${q.owner ? `<div class="owner-name">${esc(q.owner)}</div>` : '<div></div>'}
+                    ${rDL ? `<div class="dl-date ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</div>` : '<div></div>'}
                 </div>
 
                 <div class="z-div"></div>
 
                 <div class="z z-task">
                     <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
-                    ${(q.account_name || q.opportunity_name) ? `<div class="task-sub">${[esc(q.account_name), esc(q.opportunity_name)].filter(Boolean).join(' | ')}</div>` : '<div></div>'}
+                    ${(q.account_name || q.opportunity_name) ? `<div class="task-sub">${[esc(q.account_name), esc(q.opportunity_name)].filter(Boolean).join(' · ')}</div>` : '<div></div>'}
                     <div class="task-tags">
                         ${rWork ? `<span class="meta-chip">${esc(rWork)}</span>` : ''}
                         ${rType ? `<span class="meta-chip">${esc(rType)}</span>` : ''}
-                        ${q.link ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
+                        ${q.link ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i>Link</a>` : ''}
                     </div>
                 </div>
 
@@ -368,9 +349,9 @@
                 <div class="z-div"></div>
 
                 <div class="z z-assign">
-                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}">
-                        <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i> ${r.role.toUpperCase()}
-                    </span>
+                    <div class="role-label ${isDes ? 'r-des' : 'r-cre'}">
+                        <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i>${r.role}
+                    </div>
                     <select class="assign-select ${pending ? 'is-pending' : ''}"
                         data-quest-id="${q.id}"
                         data-role="${r.role}"
@@ -386,31 +367,31 @@
     function skeletonHTML() {
         const row = (accent) => `
         <div class="assign-card ${accent}" style="pointer-events:none">
-            <div class="z z-owner" style="padding-left:20px">
-                <div class="skel" style="height:16px;width:90px;border-radius:4px"></div>
-                <div class="skel" style="height:20px;width:72px;border-radius:6px"></div>
+            <div class="z z-owner" style="padding-left:22px">
+                <div class="skel" style="height:14px;width:88px;border-radius:3px"></div>
+                <div class="skel" style="height:12px;width:66px;border-radius:3px"></div>
             </div>
             <div class="z-div"></div>
             <div class="z z-task">
-                <div class="skel" style="height:15px;width:75%;border-radius:4px"></div>
-                <div class="skel" style="height:11px;width:50%;border-radius:4px"></div>
+                <div class="skel" style="height:14px;width:72%;border-radius:3px"></div>
+                <div class="skel" style="height:11px;width:46%;border-radius:3px"></div>
                 <div style="display:flex;gap:5px">
-                    <div class="skel" style="height:19px;width:64px;border-radius:20px"></div>
-                    <div class="skel" style="height:19px;width:50px;border-radius:20px"></div>
+                    <div class="skel" style="height:18px;width:58px;border-radius:4px"></div>
+                    <div class="skel" style="height:18px;width:44px;border-radius:4px"></div>
                 </div>
             </div>
             <div class="z-div"></div>
             <div class="z z-detail" style="justify-content:center">
-                <div>
-                    <div class="skel" style="height:11px;width:100%;border-radius:3px;margin-bottom:5px"></div>
-                    <div class="skel" style="height:11px;width:90%;border-radius:3px;margin-bottom:5px"></div>
-                    <div class="skel" style="height:11px;width:75%;border-radius:3px"></div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                    <div class="skel" style="height:11px;width:100%;border-radius:3px"></div>
+                    <div class="skel" style="height:11px;width:88%;border-radius:3px"></div>
+                    <div class="skel" style="height:11px;width:70%;border-radius:3px"></div>
                 </div>
             </div>
             <div class="z-div"></div>
             <div class="z z-assign">
-                <div class="skel" style="height:20px;width:76px;border-radius:6px"></div>
-                <div class="skel" style="height:32px;width:100%;border-radius:10px"></div>
+                <div class="skel" style="height:11px;width:60px;border-radius:3px"></div>
+                <div class="skel" style="height:32px;width:100%;border-radius:8px"></div>
             </div>
         </div>`;
         return row('card-des') + row('card-cre') + row('card-des') + row('card-cre');
