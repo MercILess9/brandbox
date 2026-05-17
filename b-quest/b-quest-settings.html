@@ -357,23 +357,27 @@
     <!-- Section 3: Members -->
     <div class="section" id="section-members">
         <div class="section-header">
-            <div class="section-title">
-                <i class="bi bi-people-fill"></i> Members & Permissions
-                <span class="dirty-dot"></span>
+            <div class="member-title-group">
+                <div class="section-title">
+                    <i class="bi bi-people-fill"></i> Members & Permissions
+                    <span class="dirty-dot"></span>
+                </div>
+                <button class="btn-add-member" onclick="openAddModal()">
+                    <i class="bi bi-person-plus-fill"></i> Add Member
+                </button>
             </div>
-            <div class="pill-group">
-                <button id="mpill-ae"  class="flt-pill" onclick="toggleMemberPill('ae')"><i class="bi bi-person-badge"></i> AE</button>
-                <button id="mpill-cre" class="flt-pill" onclick="toggleMemberPill('cre')"><i class="bi bi-rocket"></i> Creative</button>
-                <button id="mpill-des" class="flt-pill" onclick="toggleMemberPill('des')"><i class="bi bi-brush"></i> Designer</button>
+            <div class="member-controls">
+                <div class="pill-group">
+                    <button id="mpill-ae"  class="flt-pill" onclick="toggleMemberPill('ae')"><i class="bi bi-person-badge"></i> AE</button>
+                    <button id="mpill-cre" class="flt-pill" onclick="toggleMemberPill('cre')"><i class="bi bi-rocket"></i> Creative</button>
+                    <button id="mpill-des" class="flt-pill" onclick="toggleMemberPill('des')"><i class="bi bi-brush"></i> Designer</button>
+                </div>
+                <div class="table-search-wrap">
+                    <i class="bi bi-search table-search-icon"></i>
+                    <input type="text" id="table-search" class="table-search-input" placeholder="Filter members...">
+                </div>
+                <span class="table-count" id="table-count"></span>
             </div>
-            <div class="table-search-wrap">
-                <i class="bi bi-search table-search-icon"></i>
-                <input type="text" id="table-search" class="table-search-input" placeholder="Filter members...">
-            </div>
-            <span class="table-count" id="table-count"></span>
-            <button class="btn-add-member" onclick="openAddModal()">
-                <i class="bi bi-person-plus-fill"></i> Add Member
-            </button>
         </div>
         <div class="section-body" style="padding: 0;">
             <div class="perm-scroll-body" style="padding: 0 24px 20px;">
