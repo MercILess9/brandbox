@@ -40,20 +40,20 @@
         .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-muted); white-space: nowrap; }
 
         /* Users Table */
-        /* Grid: Avatar | Name(200px) | Employee | Dept | Level | Projects... | Actions */
+        /* Grid: Codename(160px) | NickName/FullName(200px) | EmpID(110px) | Dept(1fr) | Projects(80px x5) | System(80px) | Actions(44px) */
         .usr-scroll-body { max-height: 600px; overflow-y: auto; }
         .usr-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
+        .usr-cols { grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 44px; }
+
         .usr-table-head {
             display: grid;
-            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
             align-items: center; padding: 0 4px;
             height: 36px; background: var(--c-bg);
             border-radius: 10px; margin-bottom: 4px;
         }
         .usr-group-head {
             display: grid;
-            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
             align-items: center; padding: 0 4px; margin-bottom: 2px;
         }
         .group-label {
@@ -61,7 +61,7 @@
             letter-spacing: 1px; text-align: center;
             padding: 4px 0; border-radius: 6px; margin: 0 3px;
         }
-        .group-access { background: #f0fdf4; color: #16a34a; }
+        .group-access { background: #eff6ff; color: #2563eb; }
         .group-sys    { background: var(--c-accent-light); color: #7a8500; }
 
         .usr-col-label { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
@@ -69,7 +69,6 @@
 
         .usr-row {
             display: grid;
-            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
             align-items: center; padding: 0 4px;
             min-height: 56px; border-bottom: 1px solid #f8fafc;
             transition: background 0.15s; border-radius: 8px;
@@ -79,21 +78,19 @@
         .usr-row.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
         .usr-row.is-deleted .btn-undo-del { pointer-events: all; }
 
-        /* Visual separators: col 6 (first project), col 11 (system) */
-        .usr-table-head > :nth-child(6),
-        .usr-row > :nth-child(6) { border-left: 1px solid var(--c-border); }
-        .usr-table-head > :nth-child(11),
-        .usr-row > :nth-child(11) { border-left: 1px solid var(--c-border); }
+        /* Visual separators: col 5 (first project = B-QUEST), col 10 (system setting) */
+        .usr-table-head > :nth-child(5),
+        .usr-row > :nth-child(5) { border-left: 1px solid var(--c-border); }
+        .usr-table-head > :nth-child(10),
+        .usr-row > :nth-child(10) { border-left: 1px solid var(--c-border); }
 
-        .usr-avatar { width: 32px; height: 32px; background: var(--c-accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; color: #7a8500; margin: 0 auto; flex-shrink: 0; }
         .usr-name-zone { display: flex; flex-direction: column; padding-left: 4px; min-width: 0; }
         .usr-codename { font-size: 0.84rem; font-weight: 700; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .usr-fullname { font-size: 0.7rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .usr-empid { font-size: 0.78rem; font-weight: 600; color: var(--c-slate); }
-        .usr-dept { font-size: 0.75rem; color: var(--c-muted); }
-        .usr-level-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.66rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .level-god  { background: #fef3c7; color: #d97706; }
-        .level-user { background: #f1f5f9; color: var(--c-slate); }
+        .usr-nickfull { display: flex; flex-direction: column; padding-left: 4px; min-width: 0; }
+        .usr-nick { font-size: 0.82rem; font-weight: 600; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .usr-full { font-size: 0.7rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .usr-empid { font-size: 0.78rem; font-weight: 600; color: var(--c-slate); padding-left: 4px; }
+        .usr-dept { font-size: 0.75rem; color: var(--c-muted); padding-left: 4px; }
 
         .check-cell { display: flex; justify-content: center; align-items: center; }
 
@@ -102,7 +99,7 @@
         .bq-toggle input { opacity: 0; width: 0; height: 0; }
         .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e2e8f0; transition: .3s; border-radius: 34px; }
         .bq-slider:before { position: absolute; content: ""; height: 13px; width: 13px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-        .bq-toggle.t-access input:checked + .bq-slider { background: #22c55e; }
+        .bq-toggle.t-access input:checked + .bq-slider { background: #3b82f6; }
         .bq-toggle.t-sys    input:checked + .bq-slider { background: var(--c-accent); }
         .bq-toggle input:checked + .bq-slider:before { transform: translateX(15px); }
 
@@ -116,7 +113,7 @@
 
         .skeleton-row {
             display: grid;
-            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
+            grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 44px;
             align-items: center; padding: 0 4px;
             height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px;
         }
@@ -191,19 +188,18 @@
         <div class="usr-scroll-body" style="padding: 0 24px 20px;">
             <div class="usr-thead-sticky">
                 <!-- Group header -->
-                <div class="usr-group-head">
-                    <div></div><div></div><div></div><div></div><div></div>
-                    <div class="group-label group-access" style="grid-column: 6 / 11">PROJECT ACCESS</div>
-                    <div class="group-label group-sys" style="grid-column: 11 / 12">SYSTEM</div>
+                <div class="usr-group-head usr-cols">
+                    <div></div><div></div><div></div><div></div>
+                    <div class="group-label group-access" style="grid-column: 5 / 10">PROJECT ACCESS</div>
+                    <div class="group-label group-sys" style="grid-column: 10 / 11">SYSTEM</div>
                     <div></div>
                 </div>
                 <!-- Column labels -->
-                <div class="usr-table-head">
-                    <div></div>
-                    <div class="usr-col-name">User</div>
+                <div class="usr-table-head usr-cols">
+                    <div class="usr-col-name">Codename</div>
+                    <div class="usr-col-name">Nick Name / Full Name</div>
                     <div class="usr-col-label">Employee ID</div>
                     <div class="usr-col-label" style="text-align:left; padding-left:8px;">Department</div>
-                    <div class="usr-col-label">Level</div>
                     <div class="usr-col-label">B-QUEST</div>
                     <div class="usr-col-label">Dashboard</div>
                     <div class="usr-col-label">B-ACCOUNT</div>
@@ -318,10 +314,12 @@
     // ── Render ──
     function showSkeleton() {
         const row = () => `
-            <div class="skeleton-row">
-                <div class="skeleton-block" style="height:32px;width:32px;border-radius:10px;"></div>
-                <div class="skeleton-block" style="height:30px;width:150px;margin-left:4px;"></div>
-                ${Array(10).fill(0).map(() => `<div class="skeleton-block" style="height:19px;width:34px;margin:auto;"></div>`).join('')}
+            <div class="skeleton-row usr-cols">
+                <div class="skeleton-block" style="height:22px;width:100px;margin-left:4px;"></div>
+                <div class="skeleton-block" style="height:30px;width:140px;margin-left:4px;"></div>
+                <div class="skeleton-block" style="height:19px;width:70px;margin:auto;"></div>
+                <div class="skeleton-block" style="height:19px;width:80px;margin-left:4px;"></div>
+                ${Array(7).fill(0).map(() => `<div class="skeleton-block" style="height:19px;width:34px;margin:auto;"></div>`).join('')}
             </div>`;
         document.getElementById('user-list').innerHTML = row() + row() + row() + row();
     }
@@ -333,6 +331,7 @@
         let rows = allUsers.filter(u =>
             !q ||
             u.codename?.toLowerCase().includes(q) ||
+            u.nick_name?.toLowerCase().includes(q) ||
             u.full_name?.toLowerCase().includes(q) ||
             u.employee_id?.toLowerCase().includes(q) ||
             u.department?.toLowerCase().includes(q)
@@ -371,19 +370,16 @@
                 : `<button class="btn-remove" onclick="openDelModal('${u.codename}','${u.codename}')" title="Remove user"><i class="bi bi-trash3"></i></button>`;
 
             return `
-            <div class="usr-row ${isDeleted ? 'is-deleted' : ''}" data-codename="${u.codename}">
-                <div><div class="usr-avatar">${(u.codename||'??').substring(0,2).toUpperCase()}</div></div>
+            <div class="usr-row usr-cols ${isDeleted ? 'is-deleted' : ''}" data-codename="${u.codename}">
                 <div class="usr-name-zone">
                     <span class="usr-codename">${u.codename || '-'}</span>
-                    <span class="usr-fullname">${u.nick_name ? u.nick_name + (u.full_name ? ' · ' + u.full_name : '') : (u.full_name || '-')}</span>
+                </div>
+                <div class="usr-nickfull">
+                    <span class="usr-nick">${u.nick_name || '-'}</span>
+                    <span class="usr-full">${u.full_name || ''}</span>
                 </div>
                 <div class="usr-empid">${u.employee_id || '-'}</div>
                 <div class="usr-dept">${u.department || '-'}</div>
-                <div class="check-cell">
-                    <span class="usr-level-badge ${u.level === 'god' ? 'level-god' : 'level-user'}">
-                        ${u.level === 'god' ? '<i class="bi bi-stars"></i> God' : 'User'}
-                    </span>
-                </div>
                 ${projectToggles}
                 ${sysToggle}
                 <div class="check-cell">${actionBtn}</div>
