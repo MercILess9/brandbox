@@ -433,10 +433,21 @@
     </div>
 </div>
 
-<!-- FAB Save -->
-<button class="fab-save" id="fab-save" onclick="saveAll()">
-    <i class="bi bi-floppy2-fill"></i> Save Changes
-</button>
+<!-- Save Bar -->
+<div id="save-bar" class="save-bar">
+    <div class="save-bar-left">
+        <i class="bi bi-check2-circle"></i>
+        <div>
+            <div class="save-bar-label">Settings</div>
+            <div class="save-bar-sub">Unsaved changes</div>
+        </div>
+    </div>
+    <div class="save-bar-right">
+        <button class="btn-save-main" id="save-btn" onclick="saveAll()">
+            <i class="bi bi-floppy2-fill"></i> Save
+        </button>
+    </div>
+</div>
 
 <script>
     // ROLE group: AE, Creative, Designer (stored in roles[] array)
@@ -480,7 +491,7 @@
     function markDirty(sectionId) {
         isDirty = true;
         document.getElementById(sectionId).classList.add('is-dirty');
-        document.getElementById('fab-save').classList.add('show');
+        document.getElementById('save-bar').classList.add('visible');
     }
 
     function clearDirty() {
@@ -490,7 +501,7 @@
         ['section-capacity','section-worklist','section-members'].forEach(id =>
             document.getElementById(id).classList.remove('is-dirty')
         );
-        document.getElementById('fab-save').classList.remove('show');
+        document.getElementById('save-bar').classList.remove('visible');
     }
 
     // ── Capacity ──
@@ -869,8 +880,8 @@
 
     // ── Save All ──
     async function saveAll() {
-        const btn = document.getElementById('fab-save');
-        btn.classList.add('saving');
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
         btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
 
         try {
@@ -944,8 +955,8 @@
         } catch (e) {
             Swal.fire('Error', e.message, 'error');
         } finally {
-            btn.classList.remove('saving');
-            btn.innerHTML = '<i class="bi bi-floppy2-fill"></i> Save Changes';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-floppy2-fill"></i> Save';
         }
     }
 
