@@ -44,7 +44,7 @@
         .usr-scroll-body { max-height: 600px; overflow-y: auto; }
         .usr-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
-        .usr-cols { grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 44px; }
+        .usr-cols { grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 88px; }
 
         .usr-table-head {
             display: grid;
@@ -78,21 +78,24 @@
         .usr-row.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
         .usr-row.is-deleted .btn-undo-del { pointer-events: all; }
 
-        /* Visual separators: col 5 (first project = B-QUEST), col 10 (system setting) */
+        /* Visual separators: col 2 (nick/full), col 5 (B-QUEST), col 10 (system setting) */
+        .usr-table-head > :nth-child(2),
+        .usr-row > :nth-child(2) { border-left: 1px solid var(--c-border); }
         .usr-table-head > :nth-child(5),
         .usr-row > :nth-child(5) { border-left: 1px solid var(--c-border); }
         .usr-table-head > :nth-child(10),
         .usr-row > :nth-child(10) { border-left: 1px solid var(--c-border); }
 
-        .usr-name-zone { display: flex; flex-direction: column; padding-left: 4px; min-width: 0; }
-        .usr-codename { font-size: 0.84rem; font-weight: 700; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .usr-nickfull { display: flex; flex-direction: column; padding-left: 4px; min-width: 0; }
+        .usr-name-zone { display: flex; flex-direction: column; padding-left: 8px; min-width: 0; background: #f0fdf4; border-radius: 8px; justify-content: center; padding-top: 6px; padding-bottom: 6px; }
+        .usr-codename { font-size: 0.84rem; font-weight: 800; color: #16a34a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.02em; }
+        .usr-nickfull { display: flex; flex-direction: column; padding-left: 8px; min-width: 0; }
         .usr-nick { font-size: 0.82rem; font-weight: 600; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .usr-full { font-size: 0.7rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .usr-empid { font-size: 0.78rem; font-weight: 600; color: var(--c-slate); padding-left: 4px; }
-        .usr-dept { font-size: 0.75rem; color: var(--c-muted); padding-left: 4px; }
+        .usr-empid { font-size: 0.78rem; font-weight: 600; color: var(--c-slate); text-align: center; }
+        .usr-dept { font-size: 0.75rem; color: var(--c-muted); padding-left: 8px; }
 
         .check-cell { display: flex; justify-content: center; align-items: center; }
+        .action-cell { display: flex; justify-content: center; align-items: center; gap: 2px; }
 
         /* Toggle */
         .bq-toggle { position: relative; display: inline-block; width: 34px; height: 19px; }
@@ -103,6 +106,8 @@
         .bq-toggle.t-sys    input:checked + .bq-slider { background: var(--c-accent); }
         .bq-toggle input:checked + .bq-slider:before { transform: translateX(15px); }
 
+        .btn-edit { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px; border-radius: 7px; transition: 0.2s; display: flex; align-items: center; font-size: 0.95rem; }
+        .btn-edit:hover { background: #eff6ff; color: #3b82f6; }
         .btn-remove { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px; border-radius: 7px; transition: 0.2s; display: flex; align-items: center; font-size: 0.95rem; }
         .btn-remove:hover { background: #fee2e2; color: #ef4444; }
         .btn-undo-del { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 700; transition: 0.2s; }
@@ -113,7 +118,7 @@
 
         .skeleton-row {
             display: grid;
-            grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 44px;
+            grid-template-columns: 160px 200px 110px 1fr repeat(5, 80px) 80px 88px;
             align-items: center; padding: 0 4px;
             height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px;
         }
@@ -189,9 +194,11 @@
             <div class="usr-thead-sticky">
                 <!-- Group header -->
                 <div class="usr-group-head usr-cols">
-                    <div></div><div></div><div></div><div></div>
-                    <div class="group-label group-access" style="grid-column: 5 / 10">PROJECT ACCESS</div>
-                    <div class="group-label group-sys" style="grid-column: 10 / 11">SYSTEM</div>
+                    <div></div>
+                    <div style="border-left: 1px solid var(--c-border);"></div>
+                    <div></div><div></div>
+                    <div class="group-label group-access" style="grid-column: 5 / 10; border-left: 1px solid var(--c-border);">PROJECT ACCESS</div>
+                    <div class="group-label group-sys" style="grid-column: 10 / 11; border-left: 1px solid var(--c-border);">SYSTEM</div>
                     <div></div>
                 </div>
                 <!-- Column labels -->
@@ -365,9 +372,10 @@
                     </label>
                 </div>`;
 
-            const actionBtn = isDeleted
+            const actionBtns = isDeleted
                 ? `<button class="btn-undo-del" onclick="undoDelete('${u.codename}')" title="Undo">Undo</button>`
-                : `<button class="btn-remove" onclick="openDelModal('${u.codename}','${u.codename}')" title="Remove user"><i class="bi bi-trash3"></i></button>`;
+                : `<button class="btn-edit" onclick="openEditModal('${u.codename}')" title="Edit user"><i class="bi bi-pencil"></i></button>
+                   <button class="btn-remove" onclick="openDelModal('${u.codename}','${u.codename}')" title="Remove user"><i class="bi bi-trash3"></i></button>`;
 
             return `
             <div class="usr-row usr-cols ${isDeleted ? 'is-deleted' : ''}" data-codename="${u.codename}">
@@ -382,7 +390,7 @@
                 <div class="usr-dept">${u.department || '-'}</div>
                 ${projectToggles}
                 ${sysToggle}
-                <div class="check-cell">${actionBtn}</div>
+                <div class="action-cell">${actionBtns}</div>
             </div>`;
         }).join('');
     }
@@ -414,6 +422,66 @@
         accessChanges = {};
         document.getElementById('section-users').classList.remove('is-dirty');
         document.getElementById('save-bar').classList.remove('visible');
+    }
+
+    // ── Edit User ──
+    function openEditModal(codename) {
+        const u = allUsers.find(x => x.codename === codename);
+        if (!u) return;
+        Swal.fire({
+            title: 'Edit User',
+            html: `
+                <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                    <div>
+                        <label style="font-size:0.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Codename</label>
+                        <input id="swal-codename" class="swal2-input" value="${u.codename || ''}" placeholder="Codename" style="margin:4px 0 0;font-weight:700;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Nick Name</label>
+                        <input id="swal-nick" class="swal2-input" value="${u.nick_name || ''}" placeholder="Nick Name" style="margin:4px 0 0;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Full Name</label>
+                        <input id="swal-fullname" class="swal2-input" value="${u.full_name || ''}" placeholder="Full Name" style="margin:4px 0 0;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Employee ID</label>
+                        <input id="swal-empid" class="swal2-input" value="${u.employee_id || ''}" placeholder="Employee ID" style="margin:4px 0 0;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Department</label>
+                        <input id="swal-dept" class="swal2-input" value="${u.department || ''}" placeholder="Department" style="margin:4px 0 0;">
+                    </div>
+                </div>`,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#1e293b',
+            focusConfirm: false,
+            preConfirm: async () => {
+                const codename = document.getElementById('swal-codename').value.trim();
+                const nick_name = document.getElementById('swal-nick').value.trim();
+                const full_name = document.getElementById('swal-fullname').value.trim();
+                const employee_id = document.getElementById('swal-empid').value.trim();
+                const department = document.getElementById('swal-dept').value.trim();
+                if (!codename) { Swal.showValidationMessage('Codename is required'); return false; }
+
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ codename, nick_name, full_name, employee_id, department })
+                    .eq('id', u.id);
+                if (error) { Swal.showValidationMessage(error.message); return false; }
+
+                // Update local state
+                Object.assign(u, { codename, nick_name, full_name, employee_id, department });
+                return true;
+            }
+        }).then(result => {
+            if (result.isConfirmed) {
+                renderUsers(document.getElementById('table-search').value.trim());
+                notify('Saved', 'User info updated.', 'success');
+            }
+        });
     }
 
     // ── Delete User ──

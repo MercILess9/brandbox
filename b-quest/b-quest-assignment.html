@@ -202,6 +202,7 @@
             </div>
         </div>
         <div id="list-rows"></div>
+        <div id="assign-load-more-trigger" style="height:50px;"></div>
     </div>
 
     <div id="save-bar" class="save-bar">
@@ -228,6 +229,9 @@
     let workList  = [];
     let ownerList = [];
     let pendingAssign = {};
+    let assignPage = 0;
+    let assignHasMore = true;
+    let assignFetching = false;
 
     // ── Init ──
     async function loadPage() {
@@ -237,8 +241,9 @@
         await Promise.all([loadProfiles(), loadWorkList()]);
         populateFilterWork();
         populateFilterType();
-        await loadQuests();
+        await loadQuests(true);
         setupSearch();
+        setupInfiniteScroll();
     }
 
     async function loadProfiles() {
@@ -253,20 +258,67 @@
         workList = data || [];
     }
 
-    async function loadQuests() {
-        document.getElementById('list-rows').innerHTML = skeletonHTML();
-        const { data, error } = await supabaseClient.from('b-quest-list').select('id, task_name, account_name, opportunity_name, detail, link, publish_date, owner, designer, creative, designer_type, creative_type, designer_deadline, creative_deadline, designer_assign, creative_assign').order('last_update', { ascending: false });
-        if (error) { console.error(error); return; }
-        allRows = [];
+    async function loadQuests(isFirst = false) {
+        if (assignFetching || (!assignHasMore && !isFirst)) return;
+        assignFetching = true;
+
+        const limit = B_QUEST_CONFIG.itemsPerPage_Assign || 10;
+        const from = assignPage * limit;
+        const to = from + limit - 1;
+
+        if (isFirst) document.getElementById('list-rows').innerHTML = skeletonHTML();
+
+        let query = supabaseClient
+            .from('b-quest-list')
+            .select('id, task_name, account_name, opportunity_name, detail, link, publish_date, owner, designer, creative, designer_type, creative_type, designer_deadline, creative_deadline, designer_assign, creative_assign')
+            .or('and(designer.neq.-,designer.not.is.null,designer_assign.is.null),and(designer.neq.-,designer.not.is.null,designer_assign.eq.-),and(creative.neq.-,creative.not.is.null,creative_assign.is.null),and(creative.neq.-,creative.not.is.null,creative_assign.eq.-)')
+            .order('last_update', { ascending: false })
+            .range(from, to);
+
+        const { data, error } = await query;
+        if (error) { console.error(error); assignFetching = false; return; }
+
+        if (data.length < limit) assignHasMore = false;
+
+        const newRows = [];
         (data || []).forEach(q => {
             const hasD = q.designer && q.designer !== '-' && q.designer !== '';
             const hasC = q.creative  && q.creative  !== '-' && q.creative  !== '';
-            if (hasD && (!q.designer_assign || q.designer_assign === '-')) allRows.push({ role: 'Designer', quest: q });
-            if (hasC && (!q.creative_assign  || q.creative_assign  === '-')) allRows.push({ role: 'Creative', quest: q });
+            if (hasD && (!q.designer_assign || q.designer_assign === '-')) newRows.push({ role: 'Designer', quest: q });
+            if (hasC && (!q.creative_assign  || q.creative_assign  === '-')) newRows.push({ role: 'Creative', quest: q });
         });
-        ownerList = [...new Set(allRows.map(r => r.quest.owner).filter(o => o && o !== '-'))].sort();
-        populateFilterOwner();
+
+        if (isFirst) {
+            allRows = newRows;
+            ownerList = [...new Set(allRows.map(r => r.quest.owner).filter(o => o && o !== '-'))].sort();
+            populateFilterOwner();
+        } else {
+            allRows = allRows.concat(newRows);
+            const newOwners = newRows.map(r => r.quest.owner).filter(o => o && o !== '-' && !ownerList.includes(o));
+            if (newOwners.length) { ownerList = [...new Set([...ownerList, ...newOwners])].sort(); populateFilterOwner(); }
+        }
+
+        assignPage++;
+        assignFetching = false;
         applyFilters();
+    }
+
+    function resetAndReload() {
+        assignPage = 0;
+        assignHasMore = true;
+        assignFetching = false;
+        allRows = [];
+        ownerList = [];
+        loadQuests(true);
+    }
+
+    function setupInfiniteScroll() {
+        const trigger = document.getElementById('assign-load-more-trigger');
+        if (!trigger) return;
+        const observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && !assignFetching && assignHasMore) loadQuests();
+        }, { rootMargin: '100px' });
+        observer.observe(trigger);
     }
 
     // ── Populate filters ──
@@ -418,7 +470,7 @@
         updateSelectHighlight('filterWork'); updateSelectHighlight('filterType'); updateSelectHighlight('filterOwner');
         const desPill = document.getElementById('pill-des'); const crePill = document.getElementById('pill-cre');
         if (!desPill.classList.contains('active-des')) desPill.classList.add('active-des'); if (!crePill.classList.contains('active-cre')) crePill.classList.add('active-cre');
-        rebuildWorkFilter(); applyFilters();
+        rebuildWorkFilter(); resetAndReload();
     }
 
     // ── Pending Assign ──

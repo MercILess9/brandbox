@@ -233,14 +233,26 @@
             setupDefaultOptions(typeEl, "Type");
             B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
-            const { data: owners } = await supabaseClient.from('b-quest-list').select('owner');
-            const ownerEl = document.getElementById('filterOwner');
-            setupDefaultOptions(ownerEl, "Owner");
-            if (owners) {
-                const unique = [...new Set(owners.map(o => o.owner).filter(o => o && o !== '-'))].sort();
-                unique.forEach(name => ownerEl.add(new Option(name, name)));
-            }
+            await refreshOwnerFilter();
+            subscribeOwnerRealtime();
         } catch (e) { console.error(e); }
+    }
+
+    async function refreshOwnerFilter() {
+        const { data } = await supabaseClient.rpc('get_bquest_owners');
+        const ownerEl = document.getElementById('filterOwner');
+        const prev = ownerEl.value;
+        setupDefaultOptions(ownerEl, "Owner");
+        if (data) data.forEach(row => ownerEl.add(new Option(row.owner, row.owner)));
+        if ([...ownerEl.options].some(o => o.value === prev)) ownerEl.value = prev;
+    }
+
+    function subscribeOwnerRealtime() {
+        supabaseClient.channel('bquest-owners')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'b-quest-list' }, () => {
+                refreshOwnerFilter();
+            })
+            .subscribe();
     }
 
     function renderFilterWork() {
