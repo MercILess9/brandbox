@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>SYSTEM | Settings</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/system/config.js"></script>
+    <script src="/system/system.js"></script>
+
+    <style>
+        :root {
+            --c-accent: #bdc432;
+            --c-accent-light: #f4f7a1;
+            --c-dark: #1e293b;
+            --c-bg: #f8fafc;
+            --c-muted: #94a3b8;
+            --c-slate: #626e7f;
+            --c-border: #e2e8f0;
+        }
+
+        body { font-family: 'Inter', 'Outfit', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; }
+        .settings-wrapper { max-width: 1300px; margin: 0 auto; padding: 36px 20px 120px; }
+
+        .page-header { margin-bottom: 28px; display: flex; align-items: center; gap: 12px; }
+        .page-header h1 { font-size: 1.4rem; font-weight: 800; color: var(--c-dark); margin: 0; }
+
+        .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
+        .section-header { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--c-border); flex-wrap: wrap; }
+        .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { font-size: 1rem; }
+
+        /* Table toolbar */
+        .table-toolbar { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-wrap: wrap; }
+        .table-search-wrap { position: relative; }
+        .table-search-input { width: 220px; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
+        .table-search-input:focus { border-color: var(--c-accent); background: #fff; }
+        .table-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.8rem; pointer-events: none; }
+        .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-muted); white-space: nowrap; }
+
+        /* Users Table */
+        /* Grid: Avatar | Name(200px) | Employee | Dept | Level | Projects... | Actions */
+        .usr-scroll-body { max-height: 600px; overflow-y: auto; }
+        .usr-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
+
+        .usr-table-head {
+            display: grid;
+            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
+            align-items: center; padding: 0 4px;
+            height: 36px; background: var(--c-bg);
+            border-radius: 10px; margin-bottom: 4px;
+        }
+        .usr-group-head {
+            display: grid;
+            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
+            align-items: center; padding: 0 4px; margin-bottom: 2px;
+        }
+        .group-label {
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; text-align: center;
+            padding: 4px 0; border-radius: 6px; margin: 0 3px;
+        }
+        .group-access { background: #f0fdf4; color: #16a34a; }
+        .group-sys    { background: var(--c-accent-light); color: #7a8500; }
+
+        .usr-col-label { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
+        .usr-col-name  { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.8px; padding-left: 8px; }
+
+        .usr-row {
+            display: grid;
+            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
+            align-items: center; padding: 0 4px;
+            min-height: 56px; border-bottom: 1px solid #f8fafc;
+            transition: background 0.15s; border-radius: 8px;
+        }
+        .usr-row:last-child { border-bottom: none; }
+        .usr-row:hover { background: #fafbff; }
+        .usr-row.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
+        .usr-row.is-deleted .btn-undo-del { pointer-events: all; }
+
+        /* Visual separators: col 6 (first project), col 11 (system) */
+        .usr-table-head > :nth-child(6),
+        .usr-row > :nth-child(6) { border-left: 1px solid var(--c-border); }
+        .usr-table-head > :nth-child(11),
+        .usr-row > :nth-child(11) { border-left: 1px solid var(--c-border); }
+
+        .usr-avatar { width: 32px; height: 32px; background: var(--c-accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; color: #7a8500; margin: 0 auto; flex-shrink: 0; }
+        .usr-name-zone { display: flex; flex-direction: column; padding-left: 4px; min-width: 0; }
+        .usr-codename { font-size: 0.84rem; font-weight: 700; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .usr-fullname { font-size: 0.7rem; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .usr-empid { font-size: 0.78rem; font-weight: 600; color: var(--c-slate); }
+        .usr-dept { font-size: 0.75rem; color: var(--c-muted); }
+        .usr-level-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.66rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .level-god  { background: #fef3c7; color: #d97706; }
+        .level-user { background: #f1f5f9; color: var(--c-slate); }
+
+        .check-cell { display: flex; justify-content: center; align-items: center; }
+
+        /* Toggle */
+        .bq-toggle { position: relative; display: inline-block; width: 34px; height: 19px; }
+        .bq-toggle input { opacity: 0; width: 0; height: 0; }
+        .bq-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e2e8f0; transition: .3s; border-radius: 34px; }
+        .bq-slider:before { position: absolute; content: ""; height: 13px; width: 13px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+        .bq-toggle.t-access input:checked + .bq-slider { background: #22c55e; }
+        .bq-toggle.t-sys    input:checked + .bq-slider { background: var(--c-accent); }
+        .bq-toggle input:checked + .bq-slider:before { transform: translateX(15px); }
+
+        .btn-remove { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px; border-radius: 7px; transition: 0.2s; display: flex; align-items: center; font-size: 0.95rem; }
+        .btn-remove:hover { background: #fee2e2; color: #ef4444; }
+        .btn-undo-del { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 700; transition: 0.2s; }
+
+        .usr-empty { padding: 48px; text-align: center; color: var(--c-muted); }
+        .usr-empty i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.35; }
+        .usr-empty p { font-size: 0.84rem; font-weight: 600; margin: 0; }
+
+        .skeleton-row {
+            display: grid;
+            grid-template-columns: 44px 200px 110px 1fr 80px repeat(5, 80px) 60px 44px;
+            align-items: center; padding: 0 4px;
+            height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px;
+        }
+        .skeleton-block { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
+        @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+        /* Dirty indicator */
+        .dirty-dot { width: 7px; height: 7px; background: #f59e0b; border-radius: 50%; display: none; }
+        .section.is-dirty .dirty-dot { display: inline-block; }
+        .section.is-dirty { border-color: #fde68a; }
+
+        /* ── Floating Save Bar ── */
+        .save-bar {
+            position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 48px); max-width: 600px;
+            background: #1e293b; border-radius: 16px;
+            padding: 14px 22px;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+            transition: bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 999;
+        }
+        .save-bar.visible { bottom: 24px; }
+        .save-bar-left { display: flex; align-items: center; gap: 12px; }
+        .save-bar-left i { font-size: 1.3rem; color: var(--c-accent); }
+        .save-bar-label { font-size: 0.78rem; font-weight: 800; color: #fff; letter-spacing: 0.3px; }
+        .save-bar-sub { font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-top: 2px; font-weight: 600; }
+        .save-bar-right { display: flex; align-items: center; }
+        .btn-save-main { background: var(--c-accent); color: var(--c-dark); border: none; border-radius: 10px; padding: 9px 26px; cursor: pointer; font-size: 0.84rem; font-weight: 800; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; transition: 0.15s; }
+        .btn-save-main:hover { filter: brightness(1.08); }
+        .btn-save-main:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        /* Delete confirm modal */
+        .del-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 1100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .del-overlay.show { opacity: 1; pointer-events: all; }
+        .del-modal { background: #fff; border-radius: 20px; width: 420px; padding: 28px; box-shadow: 0 24px 60px rgba(0,0,0,0.18); transform: translateY(12px); transition: transform 0.2s; }
+        .del-overlay.show .del-modal { transform: translateY(0); }
+        .del-title { font-size: 1rem; font-weight: 800; color: var(--c-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .del-sub { font-size: 0.82rem; color: var(--c-muted); line-height: 1.6; margin-bottom: 20px; }
+        .del-highlight { font-weight: 700; color: var(--c-dark); }
+        .del-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-del-cancel { background: #f1f5f9; color: var(--c-slate); border: none; border-radius: 10px; padding: 10px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: 0.15s; }
+        .btn-del-cancel:hover { background: #e2e8f0; }
+        .btn-del-confirm { background: #ef4444; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: 0.15s; display: flex; align-items: center; gap: 6px; }
+        .btn-del-confirm:hover { background: #dc2626; }
+        .btn-del-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="settings-wrapper">
+
+    <div class="page-header">
+        <h1><i class="bi bi-shield-lock-fill me-2" style="color:var(--c-accent)"></i>System Settings</h1>
+    </div>
+
+    <!-- Section: Users & Access -->
+    <div class="section" id="section-users">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="bi bi-people-fill"></i> Users & Access
+                <span class="dirty-dot"></span>
+            </div>
+            <div class="table-toolbar">
+                <span class="table-count" id="table-count"></span>
+                <div class="table-search-wrap">
+                    <i class="bi bi-search table-search-icon"></i>
+                    <input type="text" id="table-search" class="table-search-input" placeholder="Filter users...">
+                </div>
+            </div>
+        </div>
+        <div class="usr-scroll-body" style="padding: 0 24px 20px;">
+            <div class="usr-thead-sticky">
+                <!-- Group header -->
+                <div class="usr-group-head">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div class="group-label group-access" style="grid-column: 6 / 11">PROJECT ACCESS</div>
+                    <div class="group-label group-sys" style="grid-column: 11 / 12">SYSTEM</div>
+                    <div></div>
+                </div>
+                <!-- Column labels -->
+                <div class="usr-table-head">
+                    <div></div>
+                    <div class="usr-col-name">User</div>
+                    <div class="usr-col-label">Employee ID</div>
+                    <div class="usr-col-label" style="text-align:left; padding-left:8px;">Department</div>
+                    <div class="usr-col-label">Level</div>
+                    <div class="usr-col-label">B-QUEST</div>
+                    <div class="usr-col-label">Dashboard</div>
+                    <div class="usr-col-label">B-ACCOUNT</div>
+                    <div class="usr-col-label">Finance</div>
+                    <div class="usr-col-label">B-ACADEMY</div>
+                    <div class="usr-col-label">Setting</div>
+                    <div></div>
+                </div>
+            </div>
+            <div id="user-list"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="del-overlay" id="del-overlay">
+    <div class="del-modal">
+        <div class="del-title"><i class="bi bi-exclamation-triangle-fill" style="color:#ef4444"></i> Remove User</div>
+        <div class="del-sub">
+            Remove <span class="del-highlight" id="del-target-name"></span> from the system?<br>
+            This will delete their profile and revoke all access permanently.
+        </div>
+        <div class="del-actions">
+            <button class="btn-del-cancel" onclick="closeDelModal()">Cancel</button>
+            <button class="btn-del-confirm" id="btn-del-confirm" onclick="confirmDeleteUser()">
+                <i class="bi bi-trash3-fill"></i> Remove
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Save Bar -->
+<div id="save-bar" class="save-bar">
+    <div class="save-bar-left">
+        <i class="bi bi-check2-circle"></i>
+        <div>
+            <div class="save-bar-label">System Settings</div>
+            <div class="save-bar-sub">Unsaved access changes</div>
+        </div>
+    </div>
+    <div class="save-bar-right">
+        <button class="btn-save-main" id="save-btn" onclick="saveAll()">
+            <i class="bi bi-floppy2-fill"></i> Save
+        </button>
+    </div>
+</div>
+
+<script>
+    const SYSTEM_CONFIG = {
+        projectName: "SYSTEM",
+        menus: [
+            { name: "Settings", link: "setting.html" }
+        ]
+    };
+
+    // Projects columns definition
+    const PROJECT_COLS = [
+        { key: 'bquest',    label: 'B-QUEST' },
+        { key: 'bdashboard', label: 'Dashboard' },
+        { key: 'baccount',  label: 'B-ACCOUNT' },
+        { key: 'bfinance',  label: 'Finance' },
+        { key: 'bacademy',  label: 'B-ACADEMY' },
+    ];
+
+    let allUsers = [];
+    let accessData = {};     // codename -> access row
+    let accessChanges = {};  // codename -> changed fields
+    let pendingDeleteUser = null;
+
+    // ── Init ──
+    async function loadPage() {
+        await initLayout(SYSTEM_CONFIG);
+        guardSystemSetting();
+        await Promise.all([loadUsers(), loadAccessData()]);
+        renderUsers();
+        setupSearch();
+    }
+
+    function guardSystemSetting() {
+        const user = getBxUser();
+        if (user?.level === 'god') return;
+        // Check system_access table — if not god, must have system_setting = true
+        // We check after data loads via guardAfterLoad()
+    }
+
+    async function guardAfterLoad() {
+        const user = getBxUser();
+        if (user?.level === 'god') return;
+        const myAccess = accessData[user?.codename];
+        if (!myAccess?.system_setting) {
+            window.location.replace('/index.html');
+        }
+    }
+
+    async function loadUsers() {
+        const { data } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .neq('level', 'god')
+            .order('codename');
+        allUsers = data || [];
+    }
+
+    async function loadAccessData() {
+        const { data } = await supabaseClient.from('system_access').select('*');
+        accessData = {};
+        (data || []).forEach(row => { accessData[row.codename] = row; });
+        await guardAfterLoad();
+    }
+
+    // ── Render ──
+    function showSkeleton() {
+        const row = () => `
+            <div class="skeleton-row">
+                <div class="skeleton-block" style="height:32px;width:32px;border-radius:10px;"></div>
+                <div class="skeleton-block" style="height:30px;width:150px;margin-left:4px;"></div>
+                ${Array(10).fill(0).map(() => `<div class="skeleton-block" style="height:19px;width:34px;margin:auto;"></div>`).join('')}
+            </div>`;
+        document.getElementById('user-list').innerHTML = row() + row() + row() + row();
+    }
+
+    function renderUsers(filter = '') {
+        const container = document.getElementById('user-list');
+        const q = filter.toLowerCase();
+
+        let rows = allUsers.filter(u =>
+            !q ||
+            u.codename?.toLowerCase().includes(q) ||
+            u.full_name?.toLowerCase().includes(q) ||
+            u.employee_id?.toLowerCase().includes(q) ||
+            u.department?.toLowerCase().includes(q)
+        );
+
+        updateCount(rows.length, allUsers.length);
+
+        if (!rows.length) {
+            container.innerHTML = `<div class="usr-empty"><i class="bi bi-people"></i><p>No users found</p></div>`;
+            return;
+        }
+
+        container.innerHTML = rows.map(u => {
+            const ch = accessChanges[u.codename];
+            const acc = ch ? { ...(accessData[u.codename] || {}), ...ch } : (accessData[u.codename] || {});
+            const isDeleted = ch?._delete;
+
+            const projectToggles = PROJECT_COLS.map(p => `
+                <div class="check-cell">
+                    <label class="bq-toggle t-access">
+                        <input type="checkbox" ${acc[p.key] ? 'checked' : ''} onchange="onAccessChange('${u.codename}','${p.key}',this.checked)" ${isDeleted ? 'disabled' : ''}>
+                        <span class="bq-slider"></span>
+                    </label>
+                </div>`).join('');
+
+            const sysToggle = `
+                <div class="check-cell">
+                    <label class="bq-toggle t-sys">
+                        <input type="checkbox" ${acc.system_setting ? 'checked' : ''} onchange="onAccessChange('${u.codename}','system_setting',this.checked)" ${isDeleted ? 'disabled' : ''}>
+                        <span class="bq-slider"></span>
+                    </label>
+                </div>`;
+
+            const actionBtn = isDeleted
+                ? `<button class="btn-undo-del" onclick="undoDelete('${u.codename}')" title="Undo">Undo</button>`
+                : `<button class="btn-remove" onclick="openDelModal('${u.codename}','${u.codename}')" title="Remove user"><i class="bi bi-trash3"></i></button>`;
+
+            return `
+            <div class="usr-row ${isDeleted ? 'is-deleted' : ''}" data-codename="${u.codename}">
+                <div><div class="usr-avatar">${(u.codename||'??').substring(0,2).toUpperCase()}</div></div>
+                <div class="usr-name-zone">
+                    <span class="usr-codename">${u.codename || '-'}</span>
+                    <span class="usr-fullname">${u.nick_name ? u.nick_name + (u.full_name ? ' · ' + u.full_name : '') : (u.full_name || '-')}</span>
+                </div>
+                <div class="usr-empid">${u.employee_id || '-'}</div>
+                <div class="usr-dept">${u.department || '-'}</div>
+                <div class="check-cell">
+                    <span class="usr-level-badge ${u.level === 'god' ? 'level-god' : 'level-user'}">
+                        ${u.level === 'god' ? '<i class="bi bi-stars"></i> God' : 'User'}
+                    </span>
+                </div>
+                ${projectToggles}
+                ${sysToggle}
+                <div class="check-cell">${actionBtn}</div>
+            </div>`;
+        }).join('');
+    }
+
+    function setupSearch() {
+        document.getElementById('table-search').addEventListener('input', e => renderUsers(e.target.value.trim()));
+    }
+
+    function updateCount(shown, total) {
+        document.getElementById('table-count').textContent = shown === total
+            ? `${total} users` : `${shown} / ${total} users`;
+    }
+
+    // ── Access Changes ──
+    function onAccessChange(codename, field, value) {
+        if (!accessChanges[codename]) {
+            accessChanges[codename] = { ...(accessData[codename] || { codename }) };
+        }
+        accessChanges[codename][field] = value;
+        markDirty();
+    }
+
+    function markDirty() {
+        document.getElementById('section-users').classList.add('is-dirty');
+        document.getElementById('save-bar').classList.add('visible');
+    }
+
+    function clearDirty() {
+        accessChanges = {};
+        document.getElementById('section-users').classList.remove('is-dirty');
+        document.getElementById('save-bar').classList.remove('visible');
+    }
+
+    // ── Delete User ──
+    function openDelModal(codename, displayName) {
+        pendingDeleteUser = codename;
+        document.getElementById('del-target-name').textContent = displayName;
+        document.getElementById('del-overlay').classList.add('show');
+    }
+
+    function closeDelModal() {
+        pendingDeleteUser = null;
+        document.getElementById('del-overlay').classList.remove('show');
+    }
+
+    async function confirmDeleteUser() {
+        if (!pendingDeleteUser) return;
+        const codename = pendingDeleteUser;
+        const btn = document.getElementById('btn-del-confirm');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Removing...';
+
+        try {
+            // Find user's auth id from profiles
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('id')
+                .eq('codename', codename)
+                .single();
+
+            if (profile?.id) {
+                // Delete profile row (auth user managed separately by admin)
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .delete()
+                    .eq('codename', codename);
+                if (error) throw error;
+            }
+
+            // Delete access row
+            await supabaseClient.from('system_access').delete().eq('codename', codename);
+
+            // Remove from local state
+            allUsers = allUsers.filter(u => u.codename !== codename);
+            delete accessData[codename];
+            delete accessChanges[codename];
+
+            closeDelModal();
+            renderUsers(document.getElementById('table-search').value.trim());
+            notify('Removed', `${codename} has been removed from the system.`, 'success');
+        } catch (e) {
+            Swal.fire('Error', e.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-trash3-fill"></i> Remove';
+        }
+    }
+
+    function undoDelete(codename) {
+        delete accessChanges[codename];
+        const anyDirty = Object.keys(accessChanges).length > 0;
+        if (!anyDirty) clearDirty();
+        renderUsers(document.getElementById('table-search').value.trim());
+    }
+
+    // ── Save Access Changes ──
+    async function saveAll() {
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+
+        try {
+            const errors = [];
+
+            for (const [codename, ch] of Object.entries(accessChanges)) {
+                if (ch._delete) continue; // deletions handled immediately
+
+                const payload = {
+                    codename,
+                    bquest:         !!ch.bquest,
+                    bdashboard:     !!ch.bdashboard,
+                    baccount:       !!ch.baccount,
+                    bfinance:       !!ch.bfinance,
+                    bacademy:       !!ch.bacademy,
+                    system_setting: !!ch.system_setting,
+                };
+
+                const { error } = await supabaseClient
+                    .from('system_access')
+                    .upsert([payload], { onConflict: 'codename' });
+                if (error) errors.push(`${codename}: ${error.message}`);
+                else accessData[codename] = { ...accessData[codename], ...payload };
+            }
+
+            if (errors.length) {
+                Swal.fire('Some errors occurred', errors.join('\n'), 'error');
+            } else {
+                Swal.fire({ icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1200 });
+                clearDirty();
+                renderUsers(document.getElementById('table-search').value.trim());
+            }
+        } catch (e) {
+            Swal.fire('Error', e.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-floppy2-fill"></i> Save';
+        }
+    }
+
+    loadPage();
+</script>
+</body>
+</html>

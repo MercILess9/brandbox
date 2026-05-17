@@ -199,7 +199,7 @@
         </header>
 
         <div class="app-grid">
-            
+
             <a href="b-quest/b-quest-list.html" class="app-card">
                 <i class="bi bi-rocket-takeoff-fill"></i>
                 <span>B-QUEST</span>
@@ -225,12 +225,39 @@
             </div>
 
         </div>
+
+        <div id="sys-setting-link" style="display:none; margin-top: 32px; text-align: right;">
+            <a href="/system/setting.html" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: #aaa; text-decoration: none; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s;">
+                <i class="bi bi-shield-lock" style="font-size: 0.9rem;"></i> System Settings
+            </a>
+        </div>
     </div>
 
     <script>
-        initLayout({
-            projectName: "BRANDSTROM X"
-        });
+        async function initIndex() {
+            await initLayout({ projectName: "BRANDSTROM X" });
+            const user = getBxUser();
+            if (!user) return;
+
+            // God always sees system settings link
+            if (user.level === 'god') {
+                document.getElementById('sys-setting-link').style.display = 'block';
+                return;
+            }
+
+            // Check system_access for system_setting permission
+            const { data } = await supabaseClient
+                .from('system_access')
+                .select('system_setting')
+                .eq('codename', user.codename)
+                .single();
+
+            if (data?.system_setting) {
+                document.getElementById('sys-setting-link').style.display = 'block';
+            }
+        }
+
+        initIndex();
     </script>
 </body>
 </html>
