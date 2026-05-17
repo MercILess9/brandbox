@@ -200,7 +200,32 @@
                 <span class="section-badge" id="badge-count">0</span>
             </div>
         </div>
+        <div class="col-header">
+            <div class="ch ch-owner">Owner</div>
+            <div class="ch-div"></div>
+            <div class="ch ch-task">Task</div>
+            <div class="ch-div"></div>
+            <div class="ch ch-detail">Detail</div>
+            <div class="ch-div"></div>
+            <div class="ch ch-assign">Assign</div>
+        </div>
         <div id="list-rows"></div>
+    </div>
+
+    <div id="save-bar" class="save-bar">
+        <div class="save-bar-left">
+            <i class="bi bi-check2-circle"></i>
+            <div>
+                <div class="save-bar-label">พร้อม Assign</div>
+                <div class="save-bar-sub" id="save-bar-sub">0 รายการ รอบันทึก</div>
+            </div>
+        </div>
+        <div class="save-bar-right">
+            <button class="btn-cancel-save" onclick="cancelAll()"><i class="bi bi-x"></i> ยกเลิก</button>
+            <button class="btn-save-main" id="save-btn" onclick="saveAll()">
+                <i class="bi bi-floppy2-fill"></i> Save
+            </button>
+        </div>
     </div>
 
 </div>
@@ -211,6 +236,7 @@
     let creatives = [];
     let workList  = [];
     let ownerList = [];
+    let pendingAssign = {};
 
     // ── Init ──
     async function loadPage() {
@@ -307,33 +333,50 @@
             const rType = isDes ? q.designer_type : q.creative_type;
             const rDL   = isDes ? q.designer_deadline : q.creative_deadline;
             const options = isDes ? designers : creatives;
-            const opts = [`<option value="">— Unassigned —</option>`].concat(options.map(n => `<option value="${n}">${n}</option>`)).join('');
-            const acct = [esc(q.account_name), esc(q.opportunity_name)].filter(Boolean).join(' · ');
+            const key  = `${q.id}__${r.role}`;
+            const pending = pendingAssign[key];
+            const opts = [`<option value="">— Unassigned —</option>`]
+                .concat(options.map(n => `<option value="${n}" ${pending?.value === n ? 'selected' : ''}>${n}</option>`))
+                .join('');
 
             return `
             <div class="assign-card ${isDes ? 'card-des' : 'card-cre'}" id="row-${q.id}__${r.role}">
 
-                <div class="c-head">
-                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}"><i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i> ${r.role.toUpperCase()}</span>
-                    <span class="c-account">${acct}</span>
-                    ${rDL ? `<span class="dl-chip ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</span>` : ''}
+                <div class="z z-owner">
+                    ${q.owner ? `<div class="owner-name"><i class="bi bi-person-circle"></i> ${esc(q.owner)}</div>` : '<div></div>'}
+                    ${rDL ? `<div class="dl-chip ${dlUrgency(rDL)}"><i class="bi bi-calendar3"></i> ${formatDate(rDL, true)}</div>` : '<div></div>'}
                 </div>
 
-                <div class="c-body">
-                    <div class="c-task-name">${esc(q.task_name) || 'Untitled'}</div>
-                    ${(rWork || rType) ? `<div class="c-chips">${rWork ? `<span class="meta-chip">${esc(rWork)}</span>` : ''}${rType ? `<span class="meta-chip">${esc(rType)}</span>` : ''}</div>` : ''}
-                    ${q.detail ? `<div class="c-detail">${esc(q.detail)}</div>` : ''}
+                <div class="z-div"></div>
+
+                <div class="z z-task">
+                    <div class="task-name">${esc(q.task_name) || 'Untitled'}</div>
+                    ${(q.account_name || q.opportunity_name) ? `<div class="task-sub">${[esc(q.account_name), esc(q.opportunity_name)].filter(Boolean).join(' | ')}</div>` : '<div></div>'}
+                    <div class="task-tags">
+                        ${rWork ? `<span class="meta-chip">${esc(rWork)}</span>` : ''}
+                        ${rType ? `<span class="meta-chip">${esc(rType)}</span>` : ''}
+                        ${q.link ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
+                    </div>
                 </div>
 
-                <div class="c-foot">
-                    <div class="c-foot-left">
-                        ${q.owner ? `<span class="owner-chip"><i class="bi bi-person-fill"></i> ${esc(q.owner)}</span>` : ''}
-                        ${q.link  ? `<a class="task-link" href="${esc(q.link)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
-                    </div>
-                    <div class="assign-wrap">
-                        <span class="assign-label">Assign to</span>
-                        <select class="assign-select" data-quest-id="${q.id}" data-role="${r.role}" onchange="onAssignChange(this)">${opts}</select>
-                    </div>
+                <div class="z-div"></div>
+
+                <div class="z z-detail">
+                    ${q.detail ? `<div class="detail-text">${esc(q.detail)}</div>` : ''}
+                </div>
+
+                <div class="z-div"></div>
+
+                <div class="z z-assign">
+                    <span class="role-badge ${isDes ? 'role-des' : 'role-cre'}">
+                        <i class="bi bi-${isDes ? 'brush' : 'rocket'}"></i> ${r.role.toUpperCase()}
+                    </span>
+                    <select class="assign-select ${pending ? 'is-pending' : ''}"
+                        data-quest-id="${q.id}"
+                        data-role="${r.role}"
+                        onchange="onAssignChange(this)">
+                        ${opts}
+                    </select>
                 </div>
 
             </div>`;
@@ -343,24 +386,31 @@
     function skeletonHTML() {
         const row = (accent) => `
         <div class="assign-card ${accent}" style="pointer-events:none">
-            <div class="c-head" style="gap:10px">
-                <div class="skel" style="height:22px;width:82px;border-radius:6px;flex-shrink:0"></div>
-                <div class="skel" style="height:14px;flex:1;max-width:220px;border-radius:4px"></div>
-                <div class="skel" style="height:22px;width:90px;border-radius:20px;flex-shrink:0"></div>
+            <div class="z z-owner" style="padding-left:20px">
+                <div class="skel" style="height:16px;width:90px;border-radius:4px"></div>
+                <div class="skel" style="height:20px;width:72px;border-radius:6px"></div>
             </div>
-            <div class="c-body">
-                <div class="skel" style="height:19px;width:58%;border-radius:4px;margin-bottom:9px"></div>
-                <div style="display:flex;gap:6px;margin-bottom:10px">
-                    <div class="skel" style="height:22px;width:72px;border-radius:20px"></div>
-                    <div class="skel" style="height:22px;width:56px;border-radius:20px"></div>
+            <div class="z-div"></div>
+            <div class="z z-task">
+                <div class="skel" style="height:15px;width:75%;border-radius:4px"></div>
+                <div class="skel" style="height:11px;width:50%;border-radius:4px"></div>
+                <div style="display:flex;gap:5px">
+                    <div class="skel" style="height:19px;width:64px;border-radius:20px"></div>
+                    <div class="skel" style="height:19px;width:50px;border-radius:20px"></div>
                 </div>
-                <div class="skel" style="height:50px;width:100%;border-radius:8px"></div>
             </div>
-            <div class="c-foot">
-                <div style="display:flex;gap:8px">
-                    <div class="skel" style="height:26px;width:90px;border-radius:20px"></div>
+            <div class="z-div"></div>
+            <div class="z z-detail" style="justify-content:center">
+                <div>
+                    <div class="skel" style="height:11px;width:100%;border-radius:3px;margin-bottom:5px"></div>
+                    <div class="skel" style="height:11px;width:90%;border-radius:3px;margin-bottom:5px"></div>
+                    <div class="skel" style="height:11px;width:75%;border-radius:3px"></div>
                 </div>
-                <div class="skel" style="height:34px;width:185px;border-radius:10px"></div>
+            </div>
+            <div class="z-div"></div>
+            <div class="z z-assign">
+                <div class="skel" style="height:20px;width:76px;border-radius:6px"></div>
+                <div class="skel" style="height:32px;width:100%;border-radius:10px"></div>
             </div>
         </div>`;
         return row('card-des') + row('card-cre') + row('card-des') + row('card-cre');
@@ -384,15 +434,61 @@
         rebuildWorkFilter(); applyFilters();
     }
 
-    // ── Assign ──
-    async function onAssignChange(sel) {
-        const questId = sel.dataset.questId; const role = sel.dataset.role; const newVal = sel.value; if (!newVal) return;
-        sel.classList.add('is-saving');
-        const field = role === 'Designer' ? 'designer_assign' : 'creative_assign';
-        const { error } = await supabaseClient.from('b-quest-list').update({ [field]: newVal, last_update: new Date().toISOString() }).eq('id', questId);
-        if (error) { Swal.fire({ icon: 'error', title: 'Save failed', text: error.message, timer: 3000, showConfirmButton: false }); sel.value = ''; sel.classList.remove('is-saving'); return; }
-        allRows = allRows.filter(r => !(String(r.quest.id) === String(questId) && r.role === role));
-        notify('Assigned', `${role} → ${newVal}`, 'success'); applyFilters();
+    // ── Pending Assign ──
+    function onAssignChange(sel) {
+        const questId = sel.dataset.questId;
+        const role    = sel.dataset.role;
+        const newVal  = sel.value;
+        const key     = `${questId}__${role}`;
+
+        if (!newVal) {
+            delete pendingAssign[key];
+            sel.classList.remove('is-pending');
+        } else {
+            pendingAssign[key] = { questId, role, value: newVal, sel };
+            sel.classList.add('is-pending');
+        }
+        updateSaveBar();
+    }
+
+    function updateSaveBar() {
+        const count = Object.keys(pendingAssign).length;
+        const bar   = document.getElementById('save-bar');
+        if (!count) { bar.classList.remove('visible'); return; }
+        bar.classList.add('visible');
+        document.getElementById('save-bar-sub').textContent = `${count} รายการ รอบันทึก`;
+    }
+
+    function cancelAll() {
+        Object.values(pendingAssign).forEach(p => { p.sel.value = ''; p.sel.classList.remove('is-pending'); });
+        pendingAssign = {};
+        updateSaveBar();
+    }
+
+    async function saveAll() {
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+
+        const entries = Object.entries(pendingAssign);
+        let saved = 0, failed = 0;
+
+        for (const [key, { questId, role, value }] of entries) {
+            const field = role === 'Designer' ? 'designer_assign' : 'creative_assign';
+            const { error } = await supabaseClient.from('b-quest-list')
+                .update({ [field]: value, last_update: new Date().toISOString() })
+                .eq('id', questId);
+            if (error) { failed++; }
+            else { allRows = allRows.filter(r => !(String(r.quest.id) === String(questId) && r.role === role)); delete pendingAssign[key]; saved++; }
+        }
+
+        if (failed) Swal.fire({ icon: 'error', title: `บันทึกไม่สำเร็จ ${failed} รายการ`, timer: 3000, showConfirmButton: false });
+        if (saved)  notify('Assigned', `บันทึกสำเร็จ ${saved} รายการ`, 'success');
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-floppy2-fill"></i> Save';
+        updateSaveBar();
+        applyFilters();
     }
     loadPage();
 </script>
