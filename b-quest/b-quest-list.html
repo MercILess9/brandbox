@@ -296,7 +296,7 @@
     async function fetchQuests(isFirst = false) {
         if (isFetching || (!hasMore && !isFirst)) return;
         isFetching = true;
-        const limit = B_QUEST_CONFIG.itemsPerPage || 20;
+        const limit = B_QUEST_CONFIG.itemsPerPage_List || 10;
         const from = currentPage * limit;
         const to = from + limit - 1;
 
