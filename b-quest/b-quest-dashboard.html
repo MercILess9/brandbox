@@ -115,9 +115,9 @@
         .wb-weight-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
 
         /* ── Person Summary ── */
-        .ps-table-head { display: grid; grid-template-columns: 1fr 56px 60px; gap: 8px; padding: 8px 16px; background: var(--c-bg); font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .ps-table-head { display: grid; grid-template-columns: 1fr 52px 52px 60px; gap: 8px; padding: 8px 16px; background: var(--c-bg); font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .ps-table-head span:not(:first-child) { text-align: center; }
-        .ps-row { display: grid; grid-template-columns: 1fr 56px 60px; gap: 8px; align-items: center; padding: 9px 16px; border-top: 1px solid #f8fafc; transition: background 0.15s; }
+        .ps-row { display: grid; grid-template-columns: 1fr 52px 52px 60px; gap: 8px; align-items: center; padding: 9px 16px; border-top: 1px solid #f8fafc; transition: background 0.15s; }
         .ps-row:hover { background: #fafbff; }
         .ps-name { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
         .ps-num { font-size: 0.82rem; font-weight: 800; text-align: center; }
@@ -255,12 +255,12 @@
             <div class="two-col">
                 <div class="sub-col">
                     <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
+                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Done</span><span>Weight</span></div>
                     <div id="ps-des"><div class="col-empty">Loading...</div></div>
                 </div>
                 <div class="sub-col">
                     <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
+                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Done</span><span>Weight</span></div>
                     <div id="ps-cre"><div class="col-empty">Loading...</div></div>
                 </div>
             </div>
@@ -554,20 +554,21 @@
     function renderPersons(tasks) {
         const { start, end } = monthRange();
 
-        function buildMap(list, assignField, weightField, deadlineField) {
+        function buildMap(list, assignField, weightField, statusField, deadlineField) {
             const map = {};
             list.filter(t => t[deadlineField] >= start && t[deadlineField] <= end && t[assignField])
                 .forEach(t => {
                     const k = t[assignField];
-                    if (!map[k]) map[k] = { tasks: 0, weight: 0 };
+                    if (!map[k]) map[k] = { tasks: 0, done: 0, weight: 0 };
                     map[k].tasks++;
+                    if (t[statusField] === 'Done') map[k].done++;
                     map[k].weight += (t[weightField] || 0);
                 });
             return Object.entries(map).sort((a, b) => b[1].weight - a[1].weight);
         }
 
-        const desData = buildMap(tasks.filter(t => t.designer_deadline), 'designer_assign', 'designer_weight', 'designer_deadline');
-        const creData = buildMap(tasks.filter(t => t.creative_deadline), 'creative_assign', 'creative_weight', 'creative_deadline');
+        const desData = buildMap(tasks.filter(t => t.designer_deadline), 'designer_assign', 'designer_weight', 'designer_status', 'designer_deadline');
+        const creData = buildMap(tasks.filter(t => t.creative_deadline), 'creative_assign', 'creative_weight', 'creative_status', 'creative_deadline');
 
         function renderPs(entries, taskColor, id) {
             const el = document.getElementById(id);
@@ -576,6 +577,7 @@
                 <div class="ps-row">
                     <div class="ps-name">${name}</div>
                     <div class="ps-num" style="color:${taskColor}">${d.tasks}</div>
+                    <div class="ps-num" style="color:${d.done === d.tasks && d.tasks > 0 ? '#10b981' : 'var(--c-slate)'}">${d.done}</div>
                     <div class="ps-num" style="color:var(--c-dark)">${d.weight}</div>
                 </div>
             `).join('');
