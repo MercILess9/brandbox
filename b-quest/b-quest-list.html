@@ -310,12 +310,26 @@
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
 
+        const buildDatePart = (r) => {
+            let conds = [];
+            if (startDate) conds.push(`${r}_deadline.gte.${startDate}`);
+            if (endDate) conds.push(`${r}_deadline.lte.${endDate}`);
+            return conds.length === 1 ? conds[0] : `and(${conds.join(',')})`;
+        };
+
         if (designerActive || creativeActive) {
-            const build = (r) => `and(${r}.neq.-,${r}.not.is.null${startDate?`,${r}_deadline.gte.${startDate}`:''}${endDate?`,${r}_deadline.lte.${endDate}`:''})`;
+            const build = (r) => {
+                let conds = [`${r}.neq.-`, `${r}.not.is.null`];
+                if (startDate) conds.push(`${r}_deadline.gte.${startDate}`);
+                if (endDate) conds.push(`${r}_deadline.lte.${endDate}`);
+                return `and(${conds.join(',')})`;
+            };
             let parts = [];
             if (designerActive) parts.push(build('designer'));
             if (creativeActive) parts.push(build('creative'));
             query = query.or(parts.join(','));
+        } else if (startDate || endDate) {
+            query = query.or(`${buildDatePart('designer')},${buildDatePart('creative')}`);
         }
 
         const progressActive = document.getElementById('pill-progress').classList.contains('active-progress');
