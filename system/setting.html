@@ -33,14 +33,14 @@
 
         /* Table toolbar */
         .table-toolbar { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
-        .table-search-wrap { position: relative; }
+        .table-search-wrap { position: relative; margin-left: 6px; }
         .table-search-input { width: 200px; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
         .table-search-input:focus { border-color: var(--c-accent); background: #fff; }
         .table-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.8rem; pointer-events: none; }
         .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-muted); white-space: nowrap; }
 
         /* Dept filter dropdown */
-        .dept-filter { border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 28px 7px 12px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%2394a3b8' d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+        .dept-filter { width: 140px; flex-shrink: 0; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 28px 7px 12px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; appearance: none; cursor: pointer; text-align: center; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%2394a3b8' d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
         .dept-filter:focus { border-color: var(--c-accent); background-color: #fff; }
         .dept-filter.active { border-color: #508faf; color: #508faf; font-weight: 700; }
 
@@ -49,7 +49,7 @@
         .usr-scroll-body { max-height: 600px; overflow-y: auto; }
         .usr-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
-        .usr-cols { grid-template-columns: 130px 190px 100px 1fr repeat(5, 80px) 80px 44px; }
+        .usr-cols { grid-template-columns: 130px 220px 100px 120px repeat(5, 80px) 80px 44px; }
 
         .usr-table-head {
             display: grid;
@@ -395,23 +395,23 @@
                 : `<button class="btn-remove" onclick="openDelModal('${u.codename}','${u.codename}')" title="Remove user"><i class="bi bi-trash3"></i></button>`;
 
             return `
-            <div class="usr-row usr-cols ${isDeleted ? 'is-deleted' : ''}" data-codename="${u.codename}">
+            <div class="usr-row usr-cols ${isDeleted ? 'is-deleted' : ''}" data-uid="${u.id}">
                 <div class="usr-name-zone">
                     <span class="usr-codename">${u.codename || '-'}</span>
                 </div>
                 <div class="usr-nickfull">
                     <input class="inline-input" value="${(u.nick_name || '').replace(/"/g,'&quot;')}" placeholder="Nick Name" ${dis}
-                        onchange="onNickChange('${u.codename}',this.value)">
+                        onchange="onNickChange('${u.id}',this.value)">
                     <input class="inline-input muted" value="${(u.full_name || '').replace(/"/g,'&quot;')}" placeholder="Full Name" ${dis}
-                        onchange="onProfileChange('${u.codename}','full_name',this.value)">
+                        onchange="onProfileChange('${u.id}','full_name',this.value)">
                 </div>
                 <div class="usr-empid-cell">
                     <input class="inline-input center" value="${(u.employee_id || '').replace(/"/g,'&quot;')}" placeholder="EMP ID" ${dis}
-                        onchange="onEmpIdChange('${u.codename}',this.value)">
+                        onchange="onEmpIdChange('${u.id}',this.value)">
                 </div>
                 <div class="usr-dept-cell">
                     <input class="inline-input center" value="${(u.department || '').replace(/"/g,'&quot;')}" placeholder="Department" ${dis}
-                        onchange="onProfileChange('${u.codename}','department',this.value)">
+                        onchange="onProfileChange('${u.id}','department',this.value)">
                 </div>
                 ${projectToggles}
                 ${sysToggle}
@@ -451,8 +451,8 @@
         markDirty();
     }
 
-    // ── Profile Changes (inline) ──
-    let profileChanges = {}; // codename -> { nick_name, full_name, employee_id, department, codename }
+    // ── Profile Changes (inline) — keyed by user.id ──
+    let profileChanges = {}; // uid -> { _id, nick_name, full_name, employee_id, department, codename }
 
     function buildCodename(nick, empid) {
         const n = (nick || '').trim();
@@ -461,55 +461,59 @@
         return e ? `${n} (${e})` : n;
     }
 
-    function onNickChange(oldCodename, newNick) {
-        const u = allUsers.find(x => x.codename === oldCodename);
-        if (!u) return;
-        u.nick_name = newNick;
-        if (!profileChanges[oldCodename]) profileChanges[oldCodename] = { codename: oldCodename, _id: u.id };
-        profileChanges[oldCodename].nick_name = newNick;
-        // Update codename
-        const newCN = buildCodename(newNick, profileChanges[oldCodename].employee_id ?? u.employee_id);
-        if (newCN) {
-            profileChanges[oldCodename].codename = newCN;
-            u.codename = newCN;
-            // Update codename display in same row
-            const row = document.querySelector(`.usr-row[data-codename="${oldCodename}"]`);
-            if (row) {
-                row.dataset.codename = newCN;
-                const span = row.querySelector('.usr-codename');
-                if (span) span.textContent = newCN;
-            }
+    function getOrInitProfile(uid) {
+        if (!profileChanges[uid]) {
+            const u = allUsers.find(x => x.id === uid);
+            profileChanges[uid] = {
+                _id:         uid,
+                codename:    u?.codename    || '',
+                nick_name:   u?.nick_name   || '',
+                full_name:   u?.full_name   || '',
+                employee_id: u?.employee_id || '',
+                department:  u?.department  || '',
+            };
         }
+        return profileChanges[uid];
+    }
+
+    function updateCodenameDisplay(uid) {
+        const ch = profileChanges[uid];
+        const u  = allUsers.find(x => x.id === uid);
+        if (!ch || !u) return;
+        const newCN = buildCodename(ch.nick_name, ch.employee_id);
+        if (!newCN) return;
+        ch.codename = newCN;
+        u.codename  = newCN;
+        const row = document.querySelector(`.usr-row[data-uid="${uid}"]`);
+        if (row) row.querySelector('.usr-codename').textContent = newCN;
+    }
+
+    function onNickChange(uid, value) {
+        const u = allUsers.find(x => x.id === uid);
+        if (!u) return;
+        u.nick_name = value;
+        const ch = getOrInitProfile(uid);
+        ch.nick_name = value;
+        updateCodenameDisplay(uid);
         markDirty();
     }
 
-    function onEmpIdChange(oldCodename, newEmpId) {
-        const u = allUsers.find(x => x.codename === oldCodename);
+    function onEmpIdChange(uid, value) {
+        const u = allUsers.find(x => x.id === uid);
         if (!u) return;
-        u.employee_id = newEmpId;
-        if (!profileChanges[oldCodename]) profileChanges[oldCodename] = { codename: oldCodename, _id: u.id };
-        profileChanges[oldCodename].employee_id = newEmpId;
-        // Update codename
-        const newCN = buildCodename(profileChanges[oldCodename].nick_name ?? u.nick_name, newEmpId);
-        if (newCN) {
-            profileChanges[oldCodename].codename = newCN;
-            u.codename = newCN;
-            const row = document.querySelector(`.usr-row[data-codename="${oldCodename}"]`);
-            if (row) {
-                row.dataset.codename = newCN;
-                const span = row.querySelector('.usr-codename');
-                if (span) span.textContent = newCN;
-            }
-        }
+        u.employee_id = value;
+        const ch = getOrInitProfile(uid);
+        ch.employee_id = value;
+        updateCodenameDisplay(uid);
         markDirty();
     }
 
-    function onProfileChange(codename, field, value) {
-        const u = allUsers.find(x => x.codename === codename);
+    function onProfileChange(uid, field, value) {
+        const u = allUsers.find(x => x.id === uid);
         if (!u) return;
-        if (!profileChanges[codename]) profileChanges[codename] = { codename, _id: u.id };
-        profileChanges[codename][field] = value;
         u[field] = value;
+        const ch = getOrInitProfile(uid);
+        ch[field] = value;
         markDirty();
     }
 
@@ -597,9 +601,8 @@
             const errors = [];
 
             // 1. Save profile changes (codename, nick_name, full_name, employee_id, department)
-            for (const [origCodename, ch] of Object.entries(profileChanges)) {
-                const uid = ch._id;
-                if (!uid) continue;
+            for (const ch of Object.values(profileChanges)) {
+                if (!ch._id) continue;
                 const { error } = await supabaseClient
                     .from('profiles')
                     .update({
@@ -609,8 +612,8 @@
                         employee_id: ch.employee_id,
                         department:  ch.department,
                     })
-                    .eq('id', uid);
-                if (error) errors.push(`Profile ${origCodename}: ${error.message}`);
+                    .eq('id', ch._id);
+                if (error) errors.push(`Profile (${ch.codename}): ${error.message}`);
             }
 
             // 2. Save access changes
