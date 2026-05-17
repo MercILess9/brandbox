@@ -39,7 +39,7 @@
             padding: 14px 20px; margin-bottom: 20px;
             display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
         }
-        .filter-search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 260px; }
+        .filter-search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 300px; }
         .filter-search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.82rem; pointer-events: none; }
         .filter-search { width: 100%; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; box-sizing: border-box; }
         .filter-search:focus { border-color: var(--c-accent); background: #fff; }
@@ -58,7 +58,7 @@
         .filter-select-wrap { display: flex; align-items: center; border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; height: 34px; background: var(--c-bg); transition: 0.2s; }
         .filter-select-tag { background: #f1f5f9; color: var(--c-muted); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 9px; height: 100%; display: flex; align-items: center; border-right: 1px solid var(--c-border); white-space: nowrap; }
         .filter-select { border: none; background: transparent; font-size: 0.78rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; outline: none; cursor: pointer; font-family: inherit; min-width: 90px; text-align-last: center; }
-        #wrap-filterWork { width: 160px; flex-shrink: 0; }
+        #wrap-filterWork { width: 250px; flex-shrink: 0; }
         #filterWork { width: 100%; }
         .filter-select-wrap.active { border-color: var(--c-accent); background: var(--c-accent-light); }
         .filter-select-wrap.active .filter-select-tag { background: var(--c-accent); color: var(--c-dark); border-right-color: var(--c-accent); }
@@ -172,12 +172,12 @@
             <i class="bi bi-search"></i>
             <input type="text" class="filter-search" id="filterSearch" placeholder="Search task, account...">
         </div>
-        <div class="filter-divider"></div>
+
         <div class="pill-group">
             <button id="pill-des" class="flt-pill active-des" onclick="togglePill('des')"><i class="bi bi-brush"></i> Designer</button>
             <button id="pill-cre" class="flt-pill active-cre" onclick="togglePill('cre')"><i class="bi bi-rocket"></i> Creative</button>
         </div>
-        <div class="filter-divider"></div>
+
         <div class="filter-select-wrap" id="wrap-filterOwner">
             <span class="filter-select-tag">Owner</span>
             <select class="filter-select" id="filterOwner" onchange="onSelectChange('filterOwner')"><option value="">All</option></select>
