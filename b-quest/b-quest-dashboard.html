@@ -181,68 +181,7 @@
         </div>
     </div>
 
-    <!-- 2. Work Types -->
-    <div class="section">
-        <div class="section-header">
-            <div class="section-title"><i class="bi bi-pie-chart-fill"></i> Work Types</div>
-        </div>
-        <div class="section-body">
-            <div class="two-col">
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                    <div id="wt-des"><div class="col-empty">Loading...</div></div>
-                </div>
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                    <div id="wt-cre"><div class="col-empty">Loading...</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. Work Breakdown (from b-quest-work) -->
-    <div class="section">
-        <div class="section-header">
-            <div class="section-title"><i class="bi bi-table"></i> Work Breakdown</div>
-        </div>
-        <div class="section-body">
-            <div class="two-col">
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                    <div class="wb-table-head"><span>Work</span><span>Tasks</span><span>Weight</span></div>
-                    <div id="wb-des"><div class="col-empty">Loading...</div></div>
-                </div>
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                    <div class="wb-table-head"><span>Work</span><span>Tasks</span><span>Weight</span></div>
-                    <div id="wb-cre"><div class="col-empty">Loading...</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. Person Summary -->
-    <div class="section">
-        <div class="section-header">
-            <div class="section-title"><i class="bi bi-people-fill"></i> Person Summary</div>
-        </div>
-        <div class="section-body">
-            <div class="two-col">
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
-                    <div id="ps-des"><div class="col-empty">Loading...</div></div>
-                </div>
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
-                    <div id="ps-cre"><div class="col-empty">Loading...</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. Daily Capacity -->
+    <!-- 2. Daily Capacity -->
     <div class="section">
         <div class="section-header">
             <div class="section-title"><i class="bi bi-bar-chart-fill"></i> Daily Capacity</div>
@@ -262,6 +201,67 @@
                         <span class="tl-cap-badge" id="cap-badge-cre">—</span>
                     </div>
                     <div class="tl-chart-wrap"><canvas id="chart-cre"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Work Types (donut) -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-pie-chart-fill"></i> Work Types</div>
+        </div>
+        <div class="section-body">
+            <div class="two-col">
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                    <div id="wt-des"><div class="col-empty">Loading...</div></div>
+                </div>
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                    <div id="wt-cre"><div class="col-empty">Loading...</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Work Breakdown -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-table"></i> Work Breakdown</div>
+        </div>
+        <div class="section-body">
+            <div class="two-col">
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                    <div class="wb-table-head"><span>Work</span><span>Tasks</span><span>% Done</span></div>
+                    <div id="wb-des"><div class="col-empty">Loading...</div></div>
+                </div>
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                    <div class="wb-table-head"><span>Work</span><span>Tasks</span><span>% Done</span></div>
+                    <div id="wb-cre"><div class="col-empty">Loading...</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Person Summary -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-people-fill"></i> Person Summary</div>
+        </div>
+        <div class="section-body">
+            <div class="two-col">
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
+                    <div id="ps-des"><div class="col-empty">Loading...</div></div>
+                </div>
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
+                    <div id="ps-cre"><div class="col-empty">Loading...</div></div>
                 </div>
             </div>
         </div>
@@ -513,34 +513,37 @@
         const dTasks = tasks.filter(t => t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign);
         const cTasks = tasks.filter(t => t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign);
 
-        function buildBreakdown(works, role, taskList, typeField, weightField) {
+        function buildBreakdown(works, role, taskList, workField, statusField) {
             return works
                 .filter(w => w.role === role)
                 .map(w => {
-                    const matched = taskList.filter(t => t[typeField] === w.work);
-                    const totalWeight = matched.reduce((s, t) => s + (t[weightField] || 0), 0);
-                    return { work: w.work, baseWeight: w.weight, tasks: matched.length, totalWeight };
+                    const matched = taskList.filter(t => t[workField] === w.work);
+                    const done    = matched.filter(t => t[statusField] === 'Done').length;
+                    const pct     = matched.length > 0 ? Math.round(done / matched.length * 100) : null;
+                    return { work: w.work, tasks: matched.length, done, pct };
                 })
-                .sort((a, b) => b.tasks - a.tasks || b.totalWeight - a.totalWeight);
+                .sort((a, b) => b.tasks - a.tasks);
         }
 
-        const desBreakdown = buildBreakdown(workList, 'Designer', dTasks, 'designer', 'designer_weight');
-        const creBreakdown = buildBreakdown(workList, 'Creative', cTasks, 'creative', 'creative_weight');
+        const desBreakdown = buildBreakdown(workList, 'Designer', dTasks, 'designer', 'designer_status');
+        const creBreakdown = buildBreakdown(workList, 'Creative', cTasks, 'creative', 'creative_status');
 
         function renderWb(rows, color, fillColor, id) {
             const el = document.getElementById(id);
             if (!rows.length) { el.innerHTML = `<div class="col-empty">No work types configured</div>`; return; }
-            const maxWeight = Math.max(...rows.map(r => r.totalWeight), 1);
-            el.innerHTML = rows.map(r => `
+            el.innerHTML = rows.map(r => {
+                const pctDisplay = r.pct !== null ? `${r.pct}%` : '—';
+                const barColor   = r.pct === 100 ? '#10b981' : fillColor;
+                return `
                 <div class="wb-row${r.tasks === 0 ? ' wb-zero' : ''}">
                     <div>
                         <div class="wb-name">${r.work}</div>
-                        ${r.tasks > 0 ? `<div class="wb-weight-bar"><div class="wb-weight-fill" style="width:${Math.round(r.totalWeight / maxWeight * 100)}%;background:${fillColor}"></div></div>` : ''}
+                        ${r.tasks > 0 ? `<div class="wb-weight-bar"><div class="wb-weight-fill" style="width:${r.pct ?? 0}%;background:${barColor}"></div></div>` : ''}
                     </div>
                     <div class="wb-num" style="color:${r.tasks > 0 ? color : 'var(--c-muted)'}">${r.tasks}</div>
-                    <div class="wb-num" style="color:${r.totalWeight > 0 ? 'var(--c-dark)' : 'var(--c-muted)'}">${r.totalWeight > 0 ? r.totalWeight : '—'}</div>
-                </div>
-            `).join('');
+                    <div class="wb-num" style="color:${r.pct === 100 ? '#10b981' : r.pct !== null ? 'var(--c-dark)' : 'var(--c-muted)'}">${pctDisplay}</div>
+                </div>`;
+            }).join('');
         }
 
         renderWb(desBreakdown, 'var(--c-des)', 'rgba(59,130,246,0.35)', 'wb-des');
