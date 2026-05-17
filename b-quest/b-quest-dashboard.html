@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>B-QUEST | Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="/system/config.js"></script>
+    <script src="/system/system.js"></script>
+    <script src="b-quest.js"></script>
+
+    <style>
+        :root {
+            --c-accent: #bdc432;
+            --c-accent-light: #f4f7a1;
+            --c-dark: #1e293b;
+            --c-bg: #f8fafc;
+            --c-muted: #94a3b8;
+            --c-slate: #626e7f;
+            --c-border: #e2e8f0;
+            --c-des: #3b82f6;
+            --c-des-bg: #eff6ff;
+            --c-des-border: #dbeafe;
+            --c-cre: #8b5cf6;
+            --c-cre-bg: #f5f3ff;
+            --c-cre-border: #ede9fe;
+        }
+
+        body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-dark); margin: 0; padding-bottom: 80px; }
+
+        /* ── Control Bar ── */
+        .ctrl-bar { background: #fff; border-bottom: 1px solid var(--c-border); padding: 10px 20px; position: sticky; top: 0; z-index: 100; }
+        .ctrl-inner { max-width: 1300px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+        .month-nav { display: flex; align-items: center; gap: 6px; }
+        .month-nav-btn { border: 1px solid var(--c-border); background: #fff; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--c-slate); transition: 0.15s; font-size: 0.82rem; }
+        .month-nav-btn:hover { background: var(--c-bg); border-color: #cbd5e1; }
+        .month-label { font-size: 0.9rem; font-weight: 800; color: var(--c-dark); min-width: 140px; text-align: center; }
+        .ctrl-sep { width: 1px; height: 22px; background: var(--c-border); }
+        .btn-today { border: 1px solid var(--c-border); background: #fff; border-radius: 8px; padding: 0 14px; height: 32px; font-size: 0.74rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.15s; font-family: inherit; }
+        .btn-today:hover { background: var(--c-bg); border-color: #cbd5e1; }
+
+        /* ── Wrapper ── */
+        .dash-wrapper { max-width: 1300px; margin: 0 auto; padding: 24px 20px 60px; display: flex; flex-direction: column; gap: 20px; }
+
+        /* ── Section ── */
+        .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; overflow: hidden; }
+        .section-header { display: flex; align-items: center; gap: 10px; padding: 15px 24px; border-bottom: 1px solid var(--c-border); }
+        .section-title { font-size: 0.76rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
+        .section-body { padding: 20px 24px; }
+
+        /* ── Overview ── */
+        .ov-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+        .ov-card { border: 1px solid var(--c-border); border-radius: 14px; padding: 18px 20px; }
+        .ov-val { font-size: 2rem; font-weight: 900; color: var(--c-dark); line-height: 1; }
+        .ov-label { font-size: 0.68rem; font-weight: 700; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 7px; }
+        .ov-card.ov-active { border-color: var(--c-accent); background: var(--c-accent-light); }
+        .ov-card.ov-active .ov-val { color: #5a6400; }
+        .ov-card.ov-des { border-color: var(--c-des-border); background: var(--c-des-bg); }
+        .ov-card.ov-des .ov-val { color: var(--c-des); }
+        .ov-card.ov-cre { border-color: var(--c-cre-border); background: var(--c-cre-bg); }
+        .ov-card.ov-cre .ov-val { color: var(--c-cre); }
+
+        /* ── Work Types ── */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .sub-col { border: 1px solid var(--c-border); border-radius: 14px; overflow: hidden; }
+        .sub-col-head { display: flex; align-items: center; gap: 8px; padding: 11px 16px; font-size: 0.73rem; font-weight: 800; border-bottom: 1px solid var(--c-border); }
+        .sub-col-head-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
+        .sub-col-head-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
+
+        .wt-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+        .wt-row { display: flex; align-items: center; gap: 10px; }
+        .wt-name { font-size: 0.8rem; font-weight: 600; color: var(--c-dark); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .wt-bar-wrap { flex: 2; background: var(--c-bg); border-radius: 20px; height: 7px; overflow: hidden; }
+        .wt-bar { height: 100%; border-radius: 20px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+        .wt-bar-des { background: var(--c-des); }
+        .wt-bar-cre { background: var(--c-cre); }
+        .wt-count { font-size: 0.8rem; font-weight: 800; color: var(--c-slate); min-width: 24px; text-align: right; }
+
+        /* ── Person Summary ── */
+        .ps-table-head { display: grid; grid-template-columns: 1fr 56px 60px; gap: 8px; padding: 8px 16px; background: var(--c-bg); font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .ps-table-head span:not(:first-child) { text-align: center; }
+        .ps-row { display: grid; grid-template-columns: 1fr 56px 60px; gap: 8px; align-items: center; padding: 9px 16px; border-top: 1px solid #f8fafc; transition: background 0.15s; }
+        .ps-row:hover { background: #fafbff; }
+        .ps-name { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); }
+        .ps-num { font-size: 0.82rem; font-weight: 800; text-align: center; }
+
+        /* ── Timeline ── */
+        .tl-head { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; font-size: 0.73rem; font-weight: 800; border-bottom: 1px solid var(--c-border); }
+        .tl-head-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
+        .tl-head-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
+        .tl-cap-badge { font-size: 0.67rem; font-weight: 700; opacity: 0.75; }
+        .tl-chart-wrap { padding: 16px; height: 200px; }
+
+        /* ── Empty / Skeleton ── */
+        .col-empty { padding: 24px; text-align: center; color: var(--c-muted); font-size: 0.78rem; font-weight: 600; }
+        .skel { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
+        @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    </style>
+</head>
+<body>
+
+<!-- Control Bar -->
+<div class="ctrl-bar">
+    <div class="ctrl-inner">
+        <div class="month-nav">
+            <button class="month-nav-btn" id="btn-prev"><i class="bi bi-chevron-left"></i></button>
+            <div class="month-label" id="month-label">—</div>
+            <button class="month-nav-btn" id="btn-next"><i class="bi bi-chevron-right"></i></button>
+        </div>
+        <div class="ctrl-sep"></div>
+        <button class="btn-today" id="btn-today">This Month</button>
+    </div>
+</div>
+
+<!-- Dashboard Content -->
+<div class="dash-wrapper">
+
+    <!-- 1. Overview -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-grid-1x2-fill"></i> Overview</div>
+        </div>
+        <div class="section-body">
+            <div class="ov-grid" id="ov-grid">
+                <div class="ov-card" style="grid-column:1/6"><div class="skel" style="height:70px"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Work Types -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-tags-fill"></i> Work Types</div>
+        </div>
+        <div class="section-body">
+            <div class="two-col">
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                    <div class="wt-list" id="wt-des"><div class="col-empty">Loading...</div></div>
+                </div>
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                    <div class="wt-list" id="wt-cre"><div class="col-empty">Loading...</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Person Summary -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-people-fill"></i> Person Summary</div>
+        </div>
+        <div class="section-body">
+            <div class="two-col">
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
+                    <div id="ps-des"><div class="col-empty">Loading...</div></div>
+                </div>
+                <div class="sub-col">
+                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                    <div class="ps-table-head"><span>Member</span><span>Tasks</span><span>Weight</span></div>
+                    <div id="ps-cre"><div class="col-empty">Loading...</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Daily Capacity -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-bar-chart-fill"></i> Daily Capacity</div>
+        </div>
+        <div class="section-body">
+            <div class="two-col">
+                <div class="sub-col">
+                    <div class="tl-head tl-head-des">
+                        <span><i class="bi bi-brush-fill me-1"></i> Designer</span>
+                        <span class="tl-cap-badge" id="cap-badge-des">—</span>
+                    </div>
+                    <div class="tl-chart-wrap"><canvas id="chart-des"></canvas></div>
+                </div>
+                <div class="sub-col">
+                    <div class="tl-head tl-head-cre">
+                        <span><i class="bi bi-rocket-fill me-1"></i> Creative</span>
+                        <span class="tl-cap-badge" id="cap-badge-cre">—</span>
+                    </div>
+                    <div class="tl-chart-wrap"><canvas id="chart-cre"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let curYear, curMonth;
+    let chartDes = null, chartCre = null;
+    let capDes = 0, capCre = 0;
+
+    // ── Month helpers ──
+    function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function monthRange() {
+        const start = `${curYear}-${pad(curMonth + 1)}-01`;
+        const end   = `${curYear}-${pad(curMonth + 1)}-${pad(daysInMonth(curYear, curMonth))}`;
+        return { start, end };
+    }
+
+    function initMonth() {
+        const now = new Date();
+        curYear  = now.getFullYear();
+        curMonth = now.getMonth();
+        updateLabel();
+    }
+    function updateLabel() {
+        const d = new Date(curYear, curMonth, 1);
+        document.getElementById('month-label').textContent =
+            d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    document.getElementById('btn-prev').onclick = () => {
+        if (--curMonth < 0) { curMonth = 11; curYear--; }
+        updateLabel(); loadData();
+    };
+    document.getElementById('btn-next').onclick = () => {
+        if (++curMonth > 11) { curMonth = 0; curYear++; }
+        updateLabel(); loadData();
+    };
+    document.getElementById('btn-today').onclick = () => {
+        const now = new Date(); curYear = now.getFullYear(); curMonth = now.getMonth();
+        updateLabel(); loadData();
+    };
+
+    // ── Load ──
+    async function loadData() {
+        const { start, end } = monthRange();
+
+        const [tasksRes, capRes] = await Promise.all([
+            supabaseClient.from('b-quest-list').select('*')
+                .or(`and(designer_deadline.gte.${start},designer_deadline.lte.${end}),and(creative_deadline.gte.${start},creative_deadline.lte.${end})`),
+            supabaseClient.from('b_quest_capacity').select('*')
+        ]);
+
+        const tasks = tasksRes.data || [];
+        const caps  = capRes.data  || [];
+        capDes = caps.find(c => c.role === 'Designer')?.max_capacity || 0;
+        capCre = caps.find(c => c.role === 'Creative')?.max_capacity || 0;
+
+        renderOverview(tasks);
+        renderWorkTypes(tasks);
+        renderPersons(tasks);
+        renderTimeline(tasks);
+    }
+
+    // ── Section 1: Overview ──
+    function renderOverview(tasks) {
+        const { start, end } = monthRange();
+
+        const dTasks = tasks.filter(t => t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign);
+        const cTasks = tasks.filter(t => t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign);
+        const allIds = new Set([...dTasks, ...cTasks].map(t => t.id));
+
+        const active = tasks.filter(t =>
+            (dTasks.find(d => d.id === t.id) && t.designer_status === 'On Progress') ||
+            (cTasks.find(c => c.id === t.id) && t.creative_status === 'On Progress')
+        );
+        const activeUniq = new Set(active.map(t => t.id)).size;
+
+        const done = [...allIds].filter(id => {
+            const t = tasks.find(r => r.id === id);
+            const dDone = !dTasks.find(d => d.id === id) || t.designer_status === 'Done';
+            const cDone = !cTasks.find(c => c.id === id) || t.creative_status === 'Done';
+            return dDone && cDone;
+        }).length;
+
+        const desPersons = new Set(dTasks.map(t => t.designer_assign)).size;
+        const crePersons = new Set(cTasks.map(t => t.creative_assign)).size;
+
+        document.getElementById('ov-grid').innerHTML = `
+            <div class="ov-card">
+                <div class="ov-val">${allIds.size}</div>
+                <div class="ov-label">Total Tasks</div>
+            </div>
+            <div class="ov-card ov-active">
+                <div class="ov-val">${activeUniq}</div>
+                <div class="ov-label">On Progress</div>
+            </div>
+            <div class="ov-card">
+                <div class="ov-val">${done}</div>
+                <div class="ov-label">Done</div>
+            </div>
+            <div class="ov-card ov-des">
+                <div class="ov-val">${desPersons}</div>
+                <div class="ov-label">Designers Working</div>
+            </div>
+            <div class="ov-card ov-cre">
+                <div class="ov-val">${crePersons}</div>
+                <div class="ov-label">Creatives Working</div>
+            </div>
+        `;
+    }
+
+    // ── Section 2: Work Types ──
+    function renderWorkTypes(tasks) {
+        const { start, end } = monthRange();
+
+        function countBy(list, typeField, deadlineField) {
+            const map = {};
+            list.filter(t => t[deadlineField] >= start && t[deadlineField] <= end && t[typeField])
+                .forEach(t => { map[t[typeField]] = (map[t[typeField]] || 0) + 1; });
+            return Object.entries(map).sort((a, b) => b[1] - a[1]);
+        }
+
+        const desEntries = countBy(tasks.filter(t => t.designer_deadline && t.designer_assign), 'designer_type', 'designer_deadline');
+        const creEntries = countBy(tasks.filter(t => t.creative_deadline && t.creative_assign), 'creative_type', 'creative_deadline');
+
+        function renderWt(entries, cls, id) {
+            const el = document.getElementById(id);
+            if (!entries.length) { el.innerHTML = `<div class="col-empty">No data this month</div>`; return; }
+            const max = entries[0][1];
+            el.innerHTML = entries.map(([name, count]) => `
+                <div class="wt-row">
+                    <div class="wt-name">${name}</div>
+                    <div class="wt-bar-wrap">
+                        <div class="wt-bar wt-bar-${cls}" style="width:${Math.round(count / max * 100)}%"></div>
+                    </div>
+                    <div class="wt-count">${count}</div>
+                </div>
+            `).join('');
+        }
+
+        renderWt(desEntries, 'des', 'wt-des');
+        renderWt(creEntries, 'cre', 'wt-cre');
+    }
+
+    // ── Section 3: Person Summary ──
+    function renderPersons(tasks) {
+        const { start, end } = monthRange();
+
+        function buildMap(list, assignField, weightField, deadlineField) {
+            const map = {};
+            list.filter(t => t[deadlineField] >= start && t[deadlineField] <= end && t[assignField])
+                .forEach(t => {
+                    const k = t[assignField];
+                    if (!map[k]) map[k] = { tasks: 0, weight: 0 };
+                    map[k].tasks++;
+                    map[k].weight += (t[weightField] || 0);
+                });
+            return Object.entries(map).sort((a, b) => b[1].weight - a[1].weight);
+        }
+
+        const desData = buildMap(tasks.filter(t => t.designer_deadline), 'designer_assign', 'designer_weight', 'designer_deadline');
+        const creData = buildMap(tasks.filter(t => t.creative_deadline), 'creative_assign', 'creative_weight', 'creative_deadline');
+
+        function renderPs(entries, taskColor, weightColor, id) {
+            const el = document.getElementById(id);
+            if (!entries.length) { el.innerHTML = `<div class="col-empty">No data this month</div>`; return; }
+            el.innerHTML = entries.map(([name, d]) => `
+                <div class="ps-row">
+                    <div class="ps-name">${name}</div>
+                    <div class="ps-num" style="color:${taskColor}">${d.tasks}</div>
+                    <div class="ps-num" style="color:${weightColor}">${d.weight}</div>
+                </div>
+            `).join('');
+        }
+
+        renderPs(desData, 'var(--c-des)', 'var(--c-dark)', 'ps-des');
+        renderPs(creData, 'var(--c-cre)', 'var(--c-dark)', 'ps-cre');
+    }
+
+    // ── Section 4: Daily Capacity Timeline ──
+    function renderTimeline(tasks) {
+        const { start, end } = monthRange();
+        const days   = daysInMonth(curYear, curMonth);
+        const labels = Array.from({ length: days }, (_, i) => i + 1);
+
+        function buildDayWeights(list, deadlineField, weightField) {
+            const map = {};
+            list.filter(t => t[deadlineField] >= start && t[deadlineField] <= end)
+                .forEach(t => {
+                    const day = parseInt(t[deadlineField].split('-')[2]);
+                    map[day] = (map[day] || 0) + (t[weightField] || 0);
+                });
+            return labels.map(d => map[d] || 0);
+        }
+
+        const desWeights = buildDayWeights(tasks.filter(t => t.designer_deadline && t.designer_assign), 'designer_deadline', 'designer_weight');
+        const creWeights = buildDayWeights(tasks.filter(t => t.creative_deadline && t.creative_assign), 'creative_deadline', 'creative_weight');
+
+        const today = new Date();
+        const todayIdx = (today.getFullYear() === curYear && today.getMonth() === curMonth)
+            ? today.getDate() - 1 : null;
+
+        document.getElementById('cap-badge-des').textContent = capDes > 0 ? `Max ${capDes} / day` : '';
+        document.getElementById('cap-badge-cre').textContent = capCre > 0 ? `Max ${capCre} / day` : '';
+
+        function makeChart(canvasId, data, cap, baseColor, overColor, isNew) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const bgs = data.map((v, i) => {
+                if (i === todayIdx) return cap > 0 && v > cap ? 'rgba(239,68,68,0.9)' : baseColor.replace('0.45', '0.85');
+                return cap > 0 && v > cap ? overColor : baseColor;
+            });
+
+            if (isNew === 'des' && chartDes) { chartDes.destroy(); chartDes = null; }
+            if (isNew === 'cre' && chartCre) { chartCre.destroy(); chartCre = null; }
+
+            const datasets = [
+                {
+                    label: 'Weight',
+                    data,
+                    backgroundColor: bgs,
+                    borderRadius: 3,
+                    order: 2
+                }
+            ];
+
+            if (cap > 0) {
+                datasets.push({
+                    label: `Max (${cap})`,
+                    data: Array(days).fill(cap),
+                    type: 'line',
+                    borderColor: 'rgba(239,68,68,0.6)',
+                    borderWidth: 1.5,
+                    borderDash: [5, 4],
+                    pointRadius: 0,
+                    fill: false,
+                    order: 1
+                });
+            }
+
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: items => `Day ${items[0].label}`,
+                                label: item => ` ${item.dataset.label}: ${item.parsed.y}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 9 },
+                                maxRotation: 0,
+                                color: ctx => ctx.index === todayIdx ? '#ef4444' : '#94a3b8'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 9 }, color: '#94a3b8', precision: 0 }
+                        }
+                    }
+                }
+            });
+
+            if (isNew === 'des') chartDes = chart;
+            else chartCre = chart;
+        }
+
+        makeChart('chart-des', desWeights, capDes, 'rgba(59,130,246,0.45)',  'rgba(239,68,68,0.55)', 'des');
+        makeChart('chart-cre', creWeights, capCre, 'rgba(139,92,246,0.45)', 'rgba(239,68,68,0.55)', 'cre');
+    }
+
+    // ── Init ──
+    initMonth();
+    initLayout({
+        projectName: "B-QUEST",
+        menus: B_QUEST_CONFIG.menus,
+        getMenuPerms: loadBquestPerms
+    });
+    loadData();
+</script>
+</body>
+</html>

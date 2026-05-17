@@ -3,6 +3,7 @@ const B_QUEST_CONFIG = {
     itemsPerPage: 10,
     listTypes: ["New Task", "Revise 1", "Revise 2", "Revise 3", "Revise 4", "Revise 5"],
     menus: [
+        { name: "Dashboard", link: "b-quest-dashboard.html" },
         { name: "List", link: "b-quest-list.html" },
         { name: "Assignment", link: "b-quest-assignment.html", perm: "assign" },
         { name: "Settings", link: "b-quest-settings.html", perm: "setting" },
