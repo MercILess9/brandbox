@@ -32,19 +32,24 @@
         .section-title i { font-size: 1rem; }
 
         /* Table toolbar */
-        .table-toolbar { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-wrap: wrap; }
+        .table-toolbar { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
         .table-search-wrap { position: relative; }
-        .table-search-input { width: 220px; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
+        .table-search-input { width: 200px; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px 7px 32px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; }
         .table-search-input:focus { border-color: var(--c-accent); background: #fff; }
         .table-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.8rem; pointer-events: none; }
         .table-count { font-size: 0.75rem; font-weight: 700; color: var(--c-muted); white-space: nowrap; }
 
+        /* Dept filter dropdown */
+        .dept-filter { border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 28px 7px 12px; font-size: 0.82rem; color: var(--c-dark); background: var(--c-bg); outline: none; font-family: inherit; transition: 0.2s; appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%2394a3b8' d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+        .dept-filter:focus { border-color: var(--c-accent); background-color: #fff; }
+        .dept-filter.active { border-color: #508faf; color: #508faf; font-weight: 700; }
+
         /* Users Table */
-        /* Grid: Codename(160px) | NickName/FullName(200px) | EmpID(110px) | Dept(1fr) | Projects(80px x5) | System(80px) | Actions(44px) */
+        /* Grid: Codename(130px) | NickName/FullName(190px) | EmpID(100px) | Dept(1fr) | Projects(80px x5) | System(80px) | Actions(44px) */
         .usr-scroll-body { max-height: 600px; overflow-y: auto; }
         .usr-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
-        .usr-cols { grid-template-columns: 160px 200px 100px 1fr repeat(5, 80px) 80px 44px; }
+        .usr-cols { grid-template-columns: 130px 190px 100px 1fr repeat(5, 80px) 80px 44px; }
 
         .usr-table-head {
             display: grid;
@@ -78,31 +83,32 @@
         .usr-row.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
         .usr-row.is-deleted .btn-undo-del { pointer-events: all; }
 
-        /* Visual separators: col 2 (nick/full), col 5 (B-QUEST), col 10 (system setting) */
+        /* Visual separators — floating via padding so they don't touch cell edges */
         .usr-table-head > :nth-child(2),
-        .usr-row > :nth-child(2) { border-left: 1px solid var(--c-border); }
+        .usr-row > :nth-child(2) { border-left: 1px solid var(--c-border); padding-left: 12px; }
         .usr-table-head > :nth-child(5),
         .usr-row > :nth-child(5) { border-left: 1px solid var(--c-border); }
         .usr-table-head > :nth-child(10),
         .usr-row > :nth-child(10) { border-left: 1px solid var(--c-border); }
 
-        .usr-name-zone { display: flex; flex-direction: column; padding-left: 4px; min-width: 0; }
-        .usr-codename { font-size: 0.84rem; font-weight: 700; color: #508faf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .usr-name-zone { display: flex; align-items: center; min-width: 0; padding-left: 4px; }
+        .usr-codename { font-size: 0.82rem; font-weight: 700; color: #508faf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Inline editable cells */
-        .usr-nickfull { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; min-width: 0; }
+        .usr-nickfull { display: flex; flex-direction: column; gap: 1px; padding: 4px 0; min-width: 0; }
         .inline-input {
             border: 1px solid transparent; border-radius: 6px;
             padding: 3px 7px; font-size: 0.82rem; font-weight: 600;
             color: var(--c-dark); background: transparent; outline: none;
             width: 100%; transition: 0.15s; font-family: inherit;
         }
+        .inline-input.muted { font-size: 0.75rem; font-weight: 400; color: var(--c-muted); }
         .inline-input:hover { border-color: var(--c-border); background: var(--c-bg); }
         .inline-input:focus { border-color: var(--c-accent); background: #fff; }
 
         .usr-empid-cell { display: flex; justify-content: center; align-items: center; }
         .inline-input.center { text-align: center; }
-        .usr-dept-cell { display: flex; align-items: center; }
+        .usr-dept-cell { display: flex; align-items: center; justify-content: center; }
 
         .check-cell { display: flex; justify-content: center; align-items: center; }
         .action-cell { display: flex; justify-content: center; align-items: center; gap: 2px; }
@@ -126,7 +132,7 @@
 
         .skeleton-row {
             display: grid;
-            grid-template-columns: 160px 200px 100px 1fr repeat(5, 80px) 80px 44px;
+            grid-template-columns: 130px 190px 100px 1fr repeat(5, 80px) 80px 44px;
             align-items: center; padding: 0 4px;
             height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px;
         }
@@ -191,11 +197,14 @@
                 <span class="dirty-dot"></span>
             </div>
             <div class="table-toolbar">
-                <span class="table-count" id="table-count"></span>
+                <select id="dept-filter" class="dept-filter" onchange="applyFilters()">
+                    <option value="">All Departments</option>
+                </select>
                 <div class="table-search-wrap">
                     <i class="bi bi-search table-search-icon"></i>
-                    <input type="text" id="table-search" class="table-search-input" placeholder="Filter users...">
+                    <input type="text" id="table-search" class="table-search-input" placeholder="Search..." oninput="applyFilters()">
                 </div>
+                <span class="table-count" id="table-count"></span>
             </div>
         </div>
         <div class="usr-scroll-body" style="padding: 0 24px 20px;">
@@ -203,10 +212,9 @@
                 <!-- Group header -->
                 <div class="usr-group-head usr-cols">
                     <div></div>
-                    <div style="border-left: 1px solid var(--c-border);"></div>
-                    <div></div><div></div>
-                    <div class="group-label group-access" style="grid-column: 5 / 10; border-left: 1px solid var(--c-border);">PROJECT ACCESS</div>
-                    <div class="group-label group-sys" style="grid-column: 10 / 11; border-left: 1px solid var(--c-border);">SYSTEM</div>
+                    <div></div><div></div><div></div>
+                    <div class="group-label group-access" style="grid-column: 5 / 10;">PROJECT ACCESS</div>
+                    <div class="group-label group-sys" style="grid-column: 10 / 11;">SYSTEM</div>
                     <div></div>
                 </div>
                 <!-- Column labels -->
@@ -290,8 +298,8 @@
         await initLayout(SYSTEM_CONFIG);
         guardSystemSetting();
         await Promise.all([loadUsers(), loadAccessData()]);
+        buildDeptFilter();
         renderUsers();
-        setupSearch();
     }
 
     function guardSystemSetting() {
@@ -339,18 +347,19 @@
         document.getElementById('user-list').innerHTML = row() + row() + row() + row();
     }
 
-    function renderUsers(filter = '') {
+    function renderUsers(q = '', dept = '') {
         const container = document.getElementById('user-list');
-        const q = filter.toLowerCase();
 
-        let rows = allUsers.filter(u =>
-            !q ||
-            u.codename?.toLowerCase().includes(q) ||
-            u.nick_name?.toLowerCase().includes(q) ||
-            u.full_name?.toLowerCase().includes(q) ||
-            u.employee_id?.toLowerCase().includes(q) ||
-            u.department?.toLowerCase().includes(q)
-        );
+        let rows = allUsers.filter(u => {
+            const matchQ = !q ||
+                u.codename?.toLowerCase().includes(q) ||
+                u.nick_name?.toLowerCase().includes(q) ||
+                u.full_name?.toLowerCase().includes(q) ||
+                u.employee_id?.toLowerCase().includes(q) ||
+                u.department?.toLowerCase().includes(q);
+            const matchDept = !dept || u.department === dept;
+            return matchQ && matchDept;
+        });
 
         updateCount(rows.length, allUsers.length);
 
@@ -393,7 +402,7 @@
                 <div class="usr-nickfull">
                     <input class="inline-input" value="${(u.nick_name || '').replace(/"/g,'&quot;')}" placeholder="Nick Name" ${dis}
                         onchange="onNickChange('${u.codename}',this.value)">
-                    <input class="inline-input" value="${(u.full_name || '').replace(/"/g,'&quot;')}" placeholder="Full Name" ${dis}
+                    <input class="inline-input muted" value="${(u.full_name || '').replace(/"/g,'&quot;')}" placeholder="Full Name" ${dis}
                         onchange="onProfileChange('${u.codename}','full_name',this.value)">
                 </div>
                 <div class="usr-empid-cell">
@@ -411,8 +420,21 @@
         }).join('');
     }
 
-    function setupSearch() {
-        document.getElementById('table-search').addEventListener('input', e => renderUsers(e.target.value.trim()));
+    function buildDeptFilter() {
+        const depts = [...new Set(allUsers.map(u => u.department).filter(Boolean))].sort();
+        const sel = document.getElementById('dept-filter');
+        depts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d; opt.textContent = d;
+            sel.appendChild(opt);
+        });
+    }
+
+    function applyFilters() {
+        const q = document.getElementById('table-search').value.trim().toLowerCase();
+        const dept = document.getElementById('dept-filter').value;
+        document.getElementById('dept-filter').classList.toggle('active', !!dept);
+        renderUsers(q, dept);
     }
 
     function updateCount(shown, total) {
@@ -548,7 +570,7 @@
             delete accessChanges[codename];
 
             closeDelModal();
-            renderUsers(document.getElementById('table-search').value.trim());
+            renderUsers(document.getElementById('table-search').value.trim().toLowerCase(), document.getElementById('dept-filter').value);
             notify('Removed', `${codename} has been removed from the system.`, 'success');
         } catch (e) {
             Swal.fire('Error', e.message, 'error');
@@ -562,7 +584,7 @@
         delete accessChanges[codename];
         const anyDirty = Object.keys(accessChanges).length > 0;
         if (!anyDirty) clearDirty();
-        renderUsers(document.getElementById('table-search').value.trim());
+        renderUsers(document.getElementById('table-search').value.trim().toLowerCase(), document.getElementById('dept-filter').value);
     }
 
     // ── Save All ──
