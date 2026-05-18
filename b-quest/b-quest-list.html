@@ -238,11 +238,14 @@
     }
 
     async function refreshOwnerFilter() {
-        const { data } = await supabaseClient.rpc('get_bquest_owners');
+        const { data } = await supabaseClient.from('b-quest-list').select('owner').neq('owner', null).neq('owner', '-');
         const ownerEl = document.getElementById('filterOwner');
         const prev = ownerEl.value;
         setupDefaultOptions(ownerEl, "Owner");
-        if (data) data.forEach(row => ownerEl.add(new Option(row.owner, row.owner)));
+        if (data) {
+            const unique = [...new Set(data.map(r => r.owner).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'th'));
+            unique.forEach(name => ownerEl.add(new Option(name, name)));
+        }
         if ([...ownerEl.options].some(o => o.value === prev)) ownerEl.value = prev;
     }
 
