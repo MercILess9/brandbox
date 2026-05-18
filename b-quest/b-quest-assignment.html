@@ -223,11 +223,22 @@
         await initLayout(B_QUEST_CONFIG);
         guardBquestPage('assign');
         await Promise.all([loadProfiles(), loadWorkList()]);
+        setupRolePills();
         populateFilterWork();
         populateFilterType();
         await loadQuests(true);
         setupSearch();
         setupInfiniteScroll();
+    }
+
+    function setupRolePills() {
+        const p = getBquestPerms();
+        const canDes = p?._god || p?.ae || p?.designer;
+        const canCre = p?._god || p?.ae || p?.creative;
+        const desPill = document.getElementById('pill-des');
+        const crePill = document.getElementById('pill-cre');
+        if (!canDes) { desPill.style.display = 'none'; desPill.classList.remove('active-des'); }
+        if (!canCre) { crePill.style.display = 'none'; crePill.classList.remove('active-cre'); }
     }
 
     async function loadProfiles() {
@@ -326,6 +337,10 @@
     function setupSearch() { let timer; document.getElementById('filterSearch').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(applyFilters, 250); }); }
 
     function applyFilters() {
+        const p = getBquestPerms();
+        const canDes = p?._god || p?.ae || p?.designer;
+        const canCre = p?._god || p?.ae || p?.creative;
+
         const qInput = document.getElementById('filterSearch').value.trim().toLowerCase();
         const workInput = document.getElementById('filterWork').value;
         const typeInput = document.getElementById('filterType').value;
@@ -334,8 +349,8 @@
         const creOn = document.getElementById('pill-cre').classList.contains('active-cre');
 
         const rows = allRows.filter(r => {
-            if (r.role === 'Designer' && !desOn) return false;
-            if (r.role === 'Creative'  && !creOn) return false;
+            if (r.role === 'Designer' && (!canDes || !desOn)) return false;
+            if (r.role === 'Creative'  && (!canCre || !creOn)) return false;
             const rWork = r.role === 'Designer' ? r.quest.designer : r.quest.creative;
             const rType = r.role === 'Designer' ? r.quest.designer_type : r.quest.creative_type;
             if (workInput && rWork !== workInput) return false;
