@@ -490,7 +490,7 @@
     function guardPermission() {
         const user = getBxUser();
         if (user?.level === 'god') return;
-        const perms = JSON.parse(sessionStorage.getItem('bx_bquest_perms') || 'null');
+        const perms = JSON.parse(sessionStorage.getItem('bx_perms_bquest') || 'null');
         if (!perms?.setting) window.location.replace('b-quest-list.html');
     }
 

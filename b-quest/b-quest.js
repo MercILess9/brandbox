@@ -17,11 +17,11 @@ async function loadBquestPerms() {
 
     if (user.level === 'god') {
         const godPerms = { ae: true, creative: true, designer: true, new: true, edit: true, delete: true, assign: true, setting: true, _god: true };
-        sessionStorage.setItem('bx_bquest_perms', JSON.stringify(godPerms));
+        sessionStorage.setItem('bx_perms_bquest', JSON.stringify(godPerms));
         return godPerms;
     }
 
-    const cached = sessionStorage.getItem('bx_bquest_perms');
+    const cached = sessionStorage.getItem('bx_perms_bquest');
     if (cached) return JSON.parse(cached);
 
     const { data } = await supabaseClient
@@ -31,12 +31,12 @@ async function loadBquestPerms() {
         .single();
 
     const perms = data || null;
-    sessionStorage.setItem('bx_bquest_perms', JSON.stringify(perms));
+    sessionStorage.setItem('bx_perms_bquest', JSON.stringify(perms));
     return perms;
 }
 
 function getBquestPerms() {
-    try { return JSON.parse(sessionStorage.getItem('bx_bquest_perms')); }
+    try { return JSON.parse(sessionStorage.getItem('bx_perms_bquest')); }
     catch { return null; }
 }
 

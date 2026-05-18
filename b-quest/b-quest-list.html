@@ -483,7 +483,7 @@
 
     async function initPage() {
         try {
-            sessionStorage.removeItem('bx_bquest_perms');
+            sessionStorage.removeItem('bx_perms_bquest');
             await initLayout(B_QUEST_CONFIG);
             applyPermUI();
             await loadMasterData();

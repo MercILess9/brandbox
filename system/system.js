@@ -49,7 +49,7 @@ async function initLayout(config = {}) {
     if (isAuthPage || isIndex) {
         // ล้าง permission cache ทุกครั้งที่กลับมาหน้า Index เพื่อให้ตอนเข้า project ใหม่จะ fetch ใหม่เสมอ
         if (isIndex) {
-            sessionStorage.removeItem('bx_bquest_perms');
+            Object.keys(sessionStorage).filter(k => k.startsWith('bx_perms_')).forEach(k => sessionStorage.removeItem(k));
         }
         document.body.classList.add('auth-ready');
         return;
@@ -124,8 +124,7 @@ async function renderSystemMenu(config) {
     if (typeof config.getMenuPerms === 'function') {
         perms = await config.getMenuPerms();
     } else {
-        try { perms = JSON.parse(sessionStorage.getItem('bx_bquest_perms')); }
-        catch { perms = null; }
+        perms = null;
     }
 
     const currentPath = window.location.pathname.split('/').pop();
