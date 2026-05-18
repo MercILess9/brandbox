@@ -516,12 +516,11 @@
 
     document.getElementById('globalSearch').addEventListener('keypress', e => { if(e.key==='Enter') applyFilters() });
 
-    const observer = new IntersectionObserver(entries => { 
-        if(entries[0].isIntersecting && !isFetching && hasMore) fetchQuests(); 
+    const observer = new IntersectionObserver(entries => {
+        if(entries[0].isIntersecting && !isFetching && hasMore) fetchQuests();
     }, { rootMargin: '100px' });
-    observer.observe(document.getElementById('load-more-trigger'));
 
-    initPage();
+    initPage().then(() => observer.observe(document.getElementById('load-more-trigger')));
 </script>
 </body>
 </html>
