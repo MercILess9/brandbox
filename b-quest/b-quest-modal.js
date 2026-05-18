@@ -365,8 +365,9 @@ const BQuestApp = (() => {
         badge.onclick = null;
 
         const hasName = name && name !== '-' && name !== '';
+        const canEditRole = typeof canBquestEditRole === 'function' ? canBquestEditRole(role) : true;
 
-        if (canAssign) {
+        if (canAssign && canEditRole) {
             badge.classList.add('bq-ab-show', 'bq-ab-clickable');
             badge.onclick = (e) => { e.stopPropagation(); BQuestApp.openAssignPicker(role); };
             if (hasName) {
