@@ -483,9 +483,8 @@
 
     async function initPage() {
         try {
-            await initLayout(B_QUEST_CONFIG);
             sessionStorage.removeItem('bx_bquest_perms');
-            await loadBquestPerms();
+            await initLayout(B_QUEST_CONFIG);
             applyPermUI();
             await loadMasterData();
             fetchQuests(true);
