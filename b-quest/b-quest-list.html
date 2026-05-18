@@ -234,7 +234,6 @@
             B_QUEST_CONFIG.listTypes.forEach(t => typeEl.add(new Option(t, t)));
 
             await refreshOwnerFilter();
-            subscribeOwnerRealtime();
         } catch (e) { console.error(e); }
     }
 
@@ -245,14 +244,6 @@
         setupDefaultOptions(ownerEl, "Owner");
         if (data) data.forEach(row => ownerEl.add(new Option(row.owner, row.owner)));
         if ([...ownerEl.options].some(o => o.value === prev)) ownerEl.value = prev;
-    }
-
-    function subscribeOwnerRealtime() {
-        supabaseClient.channel('bquest-owners')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'b-quest-list' }, () => {
-                refreshOwnerFilter();
-            })
-            .subscribe();
     }
 
     function renderFilterWork() {
@@ -490,6 +481,7 @@
     async function initPage() {
         try {
             await initLayout(B_QUEST_CONFIG);
+            sessionStorage.removeItem('bx_bquest_perms');
             await loadBquestPerms();
             applyPermUI();
             await loadMasterData();
