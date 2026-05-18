@@ -269,10 +269,12 @@ const BQuestApp = (() => {
             }
         },
         async loadProfiles() {
+            if (State.assignProfiles._loaded) return;
             const { data } = await supabaseClient.from('b-quest-setting').select('codename, designer, creative').order('codename');
             if (!data) return;
             State.assignProfiles.designer = data.filter(p => p.designer).map(p => p.codename);
             State.assignProfiles.creative = data.filter(p => p.creative).map(p => p.codename);
+            State.assignProfiles._loaded = true;
         }
     };
 

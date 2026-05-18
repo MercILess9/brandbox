@@ -9,25 +9,9 @@
     <script src="/system/config.js"></script>
     <script src="/system/system.js"></script>
     <script src="b-quest.js"></script>
+    <link rel="stylesheet" href="b-quest.css">
 
     <style>
-        :root {
-            --c-accent: #bdc432;
-            --c-accent-light: #f4f7a1;
-            --c-dark: #1e293b;
-            --c-bg: #f8fafc;
-            --c-muted: #94a3b8;
-            --c-slate: #626e7f;
-            --c-border: #e2e8f0;
-            --c-des: #3b82f6;
-            --c-des-bg: #eff6ff;
-            --c-cre: #8b5cf6;
-            --c-cre-bg: #f5f3ff;
-            --f-sarabun: 'Sarabun', sans-serif;
-            --f-inter: 'Inter', sans-serif;
-        }
-
-        body { font-family: var(--f-inter), var(--f-sarabun); background: var(--c-bg); color: var(--c-dark); margin: 0; }
         .assign-wrapper { max-width: 1300px; margin: 0 auto; padding: 36px 20px 120px; }
 
         .page-header { margin-bottom: 24px; }
@@ -235,8 +219,8 @@
 
     // ── Init ──
     async function loadPage() {
+        sessionStorage.removeItem('bx_perms_bquest');
         await initLayout(B_QUEST_CONFIG);
-        await loadBquestPerms();
         guardBquestPage('assign');
         await Promise.all([loadProfiles(), loadWorkList()]);
         populateFilterWork();
