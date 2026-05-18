@@ -67,11 +67,14 @@ async function loadPage() {
     await initLayout(CONFIG);                          // fetch perms + render header
     guardPage(perm);                                   // guard หลัง initLayout เท่านั้น
     await loadMasterData();                            // filter/dropdown data ครบก่อน render
-    fetchData(true);                                   // โหลด list แรก
+    await fetchData(true);                             // โหลด list แรก — ต้อง await
 }
+// IntersectionObserver ต้อง active หลัง loadPage เสร็จเท่านั้น
+loadPage().then(() => observer.observe(triggerEl));
 ```
 - `initLayout` เรียก `getMenuPerms` (= `loadPerms`) อยู่แล้ว → perms set ใน sessionStorage ก่อน guard รัน
 - **ห้าม guard ก่อน initLayout** — perms ยังไม่โหลด จะ redirect ผิด
+- **ห้าม observer.observe ก่อน loadPage เสร็จ** — observer จะ trigger fetchData ก่อน perms/masterData พร้อม ทำให้ 10 card แรกไม่มีปุ่ม Edit
 - Auth pages และ index.html ไม่ต้องทำ pattern นี้
 
 ## CSS Architecture Rules
