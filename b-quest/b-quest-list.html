@@ -471,7 +471,7 @@
             await initLayout(B_QUEST_CONFIG);
             applyPermUI();
             await loadMasterData();
-            fetchQuests(true);
+            await fetchQuests(true);
         } catch (e) { console.error(e); }
     }
 
