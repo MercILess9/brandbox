@@ -458,7 +458,8 @@ const BQuestApp = (() => {
 
     function openAssignPicker(role) {
         const canAssign = typeof canBquest === 'function' ? canBquest('assign') : false;
-        if (!canAssign) return;
+        const canEditRole = typeof canBquestEditRole === 'function' ? canBquestEditRole(role) : true;
+        if (!canAssign || !canEditRole) return;
         const names = State.assignProfiles[role] || [];
         const container = el('uni-list-container');
         const searchInput = el('uni-search-input');
