@@ -48,6 +48,16 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 .btn-reset { border: 1px solid var(--c-border); background: #fff; color: var(--c-muted); font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; }
 .btn-reset:hover { background: var(--c-bg); color: var(--c-dark); border-color: #cbd5e1; }
 
+/* ── Shared Filter Select Dropdown ── */
+.flt-select-box { background: #fff; border: 1px solid var(--c-border); border-radius: 12px; display: flex; align-items: center; overflow: hidden; height: 38px; transition: 0.2s; }
+.flt-select-box:hover { border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transform: translateY(-1px); }
+.flt-select-tag { background: #f1f5f9; color: var(--c-muted); font-size: 0.6rem; font-weight: 800; padding: 0 10px; height: 100%; display: flex; align-items: center; justify-content: center; text-transform: uppercase; letter-spacing: 0.5px; border-right: 1px solid var(--c-border); white-space: nowrap; transition: 0.2s; }
+.flt-select-box:hover .flt-select-tag { background: #e8edf2; color: var(--c-slate); }
+.flt-select-input { border: none; font-size: 0.8rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; width: 100%; outline: none; background: transparent; cursor: pointer; font-family: inherit; text-align-last: center; }
+.flt-select-box.active-filter { background: var(--c-accent-light); border-color: var(--c-accent); }
+.flt-select-box.active-filter .flt-select-tag { background: var(--c-accent); color: var(--c-dark); border-right-color: var(--c-accent); }
+.flt-select-box.active-filter:hover { box-shadow: 0 2px 8px rgba(189,196,50,0.2); }
+
 /* ── FAB ── */
 .fab-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1e293b; color: #bdc432; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; border: none; z-index: 1000; transition: 0.3s; }
 .fab-add:hover { transform: scale(1.1) rotate(90deg); background: #0f172a; }

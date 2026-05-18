@@ -38,23 +38,9 @@
         /* Divider */
         .filter-divider { width: 1px; height: 22px; background: var(--c-border); flex-shrink: 0; }
 
-        /* Select filters */
-        .filter-select-wrap { display: flex; align-items: center; border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; height: 34px; background: var(--c-bg); transition: 0.2s; }
-        .filter-select-tag { background: #f1f5f9; color: var(--c-muted); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 9px; height: 100%; display: flex; align-items: center; border-right: 1px solid var(--c-border); white-space: nowrap; }
-        .filter-select { border: none; background: transparent; font-size: 0.78rem; font-weight: 600; color: var(--c-slate); padding: 0 8px; outline: none; cursor: pointer; font-family: inherit; min-width: 90px; text-align-last: center; }
         #wrap-filterWork { width: 250px; flex-shrink: 0; }
         #filterWork { width: 100%; }
-        .filter-select-wrap.active { border-color: var(--c-accent); background: var(--c-accent-light); }
-        .filter-select-wrap.active .filter-select-tag { background: var(--c-accent); color: var(--c-dark); border-right-color: var(--c-accent); }
 
-        .btn-reset { border: 1px solid var(--c-border); background: #fff; color: var(--c-muted); font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; margin-left: auto; }
-        .btn-reset:hover { background: var(--c-bg); color: var(--c-dark); border-color: #cbd5e1; }
-
-        /* ── Section ── */
-        .section { background: #fff; border: 1px solid var(--c-border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--c-border); background: #fff; }
-        .section-title { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
-        .section-badge { background: var(--c-accent); color: var(--c-dark); border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
 
         /* ── Card List ── */
         #list-rows { padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 10px; }
@@ -162,17 +148,17 @@
             <button id="pill-cre" class="flt-pill active-cre" onclick="togglePill('cre')"><i class="bi bi-rocket"></i> Creative</button>
         </div>
 
-        <div class="filter-select-wrap" id="wrap-filterOwner">
-            <span class="filter-select-tag">Owner</span>
-            <select class="filter-select" id="filterOwner" onchange="onSelectChange('filterOwner')"><option value="">All</option></select>
+        <div class="flt-select-box" id="wrap-filterOwner">
+            <span class="flt-select-tag">Owner</span>
+            <select class="flt-select-input" id="filterOwner" onchange="onSelectChange('filterOwner')"><option value="">All</option></select>
         </div>
-        <div class="filter-select-wrap" id="wrap-filterType">
-            <span class="filter-select-tag">Type</span>
-            <select class="filter-select" id="filterType" onchange="onSelectChange('filterType')"><option value="">All</option></select>
+        <div class="flt-select-box" id="wrap-filterType">
+            <span class="flt-select-tag">Type</span>
+            <select class="flt-select-input" id="filterType" onchange="onSelectChange('filterType')"><option value="">All</option></select>
         </div>
-        <div class="filter-select-wrap" id="wrap-filterWork">
-            <span class="filter-select-tag">Work</span>
-            <select class="filter-select" id="filterWork" onchange="onSelectChange('filterWork')"><option value="">All</option></select>
+        <div class="flt-select-box" id="wrap-filterWork">
+            <span class="flt-select-tag">Work</span>
+            <select class="flt-select-input" id="filterWork" onchange="onSelectChange('filterWork')"><option value="">All</option></select>
         </div>
         <button class="btn-reset" onclick="resetFilters()">RESET</button>
     </div>
@@ -333,7 +319,7 @@
     // ── Filter logic ──
     function togglePill(role) { const btn = document.getElementById('pill-' + role); btn.classList.toggle(role === 'des' ? 'active-des' : 'active-cre'); rebuildWorkFilter(); applyFilters(); }
     function onSelectChange(id) { updateSelectHighlight(id); applyFilters(); }
-    function updateSelectHighlight(id) { const wrap = document.getElementById('wrap-' + id); wrap.classList.toggle('active', !!document.getElementById(id).value); }
+    function updateSelectHighlight(id) { const wrap = document.getElementById('wrap-' + id); wrap.classList.toggle('active-filter', !!document.getElementById(id).value); }
     function setupSearch() { let timer; document.getElementById('filterSearch').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(applyFilters, 250); }); }
 
     function applyFilters() {
