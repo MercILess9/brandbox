@@ -44,7 +44,7 @@ vercel.json
 
 **God mode:** `profiles.level === 'god'` → bypasses all permission checks, never shown in member lists (always filter `.neq('level', 'god')`). God user is not listed in any project's member/setting table.
 
-**Per-project permissions:** Each project has its own settings table (e.g. `b-quest-setting`). Permissions are cached in `sessionStorage` (key: `bx_bquest_perms`) and cleared when user returns to index.
+**Per-project permissions:** Each project has its own settings table (e.g. `b-quest-setting`). Permissions are cached in `sessionStorage` with key `bx_perms_<project>` (e.g. `bx_perms_bquest`). Cleared on index and on every project page load to ensure fresh perms on refresh.
 
 **Permission columns in b-quest-setting:**
 - ROLE: `ae`, `creative`, `designer`
@@ -60,21 +60,33 @@ vercel.json
 
 ## Page Init Pattern
 
-Every page calls `initLayout(config)` as the last script:
+Every project page follows this exact order:
 ```js
-initLayout({
-    projectName: "B-QUEST",
-    menus: [...],
-    getMenuPerms: loadBquestPerms
-});
+async function loadPage() {
+    sessionStorage.removeItem('bx_perms_<project>');  // clear cache ก่อนเสมอ
+    await initLayout(CONFIG);                          // fetch perms + render header
+    guardPage(perm);                                   // guard หลัง initLayout เท่านั้น
+    await loadMasterData();                            // filter/dropdown data ครบก่อน render
+    fetchData(true);                                   // โหลด list แรก
+}
 ```
-Auth pages and index.html pass empty/minimal config — no header is rendered for them.
+- `initLayout` เรียก `getMenuPerms` (= `loadPerms`) อยู่แล้ว → perms set ใน sessionStorage ก่อน guard รัน
+- **ห้าม guard ก่อน initLayout** — perms ยังไม่โหลด จะ redirect ผิด
+- Auth pages และ index.html ไม่ต้องทำ pattern นี้
+
+## CSS Architecture Rules
+
+- แต่ละ project มีไฟล์ CSS ของตัวเอง เช่น `b-quest.css`
+- `:root` variables ทั้งหมดอยู่ใน `<project>.css` เท่านั้น — ห้ามประกาศซ้ำใน HTML
+- แต่ละ HTML โหลด `<project>.css` แทน และมีแค่ style เฉพาะหน้านั้น
+- โหลดลำดับ: supabase → sweetalert2 → config.js → system.js → `<project>.js` → `<project>.css`
 
 ## Performance Rules
 
 - List pages use **infinite scroll**: 10–15 items per page via `IntersectionObserver`
 - Filter/search must work across **all data** (not just current page) — fetch complete datasets for filter options separately
 - Master data (work list, profiles, etc.) loaded once per page via `Promise.all`
+- Modal helper data (profiles, capacity) cached per page load with `_loaded` flag — re-fetched on page refresh, not on every modal open
 
 ## Brand & UI
 
@@ -93,9 +105,11 @@ Users are always shown as **codename** (nickname). Format reference: `codename :
 
 1. Add a card in `index.html` (app-grid section)
 2. Create a new folder `/<project-name>/`
-3. Create `<project-name>.js` with project config + permission loader (follow `b-quest.js` pattern)
-4. Create HTML pages, each loading: supabase → sweetalert2 → config.js → system.js → `<project-name>.js`
-5. Create a settings table in Supabase for project-level permissions
+3. Create `<project-name>.js` — config object, `loadPerms()`, `canProject(perm)`, `canProjectEditRole(role)` (follow `b-quest.js`)
+4. Create `<project-name>.css` — `:root` variables + shared styles (follow `b-quest.css`)
+5. Create HTML pages, each loading: supabase → sweetalert2 → config.js → system.js → `<project-name>.js` → `<project-name>.css`
+6. Create a settings table in Supabase: `<project>-setting` with columns: codename (PK), role columns, task columns (new/edit/delete), admin columns (assign/setting)
+7. sessionStorage key: `bx_perms_<project>` — system.js clears all `bx_perms_*` keys on index automatically
 
 ## Projects Status
 
