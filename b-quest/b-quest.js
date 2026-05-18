@@ -1,7 +1,7 @@
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
-    itemsPerPage_List: 10,
-    itemsPerPage_Assign: 10,
+    itemsPerPage_List: 15,
+    itemsPerPage_Assign: 15,
     listTypes: ["New Task", "Revise 1", "Revise 2", "Revise 3", "Revise 4", "Revise 5"],
     menus: [
         { name: "Dashboard", link: "b-quest-dashboard.html" },
