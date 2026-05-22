@@ -479,6 +479,18 @@
 
     function applyPermUI() {
         if (!canBquest('new')) document.querySelector('.fab-add').style.display = 'none';
+
+        const p = getBquestPerms();
+        if (!p || p._god) return;
+
+        if (p.ae || (p.designer && p.creative)) {
+            document.getElementById('pill-designer').classList.add('active-role');
+            document.getElementById('pill-creative').classList.add('active-role');
+        } else if (p.designer) {
+            document.getElementById('pill-designer').classList.add('active-role');
+        } else if (p.creative) {
+            document.getElementById('pill-creative').classList.add('active-role');
+        }
     }
 
     document.getElementById('toggleFilters').addEventListener('click', () => {
