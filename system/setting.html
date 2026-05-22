@@ -548,23 +548,12 @@
         btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Removing...';
 
         try {
-            // Find user's auth id from profiles
-            const { data: profile } = await supabaseClient
+            const { error: profErr } = await supabaseClient
                 .from('profiles')
-                .select('id')
-                .eq('codename', codename)
-                .single();
+                .delete()
+                .eq('codename', codename);
+            if (profErr) throw profErr;
 
-            if (profile?.id) {
-                // Delete profile row (auth user managed separately by admin)
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .delete()
-                    .eq('codename', codename);
-                if (error) throw error;
-            }
-
-            // Delete access row
             await supabaseClient.from('setting_project').delete().eq('codename', codename);
 
             // Remove from local state

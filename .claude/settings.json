@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\MercILess\\\\Brandbox\\\\brandbox\\\\supabase\")"
+    ]
+  }
+}
