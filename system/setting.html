@@ -226,8 +226,8 @@
                     <div class="usr-col-label">B-QUEST</div>
                     <div class="usr-col-label">Dashboard</div>
                     <div class="usr-col-label">B-ACCOUNT</div>
+                    <div class="usr-col-label">Commission</div>
                     <div class="usr-col-label">Finance</div>
-                    <div class="usr-col-label">B-ACADEMY</div>
                     <div class="usr-col-label">Setting</div>
                     <div></div>
                 </div>
@@ -281,11 +281,11 @@
 
     // Projects columns definition
     const PROJECT_COLS = [
-        { key: 'bquest',    label: 'B-QUEST' },
-        { key: 'bdashboard', label: 'Dashboard' },
-        { key: 'baccount',  label: 'B-ACCOUNT' },
-        { key: 'bfinance',  label: 'Finance' },
-        { key: 'bacademy',  label: 'B-ACADEMY' },
+        { key: 'bquest',      label: 'B-QUEST' },
+        { key: 'bdashboard',  label: 'Dashboard' },
+        { key: 'baccount',    label: 'B-ACCOUNT' },
+        { key: 'bcommission', label: 'Commission' },
+        { key: 'bfinance',    label: 'Finance' },
     ];
 
     let allUsers = [];
@@ -305,7 +305,7 @@
     function guardSystemSetting() {
         const user = getBxUser();
         if (user?.level === 'god') return;
-        // Check system_access table — if not god, must have system_setting = true
+        // Check setting_project table — if not god, must have system_setting = true
         // We check after data loads via guardAfterLoad()
     }
 
@@ -328,7 +328,7 @@
     }
 
     async function loadAccessData() {
-        const { data } = await supabaseClient.from('system_access').select('*');
+        const { data } = await supabaseClient.from('setting_project').select('*');
         accessData = {};
         (data || []).forEach(row => { accessData[row.codename] = row; });
         await guardAfterLoad();
@@ -566,7 +566,7 @@
             }
 
             // Delete access row
-            await supabaseClient.from('system_access').delete().eq('codename', codename);
+            await supabaseClient.from('setting_project').delete().eq('codename', codename);
 
             // Remove from local state
             allUsers = allUsers.filter(u => u.codename !== codename);
@@ -625,13 +625,13 @@
                     bquest:         !!ch.bquest,
                     bdashboard:     !!ch.bdashboard,
                     baccount:       !!ch.baccount,
+                    bcommission:    !!ch.bcommission,
                     bfinance:       !!ch.bfinance,
-                    bacademy:       !!ch.bacademy,
                     system_setting: !!ch.system_setting,
                 };
 
                 const { error } = await supabaseClient
-                    .from('system_access')
+                    .from('setting_project')
                     .upsert([payload], { onConflict: 'codename' });
                 if (error) errors.push(`Access ${codename}: ${error.message}`);
                 else accessData[codename] = { ...accessData[codename], ...payload };
