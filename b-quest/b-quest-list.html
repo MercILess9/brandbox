@@ -84,6 +84,7 @@
         .bqc-tag-des { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
         .bqc-tag-cre { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
         .bqc-tag-done { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; }
+        .bqc-dl-label-done { color: #94a3b8; }
 
         .bqc-actions { width: 130px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; opacity: 0; transition: 0.2s; }
         .bqc-card:hover .bqc-actions { opacity: 1; }
@@ -386,10 +387,10 @@
 
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
                             <div class="bqc-dl-col">
-                                ${hasD ? `<span class="bqc-dl-label bqc-dl-label-des">Designer</span><span class="bqc-tag ${task.designer_status === 'Done' ? 'bqc-tag-done' : 'bqc-tag-des'}">${formatDate(task.designer_deadline)}</span>` : ''}
+                                ${hasD ? `<span class="bqc-dl-label ${task.designer_status === 'Done' ? 'bqc-dl-label-done' : 'bqc-dl-label-des'}">Designer</span><span class="bqc-tag ${task.designer_status === 'Done' ? 'bqc-tag-done' : 'bqc-tag-des'}">${formatDate(task.designer_deadline)}</span>` : ''}
                             </div>
                             <div class="bqc-dl-col">
-                                ${hasC ? `<span class="bqc-dl-label bqc-dl-label-cre">Creative</span><span class="bqc-tag ${task.creative_status === 'Done' ? 'bqc-tag-done' : 'bqc-tag-cre'}">${formatDate(task.creative_deadline)}</span>` : ''}
+                                ${hasC ? `<span class="bqc-dl-label ${task.creative_status === 'Done' ? 'bqc-dl-label-done' : 'bqc-dl-label-cre'}">Creative</span><span class="bqc-tag ${task.creative_status === 'Done' ? 'bqc-tag-done' : 'bqc-tag-cre'}">${formatDate(task.creative_deadline)}</span>` : ''}
                             </div>
                         </div>
 
