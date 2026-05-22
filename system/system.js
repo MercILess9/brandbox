@@ -46,10 +46,14 @@ async function initLayout(config = {}) {
     const isIndex = path === '/' || path.endsWith('/index.html') || path.endsWith('/');
 
     // 3. ถ้าเป็นหน้า Auth หรือ Index ไม่ต้องโหลด Header ระบบ
+    if (!isAuthPage && !isIndex && config.accessKey) {
+        await guardProjectAccess(config.accessKey);
+    }
+
     if (isAuthPage || isIndex) {
         // ล้าง permission cache ทุกครั้งที่กลับมาหน้า Index เพื่อให้ตอนเข้า project ใหม่จะ fetch ใหม่เสมอ
         if (isIndex) {
-            Object.keys(sessionStorage).filter(k => k.startsWith('bx_perms_')).forEach(k => sessionStorage.removeItem(k));
+            Object.keys(sessionStorage).filter(k => k.startsWith('bx_perms_') || k === 'bx_sys_access').forEach(k => sessionStorage.removeItem(k));
         }
         document.body.classList.add('auth-ready');
         return;
@@ -92,6 +96,29 @@ async function initAuthGuard() {
     // โหลด profile ถ้ายังไม่มีใน sessionStorage
     if (session && !getBxUser()) {
         await loadUserProfile(session.user.id);
+    }
+}
+
+async function guardProjectAccess(accessKey) {
+    const user = getBxUser();
+    if (!user || user.level === 'god') return;
+
+    let access = null;
+    const cached = sessionStorage.getItem('bx_sys_access');
+    if (cached) {
+        access = JSON.parse(cached);
+    } else {
+        const { data } = await supabaseClient
+            .from('setting_project')
+            .select('*')
+            .eq('codename', user.codename)
+            .single();
+        access = data || {};
+        sessionStorage.setItem('bx_sys_access', JSON.stringify(access));
+    }
+
+    if (!access[accessKey]) {
+        window.location.replace('/index.html');
     }
 }
 

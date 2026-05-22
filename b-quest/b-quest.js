@@ -1,5 +1,6 @@
 const B_QUEST_CONFIG = {
     projectName: "B-QUEST",
+    accessKey: 'bquest',
     itemsPerPage_List: 10,
     itemsPerPage_Assign: 10,
     listTypes: ["New Task", "Revise 1", "Revise 2", "Revise 3", "Revise 4", "Revise 5"],
