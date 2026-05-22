@@ -47,7 +47,8 @@ async function initLayout(config = {}) {
 
     // 3. ถ้าเป็นหน้า Auth หรือ Index ไม่ต้องโหลด Header ระบบ
     if (!isAuthPage && !isIndex && config.accessKey) {
-        await guardProjectAccess(config.accessKey);
+        const allowed = await guardProjectAccess(config.accessKey);
+        if (!allowed) return;
     }
 
     if (isAuthPage || isIndex) {
@@ -101,7 +102,7 @@ async function initAuthGuard() {
 
 async function guardProjectAccess(accessKey) {
     const user = getBxUser();
-    if (!user || user.level === 'god') return;
+    if (!user || user.level === 'god') return true;
 
     let access = null;
     const cached = sessionStorage.getItem('bx_sys_access');
@@ -117,9 +118,11 @@ async function guardProjectAccess(accessKey) {
         sessionStorage.setItem('bx_sys_access', JSON.stringify(access));
     }
 
-    if (!access[accessKey]) {
+    if (access[accessKey] !== true) {
         window.location.replace('/index.html');
+        return false;
     }
+    return true;
 }
 
 async function renderSystemUI(config) {
