@@ -473,8 +473,25 @@
             await initLayout(B_QUEST_CONFIG);
             applyPermUI();
             await loadMasterData();
+            applyAEOwnerFilter();
             await fetchQuests(true);
         } catch (e) { console.error(e); }
+    }
+
+    function applyAEOwnerFilter() {
+        const p = getBquestPerms();
+        if (!p || p._god || !p.ae) return;
+
+        const user = getBxUser();
+        const codename = user?.codename;
+        if (!codename) return;
+
+        const ownerEl = document.getElementById('filterOwner');
+        const exists = [...ownerEl.options].some(o => o.value === codename);
+        if (exists) {
+            ownerEl.value = codename;
+            updateHighlight('filterOwner');
+        }
     }
 
     function applyPermUI() {
