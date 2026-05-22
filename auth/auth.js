@@ -101,7 +101,11 @@ async function handleUpdatePassword(newPassword) {
         });
 
     } catch (err) {
-        Swal.fire("Error", err.message, "error");
+        const msg = err.message?.toLowerCase() || '';
+        const friendly = msg.includes('same password') || msg.includes('different from') || msg.includes('different password')
+            ? 'New password must be different from your current password.'
+            : err.message;
+        Swal.fire("Error", friendly, "error");
     }
 }
 
