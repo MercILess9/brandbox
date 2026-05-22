@@ -45,11 +45,11 @@
         .dept-filter.active { border-color: #508faf; color: #508faf; font-weight: 700; }
 
         /* Users Table */
-        /* Grid: Codename(130px) | NickName/FullName(190px) | EmpID(100px) | Dept(1fr) | Projects(80px x5) | System(80px) | Actions(44px) */
+        /* Grid: Codename(130px) | NickName/FullName(190px) | Dept(1fr) | EmpID(100px) | Projects(80px x5) | System(80px) | Actions(44px) */
         .usr-scroll-body { max-height: 600px; overflow-y: auto; }
         .usr-thead-sticky { position: sticky; top: 0; background: #fff; z-index: 2; padding: 16px 0 0; }
 
-        .usr-cols { grid-template-columns: 130px 1fr 100px 1fr repeat(5, 80px) 80px 44px; }
+        .usr-cols { grid-template-columns: 130px 1fr 1fr 100px repeat(5, 80px) 80px 44px; }
 
         .usr-table-head {
             display: grid;
@@ -132,7 +132,7 @@
 
         .skeleton-row {
             display: grid;
-            grid-template-columns: 130px 190px 100px 1fr repeat(5, 80px) 80px 44px;
+            grid-template-columns: 130px 190px 1fr 100px repeat(5, 80px) 80px 44px;
             align-items: center; padding: 0 4px;
             height: 56px; border-bottom: 1px solid #f8fafc; gap: 8px;
         }
@@ -221,8 +221,8 @@
                 <div class="usr-table-head usr-cols">
                     <div class="usr-col-name" style="text-align:center; padding-left:0;">Codename</div>
                     <div class="usr-col-name">Full Name</div>
-                    <div class="usr-col-label">Employee ID</div>
                     <div class="usr-col-label">Department</div>
+                    <div class="usr-col-label">Employee ID</div>
                     <div class="usr-col-label">B-QUEST</div>
                     <div class="usr-col-label">Dashboard</div>
                     <div class="usr-col-label">B-ACCOUNT</div>
@@ -405,13 +405,12 @@
                     <input class="inline-input muted" value="${(u.full_name || '').replace(/"/g,'&quot;')}" placeholder="Full Name" ${dis}
                         onchange="onProfileChange('${u.id}','full_name',this.value)">
                 </div>
-                <div class="usr-empid-cell">
-                    <input class="inline-input center" value="${(u.employee_id || '').replace(/"/g,'&quot;')}" placeholder="EMP ID" ${dis}
-                        onchange="onEmpIdChange('${u.id}',this.value)">
-                </div>
                 <div class="usr-dept-cell">
                     <input class="inline-input center" value="${(u.department || '').replace(/"/g,'&quot;')}" placeholder="Department" ${dis}
                         onchange="onProfileChange('${u.id}','department',this.value)">
+                </div>
+                <div class="usr-empid-cell">
+                    <span class="inline-input center" style="display:block;color:var(--c-muted);cursor:default;">${u.employee_id || '-'}</span>
                 </div>
                 ${projectToggles}
                 ${sysToggle}
