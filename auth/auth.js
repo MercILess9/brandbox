@@ -29,7 +29,7 @@ async function handleLogin(email, password) {
 
 async function handleSignup(email, password, metadata) {
     try {
-        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:40px;object-fit:contain;margin-bottom:10px;"><div style="font-size:1rem;font-weight:700;color:#1e293b;">Creating Account...</div>`, showConfirmButton: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ html: `<style>@keyframes _bxspin{to{transform:rotate(360deg)}}</style><img src="${LOGO_URL}" style="height:40px;object-fit:contain;display:block;margin:0 auto 12px;"><div style="font-size:1rem;font-weight:700;color:#1e293b;margin-bottom:14px;">Creating Account...</div><div style="width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:#bdc432;border-radius:50%;animation:_bxspin .8s linear infinite;margin:0 auto;"></div>`, showConfirmButton: false, allowOutsideClick: false });
 
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
@@ -62,7 +62,7 @@ async function handleSignup(email, password, metadata) {
 
 async function handleForgotPassword(email) {
     try {
-        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:40px;object-fit:contain;margin-bottom:10px;"><div style="font-size:1rem;font-weight:700;color:#1e293b;">Processing...</div>`, showConfirmButton: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ html: `<style>@keyframes _bxspin{to{transform:rotate(360deg)}}</style><img src="${LOGO_URL}" style="height:40px;object-fit:contain;display:block;margin:0 auto 12px;"><div style="font-size:1rem;font-weight:700;color:#1e293b;margin-bottom:14px;">Processing...</div><div style="width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:#bdc432;border-radius:50%;animation:_bxspin .8s linear infinite;margin:0 auto;"></div>`, showConfirmButton: false, allowOutsideClick: false });
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/auth/reset-password.html',
         });
