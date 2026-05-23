@@ -94,9 +94,13 @@ async function initAuthGuard() {
         return;
     }
 
-    // โหลด profile ถ้ายังไม่มีใน sessionStorage
-    if (session && !getBxUser()) {
-        await loadUserProfile(session.user.id);
+    if (session) {
+        const profile = await loadUserProfile(session.user.id);
+        if (!profile) {
+            await supabaseClient.auth.signOut();
+            sessionStorage.clear();
+            window.location.replace("/auth/login.html");
+        }
     }
 }
 
