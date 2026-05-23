@@ -62,7 +62,7 @@ async function handleSignup(email, password, metadata) {
 
 async function handleForgotPassword(email) {
     try {
-        Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Processing...', imageUrl: LOGO_URL, imageHeight: 40, imageAlt: 'Brandbox', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/auth/reset-password.html',
         });
