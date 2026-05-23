@@ -29,7 +29,7 @@ async function handleLogin(email, password) {
 
 async function handleSignup(email, password, metadata) {
     try {
-        Swal.fire({ title: 'Creating Account...', imageUrl: LOGO_URL, imageHeight: 40, imageAlt: 'Brandbox', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:40px;object-fit:contain;margin-bottom:10px;"><div style="font-size:1rem;font-weight:700;color:#1e293b;">Creating Account...</div>`, showConfirmButton: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
@@ -62,7 +62,7 @@ async function handleSignup(email, password, metadata) {
 
 async function handleForgotPassword(email) {
     try {
-        Swal.fire({ title: 'Processing...', imageUrl: LOGO_URL, imageHeight: 40, imageAlt: 'Brandbox', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:40px;object-fit:contain;margin-bottom:10px;"><div style="font-size:1rem;font-weight:700;color:#1e293b;">Processing...</div>`, showConfirmButton: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/auth/reset-password.html',
         });
