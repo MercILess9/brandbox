@@ -100,6 +100,7 @@ async function initAuthGuard() {
             await supabaseClient.auth.signOut();
             sessionStorage.clear();
             window.location.replace("/auth/login.html");
+            return;
         }
     }
 }
