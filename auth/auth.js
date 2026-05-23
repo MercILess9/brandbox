@@ -29,7 +29,7 @@ async function handleLogin(email, password) {
 
 async function handleSignup(email, password, metadata) {
     try {
-        Swal.fire({ title: 'Creating Account...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Creating Account...', imageUrl: LOGO_URL, imageHeight: 40, imageAlt: 'Brandbox', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
 
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
