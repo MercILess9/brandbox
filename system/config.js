@@ -2,7 +2,7 @@
 const SITE_URL = 'https://bx.brandboxplatform.com';
 
 // assets
-const LOGO_URL = 'https://www.brandboxplatform.com/images/brandbox-logo.png';
+const LOGO_URL = 'https://hdulohaxociujwaziszy.supabase.co/storage/v1/object/public/Brandbox/logo.png';
 
 // supabase
 const SUPABASE_URL = 'https://hdulohaxociujwaziszy.supabase.co';
