@@ -548,11 +548,13 @@
         btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Removing...';
 
         try {
-            const { error: profErr } = await supabaseClient
+            const { data: deleted, error: profErr } = await supabaseClient
                 .from('profiles')
                 .delete()
-                .eq('codename', codename);
+                .eq('codename', codename)
+                .select();
             if (profErr) throw profErr;
+            if (!deleted?.length) throw new Error('ลบไม่สำเร็จ — กรุณาตรวจสอบ RLS Policy ใน Supabase (profiles table)');
 
             await supabaseClient.from('setting_project').delete().eq('codename', codename);
 
