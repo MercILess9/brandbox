@@ -396,7 +396,7 @@
                         </div>
 
                         <div class="bqc-actions">
-                            ${canEdit ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3 bqc-btn-edit" onclick="openTaskModal('${task.id}', dataList)">Edit</button>` : ''}
+                            ${canEdit ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3 bqc-btn-edit" onclick="openTaskModal('${task.id}', dataList)"><i class="bi bi-pencil me-1"></i>Edit</button>` : ''}
                             ${canNew ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3 bqc-btn-edit" onclick="openDuplicateModal('${task.id}', dataList)"><i class="bi bi-copy"></i></button>` : ''}
                             ${canDel ? `
                             <div class="dropdown">
