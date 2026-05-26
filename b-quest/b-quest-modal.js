@@ -612,6 +612,61 @@ const BQuestApp = (() => {
         },
 
         updateRoleUI, updateStatusUI, openSearchOverlay, openAssignPicker,
+        async openDuplicateModal(taskId, workData = []) {
+            const form = el('b-quest-modal-form');
+            form.reset(); form.classList.remove('was-validated');
+            State.currentData = null;
+            await Promise.all([BQuestService.loadMaxCapacities(), BQuestService.loadProfiles()]);
+            setupDropdowns(workData);
+
+            State.allowAssign = false;
+
+            const data = await BQuestService.getQuestById(taskId);
+            if (!data) return;
+
+            el('b-quest-modal-id').value = '';
+            el('btn-submit-icon').className  = 'bi bi-plus-circle-fill';
+            el('btn-submit-label').textContent = 'Create Task';
+            el('modal-owner-display').innerText = getBxUser()?.codename || '—';
+            show('btn-delete-task', false);
+
+            const duplicateData = {
+                account_name: data.account_name,
+                opportunity_name: data.opportunity_name,
+                task_name: data.task_name,
+                link: data.link,
+                publish_date: data.publish_date,
+                detail: data.detail,
+                designer_type: data.designer_type,
+                designer: data.designer,
+                designer_weight: data.designer_weight,
+                creative_type: data.creative_type,
+                creative: data.creative,
+                creative_weight: data.creative_weight,
+            };
+            fillFormData(duplicateData);
+
+            State.roles.forEach(role => {
+                const hasRoleData = !!(data[role] || data[`${role}_deadline`]);
+                el(`check-${role}`).checked = hasRoleData;
+                updateRoleUI(role);
+
+                const statusEl = el(`b-quest-modal-${role}-status`);
+                statusEl.value = '';
+                show(statusEl.id, false);
+
+                refreshAssignBadge(role, '', false);
+
+                const capEl = el(`${role}-capacity-info`);
+                if (capEl) { capEl.className = 'bq-cap-info'; capEl.innerHTML = ''; }
+
+                const card = el(`card-${role}`);
+                card.querySelectorAll('input, select, textarea, button').forEach(inp => inp.disabled = false);
+                card.style.opacity = '';
+            });
+
+            bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
+        },
         closeSearchOverlay: () => show('bq-search-overlay', false),
         handleDeleteTask
     };
@@ -619,4 +674,5 @@ const BQuestApp = (() => {
 
 window.BQuestApp = BQuestApp;
 window.openTaskModal = BQuestApp.openModal;
+window.openDuplicateModal = BQuestApp.openDuplicateModal;
 document.getElementById('b-quest-modal-form').addEventListener('submit', BQuestApp.submitForm);
