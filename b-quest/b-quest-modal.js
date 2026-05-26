@@ -649,7 +649,7 @@ const BQuestApp = (() => {
                 card.style.opacity = '';
             });
 
-            fillFormData({
+            const dupData = {
                 account_name: data.account_name,
                 opportunity_name: data.opportunity_name,
                 task_name: (data.task_name || '') + ' - Copy',
@@ -662,10 +662,16 @@ const BQuestApp = (() => {
                 creative_type: data.creative_type,
                 creative: data.creative,
                 creative_weight: data.creative_weight,
-            });
-            el('modal-owner-display').innerText = getBxUser()?.codename || '—';
+            };
+            const ownerName = getBxUser()?.codename || '—';
 
-            bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
+            const modalEl = el('b-quest-modal');
+            modalEl.addEventListener('shown.bs.modal', () => {
+                fillFormData(dupData);
+                el('modal-owner-display').innerText = ownerName;
+            }, { once: true });
+
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
         },
         closeSearchOverlay: () => show('bq-search-overlay', false),
         handleDeleteTask
