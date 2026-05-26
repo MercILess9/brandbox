@@ -633,7 +633,7 @@ const BQuestApp = (() => {
             const duplicateData = {
                 account_name: data.account_name,
                 opportunity_name: data.opportunity_name,
-                task_name: data.task_name,
+                task_name: (data.task_name || '') + ' - Copy',
                 link: data.link,
                 publish_date: data.publish_date,
                 detail: data.detail,
