@@ -665,13 +665,11 @@ const BQuestApp = (() => {
             };
             const ownerName = getBxUser()?.codename || '—';
 
-            const modalEl = el('b-quest-modal');
-            modalEl.addEventListener('shown.bs.modal', () => {
+            bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
+            setTimeout(() => {
                 fillFormData(dupData);
                 el('modal-owner-display').innerText = ownerName;
-            }, { once: true });
-
-            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            }, 50);
         },
         closeSearchOverlay: () => show('bq-search-overlay', false),
         handleDeleteTask
