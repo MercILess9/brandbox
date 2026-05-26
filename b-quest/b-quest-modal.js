@@ -649,10 +649,12 @@ const BQuestApp = (() => {
                 card.style.opacity = '';
             });
 
+            const taskNameVal = (data.task_name || '') + ' - Copy';
+            console.log('[DUP] task_name =', taskNameVal, '| el =', el('b-quest-modal-taskname'));
             fillFormData({
                 account_name: data.account_name,
                 opportunity_name: data.opportunity_name,
-                task_name: (data.task_name || '') + ' - Copy',
+                task_name: taskNameVal,
                 link: data.link,
                 publish_date: data.publish_date,
                 detail: data.detail,
