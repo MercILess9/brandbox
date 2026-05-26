@@ -652,7 +652,7 @@ const BQuestApp = (() => {
             fillFormData({
                 account_name: data.account_name,
                 opportunity_name: data.opportunity_name,
-                task_name: data.task_name,
+                task_name: (data.task_name || '') + ' - Copy',
                 link: data.link,
                 publish_date: data.publish_date,
                 detail: data.detail,
@@ -663,12 +663,9 @@ const BQuestApp = (() => {
                 creative: data.creative,
                 creative_weight: data.creative_weight,
             });
+            el('modal-owner-display').innerText = getBxUser()?.codename || '—';
 
-            const modal = bootstrap.Modal.getOrCreateInstance(el('b-quest-modal'));
-            el('b-quest-modal').addEventListener('shown.bs.modal', () => {
-                el('b-quest-modal-taskname').value = (data.task_name || '') + ' - Copy';
-            }, { once: true });
-            modal.show();
+            bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
         },
         closeSearchOverlay: () => show('bq-search-overlay', false),
         handleDeleteTask
