@@ -325,7 +325,7 @@ const BQuestApp = (() => {
             const element = el(fields[key]);
             if (element) element.value = data[key] || '';
         }
-        el('modal-owner-display').innerText = data.owner || '—';
+        if (data.owner !== undefined) el('modal-owner-display').innerText = data.owner || '—';
     }
 
     function updateStatusUI(selectEl) {
