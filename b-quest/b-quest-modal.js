@@ -669,6 +669,7 @@ const BQuestApp = (() => {
             setTimeout(() => {
                 fillFormData(dupData);
                 el('modal-owner-display').innerText = ownerName;
+                el('b-quest-modal-taskname').value = dupData.task_name;
             }, 50);
         },
         closeSearchOverlay: () => show('bq-search-overlay', false),
