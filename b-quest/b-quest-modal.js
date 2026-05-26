@@ -630,22 +630,6 @@ const BQuestApp = (() => {
             el('modal-owner-display').innerText = getBxUser()?.codename || '—';
             show('btn-delete-task', false);
 
-            const duplicateData = {
-                account_name: data.account_name,
-                opportunity_name: data.opportunity_name,
-                task_name: (data.task_name || '') + ' - Copy',
-                link: data.link,
-                publish_date: data.publish_date,
-                detail: data.detail,
-                designer_type: data.designer_type,
-                designer: data.designer,
-                designer_weight: data.designer_weight,
-                creative_type: data.creative_type,
-                creative: data.creative,
-                creative_weight: data.creative_weight,
-            };
-            fillFormData(duplicateData);
-
             State.roles.forEach(role => {
                 const hasRoleData = !!(data[role] || data[`${role}_deadline`]);
                 el(`check-${role}`).checked = hasRoleData;
@@ -663,6 +647,21 @@ const BQuestApp = (() => {
                 const card = el(`card-${role}`);
                 card.querySelectorAll('input, select, textarea, button').forEach(inp => inp.disabled = false);
                 card.style.opacity = '';
+            });
+
+            fillFormData({
+                account_name: data.account_name,
+                opportunity_name: data.opportunity_name,
+                task_name: (data.task_name || '') + ' - Copy',
+                link: data.link,
+                publish_date: data.publish_date,
+                detail: data.detail,
+                designer_type: data.designer_type,
+                designer: data.designer,
+                designer_weight: data.designer_weight,
+                creative_type: data.creative_type,
+                creative: data.creative,
+                creative_weight: data.creative_weight,
             });
 
             bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
