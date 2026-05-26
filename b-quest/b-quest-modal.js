@@ -649,12 +649,10 @@ const BQuestApp = (() => {
                 card.style.opacity = '';
             });
 
-            const taskNameVal = (data.task_name || '') + ' - Copy';
-            console.log('[DUP] task_name =', taskNameVal, '| el =', el('b-quest-modal-taskname'));
             fillFormData({
                 account_name: data.account_name,
                 opportunity_name: data.opportunity_name,
-                task_name: taskNameVal,
+                task_name: data.task_name,
                 link: data.link,
                 publish_date: data.publish_date,
                 detail: data.detail,
@@ -666,7 +664,11 @@ const BQuestApp = (() => {
                 creative_weight: data.creative_weight,
             });
 
-            bootstrap.Modal.getOrCreateInstance(el('b-quest-modal')).show();
+            const modal = bootstrap.Modal.getOrCreateInstance(el('b-quest-modal'));
+            el('b-quest-modal').addEventListener('shown.bs.modal', () => {
+                el('b-quest-modal-taskname').value = (data.task_name || '') + ' - Copy';
+            }, { once: true });
+            modal.show();
         },
         closeSearchOverlay: () => show('bq-search-overlay', false),
         handleDeleteTask
