@@ -98,7 +98,7 @@
         .bqc-last-update { font-size: 0.7rem; color: var(--c-text-muted); font-weight: 500; display: flex; align-items: center; gap: 5px; }
         .bqc-btn-link { background: #f0f4c3; border: 1px solid #d4db6a; border-radius: 10px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; color: #5a6000; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .bqc-btn-link:hover { background: var(--c-accent); border-color: var(--c-accent); color: #1e293b; }
-        .bqc-btn-edit { border-color: #e2e8f0 !important; color: var(--c-slate) !important; }
+        .bqc-btn-edit { border-color: #e2e8f0 !important; color: var(--c-slate) !important; height: 31px; display: inline-flex; align-items: center; }
 
         .bqc-layout-row { display: flex; gap: 16px; align-items: stretch; }
         .bqc-col-30 { width: 30%; display: flex; flex-direction: column; }
@@ -397,7 +397,7 @@
 
                         <div class="bqc-actions">
                             ${canEdit ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3 bqc-btn-edit" onclick="openTaskModal('${task.id}', dataList)"><i class="bi bi-pencil me-1"></i>Edit</button>` : ''}
-                            ${canNew ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3 bqc-btn-edit" onclick="openDuplicateModal('${task.id}', dataList)"><i class="bi bi-copy me-1"></i>Copy</button>` : ''}
+                            ${canNew ? `<button class="btn btn-outline-dark btn-sm rounded-pill px-3 bqc-btn-edit" onclick="openDuplicateModal('${task.id}', dataList)"><i class="bi bi-copy"></i></button>` : ''}
                             ${canDel ? `
                             <div class="dropdown">
                                 <button class="bqc-btn-more" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
