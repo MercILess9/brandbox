@@ -382,6 +382,8 @@
             items.push({ name: v.newName, _key: k, _state: 'new' });
         });
 
+        items.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
         const activeCount = items.filter(i => i._state !== 'deleted').length;
         const badge = document.getElementById('dept-count-badge');
         if (badge) badge.textContent = activeCount;

@@ -91,13 +91,6 @@
             <label>Department</label>
             <select id="dept_val" required>
                 <option value="">Select Department</option>
-                <option>Account Management</option>
-                <option>AE</option>
-                <option>Creative</option>
-                <option>Designer</option>
-                <option>Finance</option>
-                <option>Growth Team</option>
-                <option>Organizational Strategy</option>
             </select>
         </div>
 
@@ -129,6 +122,21 @@
 
 <script>
     document.getElementById('brandbox-logo').src = LOGO_URL;
+
+    // Load departments from DB
+    (async () => {
+        const { data } = await supabaseClient
+            .from('departments')
+            .select('name')
+            .order('name', { ascending: true });
+        const sel = document.getElementById('dept_val');
+        (data || []).forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.name;
+            opt.textContent = d.name;
+            sel.appendChild(opt);
+        });
+    })();
 
     function togglePass(id, btn) {
         const input = document.getElementById(id);
