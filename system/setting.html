@@ -47,16 +47,18 @@
         /* ── Departments Section ── */
         .btn-add-dept { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 7px; margin-left: auto; }
         .btn-add-dept:hover { background: #0f172a; }
-        .dept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .dept-item { display: flex; align-items: center; border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; transition: border-color 0.15s; }
-        .dept-item:hover { border-color: #94a3b8; }
-        .dept-item.is-new { border-color: #86efac; background: #f0fdf4; }
-        .dept-item.is-deleted { opacity: 0.4; background: #fff5f5; border-color: #fca5a5; pointer-events: none; }
+        .dept-grid { display: grid; grid-template-columns: 1fr 1px 1fr; column-gap: 0; row-gap: 0; }
+        .dept-divider { background: var(--c-border); }
+        .dept-item { display: flex; align-items: center; border: 1px solid transparent; border-radius: 10px; overflow: hidden; transition: border-color 0.15s, background 0.15s; }
+        .dept-item:hover { border-color: var(--c-border); background: var(--c-bg); }
+        .dept-item.is-new { border-color: #86efac !important; background: #f0fdf4; }
+        .dept-item.is-deleted { opacity: 0.4; background: #fff5f5; border-color: #fca5a5 !important; pointer-events: none; }
         .dept-item.is-deleted .btn-dept-undo { pointer-events: all; }
         .dept-name-input { flex: 1; border: none; outline: none; background: transparent; font-size: 0.88rem; font-weight: 600; color: var(--c-dark); padding: 10px 14px; font-family: inherit; min-width: 0; }
-        .btn-dept-del { background: none; border: none; border-left: 1px solid var(--c-border); color: #cbd5e1; cursor: pointer; padding: 8px 10px; transition: 0.2s; display: inline-flex; align-items: center; font-size: 0.9rem; flex-shrink: 0; }
-        .btn-dept-del:hover { background: #fee2e2; color: #ef4444; }
-        .btn-dept-undo { background: #f1f5f9; border: none; border-left: 1px solid var(--c-border); color: var(--c-slate); cursor: pointer; padding: 8px 10px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
+        .btn-dept-del { background: none; border: none; color: #d1d5db; cursor: pointer; padding: 8px 10px; transition: 0.2s; display: inline-flex; align-items: center; font-size: 0.9rem; flex-shrink: 0; opacity: 0; }
+        .dept-item:hover .btn-dept-del { opacity: 1; }
+        .btn-dept-del:hover { color: #ef4444; }
+        .btn-dept-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 8px 10px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
         .btn-dept-undo:hover { background: #e2e8f0; }
         .dept-empty { grid-column: 1 / -1; padding: 32px 20px; text-align: center; color: var(--c-muted); font-size: 0.82rem; font-weight: 600; }
         .dept-new-row { display: none; align-items: center; gap: 6px; padding: 10px 0 0; }
@@ -389,7 +391,7 @@
             return;
         }
 
-        container.innerHTML = items.map(d => {
+        const cells = items.map(d => {
             const isNew     = d._state === 'new';
             const isDeleted = d._state === 'deleted';
             const safeName  = (d.name || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -399,15 +401,23 @@
                 ? `<button class="btn-dept-undo" onclick="undoDeptDelete('${safeKey}')">Undo</button>`
                 : `<button class="btn-dept-del" onclick="stageDeptDelete('${safeKey}')" title="Remove"><i class="bi bi-trash3"></i></button>`;
 
-            return `
-            <div class="dept-item ${isNew ? 'is-new' : isDeleted ? 'is-deleted' : ''}" data-key="${safeKey}">
+            return `<div class="dept-item ${isNew ? 'is-new' : isDeleted ? 'is-deleted' : ''}" data-key="${safeKey}">
                 <input class="dept-name-input" value="${safeName}" ${isDeleted ? 'disabled' : ''}
                     oninput="onDeptRename('${safeKey}', this.value)"
                     onkeydown="if(event.key==='Enter')this.blur()"
                     placeholder="Department name">
                 ${actionBtn}
             </div>`;
-        }).join('');
+        });
+
+        // interleave divider between left and right column items
+        let html = '';
+        for (let i = 0; i < cells.length; i += 2) {
+            html += cells[i];
+            html += `<div class="dept-divider"></div>`;
+            html += cells[i + 1] || '<div></div>';
+        }
+        container.innerHTML = html;
     }
 
     function onDeptRename(key, value) {
