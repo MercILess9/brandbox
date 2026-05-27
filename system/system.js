@@ -177,6 +177,12 @@ async function renderSystemMenu(config) {
 }
 
 function injectAssets() {
+    if (typeof LOGO_URL !== 'undefined' && !document.querySelector('link[rel="icon"]')) {
+        const favicon = document.createElement('link');
+        favicon.rel = 'icon'; favicon.type = 'image/png'; favicon.href = LOGO_URL;
+        document.head.appendChild(favicon);
+    }
+
     const links = [
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
         "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
