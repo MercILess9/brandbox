@@ -522,10 +522,6 @@
         renderDepartments();
     }
 
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') cancelDeptNewRow();
-    });
-
     function markDirtyDept() {
         document.getElementById('section-departments').classList.add('is-dirty');
         document.getElementById('save-bar').classList.add('visible');
