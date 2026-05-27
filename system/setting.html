@@ -60,14 +60,6 @@
         .btn-dept-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 8px 10px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
         .btn-dept-undo:hover { background: #e2e8f0; }
         .dept-empty { grid-column: 1 / -1; padding: 32px 20px; text-align: center; color: var(--c-muted); font-size: 0.82rem; font-weight: 600; }
-        .dept-new-row { display: none; align-items: center; gap: 6px; padding: 10px 0 0; }
-        .dept-new-row.show { display: flex; }
-        .dept-new-input { flex: 1; border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 10px; font-size: 0.84rem; font-weight: 600; outline: none; font-family: inherit; background: #fff; transition: 0.2s; }
-        .dept-new-input:focus { border-color: var(--c-accent); }
-        .btn-dept-confirm { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 7px; padding: 7px 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px; }
-        .btn-dept-confirm:hover { background: #0f172a; }
-        .btn-dept-cancel { background: #f1f5f9; color: var(--c-muted); border: none; border-radius: 7px; padding: 7px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-dept-cancel:hover { background: #e2e8f0; }
 
         /* Users Table */
         /* Grid: Codename(130px) | NickName/FullName(190px) | Dept(1fr) | EmpID(100px) | Projects(80px x5) | System(80px) | Actions(44px) */
@@ -228,12 +220,6 @@
         </div>
         <div style="padding: 16px 24px 20px;">
             <div id="dept-list" class="dept-grid"></div>
-            <div id="dept-new-row" class="dept-new-row">
-                <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
-                    onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
-                <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
-                <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
-            </div>
         </div>
     </div>
 
@@ -381,7 +367,14 @@
             items.push({ name: v.newName, _key: k, _state: 'new' });
         });
 
-        items.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        // sort named items a-z, keep unnamed new items at end
+        items.sort((a, b) => {
+            const aEmpty = a._state === 'new' && !a.name;
+            const bEmpty = b._state === 'new' && !b.name;
+            if (aEmpty && !bEmpty) return 1;
+            if (!aEmpty && bEmpty) return -1;
+            return (a.name || '').localeCompare(b.name || '');
+        });
 
         const activeCount = items.filter(i => i._state !== 'deleted').length;
         const badge = document.getElementById('dept-count-badge');
@@ -423,10 +416,11 @@
 
     function onDeptRename(key, value) {
         if (!deptChanges[key]) {
-            const origName = key.startsWith('db_') ? key.slice(3) : value;
+            const origName = key.startsWith('db_') ? key.slice(3) : '';
             deptChanges[key] = { origName, newName: value };
         } else {
             deptChanges[key].newName = value;
+            if (deptChanges[key]._new) deptChanges[key].origName = value;
         }
         markDirtyDept();
     }
@@ -455,25 +449,13 @@
     }
 
     function showDeptNewRow() {
-        const input = document.getElementById('dept-new-input');
-        document.getElementById('dept-new-row').classList.add('show');
-        input.value = '';
-        input.focus();
-    }
-
-    function cancelDeptNewRow() {
-        document.getElementById('dept-new-row').classList.remove('show');
-        document.getElementById('dept-new-input').value = '';
-    }
-
-    function stageDeptAdd() {
-        const name = document.getElementById('dept-new-input').value.trim();
-        if (!name) return;
         const key = `new_${++deptNewCounter}`;
-        deptChanges[key] = { _new: true, newName: name, origName: name };
-        cancelDeptNewRow();
+        deptChanges[key] = { _new: true, newName: '', origName: '' };
         markDirtyDept();
         renderDepartments();
+        // focus the new empty input
+        const newInput = document.querySelector(`.dept-item[data-key="${key}"] .dept-name-input`);
+        if (newInput) newInput.focus();
     }
 
     function markDirtyDept() {
