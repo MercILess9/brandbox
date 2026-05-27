@@ -44,6 +44,41 @@
         .dept-filter:focus { border-color: var(--c-accent); background-color: #fff; }
         .dept-filter.active { border-color: #508faf; color: #508faf; font-weight: 700; }
 
+        /* ── Departments Section ── */
+        .dept-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 680px) { .dept-two-col { grid-template-columns: 1fr; } }
+
+        .dept-list-wrap { border: 1px solid var(--c-border); border-radius: 14px; overflow: hidden; }
+        .dept-list-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 12px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
+        .dept-list-head span { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+        .dept-item { display: grid; grid-template-columns: 1fr 44px; align-items: center; border-bottom: 1px solid #f8fafc; transition: background 0.12s; }
+        .dept-item:last-child { border-bottom: none; }
+        .dept-item:hover { background: #fafbff; }
+        .dept-item.is-new { background: #f0fdf4; }
+        .dept-item.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
+        .dept-item.is-deleted .btn-dept-undo { pointer-events: all; }
+        .dept-name-input { border: none; outline: none; background: transparent; font-size: 0.84rem; font-weight: 600; color: var(--c-dark); padding: 10px 12px; width: 100%; font-family: inherit; transition: background 0.15s; }
+        .dept-name-input:hover { background: #f1f5f9; }
+        .dept-name-input:focus { background: #fff; box-shadow: inset 0 0 0 2px var(--c-accent); }
+        .dept-item-actions { display: flex; justify-content: center; align-items: center; }
+        .btn-dept-del { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 6px; border-radius: 7px; transition: 0.2s; display: flex; align-items: center; font-size: 0.9rem; }
+        .btn-dept-del:hover { background: #fee2e2; color: #ef4444; }
+        .btn-dept-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; }
+        .btn-dept-undo:hover { background: #e2e8f0; }
+        .dept-empty { padding: 28px 16px; text-align: center; color: var(--c-muted); font-size: 0.8rem; font-weight: 600; }
+        .dept-new-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; padding: 10px 12px; border-top: 1px dashed var(--c-border); background: #fafbff; }
+        .dept-new-input { border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 10px; font-size: 0.84rem; font-weight: 600; outline: none; font-family: inherit; background: #fff; transition: 0.2s; flex: 1; }
+        .dept-new-input:focus { border-color: var(--c-accent); }
+        .dept-new-actions { display: flex; gap: 4px; align-items: center; }
+        .btn-dept-confirm { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 7px; padding: 7px 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+        .btn-dept-confirm:hover { background: #0f172a; }
+        .btn-dept-cancel { background: #f1f5f9; color: var(--c-muted); border: none; border-radius: 7px; padding: 7px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-dept-cancel:hover { background: #e2e8f0; }
+        .btn-add-dept { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 10px; padding: 7px 16px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; margin-left: auto; }
+        .btn-add-dept:hover { background: #0f172a; }
+        .dept-count-badge { font-size: 0.72rem; font-weight: 700; color: var(--c-muted); background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 20px; padding: 2px 10px; }
+        .dept-hint { font-size: 0.72rem; color: var(--c-muted); font-weight: 500; padding: 10px 12px 6px; }
+
         /* Users Table */
         /* Grid: Codename(130px) | NickName/FullName(190px) | Dept(1fr) | EmpID(100px) | Projects(80px x5) | System(80px) | Actions(44px) */
         .usr-scroll-body { max-height: 600px; overflow-y: auto; }
@@ -189,6 +224,64 @@
         <h1><i class="bi bi-shield-lock-fill me-2" style="color:var(--c-accent)"></i>System Settings</h1>
     </div>
 
+    <!-- Section: Departments -->
+    <div class="section" id="section-departments">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="bi bi-building"></i> Departments
+                <span class="dirty-dot"></span>
+            </div>
+            <span class="dept-count-badge" id="dept-count-badge">0</span>
+            <button class="btn-add-dept" onclick="showDeptNewRow()">
+                <i class="bi bi-plus-lg"></i> Add
+            </button>
+        </div>
+        <div class="section-body" style="padding: 20px 24px;">
+            <div class="dept-two-col">
+                <!-- Left: list -->
+                <div>
+                    <div class="dept-list-wrap">
+                        <div class="dept-list-head">
+                            <span>Department Name</span>
+                            <span style="text-align:center;">Action</span>
+                        </div>
+                        <div id="dept-list"></div>
+                        <!-- New row (hidden by default) -->
+                        <div id="dept-new-row" class="dept-new-row" style="display:none;">
+                            <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name...">
+                            <div class="dept-new-actions">
+                                <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
+                                <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dept-hint"><i class="bi bi-info-circle me-1"></i>Click name to rename inline. Changes are staged until you hit Save.</div>
+                </div>
+                <!-- Right: info card -->
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="background:#f8fafc;border:1px solid var(--c-border);border-radius:14px;padding:18px 20px;">
+                        <div style="font-size:0.78rem;font-weight:800;color:var(--c-dark);margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                            <i class="bi bi-info-circle" style="color:var(--c-accent)"></i> How it works
+                        </div>
+                        <ul style="margin:0;padding-left:18px;font-size:0.78rem;color:var(--c-muted);font-weight:500;line-height:1.9;">
+                            <li>Departments listed here appear in the <strong style="color:var(--c-dark)">Sign Up</strong> dropdown</li>
+                            <li>Rename by clicking the department name inline</li>
+                            <li>Deleting a department won't affect existing users</li>
+                            <li>All changes are saved together with the Save button</li>
+                        </ul>
+                    </div>
+                    <div style="background:var(--c-accent-light);border:1px solid #d4e04a;border-radius:14px;padding:14px 18px;display:flex;align-items:flex-start;gap:10px;">
+                        <i class="bi bi-database" style="color:#7a8500;font-size:1.1rem;margin-top:1px;"></i>
+                        <div>
+                            <div style="font-size:0.75rem;font-weight:800;color:#5a6200;margin-bottom:3px;">DB Table Required</div>
+                            <div style="font-size:0.72rem;color:#7a8500;font-weight:500;line-height:1.6;">Create <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">departments</code> table in Supabase<br>Columns: <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">id</code> (int8, PK), <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">name</code> (text, unique), <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">sort_order</code> (int4)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Section: Users & Access -->
     <div class="section" id="section-users">
         <div class="section-header">
@@ -288,6 +381,11 @@
         { key: 'bfinance',    label: 'Finance' },
     ];
 
+    // ── Departments State ──
+    let deptData = [];        // [{id, name, sort_order}] from DB
+    let deptChanges = {};     // key -> {_new, _delete, newName, origName, id}
+    let deptNewCounter = 0;   // temp key for new items
+
     let allUsers = [];
     let accessData = {};     // codename -> access row
     let accessChanges = {};  // codename -> changed fields
@@ -297,9 +395,142 @@
     async function loadPage() {
         await initLayout(SYSTEM_CONFIG);
         guardSystemSetting();
-        await Promise.all([loadUsers(), loadAccessData()]);
+        await Promise.all([loadUsers(), loadAccessData(), loadDepartments()]);
         buildDeptFilter();
         renderUsers();
+    }
+
+    // ── Departments ──
+    async function loadDepartments() {
+        const { data, error } = await supabaseClient
+            .from('departments')
+            .select('name, sort_order')
+            .order('sort_order', { ascending: true });
+        deptData = error ? [] : (data || []);
+        renderDepartments();
+    }
+
+    function renderDepartments() {
+        const container = document.getElementById('dept-list');
+
+        // key = "db_<origName>" for existing, "new_<n>" for staged new
+        let items = deptData.map(d => {
+            const key = `db_${d.name}`;
+            const ch  = deptChanges[key];
+            if (!ch)          return { ...d, _key: key, _state: 'clean' };
+            if (ch._delete)   return { ...d, _key: key, _state: 'deleted' };
+            return { ...d, name: ch.newName ?? d.name, _key: key, _state: 'edited' };
+        });
+
+        Object.entries(deptChanges).filter(([, v]) => v._new).forEach(([k, v]) => {
+            items.push({ name: v.newName, _key: k, _state: 'new' });
+        });
+
+        const activeCount = items.filter(i => i._state !== 'deleted').length;
+        document.getElementById('dept-count-badge').textContent = activeCount;
+
+        if (!items.length) {
+            container.innerHTML = `<div class="dept-empty"><i class="bi bi-building me-2"></i>No departments yet — add one above</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map(d => {
+            const isNew     = d._state === 'new';
+            const isDeleted = d._state === 'deleted';
+
+            const actionBtn = isDeleted
+                ? `<button class="btn-dept-undo" onclick="undoDeptDelete('${d._key}')">Undo</button>`
+                : `<button class="btn-dept-del" onclick="stageDeptDelete('${d._key}')" title="Remove"><i class="bi bi-trash3"></i></button>`;
+
+            return `
+            <div class="dept-item ${isNew ? 'is-new' : isDeleted ? 'is-deleted' : ''}" data-key="${d._key}">
+                <input class="dept-name-input" value="${(d.name || '').replace(/"/g,'&quot;')}" ${isDeleted ? 'disabled' : ''}
+                    oninput="onDeptRename('${d._key}', this.value)"
+                    onkeydown="if(event.key==='Enter')this.blur()"
+                    placeholder="Department name">
+                <div class="dept-item-actions">${actionBtn}</div>
+            </div>`;
+        }).join('');
+    }
+
+    function onDeptRename(key, value) {
+        if (!deptChanges[key]) {
+            const origName = key.startsWith('db_') ? key.slice(3) : value;
+            deptChanges[key] = { origName, newName: value };
+        } else {
+            deptChanges[key].newName = value;
+        }
+        markDirtyDept();
+    }
+
+    function stageDeptDelete(key) {
+        if (!deptChanges[key]) {
+            const origName = key.startsWith('db_') ? key.slice(3) : '';
+            deptChanges[key] = { origName };
+        }
+        deptChanges[key]._delete = true;
+        markDirtyDept();
+        renderDepartments();
+    }
+
+    function undoDeptDelete(key) {
+        if (deptChanges[key]?._new) {
+            delete deptChanges[key];
+        } else {
+            delete deptChanges[key]._delete;
+            if (!deptChanges[key].newName || deptChanges[key].newName === deptChanges[key].origName) {
+                delete deptChanges[key];
+            }
+        }
+        checkDirtyDept();
+        renderDepartments();
+    }
+
+    function showDeptNewRow() {
+        const row = document.getElementById('dept-new-row');
+        const input = document.getElementById('dept-new-input');
+        row.style.display = 'grid';
+        input.value = '';
+        input.focus();
+    }
+
+    function cancelDeptNewRow() {
+        document.getElementById('dept-new-row').style.display = 'none';
+        document.getElementById('dept-new-input').value = '';
+    }
+
+    function stageDeptAdd() {
+        const name = document.getElementById('dept-new-input').value.trim();
+        if (!name) return;
+        const key = `new_${++deptNewCounter}`;
+        deptChanges[key] = { _new: true, newName: name, origName: name };
+        cancelDeptNewRow();
+        markDirtyDept();
+        renderDepartments();
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') cancelDeptNewRow();
+    });
+
+    function markDirtyDept() {
+        document.getElementById('section-departments').classList.add('is-dirty');
+        document.getElementById('save-bar').classList.add('visible');
+    }
+
+    function checkDirtyDept() {
+        if (!Object.keys(deptChanges).length) {
+            document.getElementById('section-departments').classList.remove('is-dirty');
+            checkSaveBarVisible();
+        }
+    }
+
+    function checkSaveBarVisible() {
+        const anyDirty =
+            Object.keys(deptChanges).length > 0 ||
+            Object.keys(accessChanges).length > 0 ||
+            Object.keys(profileChanges).length > 0;
+        if (!anyDirty) document.getElementById('save-bar').classList.remove('visible');
     }
 
     function guardSystemSetting() {
@@ -522,8 +753,10 @@
     }
 
     function clearDirty() {
+        deptChanges = {};
         accessChanges = {};
         profileChanges = {};
+        document.getElementById('section-departments').classList.remove('is-dirty');
         document.getElementById('section-users').classList.remove('is-dirty');
         document.getElementById('save-bar').classList.remove('visible');
     }
@@ -590,6 +823,35 @@
         try {
             const errors = [];
 
+            // 0. Save department changes
+            let nextOrder = deptData.length
+                ? Math.max(...deptData.map(d => d.sort_order || 0)) + 1
+                : 1;
+
+            for (const [key, ch] of Object.entries(deptChanges)) {
+                if (ch._new) {
+                    const { error } = await supabaseClient
+                        .from('departments')
+                        .insert([{ name: ch.newName, sort_order: nextOrder++ }]);
+                    if (error) errors.push(`Dept add "${ch.newName}": ${error.message}`);
+                } else if (ch._delete) {
+                    const { error } = await supabaseClient
+                        .from('departments')
+                        .delete()
+                        .eq('name', ch.origName);
+                    if (error) errors.push(`Dept delete "${ch.origName}": ${error.message}`);
+                } else if (ch.newName && ch.newName !== ch.origName) {
+                    // rename = delete old + insert new (PK is name)
+                    const oldOrder = deptData.find(d => d.name === ch.origName)?.sort_order ?? nextOrder++;
+                    const { error: delErr } = await supabaseClient
+                        .from('departments').delete().eq('name', ch.origName);
+                    if (delErr) { errors.push(`Dept rename del "${ch.origName}": ${delErr.message}`); continue; }
+                    const { error: insErr } = await supabaseClient
+                        .from('departments').insert([{ name: ch.newName, sort_order: oldOrder }]);
+                    if (insErr) errors.push(`Dept rename ins "${ch.newName}": ${insErr.message}`);
+                }
+            }
+
             // 1. Save profile changes (codename, nick_name, full_name, employee_id, department)
             for (const ch of Object.values(profileChanges)) {
                 if (!ch._id) continue;
@@ -633,6 +895,10 @@
                 Swal.fire({ icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1200 });
                 clearDirty();
             }
+
+            // Reload departments to sync fresh data
+            await loadDepartments();
+
         } catch (e) {
             Swal.fire('Error', e.message, 'error');
         } finally {
