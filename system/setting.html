@@ -47,14 +47,14 @@
         /* ── Departments Section ── */
         .btn-add-dept { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 7px; margin-left: auto; }
         .btn-add-dept:hover { background: #0f172a; }
-        .dept-grid { display: grid; grid-template-columns: 1fr 1px 1fr; column-gap: 0; row-gap: 4px; }
-        .dept-divider { background: var(--c-border); margin: 4px 12px; }
-        .dept-item { display: flex; align-items: center; border: 1px solid transparent; border-radius: 10px; overflow: hidden; transition: border-color 0.15s, background 0.15s; }
+        .dept-grid { display: grid; grid-template-columns: 1fr 1px 1fr; column-gap: 0; row-gap: 2px; }
+        .dept-divider { background: var(--c-border); }
+        .dept-item { display: flex; align-items: center; border: 1px solid transparent; border-radius: 10px; overflow: hidden; transition: border-color 0.15s, background 0.15s; padding-left: 12px; }
         .dept-item:hover { border-color: var(--c-border); background: var(--c-bg); }
         .dept-item.is-new { border-color: #86efac !important; background: #f0fdf4; }
         .dept-item.is-deleted { opacity: 0.4; background: #fff5f5; border-color: #fca5a5 !important; pointer-events: none; }
         .dept-item.is-deleted .btn-dept-undo { pointer-events: all; }
-        .dept-name-input { flex: 1; border: none; outline: none; background: transparent; font-size: 0.88rem; font-weight: 600; color: var(--c-dark); padding: 10px 14px; font-family: inherit; min-width: 0; }
+        .dept-name-input { flex: 1; border: none; outline: none; background: transparent; font-size: 0.88rem; font-weight: 600; color: var(--c-dark); padding: 10px 10px 10px 0; font-family: inherit; min-width: 0; }
         .btn-dept-del { background: none; border: none; color: #d1d5db; cursor: pointer; padding: 8px 10px; transition: 0.2s; display: inline-flex; align-items: center; font-size: 0.9rem; flex-shrink: 0; }
         .btn-dept-del:hover { color: #ef4444; }
         .btn-dept-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 8px 10px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
