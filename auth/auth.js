@@ -11,18 +11,18 @@ function bxLoader(label) {
             </defs>
         </svg>
         <style>
-            .bx-loader { position:relative; width:100px; height:100px; margin:8px auto 16px; }
+            .bx-loader { position:relative; width:160px; height:160px; margin:12px auto 20px; }
             .bx-loader__arc { position:absolute; inset:0; width:100%; height:100%; animation:bx-rotate 1s linear infinite; }
-            .bx-loader__arc circle { fill:none; stroke:url(#bx-grad); stroke-width:7; stroke-linecap:round; stroke-dasharray:200; stroke-dashoffset:60; }
-            .bx-loader__logo { position:absolute; inset:0; width:56px; height:56px; object-fit:contain; margin:auto; top:0; left:0; right:0; bottom:0; }
+            .bx-loader__arc circle { fill:none; stroke:url(#bx-grad); stroke-width:6; stroke-linecap:round; stroke-dasharray:320; stroke-dashoffset:90; }
+            .bx-loader__logo { position:absolute; inset:0; width:80px; height:80px; object-fit:contain; margin:auto; top:0; left:0; right:0; bottom:0; }
             @keyframes bx-rotate { to { transform: rotate(360deg); } }
-            .bx-label { font-size:1rem; font-weight:700; color:#1e293b; margin-top:4px; }
+            .bx-label { font-size:1.2rem; font-weight:700; color:#1e293b; margin-top:4px; }
         </style>
         <div class="bx-loader" role="status" aria-label="Loading">
             <svg class="bx-loader__arc" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="46"/>
             </svg>
-            <img class="bx-loader__logo" src="${LOGO_URL}" alt=""/>
+            <img class="bx-loader__logo" src="/favicon.ico" alt=""/>
         </div>
         <div class="bx-label">${label}</div>
     `;
