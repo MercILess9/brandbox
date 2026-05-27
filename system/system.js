@@ -177,9 +177,9 @@ async function renderSystemMenu(config) {
 }
 
 function injectAssets() {
-    if (typeof LOGO_URL !== 'undefined' && !document.querySelector('link[rel="icon"]')) {
+    if (typeof FAVICON_URL !== 'undefined' && !document.querySelector('link[rel="icon"]')) {
         const favicon = document.createElement('link');
-        favicon.rel = 'icon'; favicon.type = 'image/png'; favicon.href = LOGO_URL;
+        favicon.rel = 'icon'; favicon.type = 'image/png'; favicon.href = FAVICON_URL;
         document.head.appendChild(favicon);
     }
 
