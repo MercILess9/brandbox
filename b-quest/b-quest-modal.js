@@ -628,7 +628,6 @@ const BQuestApp = (() => {
             el('b-quest-modal-id').value = '';
             el('btn-submit-icon').className  = 'bi bi-plus-circle-fill';
             el('btn-submit-label').textContent = 'Create Task';
-            el('modal-owner-display').innerText = getBxUser()?.codename || '—';
             show('btn-delete-task', false);
 
             State.roles.forEach(role => {
@@ -671,7 +670,6 @@ const BQuestApp = (() => {
                 fillFormData(dupData);
                 el('modal-owner-display').innerText = ownerName;
                 el('b-quest-modal-taskname').value = dupData.task_name;
-                console.log('[DUP shown] owner=', ownerName, 'task=', dupData.task_name, 'el=', el('modal-owner-display').innerText);
             }, 50);
         },
         closeSearchOverlay: () => show('bq-search-overlay', false),
