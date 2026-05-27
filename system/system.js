@@ -179,7 +179,7 @@ async function renderSystemMenu(config) {
 function injectAssets() {
     if (typeof FAVICON_URL !== 'undefined') {
         let favicon = document.querySelector('link[rel="icon"]');
-        if (!favicon) { favicon = document.createElement('link'); favicon.rel = 'icon'; favicon.type = 'image/png'; document.head.appendChild(favicon); }
+        if (!favicon) { favicon = document.createElement('link'); favicon.rel = 'icon'; favicon.type = 'image/x-icon'; document.head.appendChild(favicon); }
         favicon.href = FAVICON_URL + '?v=2';
     }
 
