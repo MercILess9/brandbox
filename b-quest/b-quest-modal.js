@@ -1,6 +1,6 @@
 const B_QUEST_MODAL_HTML = `
 <style>
-    #b-quest-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.14); min-height: 800px; }
+    #b-quest-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.14); }
     .bq-modal-1000 { max-width: 1000px !important; }
 
     /* ── Header ── */
@@ -13,7 +13,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-owner-name { font-size: 0.82rem; font-weight: 700; color: #1e293b; line-height: 1; }
 
     /* ── Body ── */
-    .bq-modern-body { padding: 20px 28px; min-height: 700px; }
+    .bq-modern-body { padding: 20px 28px; min-height: 560px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
     /* Right column — grows naturally; left glass-card stretches to match via flex */
