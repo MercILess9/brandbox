@@ -13,7 +13,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-owner-name { font-size: 0.82rem; font-weight: 700; color: #1e293b; line-height: 1; }
 
     /* ── Body ── */
-    .bq-modern-body { padding: 20px 28px; min-height: 560px; }
+    .bq-modern-body { padding: 20px 28px; }
     .bq-main-row { display: flex; align-items: stretch; }
 
     /* Right column — grows naturally; left glass-card stretches to match via flex */
