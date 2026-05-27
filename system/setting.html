@@ -144,6 +144,7 @@
         .usr-empid-cell { display: flex; justify-content: center; align-items: center; }
         .inline-input.center { text-align: center; }
         .usr-dept-cell { display: flex; align-items: center; justify-content: center; }
+        .usr-dept-cell select.inline-input { appearance: none; cursor: pointer; padding-right: 8px; }
 
         .check-cell { display: flex; justify-content: center; align-items: center; }
         .action-cell { display: flex; justify-content: center; align-items: center; gap: 2px; }
@@ -609,8 +610,10 @@
                         onchange="onProfileChange('${u.id}','full_name',this.value)">
                 </div>
                 <div class="usr-dept-cell">
-                    <input class="inline-input center" value="${(u.department || '').replace(/"/g,'&quot;')}" placeholder="Department" ${dis}
-                        onchange="onProfileChange('${u.id}','department',this.value)">
+                    <select class="inline-input center" ${dis} onchange="onProfileChange('${u.id}','department',this.value)">
+                        <option value="">— Select —</option>
+                        ${deptData.map(d => `<option value="${d.name}" ${u.department === d.name ? 'selected' : ''}>${d.name}</option>`).join('')}
+                    </select>
                 </div>
                 <div class="usr-empid-cell">
                     <span class="inline-input center" style="display:block;color:var(--c-muted);cursor:default;">${u.employee_id || '-'}</span>
