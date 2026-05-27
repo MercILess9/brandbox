@@ -13,10 +13,11 @@ system/
   config.js         — Supabase credentials, SITE_URL, LOGO_URL
   system.js         — Auth guard, layout init, header inject, shared utils
   header.html       — Fixed header template (injected via JS)
+  setting.html      — System Settings (Users & Access + Departments)
 auth/
   auth.js           — Login / Signup / Forgot / Reset password functions
-  *.html            — Auth pages
-index.html          — Portal home (project cards grid)
+  *.html            — Auth pages (signup.html loads departments from DB)
+index.html          — Portal home (project cards grid + top-right gear/logout icons)
 b-quest/
   b-quest.js        — Config, permission loader, God mode logic
   b-quest-modal.js  — Task create/edit modal (IIFE: BQuestApp)
@@ -31,10 +32,12 @@ vercel.json
 | Table | Key Columns |
 |---|---|
 | `profiles` | id (uuid), codename, employee_id, nick_name, full_name, email, department, level, created_at |
+| `departments` | name (text, PK) — list of departments, RLS: SELECT open to authenticated |
 | `b-quest-list` | id, account_name, opportunity_name, task_name, detail, link, publish_date, designer, designer_weight, designer_type, designer_deadline, designer_assign, designer_status, creative, creative_weight, creative_type, creative_deadline, creative_assign, creative_status, owner, create_date, last_update |
 | `b-quest-work` | role, work, weight |
 | `b_quest_capacity` | role, max_capacity |
 | `b-quest-setting` | codename (PK), ae, creative, designer, new, edit, delete, assign, setting |
+| `setting_project` | codename (PK), bquest, bdashboard, baccount, bcommission, bfinance, system_setting |
 
 ## Auth & Permission System
 
@@ -50,6 +53,10 @@ vercel.json
 - ROLE: `ae`, `creative`, `designer`
 - TASK: `new`, `edit`, `delete`
 - ADMIN: `assign`, `setting`
+
+**System-level access (`setting_project`):**
+- Per-project toggles: `bquest`, `bdashboard`, `baccount`, `bcommission`, `bfinance`
+- `system_setting` — access to `/system/setting.html`
 
 ## JS Architecture Rules
 
@@ -104,15 +111,36 @@ loadPage().then(() => observer.observe(triggerEl));
 
 Users are always shown as **codename** (nickname). Format reference: `codename : nickname (employee_id)`
 
+## index.html — Portal Home
+
+- Top-right: gear icon (⚙️ → `/system/setting.html`) shown only to god/system_setting users; logout icon shown to all
+- Project cards rendered from `setting_project` access data
+- God user sees all projects + gear icon automatically
+
+## System Settings (`/system/setting.html`)
+
+Two sections:
+1. **Departments** — CRUD list, 2-column grid, add inline in grid, sort a-z after save. Data from `departments` table (name PK). Staging pattern same as b-quest-settings.
+2. **Users & Access** — manage profiles + per-project toggles + system_setting flag. Department cell is dropdown from `departments` DB.
+
+## Departments Table
+
+- Table: `departments` — columns: `name` (text, PK only — no id, no sort_order)
+- RLS: `SELECT` open to authenticated (`USING (true)`)
+- Write policy: authenticated users (or manage via SQL Editor)
+- Sorted a-z by `name` on query
+- Used in: `system/setting.html` (manage), `auth/signup.html` (dropdown), Users & Access dept dropdown
+
 ## Adding a New Project
 
-1. Add a card in `index.html` (app-grid section)
+1. Add a card in `index.html` (app-grid section) + add key to `PROJECTS` array
 2. Create a new folder `/<project-name>/`
 3. Create `<project-name>.js` — config object, `loadPerms()`, `canProject(perm)`, `canProjectEditRole(role)` (follow `b-quest.js`)
 4. Create `<project-name>.css` — `:root` variables + shared styles (follow `b-quest.css`)
 5. Create HTML pages, each loading: supabase → sweetalert2 → config.js → system.js → `<project-name>.js` → `<project-name>.css`
 6. Create a settings table in Supabase: `<project>-setting` with columns: codename (PK), role columns, task columns (new/edit/delete), admin columns (assign/setting)
-7. sessionStorage key: `bx_perms_<project>` — system.js clears all `bx_perms_*` keys on index automatically
+7. Add column to `setting_project` table for the new project key
+8. sessionStorage key: `bx_perms_<project>` — system.js clears all `bx_perms_*` keys on index automatically
 
 ## Projects Status
 
@@ -121,6 +149,7 @@ Users are always shown as **codename** (nickname). Format reference: `codename :
 | B-QUEST | Live |
 | DASHBOARD | Coming Soon |
 | B-ACCOUNT | Coming Soon |
+| COMMISSION | Coming Soon |
 | FINANCE | Coming Soon |
 
 ## Planned Features (Future)
