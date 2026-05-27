@@ -41,10 +41,10 @@ const B_QUEST_MODAL_HTML = `
     #card-designer.active .role-card-header { background: #eff6ff; }
     #card-creative.active .role-card-header { background: #f5f3ff; }
 
-    .role-card-header { padding: 0 18px; height: 52px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 18px; transition: background 0.15s, box-shadow 0.15s; }
+    .role-card-header { padding: 14px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 18px; transition: background 0.15s, box-shadow 0.15s; }
     .role-card:not(.active):not(.disabled) .role-card-header:hover { background: #f1f5f9; box-shadow: inset 0 -2px 0 #e2e8f0; }
     .role-card.active .role-card-header { border-radius: 18px 18px 0 0; }
-    .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 5px; }
+    .role-card-title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 5px; line-height: 1; }
     #card-designer .role-card-title i.role-icon { color: #3b82f6; }
     #card-creative .role-card-title i.role-icon { color: #8b5cf6; }
     /* Toggle */
