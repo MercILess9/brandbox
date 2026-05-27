@@ -17,7 +17,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-main-row { display: flex; align-items: stretch; }
 
     /* Right column — grows naturally; left glass-card stretches to match via flex */
-    .bq-role-col { height: 100%; min-height: 460px; }
+    .bq-role-col { height: 100%; min-height: 400px; }
 
     /* Left card */
     .bq-glass-card { background: #fff; border-radius: 18px; padding: 20px; border: 1px solid #eef2f7; height: 100%; display: flex; flex-direction: column; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.04); }
