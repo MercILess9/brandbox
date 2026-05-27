@@ -385,8 +385,8 @@
     async function loadDepartments() {
         const { data, error } = await supabaseClient
             .from('departments')
-            .select('name, sort_order')
-            .order('sort_order', { ascending: true });
+            .select('name')
+            .order('name', { ascending: true });
         deptData = error ? [] : (data || []);
         renderDepartments();
     }
@@ -804,15 +804,11 @@
             const errors = [];
 
             // 0. Save department changes
-            let nextOrder = deptData.length
-                ? Math.max(...deptData.map(d => d.sort_order || 0)) + 1
-                : 1;
-
             for (const [key, ch] of Object.entries(deptChanges)) {
                 if (ch._new) {
                     const { error } = await supabaseClient
                         .from('departments')
-                        .insert([{ name: ch.newName, sort_order: nextOrder++ }]);
+                        .insert([{ name: ch.newName }]);
                     if (error) errors.push(`Dept add "${ch.newName}": ${error.message}`);
                 } else if (ch._delete) {
                     const { error } = await supabaseClient
@@ -822,12 +818,11 @@
                     if (error) errors.push(`Dept delete "${ch.origName}": ${error.message}`);
                 } else if (ch.newName && ch.newName !== ch.origName) {
                     // rename = delete old + insert new (PK is name)
-                    const oldOrder = deptData.find(d => d.name === ch.origName)?.sort_order ?? nextOrder++;
                     const { error: delErr } = await supabaseClient
                         .from('departments').delete().eq('name', ch.origName);
                     if (delErr) { errors.push(`Dept rename del "${ch.origName}": ${delErr.message}`); continue; }
                     const { error: insErr } = await supabaseClient
-                        .from('departments').insert([{ name: ch.newName, sort_order: oldOrder }]);
+                        .from('departments').insert([{ name: ch.newName }]);
                     if (insErr) errors.push(`Dept rename ins "${ch.newName}": ${insErr.message}`);
                 }
             }

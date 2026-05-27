@@ -50,7 +50,7 @@ const B_QUEST_MODAL_HTML = `
     /* Toggle */
     .bq-role-toggle-wrap { display: flex; align-items: center; gap: 7px; flex-shrink: 0; line-height: 1; }
 
-    .role-card-body { max-height: 0; padding: 0 18px; transition: all 0.35s ease; visibility: hidden; opacity: 0; }
+    .role-card-body { max-height: 0; padding: 0; overflow: hidden; transition: all 0.35s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 14px 16px 16px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
 
     /* Assign badge — interactive pill in role card header */
