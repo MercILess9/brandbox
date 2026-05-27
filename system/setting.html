@@ -45,35 +45,24 @@
         .dept-filter.active { border-color: #508faf; color: #508faf; font-weight: 700; }
 
         /* ── Departments Section ── */
-        .dept-card { background: #fff; border: 1px solid var(--c-border); border-radius: 18px; overflow: hidden; }
-        .dept-card-header { background: #eff6ff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .dept-card-title { font-size: 1rem; font-weight: 800; color: #2563eb; display: flex; align-items: center; gap: 8px; }
-        .dept-card-title i { font-size: 1rem; }
         .btn-add-dept { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 7px; margin-left: auto; }
         .btn-add-dept:hover { background: #0f172a; }
-        .dept-table { width: 100%; border-collapse: collapse; }
-        .dept-table-head th { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.6px; padding: 10px 20px 8px; text-align: left; border-bottom: 1px solid var(--c-border); }
-        .dept-table-head th.col-action { width: 44px; }
-        .dept-item { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
-        .dept-item:last-child { border-bottom: none; }
-        .dept-item:hover { background: #fafbff; }
-        .dept-item.is-new { background: #f0fdf4; }
-        .dept-item.is-deleted { opacity: 0.4; background: #fff5f5; pointer-events: none; }
+        .dept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .dept-item { display: flex; align-items: center; border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; transition: border-color 0.15s; }
+        .dept-item:hover { border-color: #94a3b8; }
+        .dept-item.is-new { border-color: #86efac; background: #f0fdf4; }
+        .dept-item.is-deleted { opacity: 0.4; background: #fff5f5; border-color: #fca5a5; pointer-events: none; }
         .dept-item.is-deleted .btn-dept-undo { pointer-events: all; }
-        .dept-item td { padding: 0; vertical-align: middle; }
-        .dept-item td.col-action { text-align: center; padding-right: 8px; }
-        .dept-name-input { border: 1px solid transparent; border-radius: 10px; outline: none; background: transparent; font-size: 0.9rem; font-weight: 600; color: var(--c-dark); padding: 10px 14px; width: 100%; font-family: inherit; transition: 0.2s; }
-        .dept-name-input:hover { border-color: var(--c-border); background: var(--c-bg); }
-        .dept-name-input:focus { border-color: var(--c-border); background: var(--c-bg); }
-        .btn-dept-del { background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 6px 8px; border-radius: 7px; transition: 0.2s; display: inline-flex; align-items: center; font-size: 0.9rem; }
+        .dept-name-input { flex: 1; border: none; outline: none; background: transparent; font-size: 0.88rem; font-weight: 600; color: var(--c-dark); padding: 10px 14px; font-family: inherit; min-width: 0; }
+        .btn-dept-del { background: none; border: none; border-left: 1px solid var(--c-border); color: #cbd5e1; cursor: pointer; padding: 8px 10px; transition: 0.2s; display: inline-flex; align-items: center; font-size: 0.9rem; flex-shrink: 0; }
         .btn-dept-del:hover { background: #fee2e2; color: #ef4444; }
-        .btn-dept-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; }
+        .btn-dept-undo { background: #f1f5f9; border: none; border-left: 1px solid var(--c-border); color: var(--c-slate); cursor: pointer; padding: 8px 10px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
         .btn-dept-undo:hover { background: #e2e8f0; }
-        .dept-empty { padding: 32px 20px; text-align: center; color: var(--c-muted); font-size: 0.82rem; font-weight: 600; }
-        .dept-new-row { display: none; align-items: center; gap: 6px; padding: 10px 12px; border-top: 1px dashed var(--c-border); }
+        .dept-empty { grid-column: 1 / -1; padding: 32px 20px; text-align: center; color: var(--c-muted); font-size: 0.82rem; font-weight: 600; }
+        .dept-new-row { display: none; align-items: center; gap: 6px; padding: 10px 0 0; }
         .dept-new-row.show { display: flex; }
         .dept-new-input { flex: 1; border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 10px; font-size: 0.84rem; font-weight: 600; outline: none; font-family: inherit; background: #fff; transition: 0.2s; }
-        .dept-new-input:focus { border-color: #3b82f6; }
+        .dept-new-input:focus { border-color: var(--c-accent); }
         .btn-dept-confirm { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 7px; padding: 7px 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px; }
         .btn-dept-confirm:hover { background: #0f172a; }
         .btn-dept-cancel { background: #f1f5f9; color: var(--c-muted); border: none; border-radius: 7px; padding: 7px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
@@ -226,26 +215,18 @@
     </div>
 
     <!-- Section: Departments -->
-    <div class="section" id="section-departments" style="max-width:50%;">
+    <div class="section" id="section-departments">
         <div class="section-header">
             <div class="section-title">
                 <i class="bi bi-building"></i> Departments
                 <span class="dirty-dot"></span>
             </div>
             <button class="btn-add-dept" onclick="showDeptNewRow()">
-                <i class="bi bi-person-plus-fill"></i> Add Department
+                <i class="bi bi-plus-lg"></i> Add Department
             </button>
         </div>
-        <div style="padding: 0 24px 20px;">
-            <table class="dept-table">
-                <thead class="dept-table-head">
-                    <tr>
-                        <th>Department Name</th>
-                        <th class="col-action"></th>
-                    </tr>
-                </thead>
-                <tbody id="dept-list"></tbody>
-            </table>
+        <div style="padding: 16px 24px 20px;">
+            <div id="dept-list" class="dept-grid"></div>
             <div id="dept-new-row" class="dept-new-row">
                 <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
                     onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
@@ -404,7 +385,7 @@
         if (badge) badge.textContent = activeCount;
 
         if (!items.length) {
-            container.innerHTML = `<tr><td colspan="2" class="dept-empty"><i class="bi bi-building me-2"></i>No departments yet — click + Add</td></tr>`;
+            container.innerHTML = `<div class="dept-empty"><i class="bi bi-building me-2"></i>No departments yet — click + Add</div>`;
             return;
         }
 
@@ -419,15 +400,13 @@
                 : `<button class="btn-dept-del" onclick="stageDeptDelete('${safeKey}')" title="Remove"><i class="bi bi-trash3"></i></button>`;
 
             return `
-            <tr class="dept-item ${isNew ? 'is-new' : isDeleted ? 'is-deleted' : ''}" data-key="${safeKey}">
-                <td>
-                    <input class="dept-name-input" value="${safeName}" ${isDeleted ? 'disabled' : ''}
-                        oninput="onDeptRename('${safeKey}', this.value)"
-                        onkeydown="if(event.key==='Enter')this.blur()"
-                        placeholder="Department name">
-                </td>
-                <td class="col-action">${actionBtn}</td>
-            </tr>`;
+            <div class="dept-item ${isNew ? 'is-new' : isDeleted ? 'is-deleted' : ''}" data-key="${safeKey}">
+                <input class="dept-name-input" value="${safeName}" ${isDeleted ? 'disabled' : ''}
+                    oninput="onDeptRename('${safeKey}', this.value)"
+                    onkeydown="if(event.key==='Enter')this.blur()"
+                    placeholder="Department name">
+                ${actionBtn}
+            </div>`;
         }).join('');
     }
 
