@@ -406,7 +406,8 @@
         });
 
         const activeCount = items.filter(i => i._state !== 'deleted').length;
-        document.getElementById('dept-count-badge').textContent = activeCount;
+        const badge = document.getElementById('dept-count-badge');
+        if (badge) badge.textContent = activeCount;
 
         if (!items.length) {
             container.innerHTML = `<tr><td colspan="2" class="dept-empty"><i class="bi bi-building me-2"></i>No departments yet — click + Add</td></tr>`;
