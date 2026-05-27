@@ -177,10 +177,10 @@ async function renderSystemMenu(config) {
 }
 
 function injectAssets() {
-    if (typeof FAVICON_URL !== 'undefined' && !document.querySelector('link[rel="icon"]')) {
-        const favicon = document.createElement('link');
-        favicon.rel = 'icon'; favicon.type = 'image/png'; favicon.href = FAVICON_URL;
-        document.head.appendChild(favicon);
+    if (typeof FAVICON_URL !== 'undefined') {
+        let favicon = document.querySelector('link[rel="icon"]');
+        if (!favicon) { favicon = document.createElement('link'); favicon.rel = 'icon'; favicon.type = 'image/png'; document.head.appendChild(favicon); }
+        favicon.href = FAVICON_URL + '?v=2';
     }
 
     const links = [
