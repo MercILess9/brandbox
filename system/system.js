@@ -177,13 +177,7 @@ async function renderSystemMenu(config) {
 }
 
 function injectAssets() {
-    if (typeof FAVICON_URL !== 'undefined') {
-        let favicon = document.querySelector('link[rel="icon"]');
-        if (!favicon) { favicon = document.createElement('link'); favicon.rel = 'icon'; favicon.type = 'image/x-icon'; document.head.appendChild(favicon); }
-        favicon.href = FAVICON_URL + '?v=2';
-    }
-
-    const links = [
+const links = [
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
         "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     ];
