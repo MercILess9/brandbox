@@ -32,7 +32,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-search-btn:hover { background: #f4f7a1; color: #7a8500; border-color: #bdc432; }
 
     /* ── Role Cards ── */
-    .role-card { background: #fff; border-radius: 18px; border: 1.5px solid #eef2f7; margin-bottom: 10px; overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .role-card { background: #fff; border-radius: 18px; border: 1.5px solid #eef2f7; margin-bottom: 16px; overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .role-card.disabled { opacity: 0.7; background: #f8fafc; box-shadow: none; }
 
     /* Active state: Designer = blue, Creative = purple */
@@ -48,7 +48,7 @@ const B_QUEST_MODAL_HTML = `
     #card-designer .role-card-title i.role-icon { color: #3b82f6; }
     #card-creative .role-card-title i.role-icon { color: #8b5cf6; }
     /* Toggle */
-    .bq-role-toggle-wrap { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    .bq-role-toggle-wrap { display: flex; align-items: center; gap: 7px; flex-shrink: 0; line-height: 1; }
 
     .role-card-body { max-height: 0; padding: 0 18px; transition: all 0.35s ease; visibility: hidden; opacity: 0; }
     .role-card.active .role-card-body { max-height: 450px; padding: 14px 16px 16px; border-top: 1px solid #f1f5f9; visibility: visible; opacity: 1; }
@@ -670,6 +670,7 @@ const BQuestApp = (() => {
                 fillFormData(dupData);
                 el('modal-owner-display').innerText = ownerName;
                 el('b-quest-modal-taskname').value = dupData.task_name;
+                console.log('[DUP shown] owner=', ownerName, 'task=', dupData.task_name, 'el=', el('modal-owner-display').innerText);
             }, 50);
         },
         closeSearchOverlay: () => show('bq-search-overlay', false),
