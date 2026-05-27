@@ -34,6 +34,7 @@ const B_QUEST_MODAL_HTML = `
     /* ── Role Cards ── */
     .role-card { background: #fff; border-radius: 18px; border: 1.5px solid #eef2f7; margin-bottom: 16px; overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .role-card.disabled { opacity: 0.7; background: #f8fafc; box-shadow: none; }
+    .role-card.disabled .role-card-body { display: none; }
 
     /* Active state: Designer = blue, Creative = purple */
     #card-designer.active { border-color: #bfdbfe; border-left: 3px solid #3b82f6; box-shadow: 0 4px 16px rgba(59,130,246,0.1); }
