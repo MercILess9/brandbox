@@ -85,7 +85,7 @@ const B_QUEST_MODAL_HTML = `
     .bq-cap-fill { height: 100%; border-radius: 10px; transition: width 0.4s ease, background-color 0.3s; }
 
     /* Toggle */
-    .bq-toggle { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
+    .bq-toggle { position: relative; display: flex; align-items: center; width: 34px; height: 18px; margin: 0; }
     .bq-toggle input { opacity: 0; width: 0; height: 0; }
     .bq-slider { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; transition: .3s; border-radius: 34px; }
     .bq-slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
