@@ -45,9 +45,6 @@
         .dept-filter.active { border-color: #508faf; color: #508faf; font-weight: 700; }
 
         /* ── Departments Section ── */
-        .dept-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        @media (max-width: 680px) { .dept-two-col { grid-template-columns: 1fr; } }
-
         /* Table */
         .dept-table { width: 100%; border-collapse: collapse; }
         .dept-table-head { background: var(--c-bg); border-radius: 10px; }
@@ -244,48 +241,22 @@
             </button>
         </div>
         <div class="section-body" style="padding: 20px 24px;">
-            <div class="dept-two-col">
-                <!-- Left: list -->
-                <div>
-                    <div style="border:1px solid var(--c-border);border-radius:14px;overflow:hidden;">
-                        <table class="dept-table">
-                            <thead class="dept-table-head">
-                                <tr>
-                                    <th>Department Name</th>
-                                    <th class="col-action"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="dept-list"></tbody>
-                        </table>
-                        <!-- New row -->
-                        <div id="dept-new-row" class="dept-new-row">
-                            <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
-                                onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
-                            <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
-                            <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
-                        </div>
-                    </div>
-                    <div class="dept-hint"><i class="bi bi-info-circle me-1"></i>Click name to rename inline. Changes staged until Save.</div>
-                </div>
-                <!-- Right: info card -->
-                <div style="display:flex;flex-direction:column;gap:12px;">
-                    <div style="background:#f8fafc;border:1px solid var(--c-border);border-radius:14px;padding:18px 20px;">
-                        <div style="font-size:0.78rem;font-weight:800;color:var(--c-dark);margin-bottom:6px;display:flex;align-items:center;gap:6px;">
-                            <i class="bi bi-info-circle" style="color:var(--c-accent)"></i> How it works
-                        </div>
-                        <ul style="margin:0;padding-left:18px;font-size:0.78rem;color:var(--c-muted);font-weight:500;line-height:1.9;">
-                            <li>Departments listed here appear in the <strong style="color:var(--c-dark)">Sign Up</strong> dropdown</li>
-                            <li>Rename by clicking the department name inline</li>
-                            <li>Deleting a department won't affect existing users</li>
-                            <li>All changes are saved together with the Save button</li>
-                        </ul>
-                    </div>
-                    <div style="background:var(--c-accent-light);border:1px solid #d4e04a;border-radius:14px;padding:14px 18px;display:flex;align-items:flex-start;gap:10px;">
-                        <i class="bi bi-database" style="color:#7a8500;font-size:1.1rem;margin-top:1px;"></i>
-                        <div>
-                            <div style="font-size:0.75rem;font-weight:800;color:#5a6200;margin-bottom:3px;">DB Table Required</div>
-                            <div style="font-size:0.72rem;color:#7a8500;font-weight:500;line-height:1.6;">Create <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">departments</code> table in Supabase<br>Columns: <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">id</code> (int8, PK), <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">name</code> (text, unique), <code style="background:#fff;border-radius:4px;padding:1px 5px;font-weight:700;">sort_order</code> (int4)</div>
-                        </div>
+            <div style="max-width:520px;">
+                <div style="border:1px solid var(--c-border);border-radius:14px;overflow:hidden;">
+                    <table class="dept-table">
+                        <thead class="dept-table-head">
+                            <tr>
+                                <th>Department Name</th>
+                                <th class="col-action"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="dept-list"></tbody>
+                    </table>
+                    <div id="dept-new-row" class="dept-new-row">
+                        <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
+                            onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
+                        <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
+                        <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
                     </div>
                 </div>
             </div>
