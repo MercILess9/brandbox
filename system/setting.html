@@ -426,6 +426,14 @@
     }
 
     function stageDeptDelete(key) {
+        // new item (not in DB yet) — just remove from changes
+        if (deptChanges[key]?._new) {
+            delete deptChanges[key];
+            checkDirtyDept();
+            renderDepartments();
+            return;
+        }
+        // existing DB item — mark for deletion
         if (!deptChanges[key]) {
             const origName = key.startsWith('db_') ? key.slice(3) : '';
             deptChanges[key] = { origName };
