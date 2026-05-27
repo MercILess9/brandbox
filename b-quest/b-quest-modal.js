@@ -1,6 +1,6 @@
 const B_QUEST_MODAL_HTML = `
 <style>
-    #b-quest-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.14); }
+    #b-quest-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.14); min-height: 800px; }
     .bq-modal-1000 { max-width: 1000px !important; }
 
     /* ── Header ── */

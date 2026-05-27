@@ -49,8 +49,8 @@
         .dept-card-header { background: #eff6ff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
         .dept-card-title { font-size: 1rem; font-weight: 800; color: #2563eb; display: flex; align-items: center; gap: 8px; }
         .dept-card-title i { font-size: 1rem; }
-        .btn-add-dept { background: #3b82f6; color: #fff; border: none; border-radius: 10px; padding: 7px 16px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-add-dept:hover { background: #2563eb; }
+        .btn-add-dept { background: var(--c-dark); color: var(--c-accent); border: none; border-radius: 12px; padding: 9px 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 7px; margin-left: auto; }
+        .btn-add-dept:hover { background: #0f172a; }
         .dept-table { width: 100%; border-collapse: collapse; }
         .dept-table-head th { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.6px; padding: 10px 20px 8px; text-align: left; border-bottom: 1px solid var(--c-border); }
         .dept-table-head th.col-action { width: 44px; }
@@ -231,32 +231,25 @@
                 <i class="bi bi-building"></i> Departments
                 <span class="dirty-dot"></span>
             </div>
+            <button class="btn-add-dept" onclick="showDeptNewRow()">
+                <i class="bi bi-person-plus-fill"></i> Add Department
+            </button>
         </div>
-        <div style="padding: 20px 24px 24px;">
-            <div class="dept-card">
-                <div class="dept-card-header">
-                    <div class="dept-card-title">
-                        <i class="bi bi-building-fill"></i> Department
-                    </div>
-                    <button class="btn-add-dept" onclick="showDeptNewRow()">
-                        <i class="bi bi-plus-lg"></i> Add
-                    </button>
-                </div>
-                <table class="dept-table">
-                    <thead class="dept-table-head">
-                        <tr>
-                            <th>Department Name</th>
-                            <th class="col-action"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="dept-list"></tbody>
-                </table>
-                <div id="dept-new-row" class="dept-new-row">
-                    <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
-                        onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
-                    <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
-                    <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
-                </div>
+        <div style="padding: 0 24px 20px;">
+            <table class="dept-table">
+                <thead class="dept-table-head">
+                    <tr>
+                        <th>Department Name</th>
+                        <th class="col-action"></th>
+                    </tr>
+                </thead>
+                <tbody id="dept-list"></tbody>
+            </table>
+            <div id="dept-new-row" class="dept-new-row">
+                <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
+                    onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
+                <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
+                <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
             </div>
         </div>
     </div>
