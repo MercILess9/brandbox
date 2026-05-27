@@ -29,7 +29,7 @@ async function handleLogin(email, password) {
 
 async function handleSignup(email, password, metadata) {
     try {
-        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:56px;object-fit:contain;margin-bottom:16px;"><br><strong style="font-size:1.1rem;">Creating Account...</strong>`, showConfirmButton: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:56px;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto;"><div style="font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:20px;">Creating Account...</div><div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#bdc432;border-radius:50%;animation:bx-spin 0.7s linear infinite;margin:0 auto;"></div><style>@keyframes bx-spin{to{transform:rotate(360deg)}}</style>`, showConfirmButton: false, allowOutsideClick: false });
 
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
@@ -62,7 +62,7 @@ async function handleSignup(email, password, metadata) {
 
 async function handleForgotPassword(email) {
     try {
-        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:56px;object-fit:contain;margin-bottom:16px;"><br><strong style="font-size:1.1rem;">Processing...</strong>`, showConfirmButton: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:56px;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto;"><div style="font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:20px;">Processing...</div><div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#bdc432;border-radius:50%;animation:bx-spin 0.7s linear infinite;margin:0 auto;"></div><style>@keyframes bx-spin{to{transform:rotate(360deg)}}</style>`, showConfirmButton: false, allowOutsideClick: false });
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/auth/reset-password.html',
         });
