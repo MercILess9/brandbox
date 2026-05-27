@@ -29,7 +29,7 @@ async function handleLogin(email, password) {
 
 async function handleSignup(email, password, metadata) {
     try {
-        Swal.fire({ title: 'Creating Account...', showConfirmButton: false, allowOutsideClick: false, didOpen: (popup) => { Swal.showLoading(); const img = document.createElement('img'); img.src = LOGO_URL; img.style.cssText = 'height:40px;object-fit:contain;display:block;margin:0 auto 10px;'; const title = popup.querySelector('.swal2-title'); if (title) title.before(img); }});
+        Swal.fire({ title: 'Creating Account...', showConfirmButton: false, allowOutsideClick: false, imageUrl: LOGO_URL, imageWidth: 160, imageAlt: 'Brandbox', didOpen: () => Swal.showLoading() });
 
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
@@ -62,7 +62,7 @@ async function handleSignup(email, password, metadata) {
 
 async function handleForgotPassword(email) {
     try {
-        Swal.fire({ title: 'Processing...', showConfirmButton: false, allowOutsideClick: false, didOpen: (popup) => { Swal.showLoading(); const img = document.createElement('img'); img.src = LOGO_URL; img.style.cssText = 'height:40px;object-fit:contain;display:block;margin:0 auto 10px;'; const title = popup.querySelector('.swal2-title'); if (title) title.before(img); }});
+        Swal.fire({ title: 'Processing...', showConfirmButton: false, allowOutsideClick: false, imageUrl: LOGO_URL, imageWidth: 160, imageAlt: 'Brandbox', didOpen: () => Swal.showLoading() });
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/auth/reset-password.html',
         });
