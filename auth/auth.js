@@ -1,12 +1,39 @@
 
+// ── BX Loader HTML (ใช้เฉพาะ loading popup เท่านั้น) ──────────────────────
+function bxLoader(label) {
+    return `
+        <svg width="0" height="0" style="position:absolute">
+            <defs>
+                <linearGradient id="bx-grad" x1="0" x2="1">
+                    <stop offset="0%"   stop-color="#b8d137" stop-opacity="0"/>
+                    <stop offset="100%" stop-color="#b8d137" stop-opacity="1"/>
+                </linearGradient>
+            </defs>
+        </svg>
+        <style>
+            .bx-loader { position:relative; width:100px; height:100px; margin:8px auto 16px; }
+            .bx-loader__arc { position:absolute; inset:0; width:100%; height:100%; animation:bx-rotate 1s linear infinite; }
+            .bx-loader__arc circle { fill:none; stroke:url(#bx-grad); stroke-width:7; stroke-linecap:round; stroke-dasharray:200; stroke-dashoffset:60; }
+            .bx-loader__logo { position:absolute; inset:0; width:56px; height:56px; object-fit:contain; margin:auto; top:0; left:0; right:0; bottom:0; }
+            @keyframes bx-rotate { to { transform: rotate(360deg); } }
+            .bx-label { font-size:1rem; font-weight:700; color:#1e293b; margin-top:4px; }
+        </style>
+        <div class="bx-loader" role="status" aria-label="Loading">
+            <svg class="bx-loader__arc" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="46"/>
+            </svg>
+            <img class="bx-loader__logo" src="${LOGO_URL}" alt=""/>
+        </div>
+        <div class="bx-label">${label}</div>
+    `;
+}
+
+// ── Auth Functions ──────────────────────────────────────────────────────────
+
 async function handleLogin(email, password) {
     try {
         if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: 'Authenticating...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
+            Swal.fire({ html: bxLoader('Authenticating...'), showConfirmButton: false, allowOutsideClick: false });
         }
 
         const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -16,7 +43,7 @@ async function handleLogin(email, password) {
 
         if (error) throw error;
         notify("Success", "Welcome back!", "success");
-        
+
         setTimeout(() => {
             window.location.href = "/index.html";
         }, 1000);
@@ -29,14 +56,14 @@ async function handleLogin(email, password) {
 
 async function handleSignup(email, password, metadata) {
     try {
-        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:56px;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto;"><div style="font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:20px;">Creating Account...</div><div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#bdc432;border-radius:50%;animation:bx-spin 0.7s linear infinite;margin:0 auto;"></div><style>@keyframes bx-spin{to{transform:rotate(360deg)}}</style>`, showConfirmButton: false, allowOutsideClick: false });
+        Swal.fire({ html: bxLoader('Creating Account...'), showConfirmButton: false, allowOutsideClick: false });
 
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
-                emailRedirectTo: window.location.origin + '/auth/login.html', 
-                data: metadata 
+                emailRedirectTo: window.location.origin + '/auth/login.html',
+                data: metadata
             }
         });
 
@@ -62,7 +89,8 @@ async function handleSignup(email, password, metadata) {
 
 async function handleForgotPassword(email) {
     try {
-        Swal.fire({ html: `<img src="${LOGO_URL}" style="height:56px;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto;"><div style="font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:20px;">Processing...</div><div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#bdc432;border-radius:50%;animation:bx-spin 0.7s linear infinite;margin:0 auto;"></div><style>@keyframes bx-spin{to{transform:rotate(360deg)}}</style>`, showConfirmButton: false, allowOutsideClick: false });
+        Swal.fire({ html: bxLoader('Processing...'), showConfirmButton: false, allowOutsideClick: false });
+
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/auth/reset-password.html',
         });
@@ -81,10 +109,9 @@ async function handleForgotPassword(email) {
     }
 }
 
-// 4. ฟังก์ชันอัปเดตรหัสผ่านใหม่ (สำหรับใช้ในหน้า forgot-password.html ตอนเป็นโหมด Reset)
 async function handleUpdatePassword(newPassword) {
     try {
-        Swal.fire({ title: 'Updating...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ html: bxLoader('Updating...'), showConfirmButton: false, allowOutsideClick: false });
 
         const { error } = await supabaseClient.auth.updateUser({
             password: newPassword
@@ -104,4 +131,3 @@ async function handleUpdatePassword(newPassword) {
         Swal.fire("Error", friendly, "error");
     }
 }
-
