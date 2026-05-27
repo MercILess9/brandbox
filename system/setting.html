@@ -47,8 +47,7 @@
         /* ── Departments Section ── */
         /* Table */
         .dept-table { width: 100%; border-collapse: collapse; }
-        .dept-table-head { background: var(--c-bg); border-radius: 10px; }
-        .dept-table-head th { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.6px; padding: 8px 12px; text-align: left; }
+        .dept-table-head th { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.6px; padding: 10px 12px 8px; text-align: left; border-bottom: 1px solid var(--c-border); }
         .dept-table-head th.col-action { width: 44px; }
         .dept-item { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
         .dept-item:last-child { border-bottom: none; }
@@ -66,9 +65,7 @@
         .btn-dept-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; transition: 0.2s; white-space: nowrap; }
         .btn-dept-undo:hover { background: #e2e8f0; }
         .dept-empty { padding: 32px 16px; text-align: center; color: var(--c-muted); font-size: 0.8rem; font-weight: 600; }
-
-        /* Add row */
-        .dept-new-row { display: none; align-items: center; gap: 6px; padding: 8px 12px; border-top: 1px dashed var(--c-border); background: #fafbff; }
+        .dept-new-row { display: none; align-items: center; gap: 6px; padding: 8px 0 4px; }
         .dept-new-row.show { display: flex; }
         .dept-new-input { flex: 1; border: 1px solid var(--c-border); border-radius: 8px; padding: 7px 10px; font-size: 0.84rem; font-weight: 600; outline: none; font-family: inherit; background: #fff; transition: 0.2s; }
         .dept-new-input:focus { border-color: var(--c-accent); }
@@ -76,12 +73,9 @@
         .btn-dept-confirm:hover { background: #0f172a; }
         .btn-dept-cancel { background: #f1f5f9; color: var(--c-muted); border: none; border-radius: 7px; padding: 7px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-dept-cancel:hover { background: #e2e8f0; }
-
-        /* Header controls */
         .btn-add-dept { background: #3b82f6; color: #fff; border: none; border-radius: 10px; padding: 7px 16px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
         .btn-add-dept:hover { background: #2563eb; }
         .dept-count-badge { font-size: 0.72rem; font-weight: 700; color: var(--c-muted); background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 20px; padding: 2px 10px; }
-        .dept-hint { font-size: 0.72rem; color: var(--c-muted); font-weight: 500; padding: 8px 4px 0; }
 
         /* Users Table */
         /* Grid: Codename(130px) | NickName/FullName(190px) | Dept(1fr) | EmpID(100px) | Projects(80px x5) | System(80px) | Actions(44px) */
@@ -240,25 +234,21 @@
                 <i class="bi bi-plus-lg"></i> Add
             </button>
         </div>
-        <div class="section-body" style="padding: 20px 24px;">
-            <div style="max-width:520px;">
-                <div style="border:1px solid var(--c-border);border-radius:14px;overflow:hidden;">
-                    <table class="dept-table">
-                        <thead class="dept-table-head">
-                            <tr>
-                                <th>Department Name</th>
-                                <th class="col-action"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="dept-list"></tbody>
-                    </table>
-                    <div id="dept-new-row" class="dept-new-row">
-                        <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
-                            onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
-                        <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
-                        <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
-                    </div>
-                </div>
+        <div style="max-width:480px; padding: 0 24px 20px;">
+            <table class="dept-table">
+                <thead class="dept-table-head">
+                    <tr>
+                        <th>Department Name</th>
+                        <th class="col-action"></th>
+                    </tr>
+                </thead>
+                <tbody id="dept-list"></tbody>
+            </table>
+            <div id="dept-new-row" class="dept-new-row">
+                <input type="text" class="dept-new-input" id="dept-new-input" placeholder="Department name..."
+                    onkeydown="if(event.key==='Enter')stageDeptAdd();if(event.key==='Escape')cancelDeptNewRow();">
+                <button class="btn-dept-cancel" onclick="cancelDeptNewRow()"><i class="bi bi-x"></i></button>
+                <button class="btn-dept-confirm" onclick="stageDeptAdd()"><i class="bi bi-check-lg"></i> Add</button>
             </div>
         </div>
     </div>
@@ -387,6 +377,7 @@
             .from('departments')
             .select('name')
             .order('name', { ascending: true });
+        console.log('[Dept]', { data, error });
         deptData = error ? [] : (data || []);
         renderDepartments();
     }
