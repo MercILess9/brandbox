@@ -28,8 +28,8 @@ const B_QUEST_MODAL_HTML = `
     .bq-input-detail { flex-grow: 1; min-height: 100px; text-align: left !important; text-align-last: left !important; resize: none; padding-top: 10px; }
 
     /* Search button — icon-only, modern */
-    .bq-search-btn { width: 35px; height: 35px; flex-shrink: 0; border: 1px solid #e2e8f0; border-left: none; border-radius: 0 10px 10px 0; background: #fff; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; transition: 0.2s; }
-    .bq-search-btn:hover { background: #f4f7a1; color: #7a8500; border-color: #bdc432; }
+    .bq-search-btn { width: 44px; height: 35px; flex-shrink: 0; border: 1px solid #bdc432; border-left: none; border-radius: 0 10px 10px 0; background: #f4f7a1; color: #7a8500; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: 0.2s; }
+    .bq-search-btn:hover { background: #bdc432; color: #fff; border-color: #bdc432; }
 
     /* ── Role Cards ── */
     .role-card { background: #fff; border-radius: 18px; border: 1.5px solid #eef2f7; margin-bottom: 16px; overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
