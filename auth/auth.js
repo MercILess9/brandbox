@@ -16,7 +16,7 @@ function bxLoader(label) {
             .bx-loader__arc circle { fill:none; stroke:url(#bx-grad); stroke-width:6; stroke-linecap:round; stroke-dasharray:320; stroke-dashoffset:90; }
             .bx-loader__logo { position:absolute; inset:0; width:80px; height:80px; object-fit:contain; margin:auto; top:0; left:0; right:0; bottom:0; }
             @keyframes bx-rotate { to { transform: rotate(360deg); } }
-            .bx-label { font-size:1.2rem; font-weight:700; color:#1e293b; margin-top:4px; }
+            .bx-label { font-size:1.5rem; font-weight:700; color:#1e293b; margin-top:4px; }
         </style>
         <div class="bx-loader" role="status" aria-label="Loading">
             <svg class="bx-loader__arc" viewBox="0 0 100 100">
