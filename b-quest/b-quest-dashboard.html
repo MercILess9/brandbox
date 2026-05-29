@@ -906,8 +906,7 @@
                         const isOver = cap > 0 && w > cap;
                         const badges = tc > 0 ? `
                             <div class="cal-badges">
-                                <span class="cal-badge cal-badge-task">${tc}t</span>
-                                <span class="cal-badge ${isOver ? 'cal-badge-over' : 'cal-badge-w'}">w${w}</span>
+                                <span class="cal-badge ${isOver ? 'cal-badge-over' : 'cal-badge-task'}">${tc} task${tc > 1 ? 's' : ''}</span>
                             </div>` : '';
                         html += `<div class="cal-day ${cls}" data-date="${dateStr}" data-role="${prefix}">
                             <span class="cal-day-num">${dayNum}</span>
