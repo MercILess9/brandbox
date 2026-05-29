@@ -137,16 +137,16 @@
         @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
         /* ── Calendar Heatmap ── */
-        .cal-grid-wrap { padding: 14px 16px 16px; }
-        .cal-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
-        .cal-dow { font-size: 0.62rem; font-weight: 800; color: var(--c-muted); text-align: center; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 0; }
-        .cal-week-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+        .cal-grid-wrap { padding: 10px 14px 14px; }
+        .cal-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 3px; }
+        .cal-dow { font-size: 0.58rem; font-weight: 800; color: var(--c-muted); text-align: center; text-transform: uppercase; letter-spacing: 0.3px; padding: 2px 0; }
+        .cal-week-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 3px; }
         .cal-day {
-            aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+            aspect-ratio: 1; border-radius: 7px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; cursor: pointer;
             border: 1.5px solid transparent; transition: 0.15s; position: relative;
-            font-size: 0.7rem; font-weight: 700; color: var(--c-slate);
-            background: var(--c-bg);
+            font-size: 0.65rem; font-weight: 700; color: var(--c-slate);
+            background: var(--c-bg); padding: 2px 0;
         }
         .cal-day:hover { border-color: #cbd5e1; background: #f1f5f9; }
         .cal-day.cal-empty { background: transparent; cursor: default; pointer-events: none; }
@@ -338,40 +338,41 @@
     </div>
 
     <!-- 6. Calendar Heatmap -->
-    <div class="section">
-        <div class="section-header">
-            <div class="section-title"><i class="bi bi-calendar3-week-fill"></i> Calendar — Deadline Load</div>
-        </div>
-        <div class="section-body" style="padding:0">
-            <div class="two-col" style="gap:0">
-                <!-- Designer Calendar -->
-                <div class="sub-col" style="border-radius:0;border:none;border-right:1px solid var(--c-border)">
-                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                    <div class="cal-grid-wrap" id="cal-des"></div>
-                </div>
-                <!-- Creative Calendar -->
-                <div class="sub-col" style="border-radius:0;border:none;">
-                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                    <div class="cal-grid-wrap" id="cal-cre"></div>
-                </div>
+    <div class="section-title" style="padding:4px 0 2px;font-size:0.72rem;font-weight:800;color:var(--c-dark);text-transform:uppercase;letter-spacing:0.8px;display:flex;align-items:center;gap:8px;">
+        <i class="bi bi-calendar3-week-fill"></i> Calendar — Deadline Load
+    </div>
+    <div class="two-col">
+        <!-- Designer Calendar -->
+        <div class="section" style="margin:0">
+            <div class="sub-col-head sub-col-head-des" style="border-radius:20px 20px 0 0;border:none;padding:12px 18px;">
+                <i class="bi bi-brush-fill"></i> Designer
             </div>
-            <!-- Day Detail -->
-            <div class="day-detail" id="day-detail" style="display:none">
-                <div class="day-detail-head">
-                    <i class="bi bi-calendar-day"></i>
-                    <span>Tasks on</span>
-                    <span class="day-detail-date" id="day-detail-date">—</span>
-                </div>
-                <div class="day-detail-body">
-                    <div class="day-col">
-                        <div class="day-col-head day-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                        <div id="day-tasks-des"></div>
-                    </div>
-                    <div class="day-col">
-                        <div class="day-col-head day-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                        <div id="day-tasks-cre"></div>
-                    </div>
-                </div>
+            <div class="cal-grid-wrap" id="cal-des"></div>
+        </div>
+        <!-- Creative Calendar -->
+        <div class="section" style="margin:0">
+            <div class="sub-col-head sub-col-head-cre" style="border-radius:20px 20px 0 0;border:none;padding:12px 18px;">
+                <i class="bi bi-rocket-fill"></i> Creative
+            </div>
+            <div class="cal-grid-wrap" id="cal-cre"></div>
+        </div>
+    </div>
+
+    <!-- Day Detail -->
+    <div class="section" id="day-detail" style="display:none;margin:0">
+        <div class="day-detail-head">
+            <i class="bi bi-calendar-day"></i>
+            <span>Tasks on</span>
+            <span class="day-detail-date" id="day-detail-date">—</span>
+        </div>
+        <div class="day-detail-body">
+            <div class="day-col">
+                <div class="day-col-head day-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                <div id="day-tasks-des"></div>
+            </div>
+            <div class="day-col">
+                <div class="day-col-head day-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                <div id="day-tasks-cre"></div>
             </div>
         </div>
     </div>
