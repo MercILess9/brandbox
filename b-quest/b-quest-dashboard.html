@@ -134,6 +134,74 @@
         .col-empty { padding: 24px; text-align: center; color: var(--c-muted); font-size: 0.78rem; font-weight: 600; }
         .skel { background: #f1f5f9; border-radius: 8px; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+        /* ── Calendar Heatmap ── */
+        .cal-grid-wrap { padding: 14px 16px 16px; }
+        .cal-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+        .cal-dow { font-size: 0.62rem; font-weight: 800; color: var(--c-muted); text-align: center; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 0; }
+        .cal-week-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+        .cal-day {
+            aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer;
+            border: 1.5px solid transparent; transition: 0.15s; position: relative;
+            font-size: 0.7rem; font-weight: 700; color: var(--c-slate);
+            background: var(--c-bg);
+        }
+        .cal-day:hover { border-color: #cbd5e1; background: #f1f5f9; }
+        .cal-day.cal-empty { background: transparent; cursor: default; pointer-events: none; }
+        .cal-day.cal-today { border-color: var(--c-accent) !important; color: #5a6400; }
+        .cal-day.cal-selected { border-color: var(--c-dark) !important; box-shadow: 0 0 0 2px var(--c-dark); }
+        .cal-day.cal-selected.cal-today { border-color: var(--c-accent) !important; box-shadow: 0 0 0 2px var(--c-accent); }
+        .cal-day-num { line-height: 1; }
+        .cal-day-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 3px; }
+
+        /* heatmap intensity — designer */
+        .cal-day.heat-des-1 { background: #dbeafe; }
+        .cal-day.heat-des-2 { background: #bfdbfe; }
+        .cal-day.heat-des-3 { background: #93c5fd; }
+        .cal-day.heat-des-4 { background: #60a5fa; color: #fff; }
+        .cal-day.heat-des-5 { background: #3b82f6; color: #fff; }
+        .cal-day.heat-des-over { background: #fca5a5; color: #7f1d1d; border-color: #ef4444 !important; }
+
+        /* heatmap intensity — creative */
+        .cal-day.heat-cre-1 { background: #ede9fe; }
+        .cal-day.heat-cre-2 { background: #ddd6fe; }
+        .cal-day.heat-cre-3 { background: #c4b5fd; }
+        .cal-day.heat-cre-4 { background: #a78bfa; color: #fff; }
+        .cal-day.heat-cre-5 { background: #8b5cf6; color: #fff; }
+        .cal-day.heat-cre-over { background: #fca5a5; color: #7f1d1d; border-color: #ef4444 !important; }
+
+        /* ── Day Detail Panel ── */
+        .day-detail { border-top: 1px solid var(--c-border); }
+        .day-detail-head {
+            padding: 10px 20px; font-size: 0.72rem; font-weight: 800;
+            color: var(--c-slate); text-transform: uppercase; letter-spacing: 0.5px;
+            background: var(--c-bg); display: flex; align-items: center; gap: 8px;
+        }
+        .day-detail-date { color: var(--c-dark); font-size: 0.82rem; }
+        .day-detail-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .day-col { padding: 12px 20px 16px; }
+        .day-col + .day-col { border-left: 1px solid var(--c-border); }
+        .day-col-head { font-size: 0.67rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .day-col-head-des { color: var(--c-des); }
+        .day-col-head-cre { color: var(--c-cre); }
+        .day-task-card {
+            display: grid; grid-template-columns: 1fr auto; gap: 4px 10px;
+            align-items: start; padding: 8px 10px; border-radius: 10px;
+            border: 1px solid var(--c-border); margin-bottom: 6px; background: #fff;
+        }
+        .day-task-name { font-size: 0.8rem; font-weight: 700; color: var(--c-dark); line-height: 1.3; }
+        .day-task-account { font-size: 0.7rem; color: var(--c-muted); margin-top: 1px; }
+        .day-task-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+        .day-task-assign { font-size: 0.72rem; font-weight: 600; color: var(--c-slate); }
+        .day-task-w { font-size: 0.68rem; font-weight: 800; padding: 1px 6px; border-radius: 20px; }
+        .day-task-w-des { background: var(--c-des-bg); color: var(--c-des); }
+        .day-task-w-cre { background: var(--c-cre-bg); color: var(--c-cre); }
+        .day-task-status { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; white-space: nowrap; align-self: start; }
+        .status-done { background: #dcfce7; color: #15803d; }
+        .status-progress { background: var(--c-accent-light); color: #5a6400; }
+        .status-pending { background: #f1f5f9; color: var(--c-slate); }
+        .day-empty { color: var(--c-muted); font-size: 0.78rem; font-weight: 600; padding: 8px 0; }
     </style>
 </head>
 <body>
@@ -268,6 +336,45 @@
         </div>
     </div>
 
+    <!-- 6. Calendar Heatmap -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-calendar3-week-fill"></i> Calendar — Deadline Load</div>
+        </div>
+        <div class="section-body" style="padding:0">
+            <div class="two-col" style="gap:0">
+                <!-- Designer Calendar -->
+                <div class="sub-col" style="border-radius:0;border:none;border-right:1px solid var(--c-border)">
+                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                    <div class="cal-grid-wrap" id="cal-des"></div>
+                </div>
+                <!-- Creative Calendar -->
+                <div class="sub-col" style="border-radius:0;border:none;">
+                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                    <div class="cal-grid-wrap" id="cal-cre"></div>
+                </div>
+            </div>
+            <!-- Day Detail -->
+            <div class="day-detail" id="day-detail" style="display:none">
+                <div class="day-detail-head">
+                    <i class="bi bi-calendar-day"></i>
+                    <span>Tasks on</span>
+                    <span class="day-detail-date" id="day-detail-date">—</span>
+                </div>
+                <div class="day-detail-body">
+                    <div class="day-col">
+                        <div class="day-col-head day-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
+                        <div id="day-tasks-des"></div>
+                    </div>
+                    <div class="day-col">
+                        <div class="day-col-head day-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
+                        <div id="day-tasks-cre"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -361,6 +468,7 @@
 
     // ── Load ──
     async function loadData() {
+        calSelectedDate = null;
         const { start, end } = monthRange();
 
         const [tasksRes, capRes, workRes] = await Promise.all([
@@ -381,6 +489,7 @@
         renderWorkBreakdown(tasks);
         renderPersons(tasks);
         renderTimeline(tasks);
+        renderCalendar(tasks);
     }
 
     // ── Section 1: Overview ──
@@ -681,6 +790,149 @@
 
         makeChart('chart-des', desWeights, capDes, 'rgba(59,130,246,0.45)',  'rgba(239,68,68,0.55)', 'des');
         makeChart('chart-cre', creWeights, capCre, 'rgba(139,92,246,0.45)', 'rgba(239,68,68,0.55)', 'cre');
+    }
+
+    // ── Section 6: Calendar Heatmap ──
+    let calSelectedDate = null;
+    let calAllTasks = [];
+
+    function heatClass(weight, cap, prefix) {
+        if (weight === 0) return '';
+        if (cap > 0 && weight > cap) return `heat-${prefix}-over`;
+        const ratio = cap > 0 ? weight / cap : weight;
+        if (ratio <= 0.2) return `heat-${prefix}-1`;
+        if (ratio <= 0.4) return `heat-${prefix}-2`;
+        if (ratio <= 0.6) return `heat-${prefix}-3`;
+        if (ratio <= 0.8) return `heat-${prefix}-4`;
+        return `heat-${prefix}-5`;
+    }
+
+    function renderCalendar(tasks) {
+        calAllTasks = tasks;
+        const { start, end } = monthRange();
+        const days = daysInMonth(curYear, curMonth);
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+
+        // build weight maps
+        const desMap = {}, creMap = {};
+        tasks.forEach(t => {
+            if (t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign) {
+                const d = t.designer_deadline;
+                desMap[d] = (desMap[d] || 0) + (t.designer_weight || 0);
+            }
+            if (t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign) {
+                const d = t.creative_deadline;
+                creMap[d] = (creMap[d] || 0) + (t.creative_weight || 0);
+            }
+        });
+
+        function buildGrid(containerId, weightMap, cap, prefix) {
+            const el = document.getElementById(containerId);
+            const firstDow = new Date(curYear, curMonth, 1).getDay(); // 0=Sun
+            const startOffset = firstDow; // Sun-based
+            const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+            let html = `<div class="cal-dow-row">${DOW.map(d => `<div class="cal-dow">${d}</div>`).join('')}</div>`;
+
+            // weeks
+            let dayNum = 1;
+            for (let week = 0; week < 6; week++) {
+                if (dayNum > days) break;
+                html += `<div class="cal-week-row">`;
+                for (let dow = 0; dow < 7; dow++) {
+                    const cellIdx = week * 7 + dow;
+                    if (cellIdx < startOffset || dayNum > days) {
+                        html += `<div class="cal-day cal-empty"></div>`;
+                    } else {
+                        const dateStr = `${curYear}-${pad(curMonth+1)}-${pad(dayNum)}`;
+                        const w = weightMap[dateStr] || 0;
+                        const heat = heatClass(w, cap, prefix);
+                        const isToday = dateStr === todayStr;
+                        const isSel = dateStr === calSelectedDate;
+                        const cls = [heat, isToday ? 'cal-today' : '', isSel ? 'cal-selected' : ''].filter(Boolean).join(' ');
+                        html += `<div class="cal-day ${cls}" data-date="${dateStr}" data-role="${prefix}">
+                            <span class="cal-day-num">${dayNum}</span>
+                            ${w > 0 ? `<div class="cal-day-dot" style="background:${prefix==='des'?'var(--c-des)':'var(--c-cre)'}"></div>` : ''}
+                        </div>`;
+                        dayNum++;
+                    }
+                }
+                html += `</div>`;
+            }
+            el.innerHTML = html;
+
+            el.querySelectorAll('.cal-day:not(.cal-empty)').forEach(cell => {
+                cell.onclick = () => {
+                    const date = cell.dataset.date;
+                    calSelectedDate = calSelectedDate === date ? null : date;
+                    renderCalendar(calAllTasks);
+                    if (calSelectedDate) renderDayDetail(calSelectedDate);
+                    else document.getElementById('day-detail').style.display = 'none';
+                };
+            });
+        }
+
+        // auto-select today on first render of current month
+        const isCurrentMonth = today.getFullYear() === curYear && today.getMonth() === curMonth;
+        if (!calSelectedDate && isCurrentMonth) {
+            calSelectedDate = todayStr;
+        }
+
+        buildGrid('cal-des', desMap, capDes, 'des');
+        buildGrid('cal-cre', creMap, capCre, 'cre');
+
+        if (calSelectedDate) renderDayDetail(calSelectedDate);
+        else document.getElementById('day-detail').style.display = 'none';
+    }
+
+    function renderDayDetail(dateStr) {
+        const panel = document.getElementById('day-detail');
+        const { start, end } = monthRange();
+
+        // check if date is still in current month
+        if (dateStr < start || dateStr > end) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const label = new Date(y, m-1, d).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('day-detail-date').textContent = label;
+
+        const desTasks = calAllTasks.filter(t => t.designer_deadline === dateStr && t.designer_assign);
+        const creTasks = calAllTasks.filter(t => t.creative_deadline === dateStr && t.creative_assign);
+
+        function statusCls(s) {
+            if (s === 'Done') return 'status-done';
+            if (s === 'On Progress') return 'status-progress';
+            return 'status-pending';
+        }
+        function statusLabel(s) { return s || 'Pending'; }
+
+        function renderTaskCards(taskList, assignField, weightField, statusField, wCls) {
+            if (!taskList.length) return `<div class="day-empty">No tasks</div>`;
+            return taskList.map(t => `
+                <div class="day-task-card">
+                    <div>
+                        <div class="day-task-name">${t.task_name || t.opportunity_name || '—'}</div>
+                        ${t.account_name ? `<div class="day-task-account">${t.account_name}</div>` : ''}
+                        <div class="day-task-meta">
+                            <span class="day-task-assign">${t[assignField]}</span>
+                            <span class="day-task-w ${wCls}">w: ${t[weightField] || 0}</span>
+                        </div>
+                    </div>
+                    <span class="day-task-status ${statusCls(t[statusField])}">${statusLabel(t[statusField])}</span>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('day-tasks-des').innerHTML =
+            renderTaskCards(desTasks, 'designer_assign', 'designer_weight', 'designer_status', 'day-task-w-des');
+        document.getElementById('day-tasks-cre').innerHTML =
+            renderTaskCards(creTasks, 'creative_assign', 'creative_weight', 'creative_status', 'day-task-w-cre');
+
+        panel.style.display = 'block';
     }
 
     // ── Init ──
