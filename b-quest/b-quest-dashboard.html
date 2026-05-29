@@ -100,6 +100,7 @@
         .wt-center-lbl { font-size: 0.6rem; font-weight: 700; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 3px; }
         .wt-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
         .wt-legend-item { display: flex; align-items: center; gap: 7px; }
+        .cal-day-info { font-size: 0.58rem; font-weight: 700; opacity: 0.82; margin-top: 2px; line-height: 1; }
         .wt-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
         .wt-legend-name { font-size: 0.78rem; font-weight: 600; color: var(--c-dark); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .wt-legend-count { font-size: 0.78rem; font-weight: 800; color: var(--c-slate); flex-shrink: 0; }
@@ -814,20 +815,23 @@
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
 
-        // build weight maps
+        // build weight + task count maps
         const desMap = {}, creMap = {};
+        const desTaskCount = {}, creTaskCount = {};
         tasks.forEach(t => {
             if (t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign) {
                 const d = t.designer_deadline;
                 desMap[d] = (desMap[d] || 0) + (t.designer_weight || 0);
+                desTaskCount[d] = (desTaskCount[d] || 0) + 1;
             }
             if (t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign) {
                 const d = t.creative_deadline;
                 creMap[d] = (creMap[d] || 0) + (t.creative_weight || 0);
+                creTaskCount[d] = (creTaskCount[d] || 0) + 1;
             }
         });
 
-        function buildGrid(containerId, weightMap, cap, prefix) {
+        function buildGrid(containerId, weightMap, taskCountMap, cap, prefix) {
             const el = document.getElementById(containerId);
             const firstDow = new Date(curYear, curMonth, 1).getDay(); // 0=Sun
             const startOffset = firstDow; // Sun-based
@@ -847,13 +851,14 @@
                     } else {
                         const dateStr = `${curYear}-${pad(curMonth+1)}-${pad(dayNum)}`;
                         const w = weightMap[dateStr] || 0;
+                        const tc = taskCountMap[dateStr] || 0;
                         const heat = heatClass(w, cap, prefix);
                         const isToday = dateStr === todayStr;
                         const isSel = dateStr === calSelectedDate;
                         const cls = [heat, isToday ? 'cal-today' : '', isSel ? 'cal-selected' : ''].filter(Boolean).join(' ');
                         html += `<div class="cal-day ${cls}" data-date="${dateStr}" data-role="${prefix}">
                             <span class="cal-day-num">${dayNum}</span>
-                            ${w > 0 ? `<div class="cal-day-dot" style="background:${prefix==='des'?'var(--c-des)':'var(--c-cre)'}"></div>` : ''}
+                            ${tc > 0 ? `<span class="cal-day-info">${tc} · w${w}</span>` : ''}
                         </div>`;
                         dayNum++;
                     }
@@ -879,8 +884,8 @@
             calSelectedDate = todayStr;
         }
 
-        buildGrid('cal-des', desMap, capDes, 'des');
-        buildGrid('cal-cre', creMap, capCre, 'cre');
+        buildGrid('cal-des', desMap, desTaskCount, capDes, 'des');
+        buildGrid('cal-cre', creMap, creTaskCount, capCre, 'cre');
 
         if (calSelectedDate) renderDayDetail(calSelectedDate);
         else document.getElementById('day-detail').style.display = 'none';
@@ -919,7 +924,7 @@
                         ${t.account_name ? `<div class="day-task-account">${t.account_name}</div>` : ''}
                         <div class="day-task-meta">
                             <span class="day-task-assign">${t[assignField]}</span>
-                            <span class="day-task-w ${wCls}">w: ${t[weightField] || 0}</span>
+                            <span class="day-task-w ${wCls}">Weight: ${t[weightField] || 0}</span>
                         </div>
                     </div>
                     <span class="day-task-status ${statusCls(t[statusField])}">${statusLabel(t[statusField])}</span>
