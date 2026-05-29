@@ -210,20 +210,21 @@
         .day-col-head-des { color: var(--c-des); }
         .day-col-head-cre { color: var(--c-cre); }
         .day-task-card {
-            display: grid; grid-template-columns: 1fr auto; gap: 4px 10px;
-            align-items: start; padding: 10px 12px; border-radius: 12px;
-            border: 1px solid var(--c-border); margin-bottom: 8px; background: var(--c-bg);
+            padding: 9px 12px; border-radius: 12px;
+            border: 1px solid var(--c-border); margin-bottom: 7px; background: var(--c-bg);
             transition: border-color 0.15s;
         }
         .day-task-card:hover { border-color: #cbd5e1; }
-        .day-task-name { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); line-height: 1.3; }
-        .day-task-account { font-size: 0.7rem; color: var(--c-muted); margin-top: 2px; }
-        .day-task-meta { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+        .day-task-row1 { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+        .day-task-row2 { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+        .day-task-name { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); line-height: 1.3; flex: 1; }
+        .day-task-account { font-size: 0.7rem; color: var(--c-muted); }
+        .day-task-dot { font-size: 0.6rem; color: var(--c-border); }
         .day-task-assign { font-size: 0.72rem; font-weight: 600; color: var(--c-slate); }
         .day-task-w { font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; }
         .day-task-w-des { background: var(--c-des-bg); color: var(--c-des); }
         .day-task-w-cre { background: var(--c-cre-bg); color: var(--c-cre); }
-        .day-task-status { font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; align-self: start; margin-top: 1px; }
+        .day-task-status { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
         .status-done { background: #dcfce7; color: #15803d; }
         .status-progress { background: var(--c-accent-light); color: #5a6400; }
         .status-pending { background: #f1f5f9; color: var(--c-slate); }
@@ -940,15 +941,15 @@
             if (!taskList.length) return `<div class="day-empty">No tasks</div>`;
             return taskList.map(t => `
                 <div class="day-task-card">
-                    <div>
-                        <div class="day-task-name">${t.task_name || t.opportunity_name || '—'}</div>
-                        ${t.account_name ? `<div class="day-task-account">${t.account_name}</div>` : ''}
-                        <div class="day-task-meta">
-                            <span class="day-task-assign">${t[assignField]}</span>
-                            <span class="day-task-w ${wCls}">Weight: ${t[weightField] || 0}</span>
-                        </div>
+                    <div class="day-task-row1">
+                        <span class="day-task-name">${t.task_name || t.opportunity_name || '—'}</span>
+                        <span class="day-task-status ${statusCls(t[statusField])}">${statusLabel(t[statusField])}</span>
                     </div>
-                    <span class="day-task-status ${statusCls(t[statusField])}">${statusLabel(t[statusField])}</span>
+                    <div class="day-task-row2">
+                        ${t.account_name ? `<span class="day-task-account">${t.account_name}</span><span class="day-task-dot">●</span>` : ''}
+                        <span class="day-task-assign">${t[assignField]}</span>
+                        <span class="day-task-w ${wCls}">w: ${t[weightField] || 0}</span>
+                    </div>
                 </div>
             `).join('');
         }
