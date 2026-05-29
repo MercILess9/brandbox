@@ -235,6 +235,14 @@
                 <select id="dept-filter" class="dept-filter" onchange="applyFilters()">
                     <option value="">All Departments</option>
                 </select>
+                <select id="project-filter" class="dept-filter" onchange="applyFilters()">
+                    <option value="">All Projects</option>
+                    <option value="bquest">B-QUEST</option>
+                    <option value="bdashboard">Dashboard</option>
+                    <option value="baccount">B-ACCOUNT</option>
+                    <option value="bcommission">Commission</option>
+                    <option value="bfinance">Finance</option>
+                </select>
                 <div class="table-search-wrap">
                     <i class="bi bi-search table-search-icon"></i>
                     <input type="text" id="table-search" class="table-search-input" placeholder="Search..." oninput="applyFilters()">
@@ -532,7 +540,7 @@
         document.getElementById('user-list').innerHTML = row() + row() + row() + row();
     }
 
-    function renderUsers(q = '', dept = '') {
+    function renderUsers(q = '', dept = '', project = '') {
         const container = document.getElementById('user-list');
 
         let rows = allUsers.filter(u => {
@@ -543,7 +551,9 @@
                 u.employee_id?.toLowerCase().includes(q) ||
                 u.department?.toLowerCase().includes(q);
             const matchDept = !dept || u.department === dept;
-            return matchQ && matchDept;
+            const acc = accessData[u.codename] || {};
+            const matchProject = !project || !!acc[project];
+            return matchQ && matchDept && matchProject;
         });
 
         updateCount(rows.length, allUsers.length);
@@ -619,8 +629,10 @@
     function applyFilters() {
         const q = document.getElementById('table-search').value.trim().toLowerCase();
         const dept = document.getElementById('dept-filter').value;
+        const project = document.getElementById('project-filter').value;
         document.getElementById('dept-filter').classList.toggle('active', !!dept);
-        renderUsers(q, dept);
+        document.getElementById('project-filter').classList.toggle('active', !!project);
+        renderUsers(q, dept, project);
     }
 
     function updateCount(shown, total) {
