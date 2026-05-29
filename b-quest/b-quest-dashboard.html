@@ -185,35 +185,6 @@
         .cal-day.heat-cre-5 { background: #8b5cf6; color: #fff; }
         .cal-day.heat-cre-over { background: #fee2e2; color: #991b1b; border-color: #ef4444 !important; }
 
-        /* ── Compact Calendar ── */
-        .cmc-wrap { padding: 10px 14px 14px; }
-        .cmc-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 2px; }
-        .cmc-dow { font-size: 0.58rem; font-weight: 800; color: var(--c-muted); text-align: center; text-transform: uppercase; padding: 3px 0; }
-        .cmc-week-row { display: grid; grid-template-columns: repeat(7, 1fr); }
-        .cmc-day {
-            position: relative; cursor: pointer; border-radius: 6px;
-            padding: 4px 5px 5px; min-height: 36px;
-            border: 1px solid transparent; transition: 0.12s;
-            display: flex; flex-direction: column;
-        }
-        .cmc-day:hover { background: #f1f5f9; border-color: #e2e8f0; }
-        .cmc-day.cmc-empty { pointer-events: none; }
-        .cmc-day.cmc-past .cmc-num { color: #cbd5e1; }
-        .cmc-day.cmc-past .cmc-pip { opacity: 0.35; }
-        .cmc-day.cmc-today { background: var(--c-accent-light); border-color: var(--c-accent) !important; }
-        .cmc-day.cmc-today .cmc-num { color: #5a6400; font-weight: 900; }
-        .cmc-day.cmc-selected { border-color: var(--c-dark) !important; box-shadow: 0 0 0 1.5px var(--c-dark); }
-        .cmc-num { font-size: 0.68rem; font-weight: 700; color: var(--c-slate); line-height: 1; }
-        .cmc-pip-row { display: flex; align-items: center; gap: 2px; margin-top: 3px; flex-wrap: wrap; }
-        .cmc-pip {
-            height: 4px; border-radius: 2px; flex: 1; min-width: 4px; max-width: 18px;
-        }
-        .cmc-count {
-            position: absolute; top: 3px; right: 4px;
-            font-size: 0.58rem; font-weight: 800; color: var(--c-slate); line-height: 1;
-        }
-        .cmc-count-over { color: #ef4444; }
-
         /* ── Day Detail Modal ── */
         #day-modal-backdrop {
             position: fixed; inset: 0; background: rgba(15,23,42,0.45);
@@ -424,25 +395,6 @@
                 <div class="sub-col">
                     <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
                     <div class="cal-grid-wrap" id="cal-cre"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 7. Compact Calendar (Test) -->
-    <div class="section">
-        <div class="section-header">
-            <div class="section-title"><i class="bi bi-calendar3-week-fill"></i> Calendar — Compact <span style="font-size:0.65rem;font-weight:600;color:var(--c-muted);margin-left:6px;text-transform:none;letter-spacing:0">(test)</span></div>
-        </div>
-        <div class="section-body">
-            <div class="two-col">
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-des"><i class="bi bi-brush-fill"></i> Designer</div>
-                    <div class="cmc-wrap" id="cmc-des"></div>
-                </div>
-                <div class="sub-col">
-                    <div class="sub-col-head sub-col-head-cre"><i class="bi bi-rocket-fill"></i> Creative</div>
-                    <div class="cmc-wrap" id="cmc-cre"></div>
                 </div>
             </div>
         </div>
