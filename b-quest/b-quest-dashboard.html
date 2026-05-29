@@ -146,31 +146,44 @@
             align-items: center; justify-content: center; cursor: pointer;
             border: 1.5px solid transparent; transition: 0.15s; position: relative;
             font-size: 0.65rem; font-weight: 700; color: var(--c-slate);
-            background: var(--c-bg); padding: 2px 0;
+            background: var(--c-bg); padding: 2px 0; gap: 3px;
         }
-        .cal-day:hover { border-color: #cbd5e1; background: #f1f5f9; }
+        .cal-day:hover { border-color: #cbd5e1; }
         .cal-day.cal-empty { background: transparent; cursor: default; pointer-events: none; }
         .cal-day.cal-today { border-color: var(--c-accent) !important; color: #5a6400; }
         .cal-day.cal-selected { border-color: var(--c-dark) !important; box-shadow: 0 0 0 2px var(--c-dark); }
         .cal-day.cal-selected.cal-today { border-color: var(--c-accent) !important; box-shadow: 0 0 0 2px var(--c-accent); }
-        .cal-day-num { line-height: 1; }
-        .cal-day-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 3px; }
+        .cal-day-num { line-height: 1; font-size: 0.72rem; }
+
+        /* past days — muted */
+        .cal-day.cal-past { opacity: 0.38; }
+        .cal-day.cal-past:hover { opacity: 0.6; }
+
+        /* badges inside cell */
+        .cal-badges { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; }
+        .cal-badge {
+            font-size: 0.52rem; font-weight: 800; padding: 1px 4px;
+            border-radius: 4px; line-height: 1.4; letter-spacing: 0.2px;
+        }
+        .cal-badge-task { background: rgba(0,0,0,0.08); color: inherit; }
+        .cal-badge-w { background: rgba(0,0,0,0.08); color: inherit; }
+        .cal-badge-over { background: #ef4444; color: #fff !important; }
 
         /* heatmap intensity — designer */
-        .cal-day.heat-des-1 { background: #dbeafe; }
-        .cal-day.heat-des-2 { background: #bfdbfe; }
-        .cal-day.heat-des-3 { background: #93c5fd; }
+        .cal-day.heat-des-1 { background: #dbeafe; color: #1d4ed8; }
+        .cal-day.heat-des-2 { background: #bfdbfe; color: #1d4ed8; }
+        .cal-day.heat-des-3 { background: #93c5fd; color: #1e40af; }
         .cal-day.heat-des-4 { background: #60a5fa; color: #fff; }
         .cal-day.heat-des-5 { background: #3b82f6; color: #fff; }
-        .cal-day.heat-des-over { background: #fca5a5; color: #7f1d1d; border-color: #ef4444 !important; }
+        .cal-day.heat-des-over { background: #fee2e2; color: #991b1b; border-color: #ef4444 !important; }
 
         /* heatmap intensity — creative */
-        .cal-day.heat-cre-1 { background: #ede9fe; }
-        .cal-day.heat-cre-2 { background: #ddd6fe; }
-        .cal-day.heat-cre-3 { background: #c4b5fd; }
+        .cal-day.heat-cre-1 { background: #ede9fe; color: #6d28d9; }
+        .cal-day.heat-cre-2 { background: #ddd6fe; color: #6d28d9; }
+        .cal-day.heat-cre-3 { background: #c4b5fd; color: #5b21b6; }
         .cal-day.heat-cre-4 { background: #a78bfa; color: #fff; }
         .cal-day.heat-cre-5 { background: #8b5cf6; color: #fff; }
-        .cal-day.heat-cre-over { background: #fca5a5; color: #7f1d1d; border-color: #ef4444 !important; }
+        .cal-day.heat-cre-over { background: #fee2e2; color: #991b1b; border-color: #ef4444 !important; }
 
         /* ── Day Detail Modal ── */
         #day-modal-backdrop {
@@ -887,11 +900,18 @@
                         const tc = taskCountMap[dateStr] || 0;
                         const heat = heatClass(w, cap, prefix);
                         const isToday = dateStr === todayStr;
+                        const isPast = dateStr < todayStr;
                         const isSel = dateStr === calSelectedDate;
-                        const cls = [heat, isToday ? 'cal-today' : '', isSel ? 'cal-selected' : ''].filter(Boolean).join(' ');
+                        const cls = [heat, isToday ? 'cal-today' : '', isPast && !heat ? 'cal-past' : '', isSel ? 'cal-selected' : ''].filter(Boolean).join(' ');
+                        const isOver = cap > 0 && w > cap;
+                        const badges = tc > 0 ? `
+                            <div class="cal-badges">
+                                <span class="cal-badge cal-badge-task">${tc}t</span>
+                                <span class="cal-badge ${isOver ? 'cal-badge-over' : 'cal-badge-w'}">w${w}</span>
+                            </div>` : '';
                         html += `<div class="cal-day ${cls}" data-date="${dateStr}" data-role="${prefix}">
                             <span class="cal-day-num">${dayNum}</span>
-                            ${tc > 0 ? `<span class="cal-day-info">${tc} · w${w}</span>` : ''}
+                            ${badges}
                         </div>`;
                         dayNum++;
                     }
