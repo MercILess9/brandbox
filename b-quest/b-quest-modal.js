@@ -418,11 +418,24 @@ const BQuestApp = (() => {
             }
 
             const currentId = el('b-quest-modal-id').value;
-            const { data: allTasks } = await supabaseClient
-                .from('b-quest-list')
-                .select(`id, ${role}_weight, ${role}_day, ${role}_deadline`);
+            const excl = currentId ? [currentId] : [];
 
-            const existingTotal = bqCalcDayLoad(allTasks || [], role, dl, currentId || null);
+            const [{ data: sameDay }, { data: overlap }] = await Promise.all([
+                supabaseClient.from('b-quest-list')
+                    .select(`id, ${role}_weight, ${role}_day`)
+                    .eq(`${role}_deadline`, dl)
+                    .not('id', 'in', `(${excl.length ? excl.join(',') : '00000000-0000-0000-0000-000000000000'})`),
+                supabaseClient.from('b-quest-list')
+                    .select(`id, ${role}_weight, ${role}_day, ${role}_deadline`)
+                    .gt(`${role}_deadline`, dl)
+                    .not('id', 'in', `(${excl.length ? excl.join(',') : '00000000-0000-0000-0000-000000000000'})`)
+            ]);
+
+            const existingTotal = bqCalcDayLoad(
+                [...(sameDay || []).map(t => ({ ...t, [`${role}_deadline`]: dl })),
+                 ...(overlap || [])],
+                role, dl, null
+            );
             const total = existingTotal + weight;
             const maxCap = State.maxCap[role] ?? 10;
             State.capacities[role] = total;
