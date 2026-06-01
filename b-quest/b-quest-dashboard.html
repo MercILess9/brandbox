@@ -762,29 +762,27 @@
         const days   = daysInMonth(curYear, curMonth);
         const labels = Array.from({ length: days }, (_, i) => i + 1);
 
-        function buildDayWeights(list, deadlineField, weightField, dayField) {
-            const dueMap = {}, ongoingMap = {};
-            list.filter(t => t[deadlineField] >= start && t[deadlineField] <= end)
-                .forEach(t => {
-                    const dayNum = parseInt(t[deadlineField].split('-')[2]);
-                    const dur = t[dayField] || 1;
-                    const w = t[weightField] || 0;
-                    // วัน deadline = due
-                    dueMap[dayNum] = (dueMap[dayNum] || 0) + w;
-                    // วันก่อนหน้า = ongoing
-                    for (let i = 1; i < dur; i++) {
-                        const prev = dayNum - i;
-                        if (prev >= 1) ongoingMap[prev] = (ongoingMap[prev] || 0) + w;
-                    }
-                });
+        function buildDayWeights(role) {
+            const spread = bqSpreadWeight(tasks.filter(t => t[`${role}_deadline`]), role, start, end, pad);
             return {
-                due:     labels.map(d => dueMap[d]     || 0),
-                ongoing: labels.map(d => ongoingMap[d] || 0)
+                due:     labels.map(d => spread.weightMap[`${curYear}-${pad(curMonth+1)}-${pad(d)}`] || 0),
+                ongoing: labels.map(d => {
+                    const ds = `${curYear}-${pad(curMonth+1)}-${pad(d)}`;
+                    return (spread.ongoingCount[ds] || 0) > 0
+                        ? tasks.filter(t => {
+                            if (!t[`${role}_deadline`]) return false;
+                            const dur = t[`${role}_day`] || 1;
+                            const dl = new Date(t[`${role}_deadline`]);
+                            const st = new Date(dl); st.setDate(st.getDate() - dur + 1);
+                            return st.toISOString().slice(0,10) <= ds && t[`${role}_deadline`] > ds;
+                        }).reduce((sum, t) => sum + (t[`${role}_weight`] || 0), 0)
+                        : 0
+                })
             };
         }
 
-        const desWeights = buildDayWeights(tasks.filter(t => t.designer_deadline), 'designer_deadline', 'designer_weight', 'designer_day');
-        const creWeights = buildDayWeights(tasks.filter(t => t.creative_deadline), 'creative_deadline', 'creative_weight', 'creative_day');
+        const desWeights = buildDayWeights('designer');
+        const creWeights = buildDayWeights('creative');
 
         const today = new Date();
         const todayIdx = (today.getFullYear() === curYear && today.getMonth() === curMonth)
@@ -900,35 +898,11 @@
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
 
-        // build weight + task count maps (กระจาย weight/day ตาม duration)
-        const desMap = {}, creMap = {};
-        const desTaskCount = {}, creTaskCount = {};
-
-        const desOngoingCount = {}, creOngoingCount = {};
-
-        function spreadWeight(map, countMap, ongoingMap, deadline, weight, day) {
-            const d = day || 1;
-            const deadlineDate = new Date(deadline);
-            for (let i = 0; i < d; i++) {
-                const dt = new Date(deadlineDate);
-                dt.setDate(dt.getDate() - i);
-                const ds = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
-                if (ds >= start && ds <= end) {
-                    map[ds] = (map[ds] || 0) + weight;
-                    if (i === 0) countMap[ds] = (countMap[ds] || 0) + 1;
-                    else ongoingMap[ds] = (ongoingMap[ds] || 0) + 1;
-                }
-            }
-        }
-
-        tasks.forEach(t => {
-            if (t.designer_deadline >= start && t.designer_deadline <= end) {
-                spreadWeight(desMap, desTaskCount, desOngoingCount, t.designer_deadline, t.designer_weight || 0, t.designer_day || 1);
-            }
-            if (t.creative_deadline >= start && t.creative_deadline <= end) {
-                spreadWeight(creMap, creTaskCount, creOngoingCount, t.creative_deadline, t.creative_weight || 0, t.creative_day || 1);
-            }
-        });
+        // build weight + task count maps โดยใช้ shared helper จาก b-quest.js
+        const des = bqSpreadWeight(tasks, 'designer', start, end, pad);
+        const cre = bqSpreadWeight(tasks, 'creative', start, end, pad);
+        const desMap = des.weightMap, desTaskCount = des.dueCount, desOngoingCount = des.ongoingCount;
+        const creMap = cre.weightMap, creTaskCount = cre.dueCount, creOngoingCount = cre.ongoingCount;
 
         function buildGrid(containerId, weightMap, taskCountMap, ongoingCountMap, cap, prefix) {
             const el = document.getElementById(containerId);

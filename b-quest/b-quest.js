@@ -65,6 +65,53 @@ function guardBquestPage(perm) {
 
 B_QUEST_CONFIG.getMenuPerms = loadBquestPerms;
 
+// ── Shared Role Constants ──
+const BQ_ROLES = ['designer', 'creative'];
+
+// ── Shared Capacity Helpers ──
+
+// คิด load ต่อวัน deadline โดยนับงานที่ deadline range ทับวันนั้น
+// tasks = array of task objects, role = 'designer'|'creative', dl = 'YYYY-MM-DD', excludeId = current task id
+function bqCalcDayLoad(tasks, role, dl, excludeId = null) {
+    const dlDate = new Date(dl);
+    return tasks
+        .filter(t => {
+            if (excludeId && t.id === excludeId) return false;
+            const deadline = t[`${role}_deadline`];
+            if (!deadline) return false;
+            const d = t[`${role}_day`] || 1;
+            const deadlineDate = new Date(deadline);
+            const startDate = new Date(deadlineDate);
+            startDate.setDate(startDate.getDate() - d + 1);
+            return startDate <= dlDate && deadlineDate >= dlDate;
+        })
+        .reduce((sum, t) => sum + (Number(t[`${role}_weight`]) || 0), 0);
+}
+
+// กระจาย weight/day ตาม duration ลงใน map { 'YYYY-MM-DD': weight }
+// คืน { weightMap, dueCountMap, ongoingCountMap }
+function bqSpreadWeight(tasks, role, start, end, pad) {
+    const weightMap = {}, dueCount = {}, ongoingCount = {};
+    tasks.forEach(t => {
+        const deadline = t[`${role}_deadline`];
+        if (!deadline || deadline < start || deadline > end) return;
+        const weight = t[`${role}_weight`] || 0;
+        const day = t[`${role}_day`] || 1;
+        const deadlineDate = new Date(deadline);
+        for (let i = 0; i < day; i++) {
+            const dt = new Date(deadlineDate);
+            dt.setDate(dt.getDate() - i);
+            const ds = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
+            if (ds >= start && ds <= end) {
+                weightMap[ds] = (weightMap[ds] || 0) + weight;
+                if (i === 0) dueCount[ds] = (dueCount[ds] || 0) + 1;
+                else ongoingCount[ds] = (ongoingCount[ds] || 0) + 1;
+            }
+        }
+    });
+    return { weightMap, dueCount, ongoingCount };
+}
+
 async function handleDeleteTask(id) {
     const res = await Swal.fire({
         title: 'Delete Task?',

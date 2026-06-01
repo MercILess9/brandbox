@@ -419,51 +419,12 @@ const BQuestApp = (() => {
             }
 
             const currentId = el('b-quest-modal-id').value;
-            // query งานทั้งหมดที่มี deadline (deadline - day + 1 ถึง deadline ทับกับวัน dl)
-            // งานที่ deadline >= dl AND deadline - day + 1 <= dl
-            // เทียบเท่า: deadline >= dl AND deadline <= dl + (day - 1) ของงานนั้น
-            // ใช้ filter: deadline ของงานอื่น >= dl - max_possible_day และ deadline <= งานนั้นเอง
-            // approach: ดึงงานทุกชิ้นที่ deadline >= dl (ไม่เกิน 60 วัน) แล้ว filter ใน client
-            let query = supabaseClient.from('b-quest-list')
-                .select(`${role}_weight, ${role}_day, ${role}_deadline`)
-                .gte(`${role}_deadline`, dl)
-                .lte(`${role}_deadline`, dl);
-            if (currentId) query = query.neq('id', currentId);
+            const { data: allTasks } = await supabaseClient
+                .from('b-quest-list')
+                .select(`id, ${role}_weight, ${role}_day, ${role}_deadline`);
 
-            // query งานที่ deadline = dl ก่อน + งานที่ deadline > dl แต่ start date <= dl
-            const [{ data: sameDayData }, { data: overlapData }] = await Promise.all([
-                (() => {
-                    let q = supabaseClient.from('b-quest-list')
-                        .select(`${role}_weight, ${role}_day, ${role}_deadline`)
-                        .eq(`${role}_deadline`, dl);
-                    if (currentId) q = q.neq('id', currentId);
-                    return q;
-                })(),
-                (() => {
-                    let q = supabaseClient.from('b-quest-list')
-                        .select(`${role}_weight, ${role}_day, ${role}_deadline`)
-                        .gt(`${role}_deadline`, dl);
-                    if (currentId) q = q.neq('id', currentId);
-                    return q;
-                })()
-            ]);
-
-            // งานที่ deadline > dl: นับเฉพาะที่ start date (deadline - day + 1) <= dl
-            const overlapping = (overlapData || []).filter(i => {
-                const d = i[`${role}_day`] || 1;
-                const deadlineDate = new Date(i[`${role}_deadline`]);
-                const startDate = new Date(deadlineDate);
-                startDate.setDate(startDate.getDate() - d + 1);
-                return startDate <= new Date(dl);
-            });
-
-            // weight ใน DB คือ pt/day อยู่แล้ว ไม่ต้องหาร
-            const existingTotal = [
-                ...(sameDayData || []).map(i => Number(i[`${role}_weight`]) || 0),
-                ...overlapping.map(i => Number(i[`${role}_weight`]) || 0)
-            ].reduce((s, v) => s + v, 0);
-
-            const total  = existingTotal + weight;
+            const existingTotal = bqCalcDayLoad(allTasks || [], role, dl, currentId || null);
+            const total = existingTotal + weight;
             const maxCap = State.maxCap[role] ?? 10;
             State.capacities[role] = total;
 
