@@ -24,8 +24,8 @@ function formatDate(dateStr) {
     try {
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr; 
-        return d.toLocaleDateString('th-TH', { 
-            day: '2-digit', month: 'short', year: '2-digit' 
+        return d.toLocaleDateString('en-GB', {
+            day: '2-digit', month: 'short', year: 'numeric'
         });
     } catch (e) { return '-'; }
 }
