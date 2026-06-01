@@ -165,9 +165,9 @@
             font-size: 0.52rem; font-weight: 800; padding: 1px 5px;
             border-radius: 4px; line-height: 1.5; letter-spacing: 0.2px;
         }
-        .cal-badge-task { background: rgba(0,0,0,0.09); color: inherit; }
+        .cal-badge-task { background: rgba(220,38,38,0.15); color: #b91c1c; font-weight: 900; }
         .cal-badge-ongoing { background: rgba(0,0,0,0.06); color: inherit; opacity: 0.75; }
-        .cal-badge-over { background: #ef4444; color: #fff !important; }
+        .cal-badge-over { background: #dc2626; color: #fff !important; }
 
         /* heatmap intensity — designer */
         .cal-day.heat-des-1 { background: #dbeafe; color: #1d4ed8; }
@@ -846,7 +846,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#94a3b8' } },
+                        legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#94a3b8', filter: item => item.type !== 'line' } },
                         tooltip: {
                             callbacks: {
                                 title: items => `Day ${items[0].label}`,
@@ -874,8 +874,8 @@
             else chartCre = chart;
         }
 
-        makeChart('chart-des', desWeights.due, desWeights.ongoing, capDes, 'rgba(59,130,246,0.7)',  'rgba(59,130,246,0.2)',  'rgba(239,68,68,0.55)', 'des');
-        makeChart('chart-cre', creWeights.due, creWeights.ongoing, capCre, 'rgba(139,92,246,0.7)', 'rgba(139,92,246,0.2)', 'rgba(239,68,68,0.55)', 'cre');
+        makeChart('chart-des', desWeights.due, desWeights.ongoing, capDes, 'rgba(239,68,68,0.75)',  'rgba(59,130,246,0.3)',  'rgba(239,68,68,0.9)', 'des');
+        makeChart('chart-cre', creWeights.due, creWeights.ongoing, capCre, 'rgba(239,68,68,0.75)', 'rgba(139,92,246,0.3)', 'rgba(239,68,68,0.9)', 'cre');
     }
 
     // ── Section 6: Calendar Heatmap ──
