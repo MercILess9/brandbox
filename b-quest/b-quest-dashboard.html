@@ -194,7 +194,7 @@
         #day-modal {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             z-index: 901; background: #fff; border-radius: 20px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.18); width: 90%; max-width: 780px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.18); width: 92%; max-width: 960px;
             max-height: 82vh; display: flex; flex-direction: column;
             animation: slideUp 0.2s ease;
         }
@@ -223,17 +223,20 @@
         .day-col-head-des { color: var(--c-des); }
         .day-col-head-cre { color: var(--c-cre); }
         .day-task-card {
-            padding: 9px 12px; border-radius: 12px;
+            padding: 10px 14px; border-radius: 12px;
             border: 1px solid var(--c-border); margin-bottom: 7px; background: var(--c-bg);
             transition: border-color 0.15s;
         }
         .day-task-card:hover { border-color: #cbd5e1; }
-        .day-task-row1 { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+        .day-task-row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .day-task-row2 { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-        .day-task-name { font-size: 0.82rem; font-weight: 700; color: var(--c-dark); line-height: 1.3; flex: 1; }
+        .day-task-row3 { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+        .day-task-name { font-size: 0.84rem; font-weight: 700; color: var(--c-dark); line-height: 1.3; flex: 1; }
+        .day-task-work { font-size: 0.72rem; font-weight: 700; color: var(--c-slate); }
         .day-task-account { font-size: 0.7rem; color: var(--c-muted); }
         .day-task-dot { font-size: 0.6rem; color: var(--c-border); }
         .day-task-assign { font-size: 0.72rem; font-weight: 600; color: var(--c-slate); }
+        .day-task-due { font-size: 0.68rem; font-weight: 700; color: var(--c-muted); }
         .day-task-w { font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; }
         .day-task-w-des { background: var(--c-des-bg); color: var(--c-des); }
         .day-task-w-cre { background: var(--c-cre-bg); color: var(--c-cre); }
@@ -994,9 +997,11 @@
 
         function renderTaskCards(taskList, assignField, weightField, dayField, statusField, wCls, isDue) {
             if (!taskList.length) return '';
+            const deadlineField = assignField === 'designer_assign' ? 'designer_deadline' : 'creative_deadline';
+            const workField = assignField === 'designer_assign' ? 'designer' : 'creative';
             return taskList.map(t => {
                 const wLabel = isDue ? `w: ${t[weightField] || 0}` : `w: ${t[weightField] || 0}/day`;
-                const dlLabel = isDue ? '' : `<span class="day-task-account">due ${t[assignField === 'designer_assign' ? 'designer_deadline' : 'creative_deadline']}</span><span class="day-task-dot">●</span>`;
+                const dueLabel = !isDue ? `<span class="day-task-due">due ${t[deadlineField]}</span><span class="day-task-dot">●</span>` : '';
                 return `
                 <div class="day-task-card">
                     <div class="day-task-row1">
@@ -1004,10 +1009,13 @@
                         <span class="day-task-status ${statusCls(t[statusField])}">${statusLabel(t[statusField])}</span>
                     </div>
                     <div class="day-task-row2">
-                        ${t.account_name ? `<span class="day-task-account">${t.account_name}</span><span class="day-task-dot">●</span>` : ''}
-                        ${dlLabel}
-                        <span class="day-task-assign">${t[assignField]}</span>
+                        ${t[workField] ? `<span class="day-task-work"><i class="bi bi-briefcase" style="font-size:0.6rem;opacity:0.5"></i> ${t[workField]}</span><span class="day-task-dot">●</span>` : ''}
                         <span class="day-task-w ${wCls}">${wLabel}</span>
+                    </div>
+                    <div class="day-task-row3">
+                        ${t.account_name ? `<span class="day-task-account">${t.account_name}</span><span class="day-task-dot">●</span>` : ''}
+                        ${dueLabel}
+                        <span class="day-task-assign">${t[assignField] || '—'}</span>
                     </div>
                 </div>`;
             }).join('');
