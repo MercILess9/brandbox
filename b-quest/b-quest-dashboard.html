@@ -861,19 +861,31 @@
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
 
-        // build weight + task count maps
+        // build weight + task count maps (กระจาย weight/day ตาม duration)
         const desMap = {}, creMap = {};
         const desTaskCount = {}, creTaskCount = {};
+
+        function spreadWeight(map, countMap, deadline, weight, day) {
+            const d = day || 1;
+            const wpd = d > 0 ? weight / d : weight;
+            const deadlineDate = new Date(deadline);
+            for (let i = 0; i < d; i++) {
+                const dt = new Date(deadlineDate);
+                dt.setDate(dt.getDate() - i);
+                const ds = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
+                if (ds >= start && ds <= end) {
+                    map[ds] = (map[ds] || 0) + wpd;
+                    if (i === 0) countMap[ds] = (countMap[ds] || 0) + 1;
+                }
+            }
+        }
+
         tasks.forEach(t => {
             if (t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign) {
-                const d = t.designer_deadline;
-                desMap[d] = (desMap[d] || 0) + (t.designer_weight || 0);
-                desTaskCount[d] = (desTaskCount[d] || 0) + 1;
+                spreadWeight(desMap, desTaskCount, t.designer_deadline, t.designer_weight || 0, t.designer_day || 1);
             }
             if (t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign) {
-                const d = t.creative_deadline;
-                creMap[d] = (creMap[d] || 0) + (t.creative_weight || 0);
-                creTaskCount[d] = (creTaskCount[d] || 0) + 1;
+                spreadWeight(creMap, creTaskCount, t.creative_deadline, t.creative_weight || 0, t.creative_day || 1);
             }
         });
 
@@ -946,8 +958,29 @@
         const label = new Date(y, m-1, d).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('dm-date').textContent = label;
 
-        const desTasks = calAllTasks.filter(t => t.designer_deadline === dateStr && t.designer_assign);
-        const creTasks = calAllTasks.filter(t => t.creative_deadline === dateStr && t.creative_assign);
+        // งานที่ deadline วันนี้
+        const desDue  = calAllTasks.filter(t => t.designer_deadline === dateStr && t.designer_assign);
+        const creDue  = calAllTasks.filter(t => t.creative_deadline === dateStr && t.creative_assign);
+
+        // งานที่ range ทับวันนี้ (deadline > วันนี้ และ start date <= วันนี้)
+        const desInProgress = calAllTasks.filter(t => {
+            if (!t.designer_deadline || !t.designer_assign) return false;
+            if (t.designer_deadline <= dateStr) return false;
+            const day = t.designer_day || 1;
+            const dl = new Date(t.designer_deadline);
+            const startDate = new Date(dl);
+            startDate.setDate(startDate.getDate() - day + 1);
+            return startDate.toISOString().slice(0,10) <= dateStr;
+        });
+        const creInProgress = calAllTasks.filter(t => {
+            if (!t.creative_deadline || !t.creative_assign) return false;
+            if (t.creative_deadline <= dateStr) return false;
+            const day = t.creative_day || 1;
+            const dl = new Date(t.creative_deadline);
+            const startDate = new Date(dl);
+            startDate.setDate(startDate.getDate() - day + 1);
+            return startDate.toISOString().slice(0,10) <= dateStr;
+        });
 
         function statusCls(s) {
             if (s === 'Done') return 'status-done';
@@ -956,9 +989,14 @@
         }
         function statusLabel(s) { return s || 'Pending'; }
 
-        function renderTaskCards(taskList, assignField, weightField, statusField, wCls) {
-            if (!taskList.length) return `<div class="day-empty">No tasks</div>`;
-            return taskList.map(t => `
+        function renderTaskCards(taskList, assignField, weightField, dayField, statusField, wCls, isDue) {
+            if (!taskList.length) return '';
+            return taskList.map(t => {
+                const day = t[dayField] || 1;
+                const wpd = day > 0 ? Math.round((t[weightField] || 0) / day * 10) / 10 : (t[weightField] || 0);
+                const wLabel = isDue ? `w: ${t[weightField] || 0}` : `w: ${wpd}/day`;
+                const dlLabel = isDue ? '' : `<span class="day-task-account">due ${t[assignField === 'designer_assign' ? 'designer_deadline' : 'creative_deadline']}</span><span class="day-task-dot">●</span>`;
+                return `
                 <div class="day-task-card">
                     <div class="day-task-row1">
                         <span class="day-task-name">${t.task_name || t.opportunity_name || '—'}</span>
@@ -966,17 +1004,31 @@
                     </div>
                     <div class="day-task-row2">
                         ${t.account_name ? `<span class="day-task-account">${t.account_name}</span><span class="day-task-dot">●</span>` : ''}
+                        ${dlLabel}
                         <span class="day-task-assign">${t[assignField]}</span>
-                        <span class="day-task-w ${wCls}">w: ${t[weightField] || 0}</span>
+                        <span class="day-task-w ${wCls}">${wLabel}</span>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
+        }
+
+        function buildSection(inProgress, due, assignField, weightField, dayField, statusField, wCls) {
+            let html = '';
+            if (inProgress.length) {
+                html += `<div style="font-size:0.62rem;font-weight:800;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">In Progress</div>`;
+                html += renderTaskCards(inProgress, assignField, weightField, dayField, statusField, wCls, false);
+            }
+            if (due.length) {
+                if (inProgress.length) html += `<div style="font-size:0.62rem;font-weight:800;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.6px;margin:10px 0 6px;">Due Today</div>`;
+                html += renderTaskCards(due, assignField, weightField, dayField, statusField, wCls, true);
+            }
+            return html || `<div class="day-empty">No tasks</div>`;
         }
 
         document.getElementById('day-tasks-des').innerHTML =
-            renderTaskCards(desTasks, 'designer_assign', 'designer_weight', 'designer_status', 'day-task-w-des');
+            buildSection(desInProgress, desDue, 'designer_assign', 'designer_weight', 'designer_day', 'designer_status', 'day-task-w-des');
         document.getElementById('day-tasks-cre').innerHTML =
-            renderTaskCards(creTasks, 'creative_assign', 'creative_weight', 'creative_status', 'day-task-w-cre');
+            buildSection(creInProgress, creDue, 'creative_assign', 'creative_weight', 'creative_day', 'creative_status', 'day-task-w-cre');
 
         document.getElementById('day-modal-backdrop').style.display = 'block';
         document.getElementById('day-modal').style.display = 'flex';
