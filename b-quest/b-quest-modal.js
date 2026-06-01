@@ -448,6 +448,7 @@ const BQuestApp = (() => {
                 })()
             ]);
 
+            console.log('dl:', dl, 'sameDayData:', sameDayData, 'overlapData:', overlapData);
             // งานที่ deadline > dl: นับเฉพาะที่ start date (deadline - day + 1) <= dl
             const overlapping = (overlapData || []).filter(i => {
                 const d = i[`${role}_day`] || 1;
