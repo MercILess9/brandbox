@@ -679,8 +679,8 @@
     function renderWorkBreakdown(tasks) {
         const { start, end } = monthRange();
 
-        const dTasks = tasks.filter(t => t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign);
-        const cTasks = tasks.filter(t => t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign);
+        const dTasks = tasks.filter(t => t.designer_deadline >= start && t.designer_deadline <= end);
+        const cTasks = tasks.filter(t => t.creative_deadline >= start && t.creative_deadline <= end);
 
         function buildBreakdown(works, role, taskList, workField, statusField) {
             return works
