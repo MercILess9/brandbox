@@ -606,8 +606,8 @@
             return Object.entries(map).sort((a, b) => b[1] - a[1]);
         }
 
-        const desEntries = countBy(tasks.filter(t => t.designer_deadline && t.designer_assign), 'designer_type', 'designer_deadline');
-        const creEntries = countBy(tasks.filter(t => t.creative_deadline && t.creative_assign), 'creative_type', 'creative_deadline');
+        const desEntries = countBy(tasks.filter(t => t.designer_deadline), 'designer_type', 'designer_deadline');
+        const creEntries = countBy(tasks.filter(t => t.creative_deadline), 'creative_type', 'creative_deadline');
 
         function renderDonut(entries, containerId, chartKey) {
             const el = document.getElementById(containerId);
