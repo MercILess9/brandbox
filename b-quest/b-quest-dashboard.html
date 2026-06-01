@@ -641,8 +641,7 @@
                 </div>
             `;
 
-            // destroy old chart
-            if (chartKey === 'des' && chartWtDes) { chartWtDes.destroy(); chartWtDes = null; }
+if (chartKey === 'des' && chartWtDes) { chartWtDes.destroy(); chartWtDes = null; }
             if (chartKey === 'cre' && chartWtCre) { chartWtCre.destroy(); chartWtCre = null; }
 
             const ctx = document.getElementById(canvasId).getContext('2d');
@@ -898,7 +897,6 @@
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
 
-        // build weight + task count maps โดยใช้ shared helper จาก b-quest.js
         const des = bqSpreadWeight(tasks, 'designer', start, end, pad);
         const cre = bqSpreadWeight(tasks, 'creative', start, end, pad);
         const desMap = des.weightMap, desTaskCount = des.dueCount, desOngoingCount = des.ongoingCount;
@@ -906,8 +904,8 @@
 
         function buildGrid(containerId, weightMap, taskCountMap, ongoingCountMap, cap, prefix) {
             const el = document.getElementById(containerId);
-            const firstDow = new Date(curYear, curMonth, 1).getDay(); // 0=Sun
-            const startOffset = firstDow; // Sun-based
+            const firstDow = new Date(curYear, curMonth, 1).getDay();
+            const startOffset = firstDow;
             const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
             let html = `<div class="cal-dow-row">${DOW.map(d => `<div class="cal-dow">${d}</div>`).join('')}</div>`;
@@ -954,7 +952,6 @@
             });
         }
 
-        // auto-select today on first render of current month
         const isCurrentMonth = today.getFullYear() === curYear && today.getMonth() === curMonth;
         if (!calSelectedDate && isCurrentMonth) {
             calSelectedDate = todayStr;
@@ -973,11 +970,9 @@
         const label = new Date(y, m-1, d).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('dm-date').textContent = label;
 
-        // งานที่ deadline วันนี้
         const desDue  = calAllTasks.filter(t => t.designer_deadline === dateStr);
         const creDue  = calAllTasks.filter(t => t.creative_deadline === dateStr);
 
-        // งานที่ range ทับวันนี้ (deadline > วันนี้ และ start date <= วันนี้)
         const desInProgress = calAllTasks.filter(t => {
             if (!t.designer_deadline) return false;
             if (t.designer_deadline <= dateStr) return false;

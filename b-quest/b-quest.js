@@ -48,15 +48,13 @@ function canBquest(perm) {
     return !!p[perm];
 }
 
-// ตรวจสิทธิ์แก้ไข role card ใน modal
-// AE แก้ได้ทุก role, Designer/Creative แก้ได้เฉพาะ role ตัวเอง
 function canBquestEditRole(role) {
     const p = getBquestPerms();
     if (!p) return false;
     if (p._god) return true;
     if (!p.edit) return false;
     if (p.ae) return true;
-    return !!p[role]; // role = 'designer' | 'creative'
+    return !!p[role];
 }
 
 function guardBquestPage(perm) {
@@ -65,13 +63,8 @@ function guardBquestPage(perm) {
 
 B_QUEST_CONFIG.getMenuPerms = loadBquestPerms;
 
-// ── Shared Role Constants ──
 const BQ_ROLES = ['designer', 'creative'];
 
-// ── Shared Capacity Helpers ──
-
-// คิด load ต่อวัน deadline โดยนับงานที่ deadline range ทับวันนั้น
-// tasks = array of task objects, role = 'designer'|'creative', dl = 'YYYY-MM-DD', excludeId = current task id
 function bqCalcDayLoad(tasks, role, dl, excludeId = null) {
     const dlDate = new Date(dl);
     return tasks
@@ -88,8 +81,6 @@ function bqCalcDayLoad(tasks, role, dl, excludeId = null) {
         .reduce((sum, t) => sum + (Number(t[`${role}_weight`]) || 0), 0);
 }
 
-// กระจาย weight/day ตาม duration ลงใน map { 'YYYY-MM-DD': weight }
-// คืน { weightMap, dueCountMap, ongoingCountMap }
 function bqSpreadWeight(tasks, role, start, end, pad) {
     const weightMap = {}, dueCount = {}, ongoingCount = {};
     tasks.forEach(t => {

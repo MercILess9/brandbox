@@ -391,7 +391,6 @@ const BQuestApp = (() => {
                 badge.classList.add('bq-ab-show');
                 badge.innerHTML = `<i class="bi bi-person-fill" style="font-size:0.72rem"></i>${name}`;
             }
-            // no name + no perm = hidden
         }
     }
 
@@ -539,7 +538,6 @@ const BQuestApp = (() => {
                         const capEl = el(`${role}-capacity-info`);
                         if (capEl) { capEl.className = 'bq-cap-info'; capEl.innerHTML = ''; }
 
-                        // AE แก้ได้ทั้ง 2 role, Designer/Creative แก้ได้เฉพาะ role ตัวเอง
                         const canEditRole = typeof canBquestEditRole === 'function' ? canBquestEditRole(role) : true;
                         const card = el(`card-${role}`);
                         card.querySelectorAll('input, select, textarea').forEach(inp => inp.disabled = !canEditRole);
@@ -602,7 +600,6 @@ const BQuestApp = (() => {
                     payload[`${role}_day`] = parseInt(payload[`${role}_day`]) || 1;
                     if (!payload[`${role}_status`]) payload[`${role}_status`] = 'On Progress';
                     if (!canAssign) {
-                        // preserve existing assign — don't overwrite from hidden input
                         if (State.currentData) payload[`${role}_assign`] = State.currentData[`${role}_assign`] || null;
                         else delete payload[`${role}_assign`];
                     } else {
