@@ -846,7 +846,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#94a3b8', filter: item => item.type !== 'line' } },
+                        legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#94a3b8', filter: item => item.text === 'Ongoing' || item.text === 'Due' } },
                         tooltip: {
                             callbacks: {
                                 title: items => `Day ${items[0].label}`,
