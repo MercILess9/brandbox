@@ -293,6 +293,7 @@ const BQuestApp = (() => {
             });
             workSelect.onchange = () => {
                 const selected = workSelect.options[workSelect.selectedIndex];
+                console.log('work selected:', selected.value, 'day:', selected.dataset.day, 'weight:', selected.dataset.weight);
                 el(`b-quest-modal-${role}-weight`).value = selected.dataset.weight;
                 el(`b-quest-modal-${role}-day`).value = selected.dataset.day || 1;
                 checkCapacity(role);
