@@ -56,10 +56,10 @@
         .btn-add-work-cre:hover { background: #7c3aed; }
 
         .work-col-inner { padding: 8px 12px; }
-        .work-col-subhead { display: grid; grid-template-columns: 1fr 56px 60px; gap: 6px; padding: 4px 4px 8px; border-bottom: 1px solid var(--c-border); margin-bottom: 2px; }
+        .work-col-subhead { display: grid; grid-template-columns: 1fr 56px 56px 60px; gap: 6px; padding: 4px 4px 8px; border-bottom: 1px solid var(--c-border); margin-bottom: 2px; }
         .work-col-subhead span { font-size: 0.6rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .work-row { display: grid; grid-template-columns: 1fr 56px 60px; align-items: center; gap: 6px; padding: 5px 2px; border-bottom: 1px solid #f8fafc; }
+        .work-row { display: grid; grid-template-columns: 1fr 56px 56px 60px; align-items: center; gap: 6px; padding: 5px 2px; border-bottom: 1px solid #f8fafc; }
         .work-row:last-child { border-bottom: none; }
         .work-row.is-deleted { opacity: 0.4; background: #fff5f5; text-decoration: line-through; pointer-events: none; }
         .work-row.is-new { background: #f0fdf4; }
@@ -75,7 +75,7 @@
         .btn-work-undo { background: #f1f5f9; border: none; color: var(--c-slate); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 700; transition: 0.2s; display: none; }
         .work-row.is-deleted .btn-work-undo { display: inline-block; pointer-events: all; }
 
-        .work-new-row { display: grid; grid-template-columns: 1fr 56px 90px; gap: 6px; padding: 8px 2px 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
+        .work-new-row { display: grid; grid-template-columns: 1fr 56px 56px 90px; gap: 6px; padding: 8px 2px 4px; border-top: 1px dashed var(--c-border); margin-top: 4px; }
         .work-new-input { border: 1px solid var(--c-border); border-radius: 7px; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; outline: none; transition: 0.2s; font-family: inherit; background: var(--c-bg); }
         .work-new-input:focus { border-color: var(--c-accent); background: #fff; }
         .work-new-actions { display: flex; gap: 4px; justify-content: flex-end; }
@@ -302,11 +302,12 @@
                     </div>
                     <div class="work-col-inner">
                         <div class="work-col-subhead">
-                            <span>Work Name</span><span style="text-align:center;">Weight</span><span></span>
+                            <span>Work Name</span><span style="text-align:center;">Day</span><span style="text-align:center;">Weight</span><span></span>
                         </div>
                         <div id="work-list-designer"></div>
                         <div id="new-work-row-designer" style="display:none;" class="work-new-row">
                             <input type="text" class="work-new-input" id="new-work-name-designer" placeholder="Work name...">
+                            <input type="number" class="work-new-input" id="new-work-day-designer" value="1" min="1" max="99" style="text-align:center;">
                             <input type="number" class="work-new-input" id="new-work-weight-designer" value="1" min="1" max="99" style="text-align:center;">
                             <div class="work-new-actions">
                                 <button class="btn-cancel-add" onclick="cancelAddWork('Designer')"><i class="bi bi-x"></i></button>
@@ -322,11 +323,12 @@
                     </div>
                     <div class="work-col-inner">
                         <div class="work-col-subhead">
-                            <span>Work Name</span><span style="text-align:center;">Weight</span><span></span>
+                            <span>Work Name</span><span style="text-align:center;">Day</span><span style="text-align:center;">Weight</span><span></span>
                         </div>
                         <div id="work-list-creative"></div>
                         <div id="new-work-row-creative" style="display:none;" class="work-new-row">
                             <input type="text" class="work-new-input" id="new-work-name-creative" placeholder="Work name...">
+                            <input type="number" class="work-new-input" id="new-work-day-creative" value="1" min="1" max="99" style="text-align:center;">
                             <input type="number" class="work-new-input" id="new-work-weight-creative" value="1" min="1" max="99" style="text-align:center;">
                             <div class="work-new-actions">
                                 <button class="btn-cancel-add" onclick="cancelAddWork('Creative')"><i class="bi bi-x"></i></button>
@@ -529,11 +531,11 @@
                 const ch = workChanges[key];
                 if (!ch) return { ...w, _state: 'clean' };
                 if (ch._delete) return { ...w, _state: 'deleted', _key: key };
-                return { role: w.role, work: ch.newName ?? w.work, weight: ch.newWeight ?? w.weight, _origWork: w.work, _state: 'edited', _key: key };
+                return { role: w.role, work: ch.newName ?? w.work, day: ch.newDay ?? w.day ?? 1, weight: ch.newWeight ?? w.weight, _origWork: w.work, _state: 'edited', _key: key };
             });
 
             Object.values(workChanges).filter(c => c._new && c.origRole === role).forEach(c => {
-                items.push({ role: c.origRole, work: c.newName, weight: c.newWeight, _state: 'new', _key: `${c.origRole}|${c.newName}` });
+                items.push({ role: c.origRole, work: c.newName, day: c.newDay ?? 1, weight: c.newWeight, _state: 'new', _key: `${c.origRole}|${c.newName}` });
             });
 
             if (!items.length) { container.innerHTML = `<div class="work-empty">No items yet</div>`; return; }
@@ -541,7 +543,8 @@
             container.innerHTML = items.map(w => `
                 <div class="work-row ${w._state === 'deleted' ? 'is-deleted' : w._state === 'new' ? 'is-new' : ''}" data-key="${w._key || `${w.role}|${w.work}`}">
                     <input class="work-input" value="${w.work}" oninput="onWorkEdit(this)">
-                    <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" oninput="onWorkEdit(this)">
+                    <input class="work-weight" type="number" value="${w.day ?? 1}" min="1" max="99" oninput="onWorkEdit(this)" data-field="day">
+                    <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" oninput="onWorkEdit(this)" data-field="weight">
                     <div class="work-actions">
                         <button class="btn-work-del" onclick="stageDeleteWork(this)" title="Remove"><i class="bi bi-trash3"></i></button>
                         <button class="btn-work-undo" onclick="undoDeleteWork(this)">Undo</button>
@@ -557,7 +560,8 @@
         const [origRole, origWork] = key.split('|');
         if (!workChanges[key]) workChanges[key] = { origRole, origWork };
         workChanges[key].newName = row.querySelector('.work-input').value.trim();
-        workChanges[key].newWeight = parseInt(row.querySelector('.work-weight').value);
+        workChanges[key].newDay = parseInt(row.querySelector('[data-field="day"]').value) || 1;
+        workChanges[key].newWeight = parseInt(row.querySelector('[data-field="weight"]').value) || 1;
         markDirty('section-worklist');
     }
 
@@ -596,10 +600,11 @@
     function stageNewWork(role) {
         const id = role.toLowerCase();
         const name = document.getElementById(`new-work-name-${id}`).value.trim();
+        const day = parseInt(document.getElementById(`new-work-day-${id}`).value) || 1;
         const weight = parseInt(document.getElementById(`new-work-weight-${id}`).value) || 1;
         if (!name) return;
         const key = `${role}|${name}`;
-        workChanges[key] = { origRole: role, origWork: name, newName: name, newWeight: weight, _new: true };
+        workChanges[key] = { origRole: role, origWork: name, newName: name, newDay: day, newWeight: weight, _new: true };
         document.getElementById(`new-work-row-${id}`).style.display = 'none';
         markDirty('section-worklist');
         renderWorkFromBuffer();
@@ -893,7 +898,7 @@
             for (const [key, ch] of Object.entries(workChanges)) {
                 if (ch._new) {
                     const { error } = await supabaseClient.from('b-quest-work')
-                        .insert([{ role: ch.origRole, work: ch.newName, weight: ch.newWeight }]);
+                        .insert([{ role: ch.origRole, work: ch.newName, day: ch.newDay ?? 1, weight: ch.newWeight }]);
                     if (error) errors.push(`Work add "${ch.newName}": ` + error.message);
                 } else if (ch._delete) {
                     const { error } = await supabaseClient.from('b-quest-work')
@@ -901,7 +906,7 @@
                     if (error) errors.push(`Work delete "${ch.origWork}": ` + error.message);
                 } else {
                     const { error } = await supabaseClient.from('b-quest-work')
-                        .update({ work: ch.newName, weight: ch.newWeight })
+                        .update({ work: ch.newName, day: ch.newDay ?? 1, weight: ch.newWeight })
                         .eq('role', ch.origRole).eq('work', ch.origWork);
                     if (error) errors.push(`Work update "${ch.origWork}": ` + error.message);
                 }
