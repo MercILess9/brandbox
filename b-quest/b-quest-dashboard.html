@@ -867,14 +867,14 @@
 
         function spreadWeight(map, countMap, deadline, weight, day) {
             const d = day || 1;
-            const wpd = d > 0 ? weight / d : weight;
+            // weight คือ pt/day อยู่แล้ว ใส่แต่ละวันตาม duration
             const deadlineDate = new Date(deadline);
             for (let i = 0; i < d; i++) {
                 const dt = new Date(deadlineDate);
                 dt.setDate(dt.getDate() - i);
                 const ds = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
                 if (ds >= start && ds <= end) {
-                    map[ds] = (map[ds] || 0) + wpd;
+                    map[ds] = (map[ds] || 0) + weight;
                     if (i === 0) countMap[ds] = (countMap[ds] || 0) + 1;
                 }
             }
@@ -992,9 +992,7 @@
         function renderTaskCards(taskList, assignField, weightField, dayField, statusField, wCls, isDue) {
             if (!taskList.length) return '';
             return taskList.map(t => {
-                const day = t[dayField] || 1;
-                const wpd = day > 0 ? Math.round((t[weightField] || 0) / day * 10) / 10 : (t[weightField] || 0);
-                const wLabel = isDue ? `w: ${t[weightField] || 0}` : `w: ${wpd}/day`;
+                const wLabel = isDue ? `w: ${t[weightField] || 0}` : `w: ${t[weightField] || 0}/day`;
                 const dlLabel = isDue ? '' : `<span class="day-task-account">due ${t[assignField === 'designer_assign' ? 'designer_deadline' : 'creative_deadline']}</span><span class="day-task-dot">●</span>`;
                 return `
                 <div class="day-task-card">

@@ -457,25 +457,24 @@ const BQuestApp = (() => {
                 return startDate <= new Date(dl);
             });
 
-            const weightPerDay = day > 0 ? weight / day : weight;
+            // weight ใน DB คือ pt/day อยู่แล้ว ไม่ต้องหาร
             const existingTotal = [
-                ...(sameDayData || []).map(i => (i[`${role}_day`] || 1) > 0 ? (Number(i[`${role}_weight`]) || 0) / (i[`${role}_day`] || 1) : 0),
-                ...overlapping.map(i => (i[`${role}_day`] || 1) > 0 ? (Number(i[`${role}_weight`]) || 0) / (i[`${role}_day`] || 1) : 0)
+                ...(sameDayData || []).map(i => Number(i[`${role}_weight`]) || 0),
+                ...overlapping.map(i => Number(i[`${role}_weight`]) || 0)
             ].reduce((s, v) => s + v, 0);
 
-            const total  = existingTotal + weightPerDay;
+            const total  = existingTotal + weight;
             const maxCap = State.maxCap[role] ?? 10;
             State.capacities[role] = total;
 
             const isOver   = total > maxCap;
             const pct      = Math.min(100, Math.round(total / maxCap * 100));
             const barColor = isOver ? '#ef4444' : total >= maxCap * 0.8 ? '#f59e0b' : '#4ade80';
-            const displayWeight = Math.round(weightPerDay * 10) / 10;
-            const displayTotal  = Math.round(total * 10) / 10;
+            const displayTotal = Math.round(total * 10) / 10;
 
             info.innerHTML = `
                 <div class="bq-cap-nums">
-                    <span class="bq-cap-badge${isOver ? ' over' : ''}">+${displayWeight} pt/day</span>
+                    <span class="bq-cap-badge${isOver ? ' over' : ''}">+${weight} pt/day</span>
                     <span class="bq-cap-frac${isOver ? ' over' : ''}">${displayTotal} / ${maxCap}</span>
                 </div>
                 <div class="bq-cap-track">
