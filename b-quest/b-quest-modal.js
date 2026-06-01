@@ -405,6 +405,7 @@ const BQuestApp = (() => {
         const dl     = el(`b-quest-modal-${role}-deadline`).value;
         const work   = el(`b-quest-modal-${role}-work`).value;
         const weight = Number(el(`b-quest-modal-${role}-weight`).value) || 0;
+        const day    = Number(el(`b-quest-modal-${role}-day`).value) || 1;
         const info   = el(`${role}-capacity-info`);
 
         const hideInfo = () => { if (info) { info.className = 'bq-cap-info'; info.innerHTML = ''; } };
@@ -418,22 +419,64 @@ const BQuestApp = (() => {
             }
 
             const currentId = el('b-quest-modal-id').value;
-            let query = supabaseClient.from('b-quest-list').select(`${role}_weight`).eq(`${role}_deadline`, dl);
+            // query งานทั้งหมดที่มี deadline (deadline - day + 1 ถึง deadline ทับกับวัน dl)
+            // งานที่ deadline >= dl AND deadline - day + 1 <= dl
+            // เทียบเท่า: deadline >= dl AND deadline <= dl + (day - 1) ของงานนั้น
+            // ใช้ filter: deadline ของงานอื่น >= dl - max_possible_day และ deadline <= งานนั้นเอง
+            // approach: ดึงงานทุกชิ้นที่ deadline >= dl (ไม่เกิน 60 วัน) แล้ว filter ใน client
+            let query = supabaseClient.from('b-quest-list')
+                .select(`${role}_weight, ${role}_day, ${role}_deadline`)
+                .gte(`${role}_deadline`, dl)
+                .lte(`${role}_deadline`, dl);
             if (currentId) query = query.neq('id', currentId);
 
-            const { data } = await query;
-            const total  = (data || []).reduce((s, i) => s + (Number(i[`${role}_weight`]) || 0), 0) + weight;
+            // query งานที่ deadline = dl ก่อน + งานที่ deadline > dl แต่ start date <= dl
+            const [{ data: sameDayData }, { data: overlapData }] = await Promise.all([
+                (() => {
+                    let q = supabaseClient.from('b-quest-list')
+                        .select(`${role}_weight, ${role}_day, ${role}_deadline`)
+                        .eq(`${role}_deadline`, dl);
+                    if (currentId) q = q.neq('id', currentId);
+                    return q;
+                })(),
+                (() => {
+                    let q = supabaseClient.from('b-quest-list')
+                        .select(`${role}_weight, ${role}_day, ${role}_deadline`)
+                        .gt(`${role}_deadline`, dl);
+                    if (currentId) q = q.neq('id', currentId);
+                    return q;
+                })()
+            ]);
+
+            // งานที่ deadline > dl: นับเฉพาะที่ start date (deadline - day + 1) <= dl
+            const overlapping = (overlapData || []).filter(i => {
+                const d = i[`${role}_day`] || 1;
+                const deadlineDate = new Date(i[`${role}_deadline`]);
+                const startDate = new Date(deadlineDate);
+                startDate.setDate(startDate.getDate() - d + 1);
+                return startDate <= new Date(dl);
+            });
+
+            const weightPerDay = day > 0 ? weight / day : weight;
+            const existingTotal = [
+                ...(sameDayData || []).map(i => (i[`${role}_day`] || 1) > 0 ? (Number(i[`${role}_weight`]) || 0) / (i[`${role}_day`] || 1) : 0),
+                ...overlapping.map(i => (i[`${role}_day`] || 1) > 0 ? (Number(i[`${role}_weight`]) || 0) / (i[`${role}_day`] || 1) : 0)
+            ].reduce((s, v) => s + v, 0);
+
+            const total  = existingTotal + weightPerDay;
             const maxCap = State.maxCap[role] ?? 10;
             State.capacities[role] = total;
 
             const isOver   = total > maxCap;
             const pct      = Math.min(100, Math.round(total / maxCap * 100));
             const barColor = isOver ? '#ef4444' : total >= maxCap * 0.8 ? '#f59e0b' : '#4ade80';
+            const displayWeight = Math.round(weightPerDay * 10) / 10;
+            const displayTotal  = Math.round(total * 10) / 10;
 
             info.innerHTML = `
                 <div class="bq-cap-nums">
-                    <span class="bq-cap-badge${isOver ? ' over' : ''}">+${weight} pt</span>
-                    <span class="bq-cap-frac${isOver ? ' over' : ''}">${total} / ${maxCap}</span>
+                    <span class="bq-cap-badge${isOver ? ' over' : ''}">+${displayWeight} pt/day</span>
+                    <span class="bq-cap-frac${isOver ? ' over' : ''}">${displayTotal} / ${maxCap}</span>
                 </div>
                 <div class="bq-cap-track">
                     <div class="bq-cap-fill" style="width:${pct}%;background:${barColor}"></div>
@@ -593,9 +636,10 @@ const BQuestApp = (() => {
             State.roles.forEach(role => {
                 if (!el(`check-${role}`).checked) {
                     payload[role] = null; payload[`${role}_type`] = null; payload[`${role}_deadline`] = null;
-                    payload[`${role}_weight`] = 0; payload[`${role}_assign`] = null; payload[`${role}_status`] = null;
+                    payload[`${role}_weight`] = 0; payload[`${role}_day`] = 1; payload[`${role}_assign`] = null; payload[`${role}_status`] = null;
                 } else {
                     payload[`${role}_weight`] = parseInt(payload[`${role}_weight`]) || 0;
+                    payload[`${role}_day`] = parseInt(payload[`${role}_day`]) || 1;
                     if (!payload[`${role}_status`]) payload[`${role}_status`] = 'On Progress';
                     if (!canAssign) {
                         // preserve existing assign — don't overwrite from hidden input
@@ -666,9 +710,11 @@ const BQuestApp = (() => {
                 designer_type: data.designer_type,
                 designer: data.designer,
                 designer_weight: data.designer_weight,
+                designer_day: data.designer_day ?? 1,
                 creative_type: data.creative_type,
                 creative: data.creative,
                 creative_weight: data.creative_weight,
+                creative_day: data.creative_day ?? 1,
             };
             const ownerName = getBxUser()?.codename || '—';
 
