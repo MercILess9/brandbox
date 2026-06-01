@@ -762,18 +762,29 @@
         const days   = daysInMonth(curYear, curMonth);
         const labels = Array.from({ length: days }, (_, i) => i + 1);
 
-        function buildDayWeights(list, deadlineField, weightField) {
-            const map = {};
+        function buildDayWeights(list, deadlineField, weightField, dayField) {
+            const dueMap = {}, ongoingMap = {};
             list.filter(t => t[deadlineField] >= start && t[deadlineField] <= end)
                 .forEach(t => {
-                    const day = parseInt(t[deadlineField].split('-')[2]);
-                    map[day] = (map[day] || 0) + (t[weightField] || 0);
+                    const dayNum = parseInt(t[deadlineField].split('-')[2]);
+                    const dur = t[dayField] || 1;
+                    const w = t[weightField] || 0;
+                    // วัน deadline = due
+                    dueMap[dayNum] = (dueMap[dayNum] || 0) + w;
+                    // วันก่อนหน้า = ongoing
+                    for (let i = 1; i < dur; i++) {
+                        const prev = dayNum - i;
+                        if (prev >= 1) ongoingMap[prev] = (ongoingMap[prev] || 0) + w;
+                    }
                 });
-            return labels.map(d => map[d] || 0);
+            return {
+                due:     labels.map(d => dueMap[d]     || 0),
+                ongoing: labels.map(d => ongoingMap[d] || 0)
+            };
         }
 
-        const desWeights = buildDayWeights(tasks.filter(t => t.designer_deadline && t.designer_assign), 'designer_deadline', 'designer_weight');
-        const creWeights = buildDayWeights(tasks.filter(t => t.creative_deadline && t.creative_assign), 'creative_deadline', 'creative_weight');
+        const desWeights = buildDayWeights(tasks.filter(t => t.designer_deadline), 'designer_deadline', 'designer_weight', 'designer_day');
+        const creWeights = buildDayWeights(tasks.filter(t => t.creative_deadline), 'creative_deadline', 'creative_weight', 'creative_day');
 
         const today = new Date();
         const todayIdx = (today.getFullYear() === curYear && today.getMonth() === curMonth)
@@ -782,23 +793,37 @@
         document.getElementById('cap-badge-des').textContent = capDes > 0 ? `Max ${capDes} / day` : '';
         document.getElementById('cap-badge-cre').textContent = capCre > 0 ? `Max ${capCre} / day` : '';
 
-        function makeChart(canvasId, data, cap, baseColor, overColor, key) {
+        function makeChart(canvasId, dueData, ongoingData, cap, dueColor, ongoingColor, overColor, key) {
             const ctx = document.getElementById(canvasId).getContext('2d');
-            const bgs = data.map((v, i) => {
-                if (i === todayIdx) return cap > 0 && v > cap ? 'rgba(239,68,68,0.9)' : baseColor.replace('0.45', '0.85');
-                return cap > 0 && v > cap ? overColor : baseColor;
-            });
 
             if (key === 'des' && chartDes) { chartDes.destroy(); chartDes = null; }
             if (key === 'cre' && chartCre) { chartCre.destroy(); chartCre = null; }
 
-            const datasets = [{
-                label: 'Weight',
-                data,
-                backgroundColor: bgs,
-                borderRadius: 3,
-                order: 2
-            }];
+            const total = dueData.map((v, i) => v + ongoingData[i]);
+            const dueBgs = dueData.map((v, i) => {
+                const isOver = cap > 0 && total[i] > cap;
+                if (i === todayIdx) return isOver ? 'rgba(239,68,68,0.9)' : dueColor.replace('0.7', '0.9');
+                return isOver ? overColor : dueColor;
+            });
+
+            const datasets = [
+                {
+                    label: 'Ongoing',
+                    data: ongoingData,
+                    backgroundColor: ongoingColor,
+                    borderRadius: 0,
+                    stack: 'load',
+                    order: 2
+                },
+                {
+                    label: 'Due',
+                    data: dueData,
+                    backgroundColor: dueBgs,
+                    borderRadius: 3,
+                    stack: 'load',
+                    order: 2
+                }
+            ];
 
             if (cap > 0) {
                 datasets.push({
@@ -821,7 +846,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false },
+                        legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 }, color: '#94a3b8' } },
                         tooltip: {
                             callbacks: {
                                 title: items => `Day ${items[0].label}`,
@@ -831,10 +856,12 @@
                     },
                     scales: {
                         x: {
+                            stacked: true,
                             grid: { display: false },
-                            ticks: { font: { size: 9 }, maxRotation: 0, color: ctx => ctx.index === todayIdx ? '#ef4444' : '#94a3b8' }
+                            ticks: { font: { size: 9 }, maxRotation: 0, color: '#94a3b8' }
                         },
                         y: {
+                            stacked: true,
                             beginAtZero: true,
                             grid: { color: '#f1f5f9' },
                             ticks: { font: { size: 9 }, color: '#94a3b8', precision: 0 }
@@ -847,8 +874,8 @@
             else chartCre = chart;
         }
 
-        makeChart('chart-des', desWeights, capDes, 'rgba(59,130,246,0.45)',  'rgba(239,68,68,0.55)', 'des');
-        makeChart('chart-cre', creWeights, capCre, 'rgba(139,92,246,0.45)', 'rgba(239,68,68,0.55)', 'cre');
+        makeChart('chart-des', desWeights.due, desWeights.ongoing, capDes, 'rgba(59,130,246,0.7)',  'rgba(59,130,246,0.2)',  'rgba(239,68,68,0.55)', 'des');
+        makeChart('chart-cre', creWeights.due, creWeights.ongoing, capCre, 'rgba(139,92,246,0.7)', 'rgba(139,92,246,0.2)', 'rgba(239,68,68,0.55)', 'cre');
     }
 
     // ── Section 6: Calendar Heatmap ──
