@@ -207,7 +207,7 @@
     async function loadMasterData() {
         try {
             const [workRes, profileRes] = await Promise.all([
-                supabaseClient.from('b-quest-work').select('work, weight, role').order('work'),
+                supabaseClient.from('b-quest-work').select('work, day, weight, role').order('work'),
                 supabaseClient.from('b-quest-setting').select('codename, designer, creative').order('codename')
             ]);
 
