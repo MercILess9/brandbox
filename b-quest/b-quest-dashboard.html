@@ -895,10 +895,10 @@
         }
 
         tasks.forEach(t => {
-            if (t.designer_deadline >= start && t.designer_deadline <= end && t.designer_assign) {
+            if (t.designer_deadline >= start && t.designer_deadline <= end) {
                 spreadWeight(desMap, desTaskCount, desOngoingCount, t.designer_deadline, t.designer_weight || 0, t.designer_day || 1);
             }
-            if (t.creative_deadline >= start && t.creative_deadline <= end && t.creative_assign) {
+            if (t.creative_deadline >= start && t.creative_deadline <= end) {
                 spreadWeight(creMap, creTaskCount, creOngoingCount, t.creative_deadline, t.creative_weight || 0, t.creative_day || 1);
             }
         });
@@ -973,12 +973,12 @@
         document.getElementById('dm-date').textContent = label;
 
         // งานที่ deadline วันนี้
-        const desDue  = calAllTasks.filter(t => t.designer_deadline === dateStr && t.designer_assign);
-        const creDue  = calAllTasks.filter(t => t.creative_deadline === dateStr && t.creative_assign);
+        const desDue  = calAllTasks.filter(t => t.designer_deadline === dateStr);
+        const creDue  = calAllTasks.filter(t => t.creative_deadline === dateStr);
 
         // งานที่ range ทับวันนี้ (deadline > วันนี้ และ start date <= วันนี้)
         const desInProgress = calAllTasks.filter(t => {
-            if (!t.designer_deadline || !t.designer_assign) return false;
+            if (!t.designer_deadline) return false;
             if (t.designer_deadline <= dateStr) return false;
             const day = t.designer_day || 1;
             const dl = new Date(t.designer_deadline);
@@ -987,7 +987,7 @@
             return startDate.toISOString().slice(0,10) <= dateStr;
         });
         const creInProgress = calAllTasks.filter(t => {
-            if (!t.creative_deadline || !t.creative_assign) return false;
+            if (!t.creative_deadline) return false;
             if (t.creative_deadline <= dateStr) return false;
             const day = t.creative_day || 1;
             const dl = new Date(t.creative_deadline);
@@ -1022,7 +1022,7 @@
                         ${t.opportunity_name ? `<span class="day-task-opp">${t.opportunity_name}</span>` : ''}
                     </div>
                     <div class="day-task-row3">
-                        <span class="day-task-w ${wCls}">${wLabel}</span>
+                        <span class="day-task-w ${wCls}">${t[workField] || '—'}</span>
                         <span class="day-task-spacer"></span>
                         <span class="day-task-meta"><i class="bi bi-person-fill"></i>${t[assignField] || '—'}</span>
                         <span class="day-task-dot">·</span>
