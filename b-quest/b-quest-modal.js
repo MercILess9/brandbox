@@ -198,6 +198,7 @@ const B_QUEST_MODAL_HTML = `
                                         </div>
                                     </div>
                                     <input type="hidden" id="b-quest-modal-designer-weight" name="designer_weight" value="0">
+                                    <input type="hidden" id="b-quest-modal-designer-day" name="designer_day" value="1">
                                     <input type="hidden" id="b-quest-modal-designer-assign" name="designer_assign" value="">
                                 </div>
                             </div>
@@ -228,6 +229,7 @@ const B_QUEST_MODAL_HTML = `
                                         </div>
                                     </div>
                                     <input type="hidden" id="b-quest-modal-creative-weight" name="creative_weight" value="0">
+                                    <input type="hidden" id="b-quest-modal-creative-day" name="creative_day" value="1">
                                     <input type="hidden" id="b-quest-modal-creative-assign" name="creative_assign" value="">
                                 </div>
                             </div>
@@ -286,10 +288,13 @@ const BQuestApp = (() => {
             (workData || []).filter(i => i.role === role.charAt(0).toUpperCase() + role.slice(1)).forEach(i => {
                 const opt = new Option(i.work, i.work);
                 opt.dataset.weight = i.weight || 0;
+                opt.dataset.day = i.day || 1;
                 workSelect.appendChild(opt);
             });
             workSelect.onchange = () => {
-                el(`b-quest-modal-${role}-weight`).value = workSelect.options[workSelect.selectedIndex].dataset.weight;
+                const selected = workSelect.options[workSelect.selectedIndex];
+                el(`b-quest-modal-${role}-weight`).value = selected.dataset.weight;
+                el(`b-quest-modal-${role}-day`).value = selected.dataset.day || 1;
                 checkCapacity(role);
             };
 
@@ -314,11 +319,13 @@ const BQuestApp = (() => {
             'designer': 'b-quest-modal-designer-work',
             'designer_deadline': 'b-quest-modal-designer-deadline',
             'designer_weight': 'b-quest-modal-designer-weight',
+            'designer_day': 'b-quest-modal-designer-day',
             'creative_status': 'b-quest-modal-creative-status',
             'creative_type': 'b-quest-modal-creative-type',
             'creative': 'b-quest-modal-creative-work',
             'creative_deadline': 'b-quest-modal-creative-deadline',
             'creative_weight': 'b-quest-modal-creative-weight',
+            'creative_day': 'b-quest-modal-creative-day',
             'designer_assign': 'b-quest-modal-designer-assign',
             'creative_assign': 'b-quest-modal-creative-assign'
         };
