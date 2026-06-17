@@ -33,10 +33,11 @@
         #pill-designer.active-role { background: var(--c-des-bg); color: var(--c-des); border-color: var(--c-des-border); }
         #pill-creative:hover { background: var(--c-cre-bg); border-color: var(--c-cre-border); color: var(--c-cre); }
         #pill-creative.active-role { background: var(--c-cre-bg); color: var(--c-cre); border-color: var(--c-cre-border); }
-        #pill-progress:hover { background: var(--c-progress-bg); border-color: var(--c-progress); color: #7a8500; }
-        #pill-progress.active-progress { background: var(--c-progress-bg); color: #7a8500; border-color: var(--c-progress); }
-        #pill-done:hover { background: var(--c-done-bg); border-color: var(--c-done); color: var(--c-slate); }
-        #pill-done.active-done { background: var(--c-done-bg); color: var(--c-slate); border-color: var(--c-done); }
+        .status-seg { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+        .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .seg-btn:last-child { border-right: none; }
+        .seg-btn.active { background: var(--c-accent); color: #1e293b; }
+        .seg-btn:not(.active):hover { background: var(--c-bg); }
 
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
         .flt-btn-adv:hover { background: var(--c-bg); border-color: #cbd5e1; }
@@ -150,8 +151,11 @@
 
         <div class="flt-advanced-zone" id="advancedFilterZone">
             <div class="flt-advanced-row">
-                <button id="pill-progress" class="flt-pill active-progress" onclick="togglePill(this, 'progress')"><i class="bi bi-hourglass-split"></i> Progress</button>
-                <button id="pill-done" class="flt-pill" onclick="togglePill(this, 'done')"><i class="bi bi-check-circle"></i> Done</button>
+                <div class="status-seg">
+                    <button id="seg-all" class="seg-btn active" onclick="setStatusFilter('all')">All</button>
+                    <button id="seg-progress" class="seg-btn" onclick="setStatusFilter('progress')"><i class="bi bi-hourglass-split"></i> Progress</button>
+                    <button id="seg-done" class="seg-btn" onclick="setStatusFilter('done')"><i class="bi bi-check-circle"></i> Done</button>
+                </div>
                 <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 4px; flex-shrink:0;"></div>
                 <div class="flt-select-box"><span class="flt-select-tag">Work</span><select class="flt-select-input" id="filterWork"></select></div>
                 <div class="flt-select-box"><span class="flt-select-tag">Type</span><select class="flt-select-input" id="filterType"></select></div>
@@ -271,8 +275,15 @@
         updateHighlight('filterAssign');
     }
 
+    function setStatusFilter(type) {
+        ['all', 'progress', 'done'].forEach(t => {
+            document.getElementById(`seg-${t}`).classList.toggle('active', t === type);
+        });
+        applyFilters();
+    }
+
     function togglePill(btn, type) {
-        const className = 'active-' + (type === 'designer' || type === 'creative' ? 'role' : type);
+        const className = 'active-role';
         btn.classList.toggle(className);
         if (type === 'designer' || type === 'creative') {
             renderFilterWork();
@@ -326,11 +337,14 @@
             query = query.or(`${buildDatePart('designer')},${buildDatePart('creative')}`);
         }
 
-        const progressActive = document.getElementById('pill-progress').classList.contains('active-progress');
-        const doneActive = document.getElementById('pill-done').classList.contains('active-done');
+        const statusFilter = ['all','progress','done'].find(t => document.getElementById(`seg-${t}`)?.classList.contains('active')) || 'all';
 
-        if (progressActive && !doneActive) query = query.or('designer_status.neq.Done,creative_status.neq.Done');
-        else if (doneActive && !progressActive) query = query.eq('designer_status','Done').eq('creative_status','Done');
+        if (statusFilter === 'progress') query = query.or('designer_status.neq.Done,creative_status.neq.Done');
+        else if (statusFilter === 'done') {
+            query = query
+                .or('designer.is.null,designer.eq.-,designer_status.eq.Done')
+                .or('creative.is.null,creative.eq.-,creative_status.eq.Done');
+        }
 
         const val = (id) => document.getElementById(id)?.value || "";
         if (val('filterWork')) query = query.or(`designer.eq."${val('filterWork')}",creative.eq."${val('filterWork')}"`);
@@ -469,7 +483,7 @@
             if(el) el.value = "";
             updateHighlight(id);
         });
-        applyFilters();
+        setStatusFilter('all');
     }
 
     async function initPage() {
