@@ -19,11 +19,12 @@ auth/
   *.html            — Auth pages (signup.html loads departments from DB)
 index.html          — Portal home (project cards grid + top-right gear/logout icons)
 b-quest/
-  b-quest.js        — Config, permission loader, God mode logic
-  b-quest-modal.js  — Task create/edit modal (IIFE: BQuestApp)
-  b-quest-list.html
-  b-quest-assignment.html
-  b-quest-settings.html
+  b-quest.js            — Config, permission loader, God mode logic
+  b-quest-modal.js      — Task create/edit modal (IIFE: BQuestApp)
+  b-quest-list.html     — Task list with infinite scroll + filter
+  b-quest-assignment.html — Unassigned task queue
+  b-quest-settings.html — Member permissions management
+  b-quest-dashboard.html — Charts & capacity overview (uses Chart.js CDN)
 vercel.json
 ```
 
@@ -69,19 +70,20 @@ vercel.json
 
 Every project page follows this exact order:
 ```js
-async function loadPage() {
+async function initPage() {
     sessionStorage.removeItem('bx_perms_<project>');  // clear cache ก่อนเสมอ
     await initLayout(CONFIG);                          // fetch perms + render header
-    guardPage(perm);                                   // guard หลัง initLayout เท่านั้น
+    // guard หลัง initLayout — ตรวจ perms แล้ว redirect ถ้าไม่มีสิทธิ์
+    // ตัวอย่าง: if (!perms?.setting) window.location.replace('...');
     await loadMasterData();                            // filter/dropdown data ครบก่อน render
     await fetchData(true);                             // โหลด list แรก — ต้อง await
 }
-// IntersectionObserver ต้อง active หลัง loadPage เสร็จเท่านั้น
-loadPage().then(() => observer.observe(triggerEl));
+// IntersectionObserver ต้อง active หลัง initPage เสร็จเท่านั้น
+initPage().then(() => observer.observe(triggerEl));
 ```
 - `initLayout` เรียก `getMenuPerms` (= `loadPerms`) อยู่แล้ว → perms set ใน sessionStorage ก่อน guard รัน
 - **ห้าม guard ก่อน initLayout** — perms ยังไม่โหลด จะ redirect ผิด
-- **ห้าม observer.observe ก่อน loadPage เสร็จ** — observer จะ trigger fetchData ก่อน perms/masterData พร้อม ทำให้ 10 card แรกไม่มีปุ่ม Edit
+- **ห้าม observer.observe ก่อน initPage เสร็จ** — observer จะ trigger fetchData ก่อน perms/masterData พร้อม ทำให้ 10 card แรกไม่มีปุ่ม Edit
 - Auth pages และ index.html ไม่ต้องทำ pattern นี้
 
 ## CSS Architecture Rules
@@ -141,6 +143,14 @@ Two sections:
 6. Create a settings table in Supabase: `<project>-setting` with columns: codename (PK), role columns, task columns (new/edit/delete), admin columns (assign/setting)
 7. Add column to `setting_project` table for the new project key
 8. sessionStorage key: `bx_perms_<project>` — system.js clears all `bx_perms_*` keys on index automatically
+
+## Security Patterns
+
+- **HTML escaping:** All DB fields rendered via `innerHTML` must go through `esc(s)` — escapes `&`, `<`, `>`, `"`. Defined inline per page (not in system.js).
+- **Safe links:** External URLs from DB must use `safeLink(url)` — allows only `http://` and `https://` protocols, returns `'#'` otherwise.
+- **External links:** Always add `rel="noopener"` on `target="_blank"` anchors.
+- **Input value attributes:** Escape `"` → `&quot;` when interpolating DB strings into HTML `value="..."` attributes.
+- b-quest-assignment already uses `esc()` globally. b-quest-list applies it to all card render fields.
 
 ## B-QUEST List Filter Pattern
 
