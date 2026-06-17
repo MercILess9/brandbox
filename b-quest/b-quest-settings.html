@@ -542,7 +542,7 @@
 
             container.innerHTML = items.map(w => `
                 <div class="work-row ${w._state === 'deleted' ? 'is-deleted' : w._state === 'new' ? 'is-new' : ''}" data-key="${w._key || `${w.role}|${w.work}`}">
-                    <input class="work-input" value="${w.work}" oninput="onWorkEdit(this)">
+                    <input class="work-input" value="${(w.work||'').replace(/"/g,'&quot;')}" oninput="onWorkEdit(this)">
                     <input class="work-weight" type="number" value="${w.day ?? 1}" min="1" max="99" oninput="onWorkEdit(this)" data-field="day">
                     <input class="work-weight" type="number" value="${w.weight}" min="1" max="99" oninput="onWorkEdit(this)" data-field="weight">
                     <div class="work-actions">

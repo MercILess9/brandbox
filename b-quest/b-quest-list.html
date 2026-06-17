@@ -180,11 +180,14 @@
 
 <script>
     const SEARCH_COLUMNS = ['account_name', 'opportunity_name', 'task_name', 'detail', 'designer_assign', 'creative_assign', 'owner'];
-    let dataList = [];     
-    let assignList = [];   
+    let dataList = [];
+    let assignList = [];
     let currentPage = 0;
     let isFetching = false;
     let hasMore = true;
+
+    function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+    function safeLink(url) { if (!url) return '#'; const u = url.trim(); return (u.startsWith('http://') || u.startsWith('https://')) ? u : '#'; }
 
     // --- Helpers ---
     function setupDefaultOptions(el, label) {
@@ -398,8 +401,8 @@
                 <div class="bqc-card ${isDone ? 'bqc-status-done' : 'bqc-status-progress'}">
                     <div class="bqc-header">
                         <div class="bqc-info-zone" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                            <div class="bqc-title">${task.task_name || 'Untitled'}</div>
-                            <div class="bqc-subtitle">${task.account_name} | ${task.opportunity_name}</div>
+                            <div class="bqc-title">${esc(task.task_name) || 'Untitled'}</div>
+                            <div class="bqc-subtitle">${esc(task.account_name)} | ${esc(task.opportunity_name)}</div>
                         </div>
 
                         <div class="bqc-dl-grid" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
@@ -428,9 +431,9 @@
                         <div class="bqc-body">
                             <div class="bqc-meta-row">
                                 <div class="d-flex gap-2">
-                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Owner</span><span class="bqc-meta-val ms-2">${task.owner || '-'}</span></div>
+                                    <div class="bqc-meta-pill"><span class="bqc-meta-label">Owner</span><span class="bqc-meta-val ms-2">${esc(task.owner) || '-'}</span></div>
                                     <div class="bqc-meta-pill"><span class="bqc-meta-label">Publish</span><span class="bqc-meta-val ms-2">${formatDate(task.publish_date)}</span></div>
-                                    ${task.link ? `<a href="${task.link}" target="_blank" class="bqc-btn-link"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
+                                    ${task.link ? `<a href="${safeLink(task.link)}" target="_blank" rel="noopener" class="bqc-btn-link"><i class="bi bi-link-45deg"></i> Link</a>` : ''}
                                 </div>
                                 <div class="bqc-last-update"><i class="bi bi-clock-history"></i> Last Update : ${formatDate(task.last_update)}</div>
                             </div>
@@ -440,10 +443,10 @@
                                     <div class="bqc-panel-label bqc-panel-label-des"><i class="bi bi-brush"></i> DESIGNER</div>
                                     ${hasD ? `
                                         <div class="bqc-panel bqc-panel-des">
-                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.designer_status}</span></div>
-                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.designer_type || '-'}</span></div>
-                                            <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.designer || '-'}</span></div>
-                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.designer_assign && task.designer_assign !== '-') ? task.designer_assign : '-'}</span></div>
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.designer_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${esc(task.designer_status)}</span></div>
+                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${esc(task.designer_type) || '-'}</span></div>
+                                            <div class="bqc-item"><span>Work</span><span class="bqc-val">${esc(task.designer) || '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.designer_assign && task.designer_assign !== '-') ? esc(task.designer_assign) : '-'}</span></div>
                                             <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.designer_deadline)}</span></div>
                                         </div>
                                     ` : '<div class="bqc-panel-empty">NO DESIGNER</div>'}
@@ -453,10 +456,10 @@
                                     <div class="bqc-panel-label bqc-panel-label-cre"><i class="bi bi-rocket"></i> CREATIVE</div>
                                     ${hasC ? `
                                         <div class="bqc-panel bqc-panel-cre">
-                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${task.creative_status}</span></div>
-                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${task.creative_type || '-'}</span></div>
-                                            <div class="bqc-item"><span>Work</span><span class="bqc-val">${task.creative || '-'}</span></div>
-                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.creative_assign && task.creative_assign !== '-') ? task.creative_assign : '-'}</span></div>
+                                            <div class="bqc-item"><span>Status</span><span class="bqc-val"><span class="bqc-dot ${task.creative_status === 'Done' ? 'bqc-dot-done' : 'bqc-dot-progress'}"></span>${esc(task.creative_status)}</span></div>
+                                            <div class="bqc-item"><span>Type</span><span class="bqc-val">${esc(task.creative_type) || '-'}</span></div>
+                                            <div class="bqc-item"><span>Work</span><span class="bqc-val">${esc(task.creative) || '-'}</span></div>
+                                            <div class="bqc-item"><span>Assign</span><span class="bqc-val">${(task.creative_assign && task.creative_assign !== '-') ? esc(task.creative_assign) : '-'}</span></div>
                                             <div class="bqc-item mt-2"><span>Deadline</span><span class="bqc-val fw-bold">${formatDate(task.creative_deadline)}</span></div>
                                         </div>
                                     ` : '<div class="bqc-panel-empty">NO CREATIVE</div>'}
