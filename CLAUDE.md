@@ -34,7 +34,7 @@ vercel.json
 | `profiles` | id (uuid), codename, employee_id, nick_name, full_name, email, department, level, created_at |
 | `departments` | name (text, PK) — list of departments, RLS: SELECT open to authenticated |
 | `b-quest-list` | id, account_name, opportunity_name, task_name, detail, link, publish_date, designer, designer_weight, designer_type, designer_deadline, designer_assign, designer_status, creative, creative_weight, creative_type, creative_deadline, creative_assign, creative_status, owner, create_date, last_update |
-| `b-quest-work` | role, work, weight |
+| `b-quest-work` | role, work, day, weight |
 | `b_quest_capacity` | role, max_capacity |
 | `b-quest-setting` | codename (PK), ae, creative, designer, new, edit, delete, assign, setting |
 | `setting_project` | codename (PK), bquest, bdashboard, baccount, bcommission, bfinance, system_setting |
@@ -141,6 +141,16 @@ Two sections:
 6. Create a settings table in Supabase: `<project>-setting` with columns: codename (PK), role columns, task columns (new/edit/delete), admin columns (assign/setting)
 7. Add column to `setting_project` table for the new project key
 8. sessionStorage key: `bx_perms_<project>` — system.js clears all `bx_perms_*` keys on index automatically
+
+## B-QUEST List Filter Pattern
+
+Advanced filter zone (`flt-advanced-row`) contains:
+- **Status segmented control** — 3-button group (All / Progress / Done), single-select, default = All
+  - `setStatusFilter(type)` toggles `.active` class and calls `applyFilters()`
+  - Done filter: `or('designer.is.null,designer.eq.-,designer_status.eq.Done')` + same for creative — handles tasks with only one role (other role = null)
+  - Progress filter: `or('designer_status.neq.Done,creative_status.neq.Done')`
+- **Work / Type / Assign / Owner** dropdowns
+- **RESET** resets all dropdowns + returns status to All
 
 ## Projects Status
 
