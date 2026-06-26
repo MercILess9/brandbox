@@ -334,14 +334,15 @@
         menu.className = 'ac-floating-menu';
         menu.style.cssText = `position:fixed;top:${rect.bottom + 4}px;right:${window.innerWidth - rect.right}px;z-index:500;`;
         menu.innerHTML = `
-            <button class="muted" disabled><i class="bi bi-copy"></i> Duplicate</button>
-            ${_canDel ? `<hr><button class="danger" onclick="deleteAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : ''}
+            ${_canEdit ? `<button onclick="duplicateAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-copy"></i> Duplicate</button>` : ''}
+            ${_canDel  ? `<hr><button class="danger" onclick="deleteAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : ''}
         `;
         document.body.appendChild(menu);
         setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
     }
 
     function editAccount(id) { BAccountApp.openEdit(id); }
+    function duplicateAccount(id) { BAccountApp.openDuplicate(id); }
 
     async function deleteAccount(id) {
         const result = await Swal.fire({

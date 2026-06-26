@@ -387,8 +387,22 @@ const BAccountApp = (() => {
         if (typeof loadAllAccounts === 'function') await loadAllAccounts();
     }
 
+    // ── Public: open duplicate ───────────────────────────
+    function openDuplicate(accountId) {
+        const rec = (window.allAccounts || []).find(a => a.account_id === accountId);
+        if (!rec) return;
+        openNew();
+        el('bac-account-name').value = rec.account_name || '';
+        el('bac-address').value      = rec.address      || '';
+        el('bac-contact').value      = rec.contact      || '';
+        el('bac-document').value     = rec.document     || '';
+        el('bac-payment').value      = rec.payment      || '';
+        el('bac-remark').value       = rec.remark       || '';
+        // company_name + tax_id left empty intentionally
+    }
+
     el('bac-form').addEventListener('submit', handleSubmit);
     el('bac-btn-del').addEventListener('click', handleDelete);
 
-    return { openNew, openEdit, openOverlay, closeOverlay };
+    return { openNew, openEdit, openDuplicate, openOverlay, closeOverlay };
 })();
