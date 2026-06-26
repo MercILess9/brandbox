@@ -213,7 +213,7 @@ const BAccountApp = (() => {
 
     function setOwner() {
         const user = getBxUser();
-        el('bac-owner-name').textContent = user ? `${user.codename} (${user.employee_id})` : '—';
+        el('bac-owner-name').textContent = user ? user.codename : '—';
     }
 
     function buildNameList() {
