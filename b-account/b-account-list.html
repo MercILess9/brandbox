@@ -109,9 +109,14 @@
         .ac-floating-menu button.danger:hover { background: #fff5f5; color: #ef4444; }
         .ac-floating-menu hr { border: none; border-top: 1px solid var(--c-border); margin: 4px 0; }
 
-        /* ── Sort + Type seg ── */
+        /* ── Sort seg ── */
         .seg-sm { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
         .seg-sm .seg-btn { min-width: 0; padding: 0 13px; font-size: 0.72rem; }
+
+        /* ── Type pill buttons (B-QUEST style) ── */
+        .type-btn { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 6px 16px; font-size: 0.78rem; font-weight: 700; color: #64748b; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: inherit; }
+        .type-btn:hover:not(.active) { border-color: #cbd5e1; background: var(--c-bg); }
+        .type-btn.active { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
 
         /* ── Empty ── */
         .empty-state { text-align: center; padding: 80px 20px; color: #94a3b8; }
@@ -129,15 +134,12 @@
                 <i class="bi bi-search"></i>
                 <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search...">
             </div>
+            <button id="type-single" class="type-btn" onclick="setTypeFilter('single')"><i class="bi bi-person-fill"></i> Single</button>
+            <button id="type-group"  class="type-btn" onclick="setTypeFilter('group')"><i class="bi bi-people-fill"></i> Group</button>
             <div class="status-seg seg-sm">
-                <button id="seg-all"      class="seg-btn active" onclick="setStatusFilter('all')">All</button>
-                <button id="seg-active"   class="seg-btn"        onclick="setStatusFilter('active')"><i class="bi bi-circle-fill" style="font-size:0.55rem;"></i> Active</button>
+                <button id="seg-all"      class="seg-btn"        onclick="setStatusFilter('all')">All</button>
+                <button id="seg-active"   class="seg-btn active" onclick="setStatusFilter('active')"><i class="bi bi-circle-fill" style="font-size:0.55rem;"></i> Active</button>
                 <button id="seg-inactive" class="seg-btn"        onclick="setStatusFilter('inactive')"><i class="bi bi-circle" style="font-size:0.55rem;"></i> Inactive</button>
-            </div>
-            <div class="status-seg seg-sm">
-                <button id="type-all"    class="seg-btn active" onclick="setTypeFilter('all')">All</button>
-                <button id="type-single" class="seg-btn"        onclick="setTypeFilter('single')"><i class="bi bi-person"></i> Single</button>
-                <button id="type-group"  class="seg-btn"        onclick="setTypeFilter('group')"><i class="bi bi-people"></i> Group</button>
             </div>
             <div class="status-seg seg-sm">
                 <button id="sort-name"   class="seg-btn active" onclick="setSortFilter('name')"   title="Sort A-Z"><i class="bi bi-sort-alpha-down"></i></button>
@@ -171,10 +173,15 @@
     }
 
     function getTypeFilter() {
-        return ['all','single','group'].find(t => document.getElementById(`type-${t}`)?.classList.contains('active')) || 'all';
+        if (document.getElementById('type-single')?.classList.contains('active')) return 'single';
+        if (document.getElementById('type-group')?.classList.contains('active'))  return 'group';
+        return 'all';
     }
     function setTypeFilter(type) {
-        ['all','single','group'].forEach(t => document.getElementById(`type-${t}`)?.classList.toggle('active', t === type));
+        const btn = document.getElementById(`type-${type}`);
+        const isActive = btn?.classList.contains('active');
+        ['single','group'].forEach(t => document.getElementById(`type-${t}`)?.classList.remove('active'));
+        if (!isActive) btn?.classList.add('active');
         renderList();
     }
 
