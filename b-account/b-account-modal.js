@@ -40,9 +40,10 @@ const B_ACCOUNT_MODAL_HTML = `
     .bac-search-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #bdc432; font-size: 0.95rem; cursor: pointer; background: none; border: none; padding: 0; line-height: 1; transition: color 0.15s; }
     .bac-search-icon:hover { color: #8a9000; }
 
-    /* Duplicate warning */
-    .bac-dup-warn { font-size: 0.72rem; font-weight: 700; color: #dc2626; margin-top: 4px; display: none; }
-    .bac-dup-warn.visible { display: block; }
+    /* Duplicate warning — absolute so it doesn't shift layout */
+    .bac-company-wrap { position: relative; }
+    .bac-dup-warn { position: absolute; top: calc(100% + 3px); left: 0; font-size: 0.7rem; font-weight: 700; color: #dc2626; background: #fff; border: 1px solid #fecaca; border-radius: 8px; padding: 3px 9px; white-space: nowrap; display: none; z-index: 10; box-shadow: 0 2px 8px rgba(220,38,38,0.1); }
+    .bac-dup-warn.visible { display: flex; align-items: center; gap: 5px; }
 
     /* ── Card-style text boxes (like ac-box) ── */
     .bac-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -127,9 +128,11 @@ const B_ACCOUNT_MODAL_HTML = `
                             </div>
                             <div style="flex:1; min-width:0;">
                                 <label class="bq-label-modern">Company Name <span style="color:#ef4444">*</span></label>
-                                <input type="text" id="bac-company-name" class="bq-input-modern" style="margin:0;" placeholder="Company name..." required>
-                                <div class="bac-dup-warn" id="bac-dup-warn">
-                                    <i class="bi bi-exclamation-circle me-1"></i>Company name already exists
+                                <div class="bac-company-wrap">
+                                    <input type="text" id="bac-company-name" class="bq-input-modern" style="margin:0;" placeholder="Company name..." required>
+                                    <div class="bac-dup-warn" id="bac-dup-warn">
+                                        <i class="bi bi-exclamation-circle"></i> Already exists
+                                    </div>
                                 </div>
                             </div>
                         </div>
