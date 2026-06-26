@@ -40,6 +40,8 @@
         .ac-company { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .ac-account-sub { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
+        .ac-last-update { font-size: 0.72rem; color: #94a3b8; display: flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0; }
+
         .ac-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; margin-left: 2px; }
         .ac-card.open > .ac-header .ac-chevron { transform: rotate(180deg); }
 
@@ -55,7 +57,6 @@
         /* ── Detail meta bar ── */
         .ac-meta-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
         .ac-owner-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--c-accent-light); border: 1px solid var(--c-accent); border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; color: #5a6000; font-weight: 700; }
-        .ac-update-badge { display: inline-flex; align-items: center; gap: 5px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; color: #64748b; font-weight: 600; margin-left: auto; }
 
         /* ── Detail columns layout ── */
         .ac-addr-row { display: flex; gap: 10px; margin-bottom: 10px; }
@@ -170,13 +171,10 @@
     }
 
     function renderDetail(a) {
-        const updateBy   = a.update_by   || '';
-        const updateDate = a.update_date ? a.update_date.substring(0,10) : '';
-        const hasTax     = a.tax_id && a.tax_id.trim();
+        const hasTax = a.tax_id && a.tax_id.trim();
         return `<div class="ac-detail-inner">
             <div class="ac-meta-bar">
                 <span class="ac-owner-badge"><i class="bi bi-person-fill"></i>${esc(a.create_by || '—')}</span>
-                ${(updateBy || updateDate) ? `<span class="ac-update-badge"><i class="bi bi-clock"></i>Updated · ${[updateBy ? esc(updateBy) : '', updateDate].filter(Boolean).join(' · ')}</span>` : ''}
             </div>
             <div class="ac-addr-row">
                 ${box('bi-geo-alt-fill', 'Address', a.address)}
@@ -201,6 +199,15 @@
         </button>`;
     }
 
+    function lastUpdateEl(a) {
+        const d = a.update_date ? a.update_date.substring(0,10) : (a.create_date ? a.create_date.substring(0,10) : '');
+        if (!d) return '';
+        const [y, m, mo] = d.split('-');
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const fmt = `${parseInt(mo)} ${months[parseInt(m)-1]} ${y}`;
+        return `<span class="ac-last-update"><i class="bi bi-clock"></i>Last Update : ${fmt}</span>`;
+    }
+
     function renderSingleCard(a) {
         const isActive = (a.status || 'Active').toLowerCase() === 'active';
         return `<div class="ac-card${isActive ? '' : ' inactive'}">
@@ -210,6 +217,7 @@
                     <div class="ac-company">${esc(a.account_name)}</div>
                     <div class="ac-account-sub">${esc(a.company_name)}</div>
                 </div>
+                ${lastUpdateEl(a)}
                 ${menuBtn(a.account_id)}
                 <i class="bi bi-chevron-down ac-chevron"></i>
             </div>
