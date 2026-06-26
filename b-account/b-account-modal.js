@@ -40,6 +40,7 @@ const B_ACCOUNT_MODAL_HTML = `
 
     /* Duplicate warning — absolute so it doesn't shift layout */
     .bac-company-wrap { position: relative; }
+    .bac-company-wrap.has-dup .bq-input-modern { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.1); background: #fff; }
     .bac-dup-warn { position: absolute; top: calc(100% + 3px); left: 0; font-size: 0.7rem; font-weight: 700; color: #dc2626; background: #fff; border: 1px solid #fecaca; border-radius: 8px; padding: 3px 9px; white-space: nowrap; display: none; z-index: 10; box-shadow: 0 2px 8px rgba(220,38,38,0.1); }
     .bac-dup-warn.visible { display: flex; align-items: center; gap: 5px; }
 
@@ -212,6 +213,7 @@ const BAccountApp = (() => {
         });
         el('bac-header-status').value = 'Active';
         el('bac-dup-warn').classList.remove('visible');
+        el('bac-company-name').closest('.bac-company-wrap')?.classList.remove('has-dup');
     }
 
     function setOwner() {
@@ -297,7 +299,12 @@ const BAccountApp = (() => {
         );
     }
 
-    el('bac-company-name').addEventListener('input', () => el('bac-dup-warn').classList.remove('visible'));
+    function setDupWarn(show) {
+        el('bac-dup-warn').classList.toggle('visible', show);
+        el('bac-company-name').closest('.bac-company-wrap').classList.toggle('has-dup', show);
+    }
+
+    el('bac-company-name').addEventListener('input', () => setDupWarn(false));
 
     // ── Submit ───────────────────────────────────────────
     async function handleSubmit(e) {
@@ -308,11 +315,11 @@ const BAccountApp = (() => {
 
         const companyName = el('bac-company-name').value.trim();
         if (isDupCompany(companyName)) {
-            el('bac-dup-warn').classList.add('visible');
+            setDupWarn(true);
             el('bac-company-name').focus();
             return;
         }
-        el('bac-dup-warn').classList.remove('visible');
+        setDupWarn(false);
 
         const user = getBxUser();
         const saveBtn = el('bac-btn-save');
