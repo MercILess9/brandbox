@@ -111,23 +111,24 @@ const B_ACCOUNT_MODAL_HTML = `
 
                     <!-- ── Top: Account / Company / Address + Tax ID ── -->
                     <div class="bac-top-card">
-                        <!-- Account Name -->
-                        <div class="bac-account-group" style="margin-bottom:10px;">
-                            <label class="bq-label-modern">Account Name <span style="color:#ef4444">*</span></label>
-                            <div class="d-flex">
-                                <input type="text" id="bac-account-name" class="bq-input-modern"
-                                       style="border-radius:10px 0 0 10px; margin:0;" placeholder="Select or type..." required>
-                                <button type="button" class="bq-search-btn" onclick="BAccountApp.openOverlay()">
-                                    <i class="bi bi-search"></i>
-                                </button>
+                        <!-- Account Name + Company Name same row 50:50 -->
+                        <div class="bac-top-row" style="margin-bottom:10px;">
+                            <div style="flex:1; min-width:0;">
+                                <label class="bq-label-modern">Account Name <span style="color:#ef4444">*</span></label>
+                                <div class="d-flex">
+                                    <input type="text" id="bac-account-name" class="bq-input-modern"
+                                           style="border-radius:10px 0 0 10px; margin:0;" placeholder="Select or type..." required>
+                                    <button type="button" class="bq-search-btn" onclick="BAccountApp.openOverlay()">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Company Name -->
-                        <div class="bac-company-row">
-                            <label class="bq-label-modern">Company Name <span style="color:#ef4444">*</span></label>
-                            <input type="text" id="bac-company-name" class="bq-input-modern" style="margin:0;" placeholder="Company name..." required>
-                            <div class="bac-dup-warn" id="bac-dup-warn">
-                                <i class="bi bi-exclamation-circle me-1"></i>Company name already exists
+                            <div style="flex:1; min-width:0;">
+                                <label class="bq-label-modern">Company Name <span style="color:#ef4444">*</span></label>
+                                <input type="text" id="bac-company-name" class="bq-input-modern" style="margin:0;" placeholder="Company name..." required>
+                                <div class="bac-dup-warn" id="bac-dup-warn">
+                                    <i class="bi bi-exclamation-circle me-1"></i>Company name already exists
+                                </div>
                             </div>
                         </div>
                         <!-- Address + Tax ID same row -->
