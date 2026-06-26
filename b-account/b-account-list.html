@@ -49,10 +49,10 @@
         .ac-actions { display: flex; align-items: center; gap: 6px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
         .ac-card:hover .ac-actions,
         .ac-sub-card:hover .ac-actions { opacity: 1; }
-        .ac-action-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.15s; white-space: nowrap; font-family: inherit; }
-        .ac-action-btn:hover { border-color: #cbd5e1; background: var(--c-bg); color: #1e293b; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
-        .ac-action-icon { border: 1px solid #e2e8f0; background: #fff; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: #94a3b8; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
-        .ac-action-icon:hover { border-color: #cbd5e1; background: var(--c-bg); color: #475569; }
+        .ac-action-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 0 14px; height: 31px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: 0.15s; white-space: nowrap; font-family: inherit; }
+        .ac-action-btn:hover { border-color: var(--c-accent); background: var(--c-accent); color: #1e293b; }
+        .ac-action-icon { border: none; background: transparent; border-radius: 8px; width: 31px; height: 31px; display: flex; align-items: center; justify-content: center; color: var(--c-text-muted); cursor: pointer; transition: 0.15s; font-size: 1.05rem; }
+        .ac-action-icon:hover { background: #f1f5f9; color: var(--c-slate); }
 
         /* ── Detail ── */
         .ac-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
