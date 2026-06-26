@@ -141,13 +141,13 @@
     function groupAccounts(accounts) {
         const map = new Map();
         accounts.forEach(a => {
-            const key = a.company_name || '';
+            const key = a.account_name || '';
             if (!map.has(key)) map.set(key, []);
             map.get(key).push(a);
         });
         return [...map.entries()]
             .sort(([a], [b]) => a.localeCompare(b, 'th'))
-            .map(([company, list]) => ({ company, list }));
+            .map(([account, list]) => ({ account, list }));
     }
 
     function detailItem(icon, label, value, full) {
@@ -189,8 +189,8 @@
             <div class="ac-header" onclick="toggleCard(this.closest('.ac-card'))">
                 <span class="ac-badge">${esc(a.account_id)}</span>
                 <div class="ac-main">
-                    <div class="ac-company">${esc(a.company_name)}</div>
-                    <div class="ac-account-sub">${esc(a.account_name)}</div>
+                    <div class="ac-company">${esc(a.account_name)}</div>
+                    <div class="ac-account-sub">${esc(a.company_name)}</div>
                 </div>
                 ${menuBtn(a.account_id)}
                 <i class="bi bi-chevron-down ac-chevron"></i>
@@ -207,7 +207,7 @@
                 <div class="ac-sub-header" onclick="toggleCard(this.closest('.ac-sub-card'))">
                     <span class="ac-badge">${esc(a.account_id)}</span>
                     <div class="ac-main">
-                        <div class="ac-company" style="font-size:0.88rem;">${esc(a.account_name)}</div>
+                        <div class="ac-company" style="font-size:0.88rem;">${esc(a.company_name)}</div>
                     </div>
                     <span class="ac-sub-status ${isActive ? 'active' : 'inactive'}">${esc(a.status || 'Active')}</span>
                     ${menuBtn(a.account_id)}
@@ -219,9 +219,9 @@
 
         return `<div class="ac-card${hasActive ? '' : ' inactive'}">
             <div class="ac-header" onclick="toggleCard(this.closest('.ac-card'))">
-                <span class="ac-badge count">${group.list.length} Accounts</span>
+                <span class="ac-badge count">${group.list.length} Companies</span>
                 <div class="ac-main">
-                    <div class="ac-company">${esc(group.company)}</div>
+                    <div class="ac-company">${esc(group.account)}</div>
                 </div>
                 <i class="bi bi-chevron-down ac-chevron"></i>
             </div>
@@ -257,6 +257,7 @@
         container.innerHTML = groups.map(g =>
             g.list.length === 1 ? renderSingleCard(g.list[0]) : renderMultiCard(g)
         ).join('');
+
     }
 
     function toggleCard(card) {
@@ -300,8 +301,8 @@
         const { data } = await supabaseClient
             .from('b_account_list')
             .select('*')
-            .order('company_name', { ascending: true })
-            .order('account_id',   { ascending: true });
+            .order('account_name', { ascending: true })
+            .order('account_id',  { ascending: true });
         allAccounts = data || [];
         renderList();
     }
