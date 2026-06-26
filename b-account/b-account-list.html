@@ -13,13 +13,13 @@
     <style>
         body { padding-bottom: 120px; }
 
+        /* ── Filter ── */
         .flt-wrapper { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .flt-inner { max-width: 1300px; margin: 0 auto; }
-        .flt-row { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
-        .flt-search { position: relative; flex: 1; min-width: 120px; }
+        .flt-row { display: flex; align-items: center; gap: 12px; }
+        .flt-search { position: relative; flex: 1; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
         .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
-
         .status-seg { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
         .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 18px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; flex: 1; min-width: 80px; }
         .seg-btn:last-child { border-right: none; }
@@ -27,49 +27,71 @@
         .seg-btn:not(.active):hover { background: var(--c-bg); }
 
         /* ── Card ── */
-        .ac-card { background: #fff; border: 1px solid #eef2f7; border-radius: var(--radius-card); margin-bottom: 10px; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.05); overflow: hidden; transition: box-shadow 0.2s; }
+        .ac-card { background: #fff; border: 1px solid #eef2f7; border-left: 5px solid var(--c-accent); border-radius: var(--radius-card); margin-bottom: 10px; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.05); transition: box-shadow 0.2s; }
         .ac-card:hover { box-shadow: 0 8px 24px -4px rgba(0,0,0,0.09); }
-        .ac-card.open { box-shadow: 0 8px 24px -4px rgba(0,0,0,0.09); }
+        .ac-card.inactive { border-left-color: #d1d5db; }
 
-        .ac-header { display: flex; align-items: center; gap: 16px; padding: 18px 24px; cursor: pointer; }
-        .ac-id-badge { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); letter-spacing: 1px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 4px 10px; flex-shrink: 0; }
+        .ac-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; user-select: none; }
 
-        .ac-info { flex: 1; min-width: 0; }
-        .ac-name { font-size: 0.97rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
-        .ac-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ac-badge { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); letter-spacing: 1px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 4px 10px; flex-shrink: 0; white-space: nowrap; }
+        .ac-badge.count { background: var(--c-accent-light); border-color: var(--c-accent); color: #6b7200; }
 
-        .ac-meta { text-align: right; flex-shrink: 0; min-width: 90px; }
-        .ac-status { display: inline-block; font-size: 0.68rem; font-weight: 800; padding: 3px 11px; border-radius: 20px; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .ac-status.active   { background: #d1fae5; color: #065f46; }
-        .ac-status.inactive { background: #f1f5f9; color: #94a3b8; }
-        .ac-by { font-size: 0.7rem; color: var(--c-muted); }
+        .ac-main { flex: 1; min-width: 0; }
+        .ac-company { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ac-account-sub { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
-        .ac-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; opacity: 0; transition: 0.2s; }
-        .ac-card:hover .ac-actions { opacity: 1; }
-        .ac-btn { border: 1px solid var(--c-border); background: #fff; color: var(--c-slate); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; transition: 0.15s; }
-        .ac-btn:hover { border-color: var(--c-accent); background: var(--c-accent-light); color: var(--c-dark); }
-        .ac-btn.del:hover { border-color: #fca5a5; background: #fff5f5; color: #ef4444; }
+        .ac-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; margin-left: 2px; }
+        .ac-card.open > .ac-header .ac-chevron { transform: rotate(180deg); }
 
-        /* ── Detail Body ── */
-        .ac-body { background: #fafbfc; border-top: 1px solid #f1f5f9; padding: 0; max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.2s ease; }
-        .ac-card.open .ac-body { max-height: 800px; padding: 20px 24px; }
+        .ac-menu-btn { border: 1px solid transparent; background: transparent; color: var(--c-muted); border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.15s; font-size: 1rem; flex-shrink: 0; }
+        .ac-menu-btn:hover { background: var(--c-bg); border-color: var(--c-border); color: var(--c-slate); }
 
-        .ac-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        /* ── Detail body ── */
+        .ac-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .ac-card.open > .ac-detail-body,
+        .ac-sub-card.open > .ac-detail-body { max-height: 1200px; }
+
+        .ac-detail-inner { padding: 20px 22px; background: #fafbfc; border-top: 1px solid #f1f5f9; }
+        .ac-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .ac-detail-full { grid-column: 1 / -1; }
-        .ac-detail-item { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 16px; }
-        .ac-detail-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--c-muted); margin-bottom: 6px; }
+        .ac-detail-item { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 14px; }
+        .ac-detail-label { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--c-muted); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
         .ac-detail-val { font-size: 0.82rem; color: var(--c-slate); white-space: pre-line; line-height: 1.6; }
-        .ac-detail-val.empty { color: var(--c-muted); font-style: italic; }
+        .ac-detail-val.empty { color: #cbd5e1; font-style: italic; }
+        .ac-detail-footer { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; }
+        .ac-detail-by { font-size: 0.7rem; color: var(--c-muted); }
 
-        .ac-detail-footer { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .ac-detail-by { font-size: 0.72rem; color: var(--c-muted); }
+        /* ── Multi body (Level 2) ── */
+        .ac-multi-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .ac-card.open > .ac-multi-body { max-height: 5000px; }
+        .ac-multi-inner { padding: 12px 16px 16px; background: #f4f6f9; border-top: 1px solid #f1f5f9; }
 
-        /* ── Empty / Scroll ── */
+        /* ── Sub Card ── */
+        .ac-sub-card { background: #fff; border: 1px solid #eef2f7; border-left: 4px solid var(--c-accent); border-radius: 14px; margin-bottom: 8px; transition: box-shadow 0.2s; }
+        .ac-sub-card:last-child { margin-bottom: 0; }
+        .ac-sub-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+        .ac-sub-card.inactive { border-left-color: #d1d5db; }
+
+        .ac-sub-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+        .ac-sub-status { font-size: 0.65rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; flex-shrink: 0; }
+        .ac-sub-status.active   { background: #d1fae5; color: #065f46; }
+        .ac-sub-status.inactive { background: #f1f5f9; color: #94a3b8; }
+        .ac-sub-card.open > .ac-sub-header .ac-chevron { transform: rotate(180deg); }
+
+        /* ── Floating menu ── */
+        .ac-floating-menu { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 150px; overflow: hidden; }
+        .ac-floating-menu button { width: 100%; border: none; background: none; padding: 10px 16px; text-align: left; font-size: 0.82rem; font-weight: 600; color: var(--c-text-main); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.12s; font-family: inherit; }
+        .ac-floating-menu button:hover { background: var(--c-bg); }
+        .ac-floating-menu button.muted { color: var(--c-muted); cursor: default; opacity: 0.6; }
+        .ac-floating-menu button.muted:hover { background: none; }
+        .ac-floating-menu button.danger:hover { background: #fff5f5; color: #ef4444; }
+        .ac-floating-menu hr { border: none; border-top: 1px solid var(--c-border); margin: 4px 0; }
+
+        /* ── Empty ── */
         .empty-state { text-align: center; padding: 80px 20px; color: #94a3b8; }
         .empty-state i { font-size: 3rem; display: block; margin-bottom: 16px; }
         .empty-state h3 { font-size: 1rem; font-weight: 700; color: #64748b; margin-bottom: 8px; }
         .empty-state p { font-size: 0.85rem; margin: 0; }
-        #scroll-trigger { height: 40px; }
     </style>
 </head>
 <body>
@@ -92,7 +114,6 @@
 
 <main class="flt-inner" style="padding: 24px 20px 120px;">
     <div id="listContainer"></div>
-    <div id="scroll-trigger"></div>
 </main>
 
 <button class="fab-add" id="btn-add" title="New Account" style="display:none;">
@@ -101,118 +122,160 @@
 
 <script>
     function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
-    function val(s) { return s && s.trim() ? s : null; }
 
-    let page = 0;
-    const PAGE_SIZE = 15;
-    let fetching = false;
-    let hasMore = true;
+    let allAccounts = [];
+    let _canEdit = false;
+    let _canDel  = false;
 
-    function getFilters() {
-        return {
-            search: document.getElementById('globalSearch').value.trim(),
-            status: ['all','active','inactive'].find(t => document.getElementById(`seg-${t}`)?.classList.contains('active')) || 'all'
-        };
+    function getStatusFilter() {
+        return ['all','active','inactive'].find(t => document.getElementById(`seg-${t}`)?.classList.contains('active')) || 'all';
     }
 
     function setStatusFilter(type) {
-        ['all','active','inactive'].forEach(t => {
-            document.getElementById(`seg-${t}`)?.classList.toggle('active', t === type);
-        });
-        fetchData(true);
+        ['all','active','inactive'].forEach(t => document.getElementById(`seg-${t}`)?.classList.toggle('active', t === type));
+        renderList();
     }
 
     function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
-    function toggleCard(cardEl) {
-        cardEl.classList.toggle('open');
+    function groupAccounts(accounts) {
+        const map = new Map();
+        accounts.forEach(a => {
+            const key = a.company_name || '';
+            if (!map.has(key)) map.set(key, []);
+            map.get(key).push(a);
+        });
+        return [...map.entries()]
+            .sort(([a], [b]) => a.localeCompare(b, 'th'))
+            .map(([company, list]) => ({ company, list }));
     }
 
-    function detailItem(label, value, full = false) {
-        const cls = full ? 'ac-detail-item ac-detail-full' : 'ac-detail-item';
-        const v = val(value);
-        return `<div class="${cls}">
-            <div class="ac-detail-label">${label}</div>
+    function detailItem(icon, label, value, full) {
+        const v = value && String(value).trim() ? value : null;
+        return `<div class="ac-detail-item${full ? ' ac-detail-full' : ''}">
+            <div class="ac-detail-label"><i class="bi ${icon}"></i> ${label}</div>
             <div class="ac-detail-val${v ? '' : ' empty'}">${v ? esc(v) : '—'}</div>
         </div>`;
     }
 
-    async function fetchData(reset = false) {
-        if (fetching || (!reset && !hasMore)) return;
-        if (reset) { page = 0; hasMore = true; document.getElementById('listContainer').innerHTML = ''; }
-        fetching = true;
+    function renderDetail(a) {
+        const createStr = [a.create_by, a.create_date ? a.create_date.substring(0,10) : ''].filter(Boolean).join(' · ');
+        const updateStr = [a.update_by, a.update_date ? a.update_date.substring(0,10) : ''].filter(Boolean).join(' · ');
+        return `<div class="ac-detail-inner">
+            <div class="ac-detail-grid">
+                ${detailItem('bi-geo-alt-fill',          'Address',  a.address,  true)}
+                ${detailItem('bi-telephone-fill',        'Contact',  a.contact,  true)}
+                ${detailItem('bi-file-earmark-text-fill','Document', a.document, false)}
+                ${detailItem('bi-credit-card-fill',      'Payment',  a.payment,  false)}
+                ${detailItem('bi-chat-left-text-fill',   'Remark',   a.remark,   true)}
+            </div>
+            <div class="ac-detail-footer">
+                <span class="ac-detail-by">Created ${esc(createStr || '—')}</span>
+                ${updateStr ? `<span class="ac-detail-by">Updated ${esc(updateStr)}</span>` : ''}
+            </div>
+        </div>`;
+    }
 
-        const { search, status } = getFilters();
+    function menuBtn(accountId) {
+        if (!_canEdit && !_canDel) return '';
+        return `<button class="ac-menu-btn" onclick="event.stopPropagation();showMenu(this,'${esc(accountId)}')" title="Options">
+            <i class="bi bi-three-dots-vertical"></i>
+        </button>`;
+    }
 
-        let query = supabaseClient
-            .from('b_account_list')
-            .select('*')
-            .order('company_name', { ascending: true })
-            .order('account_id',   { ascending: true })
-            .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+    function renderSingleCard(a) {
+        const isActive = (a.status || 'Active').toLowerCase() === 'active';
+        return `<div class="ac-card${isActive ? '' : ' inactive'}">
+            <div class="ac-header" onclick="toggleCard(this.closest('.ac-card'))">
+                <span class="ac-badge">${esc(a.account_id)}</span>
+                <div class="ac-main">
+                    <div class="ac-company">${esc(a.company_name)}</div>
+                    <div class="ac-account-sub">${esc(a.account_name)}</div>
+                </div>
+                ${menuBtn(a.account_id)}
+                <i class="bi bi-chevron-down ac-chevron"></i>
+            </div>
+            <div class="ac-detail-body">${renderDetail(a)}</div>
+        </div>`;
+    }
 
-        if (search) query = query.or(`company_name.ilike.%${search}%,account_name.ilike.%${search}%`);
-        if (status !== 'all') query = query.eq('status', status.charAt(0).toUpperCase() + status.slice(1));
+    function renderMultiCard(group) {
+        const hasActive = group.list.some(a => (a.status || 'Active').toLowerCase() === 'active');
+        const subCards = group.list.map(a => {
+            const isActive = (a.status || 'Active').toLowerCase() === 'active';
+            return `<div class="ac-sub-card${isActive ? '' : ' inactive'}">
+                <div class="ac-sub-header" onclick="toggleCard(this.closest('.ac-sub-card'))">
+                    <span class="ac-badge">${esc(a.account_id)}</span>
+                    <div class="ac-main">
+                        <div class="ac-company" style="font-size:0.88rem;">${esc(a.account_name)}</div>
+                    </div>
+                    <span class="ac-sub-status ${isActive ? 'active' : 'inactive'}">${esc(a.status || 'Active')}</span>
+                    ${menuBtn(a.account_id)}
+                    <i class="bi bi-chevron-down ac-chevron"></i>
+                </div>
+                <div class="ac-detail-body">${renderDetail(a)}</div>
+            </div>`;
+        }).join('');
 
-        const { data, error } = await query;
-        if (error || !data) { fetching = false; return; }
+        return `<div class="ac-card${hasActive ? '' : ' inactive'}">
+            <div class="ac-header" onclick="toggleCard(this.closest('.ac-card'))">
+                <span class="ac-badge count">${group.list.length} Accounts</span>
+                <div class="ac-main">
+                    <div class="ac-company">${esc(group.company)}</div>
+                </div>
+                <i class="bi bi-chevron-down ac-chevron"></i>
+            </div>
+            <div class="ac-multi-body">
+                <div class="ac-multi-inner">${subCards}</div>
+            </div>
+        </div>`;
+    }
 
-        hasMore = data.length === PAGE_SIZE;
-        page++;
+    function renderList() {
+        const search = document.getElementById('globalSearch').value.trim().toLowerCase();
+        const status = getStatusFilter();
 
+        let filtered = allAccounts;
+        if (search) filtered = filtered.filter(a =>
+            (a.company_name || '').toLowerCase().includes(search) ||
+            (a.account_name  || '').toLowerCase().includes(search) ||
+            (a.account_id    || '').toLowerCase().includes(search)
+        );
+        if (status !== 'all') {
+            const s = status.charAt(0).toUpperCase() + status.slice(1);
+            filtered = filtered.filter(a => a.status === s);
+        }
+
+        const groups = groupAccounts(filtered);
         const container = document.getElementById('listContainer');
 
-        if (page === 1 && data.length === 0) {
+        if (groups.length === 0) {
             container.innerHTML = `<div class="empty-state"><i class="bi bi-person-vcard"></i><h3>No accounts found</h3><p>Try adjusting your search or filters.</p></div>`;
-            fetching = false;
             return;
         }
 
-        const canEdit = canBaccount('edit');
-        const canDel  = canBaccount('delete');
+        container.innerHTML = groups.map(g =>
+            g.list.length === 1 ? renderSingleCard(g.list[0]) : renderMultiCard(g)
+        ).join('');
+    }
 
-        container.insertAdjacentHTML('beforeend', data.map(a => {
-            const statusClass = (a.status || 'Active').toLowerCase() === 'active' ? 'active' : 'inactive';
-            const createDate  = a.create_date ? a.create_date.substring(0, 10) : '';
-            const updateDate  = a.update_date ? a.update_date.substring(0, 10) : '';
+    function toggleCard(card) {
+        card.classList.toggle('open');
+    }
 
-            const actions = (canEdit || canDel) ? `<div class="ac-actions">
-                ${canEdit ? `<button class="ac-btn" title="Edit" onclick="event.stopPropagation();editAccount('${esc(a.account_id)}')"><i class="bi bi-pencil"></i></button>` : ''}
-                ${canDel  ? `<button class="ac-btn del" title="Delete" onclick="event.stopPropagation();deleteAccount('${esc(a.account_id)}')"><i class="bi bi-trash3"></i></button>` : ''}
-            </div>` : '';
-
-            const byLine = [a.create_by, createDate].filter(Boolean).join(' · ');
-
-            return `<div class="ac-card">
-                <div class="ac-header" onclick="toggleCard(this.closest('.ac-card'))">
-                    <span class="ac-id-badge">${esc(a.account_id)}</span>
-                    <div class="ac-info">
-                        <div class="ac-name">${esc(a.company_name)}</div>
-                        <div class="ac-sub">${esc(a.account_name)}</div>
-                    </div>
-                    <div class="ac-meta">
-                        <div><span class="ac-status ${statusClass}">${esc(a.status || 'Active')}</span></div>
-                        <div class="ac-by">${esc(byLine)}</div>
-                    </div>
-                    ${actions}
-                </div>
-                <div class="ac-body">
-                    <div class="ac-detail-grid">
-                        ${detailItem('Address', a.address, true)}
-                        ${detailItem('Contact', a.contact, true)}
-                        ${detailItem('Document', a.document)}
-                        ${detailItem('Payment', a.payment)}
-                        ${detailItem('Remark', a.remark, true)}
-                    </div>
-                    <div class="ac-detail-footer">
-                        <span class="ac-detail-by">Created by ${esc(a.create_by || '—')}${createDate ? ' · ' + createDate : ''}</span>
-                        ${a.update_by ? `<span class="ac-detail-by">Updated by ${esc(a.update_by)}${updateDate ? ' · ' + updateDate : ''}</span>` : ''}
-                    </div>
-                </div>
-            </div>`;
-        }).join(''));
-
-        fetching = false;
+    function showMenu(btn, accountId) {
+        document.querySelectorAll('.ac-floating-menu').forEach(el => el.remove());
+        const rect = btn.getBoundingClientRect();
+        const menu = document.createElement('div');
+        menu.className = 'ac-floating-menu';
+        menu.style.cssText = `position:fixed;top:${rect.bottom + 4}px;right:${window.innerWidth - rect.right}px;z-index:500;`;
+        menu.innerHTML = `
+            ${_canEdit ? `<button onclick="editAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-pencil"></i> Edit</button>` : ''}
+            <button class="muted" disabled><i class="bi bi-copy"></i> Duplicate</button>
+            ${_canDel  ? `<hr><button class="danger" onclick="deleteAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : ''}
+        `;
+        document.body.appendChild(menu);
+        setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
     }
 
     function editAccount(id) {
@@ -221,36 +284,40 @@
 
     async function deleteAccount(id) {
         const result = await Swal.fire({
-            title: 'Delete Account?',
-            text: `${id} will be permanently deleted.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-            confirmButtonColor: '#ef4444',
-            cancelButtonText: 'Cancel'
+            title: 'Delete Account?', text: `${id} will be permanently deleted.`,
+            icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Delete', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel'
         });
         if (!result.isConfirmed) return;
         const { error } = await supabaseClient.from('b_account_list').delete().eq('account_id', id);
         if (error) { notify('error', 'Delete failed'); return; }
         notify('success', 'Deleted');
-        fetchData(true);
+        allAccounts = allAccounts.filter(a => a.account_id !== id);
+        renderList();
     }
 
-    const observer = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) fetchData();
-    }, { rootMargin: '200px' });
+    async function loadAllAccounts() {
+        const { data } = await supabaseClient
+            .from('b_account_list')
+            .select('*')
+            .order('company_name', { ascending: true })
+            .order('account_id',   { ascending: true });
+        allAccounts = data || [];
+        renderList();
+    }
 
-    document.getElementById('globalSearch').addEventListener('input', debounce(() => fetchData(true), 350));
+    document.getElementById('globalSearch').addEventListener('input', debounce(renderList, 250));
 
     async function initPage() {
         sessionStorage.removeItem('bx_perms_baccount');
         await initLayout(B_ACCOUNT_CONFIG);
+        _canEdit = canBaccount('edit');
+        _canDel  = canBaccount('delete');
         if (canBaccount('new')) document.getElementById('btn-add').style.display = 'flex';
+        await loadAllAccounts();
     }
 
-    initPage().then(() => {
-        fetchData(true).then(() => observer.observe(document.getElementById('scroll-trigger')));
-    });
+    initPage();
 </script>
 </body>
 </html>
