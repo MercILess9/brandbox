@@ -9,6 +9,7 @@
     <script src="/system/config.js"></script>
     <script src="/system/system.js"></script>
     <script src="b-account.js"></script>
+    <script src="b-account-modal.js"></script>
     <link rel="stylesheet" href="b-account.css">
     <style>
         body { padding-bottom: 120px; }
@@ -340,7 +341,7 @@
         setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
     }
 
-    function editAccount(id) { /* TODO: edit modal */ }
+    function editAccount(id) { BAccountApp.openEdit(id); }
 
     async function deleteAccount(id) {
         const result = await Swal.fire({
@@ -375,7 +376,11 @@
         await initLayout(B_ACCOUNT_CONFIG);
         _canEdit = canBaccount('edit');
         _canDel  = canBaccount('delete');
-        if (canBaccount('new')) document.getElementById('btn-add').style.display = 'flex';
+        if (canBaccount('new')) {
+            const fab = document.getElementById('btn-add');
+            fab.style.display = 'flex';
+            fab.onclick = () => BAccountApp.openNew();
+        }
         await loadAllAccounts();
     }
 
