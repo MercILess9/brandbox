@@ -123,7 +123,7 @@
         <div class="flt-row">
             <div class="flt-search">
                 <i class="bi bi-search"></i>
-                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search company or account...">
+                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search...">
             </div>
             <div class="status-seg">
                 <button id="seg-all"      class="seg-btn active" onclick="setStatusFilter('all')">     <i class="bi bi-grid-fill"></i> All</button>
@@ -282,9 +282,16 @@
 
         let filtered = allAccounts;
         if (search) filtered = filtered.filter(a =>
-            (a.company_name || '').toLowerCase().includes(search) ||
+            (a.account_id    || '').toLowerCase().includes(search) ||
             (a.account_name  || '').toLowerCase().includes(search) ||
-            (a.account_id    || '').toLowerCase().includes(search)
+            (a.company_name  || '').toLowerCase().includes(search) ||
+            (a.address       || '').toLowerCase().includes(search) ||
+            (a.tax_id        || '').toLowerCase().includes(search) ||
+            (a.contact       || '').toLowerCase().includes(search) ||
+            (a.document      || '').toLowerCase().includes(search) ||
+            (a.payment       || '').toLowerCase().includes(search) ||
+            (a.remark        || '').toLowerCase().includes(search) ||
+            (a.create_by     || '').toLowerCase().includes(search)
         );
         if (status !== 'all') {
             const s = status.charAt(0).toUpperCase() + status.slice(1);
