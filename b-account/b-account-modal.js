@@ -18,12 +18,15 @@ const B_ACCOUNT_MODAL_HTML = `
     /* ── Body ── */
     .bac-body { padding: 20px 28px; }
 
-    /* ── Top glass card (Account / Company / Tax ID) ── */
+    /* ── Top glass card ── */
     .bac-top-card { background: #fff; border-radius: 18px; padding: 18px 20px 14px; border: 1px solid #eef2f7; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.04); margin-bottom: 14px; }
-    .bac-top-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 0; }
+    .bac-top-row { display: flex; align-items: flex-end; gap: 12px; }
     .bac-account-group { flex: 1; min-width: 0; }
     .bac-taxid-group { width: 210px; flex-shrink: 0; }
     .bac-company-row { margin-top: 10px; }
+    .bac-addr-row { display: flex; align-items: flex-start; gap: 12px; margin-top: 10px; }
+    .bac-addr-group { flex: 4; min-width: 0; }
+    .bac-addr-taxid-group { flex: 1; min-width: 160px; }
 
     /* Inputs */
     .bq-label-modern { font-size: 0.6rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; display: block; }
@@ -46,10 +49,6 @@ const B_ACCOUNT_MODAL_HTML = `
     .bac-box-ta { width: 100%; border: none; background: transparent; padding: 11px 14px; font-size: 0.85rem; color: #334155; font-family: inherit; resize: none; min-height: 80px; outline: none; line-height: 1.6; box-sizing: border-box; transition: background 0.15s; }
     .bac-box-ta:focus { background: #fffef0; }
     .bac-box-ta::placeholder { color: #cbd5e1; }
-    /* Address box — full width */
-    .bac-box.full { grid-column: 1 / -1; }
-    .bac-box.full .bac-box-ta { min-height: 64px; }
-
     /* ── Account name search overlay ── */
     .bac-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 10001; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
     .bac-overlay.open { display: flex; }
@@ -110,27 +109,20 @@ const B_ACCOUNT_MODAL_HTML = `
                 <input type="hidden" id="bac-editing-id">
                 <div class="bac-body">
 
-                    <!-- ── Top: Account / Tax ID / Company ── -->
+                    <!-- ── Top: Account / Company / Address + Tax ID ── -->
                     <div class="bac-top-card">
-                        <div class="bac-top-row">
-                            <!-- Account Name (wide) -->
-                            <div class="bac-account-group">
-                                <label class="bq-label-modern">Account Name <span style="color:#ef4444">*</span></label>
-                                <div class="d-flex">
-                                    <input type="text" id="bac-account-name" class="bq-input-modern"
-                                           style="border-radius:10px 0 0 10px; margin:0;" placeholder="Select or type..." required>
-                                    <button type="button" class="bq-search-btn" onclick="BAccountApp.openOverlay()">
-                                        <i class="bi bi-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- Tax ID (narrow) -->
-                            <div class="bac-taxid-group">
-                                <label class="bq-label-modern">Tax ID</label>
-                                <input type="text" id="bac-tax-id" class="bq-input-modern" style="margin:0;" placeholder="0000000000000">
+                        <!-- Account Name -->
+                        <div class="bac-account-group" style="margin-bottom:10px;">
+                            <label class="bq-label-modern">Account Name <span style="color:#ef4444">*</span></label>
+                            <div class="d-flex">
+                                <input type="text" id="bac-account-name" class="bq-input-modern"
+                                       style="border-radius:10px 0 0 10px; margin:0;" placeholder="Select or type..." required>
+                                <button type="button" class="bq-search-btn" onclick="BAccountApp.openOverlay()">
+                                    <i class="bi bi-search"></i>
+                                </button>
                             </div>
                         </div>
-                        <!-- Company Name (full width below) -->
+                        <!-- Company Name -->
                         <div class="bac-company-row">
                             <label class="bq-label-modern">Company Name <span style="color:#ef4444">*</span></label>
                             <input type="text" id="bac-company-name" class="bq-input-modern" style="margin:0;" placeholder="Company name..." required>
@@ -138,16 +130,21 @@ const B_ACCOUNT_MODAL_HTML = `
                                 <i class="bi bi-exclamation-circle me-1"></i>Company name already exists
                             </div>
                         </div>
+                        <!-- Address + Tax ID same row -->
+                        <div class="bac-addr-row">
+                            <div class="bac-addr-group">
+                                <label class="bq-label-modern">Address</label>
+                                <input type="text" id="bac-address" class="bq-input-modern" style="margin:0;" placeholder="Address...">
+                            </div>
+                            <div class="bac-addr-taxid-group">
+                                <label class="bq-label-modern">Tax ID</label>
+                                <input type="text" id="bac-tax-id" class="bq-input-modern" style="margin:0;" placeholder="0000000000000">
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- ── Card-style boxes ── -->
+                    <!-- ── 2×2 Card-style boxes ── -->
                     <div class="bac-boxes">
-                        <!-- Address — full width -->
-                        <div class="bac-box full">
-                            <div class="bac-box-label"><i class="bi bi-geo-alt-fill"></i> Address</div>
-                            <textarea id="bac-address" class="bac-box-ta" placeholder="Address..."></textarea>
-                        </div>
-                        <!-- 2×2 -->
                         <div class="bac-box">
                             <div class="bac-box-label"><i class="bi bi-telephone-fill"></i> Contact</div>
                             <textarea id="bac-contact" class="bac-box-ta" placeholder="Phone / Email..."></textarea>
