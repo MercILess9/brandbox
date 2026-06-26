@@ -143,7 +143,7 @@ const B_ACCOUNT_MODAL_HTML = `
                             </div>
                             <div class="bac-addr-taxid-group">
                                 <label class="bq-label-modern">Tax ID</label>
-                                <input type="text" id="bac-tax-id" class="bq-input-modern" style="margin:0;" placeholder="0000000000000">
+                                <input type="text" id="bac-tax-id" class="bq-input-modern" style="margin:0; text-align:center; letter-spacing:1.5px; font-family:'Courier New',monospace;" placeholder="0000000000000">
                             </div>
                         </div>
                     </div>
