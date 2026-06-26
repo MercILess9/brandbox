@@ -227,13 +227,19 @@
     }
     function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
-    function populateFilters() {
-        const bizSel   = document.getElementById('filterBiz');
+    function populateOwnerFilter() {
         const ownerSel = document.getElementById('filterOwner');
-        const bizTypes = [...new Set(allOpps.map(o => o.business_type).filter(Boolean))].sort();
-        const owners   = [...new Set(allOpps.map(o => o.owner).filter(Boolean))].sort();
-        bizTypes.forEach(v => { const opt = document.createElement('option'); opt.value = v; opt.textContent = v; bizSel.appendChild(opt); });
-        owners.forEach(v =>   { const opt = document.createElement('option'); opt.value = v; opt.textContent = v; ownerSel.appendChild(opt); });
+        const owners = [...new Set(allOpps.map(o => o.owner).filter(Boolean))].sort();
+        owners.forEach(v => { const opt = document.createElement('option'); opt.value = v; opt.textContent = v; ownerSel.appendChild(opt); });
+    }
+
+    function populateBizFilter(configs) {
+        const bizSel = document.getElementById('filterBiz');
+        (configs || []).forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.value; opt.textContent = c.value;
+            bizSel.appendChild(opt);
+        });
     }
 
     // ── Card render ───────────────────────────────────────────────
@@ -444,11 +450,14 @@
     }
 
     async function loadAllOpps() {
-        const [{ data: opps, error }, { data: accs }] = await Promise.all([
+        const [{ data: opps, error }, { data: accs }, { data: configs }] = await Promise.all([
             supabaseClient.from('b_opportunity_list').select('*'),
-            supabaseClient.from('b_account_list').select('account_id, account_name, company_name')
+            supabaseClient.from('b_account_list').select('account_id, account_name, company_name'),
+            supabaseClient.from('b_opp_config').select('value').eq('type', 'business_type').order('value')
         ]);
         if (error) { console.error('[B-OPP]', error); return; }
+
+        populateBizFilter(configs);
 
         const accMap = new Map((accs || []).map(a => [a.account_id, a]));
         allOpps = (opps || []).map(o => {
@@ -462,7 +471,7 @@
                          .map(f => (f || '').toLowerCase()).join(' ')
             };
         });
-        populateFilters();
+        populateOwnerFilter();
         renderList();
     }
 
