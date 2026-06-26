@@ -185,7 +185,7 @@
 
     function renderDetail(a) {
         const hasTax     = a.tax_id && a.tax_id.trim();
-        const updateStr  = [a.update_by ? esc(a.update_by) : '', fmtDate(a.update_date)].filter(Boolean).join(' · ');
+        const updateStr  = [a.update_by ? esc(a.update_by) : '', fmtDate(a.update_date || a.create_date)].filter(Boolean).join(' · ');
         return `<div class="ac-detail-inner">
             <div class="ac-meta-bar">
                 <span class="ac-owner-badge"><i class="bi bi-person-fill"></i>${esc(a.create_by || '—')}</span>
