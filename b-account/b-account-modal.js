@@ -23,8 +23,6 @@ const B_ACCOUNT_MODAL_HTML = `
     /* ── Top glass card ── */
     .bac-top-card { background: #fff; border-radius: 18px; padding: 18px 20px 14px; border: 1px solid #eef2f7; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.04); margin-bottom: 14px; }
     .bac-top-row { display: flex; align-items: flex-end; gap: 12px; }
-    .bac-account-group { flex: 1; min-width: 0; }
-    .bac-taxid-group { width: 210px; flex-shrink: 0; }
     .bac-company-row { margin-top: 10px; }
     .bac-addr-row { display: flex; align-items: flex-start; gap: 12px; margin-top: 10px; }
     .bac-addr-group { flex: 4; min-width: 0; }

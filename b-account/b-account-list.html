@@ -148,35 +148,26 @@
 
     var allAccounts = [];
     let _canEdit = false, _canDel = false;
+    let _statusFilter = 'active', _typeFilter = 'all', _sortFilter = 'latest';
 
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const isActive = a => (a.status || 'Active').toLowerCase() === 'active';
 
     // ── Filters ──────────────────────────────────────────
-    function getStatusFilter() {
-        return ['all','active','inactive'].find(t => document.getElementById(`seg-${t}`)?.classList.contains('active')) || 'all';
-    }
     function setStatusFilter(type) {
+        _statusFilter = type;
         ['all','active','inactive'].forEach(t => document.getElementById(`seg-${t}`)?.classList.toggle('active', t === type));
         renderList();
     }
-
-    function getTypeFilter() {
-        if (document.getElementById('type-single')?.classList.contains('active')) return 'single';
-        if (document.getElementById('type-group')?.classList.contains('active'))  return 'group';
-        return 'all';
-    }
     function setTypeFilter(type) {
-        const btn = document.getElementById(`type-${type}`);
-        const wasActive = btn?.classList.contains('active');
+        const wasActive = document.getElementById(`type-${type}`)?.classList.contains('active');
         ['single','group'].forEach(t => document.getElementById(`type-${t}`)?.classList.remove('active'));
-        if (!wasActive) btn?.classList.add('active');
+        _typeFilter = wasActive ? 'all' : type;
+        if (!wasActive) document.getElementById(`type-${type}`)?.classList.add('active');
         renderList();
     }
-
-    function getSortFilter() {
-        return document.getElementById('sort-latest')?.classList.contains('active') ? 'latest' : 'name';
-    }
     function setSortFilter(type) {
+        _sortFilter = type;
         ['name','latest'].forEach(t => document.getElementById(`sort-${t}`)?.classList.toggle('active', t === type));
         renderList();
     }
@@ -184,7 +175,9 @@
     function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
     // ── Grouping + Sort ───────────────────────────────────
-    function groupAccounts(accounts, sort) {
+    const maxDate = list => list.reduce((m, x) => Math.max(m, +new Date(x.create_date || 0)), 0);
+
+    function groupAccounts(accounts) {
         const map = new Map();
         for (const a of accounts) {
             const key = a.account_name || '';
@@ -192,11 +185,8 @@
             map.get(key).push(a);
         }
         const groups = [...map.entries()].map(([account, list]) => ({ account, list }));
-        if (sort === 'latest') {
-            groups.sort((a, b) =>
-                Math.max(...b.list.map(x => +new Date(x.create_date || 0))) -
-                Math.max(...a.list.map(x => +new Date(x.create_date || 0)))
-            );
+        if (_sortFilter === 'latest') {
+            groups.sort((a, b) => maxDate(b.list) - maxDate(a.list));
         } else {
             groups.sort((a, b) => a.account.localeCompare(b.account, 'th'));
         }
@@ -215,8 +205,7 @@
     function fmtDate(d) {
         if (!d) return '';
         const [yr, mo, dy] = d.substring(0, 10).split('-');
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        return `${+dy} ${months[+mo - 1]} ${yr}`;
+        return `${+dy} ${MONTHS[+mo - 1]} ${yr}`;
     }
 
     function pill(tag, val) {
@@ -253,14 +242,15 @@
 
     function cardActions(accountId) {
         const id = esc(accountId);
+        const hasMenu = _canEdit || _canDel;
         return `<div class="ac-actions">
             ${_canEdit ? `<button class="ac-action-btn" onclick="event.stopPropagation();editAccount('${id}')"><i class="bi bi-pencil"></i> Edit</button>` : ''}
-            <button class="ac-action-icon" onclick="event.stopPropagation();showMenu(this,'${id}')" title="More"><i class="bi bi-three-dots-vertical"></i></button>
+            ${hasMenu  ? `<button class="ac-action-icon" onclick="event.stopPropagation();showMenu(this,'${id}')" title="More"><i class="bi bi-three-dots-vertical"></i></button>` : ''}
         </div>`;
     }
 
     function renderSingleCard(a) {
-        return `<div class="ac-card${isActive(a) ? '' : ' inactive'}">
+        return `<div class="ac-card${isActive(a) ? '' : ' inactive'}" data-id="${esc(a.account_id)}">
             <div class="ac-header" onclick="toggleCard(this.closest('.ac-card'))">
                 <span class="ac-badge">${esc(a.account_id)}</span>
                 <div class="ac-main">
@@ -270,13 +260,13 @@
                 ${cardActions(a.account_id)}
                 <i class="bi bi-chevron-down ac-chevron"></i>
             </div>
-            <div class="ac-detail-body">${renderDetail(a)}</div>
+            <div class="ac-detail-body"></div>
         </div>`;
     }
 
     function renderMultiCard(group) {
         const anyActive = group.list.some(isActive);
-        const subCards  = group.list.map(a => `<div class="ac-sub-card${isActive(a) ? '' : ' inactive'}">
+        const subCards  = group.list.map(a => `<div class="ac-sub-card${isActive(a) ? '' : ' inactive'}" data-id="${esc(a.account_id)}">
             <div class="ac-sub-header" onclick="toggleCard(this.closest('.ac-sub-card'))">
                 <span class="ac-badge">${esc(a.account_id)}</span>
                 <div class="ac-main">
@@ -285,7 +275,7 @@
                 ${cardActions(a.account_id)}
                 <i class="bi bi-chevron-down ac-chevron"></i>
             </div>
-            <div class="ac-detail-body">${renderDetail(a)}</div>
+            <div class="ac-detail-body"></div>
         </div>`).join('');
 
         return `<div class="ac-card${anyActive ? '' : ' inactive'}">
@@ -301,21 +291,17 @@
     // ── Render list ───────────────────────────────────────
     function renderList() {
         const search = document.getElementById('globalSearch').value.trim().toLowerCase();
-        const status = getStatusFilter();
 
-        let filtered = search
-            ? allAccounts.filter(a => a._search.includes(search))
-            : allAccounts;
+        let filtered = search ? allAccounts.filter(a => a._search.includes(search)) : allAccounts;
 
-        if (status !== 'all') {
-            const s = status === 'active' ? 'Active' : 'Inactive';
+        if (_statusFilter !== 'all') {
+            const s = _statusFilter === 'active' ? 'Active' : 'Inactive';
             filtered = filtered.filter(a => (a.status || 'Active') === s);
         }
 
-        let groups = groupAccounts(filtered, getSortFilter());
-        const type = getTypeFilter();
-        if (type === 'single') groups = groups.filter(g => g.list.length === 1);
-        if (type === 'group')  groups = groups.filter(g => g.list.length > 1);
+        let groups = groupAccounts(filtered);
+        if (_typeFilter === 'single') groups = groups.filter(g => g.list.length === 1);
+        if (_typeFilter === 'group')  groups = groups.filter(g => g.list.length > 1);
 
         const container = document.getElementById('listContainer');
         if (!groups.length) {
@@ -325,7 +311,16 @@
         container.innerHTML = groups.map(g => g.list.length === 1 ? renderSingleCard(g.list[0]) : renderMultiCard(g)).join('');
     }
 
-    function toggleCard(card) { card.classList.toggle('open'); }
+    function toggleCard(card) {
+        if (!card.classList.contains('open')) {
+            const detail = card.querySelector(':scope > .ac-detail-body');
+            if (detail && !detail.innerHTML && card.dataset.id) {
+                const rec = allAccounts.find(a => a.account_id === card.dataset.id);
+                if (rec) detail.innerHTML = renderDetail(rec);
+            }
+        }
+        card.classList.toggle('open');
+    }
 
     function showMenu(btn, accountId) {
         document.querySelectorAll('.ac-floating-menu').forEach(el => el.remove());
