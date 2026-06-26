@@ -4,81 +4,165 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>B-ACCOUNT | Opportunity</title>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/system/config.js"></script>
     <script src="/system/system.js"></script>
     <script src="b-account.js"></script>
     <link rel="stylesheet" href="b-account.css">
-
     <style>
         body { padding-bottom: 120px; }
 
-        /* --- Filter Zone --- */
+        /* ── Filter ── */
         .flt-wrapper { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .flt-inner { max-width: 1300px; margin: 0 auto; }
-        .flt-row { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
-        .flt-search { position: relative; flex: 1; min-width: 120px; }
+        .flt-row { display: flex; align-items: center; gap: 12px; }
+        .flt-search { position: relative; flex: 1; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
-        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; }
-        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; margin-left: auto; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .flt-btn-adv:hover { background: var(--c-bg); border-color: #cbd5e1; }
-        .flt-btn-adv.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
-
-        .flt-advanced-zone { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s ease; opacity: 0; border-top: 1px dashed transparent; }
-        .flt-advanced-zone.show { max-height: 200px; opacity: 1; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; }
-        .flt-advanced-row { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
-
+        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
         .status-seg { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
-        .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 18px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; flex: 1; min-width: 80px; }
+        .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 16px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
         .seg-btn:last-child { border-right: none; }
         .seg-btn.active { background: var(--c-accent); color: #1e293b; }
         .seg-btn:not(.active):hover { background: var(--c-bg); }
+        .seg-sm { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
+        .seg-sm .seg-btn { padding: 0 13px; font-size: 0.72rem; }
 
-        /* --- Empty State --- */
+        /* ── Cards ── */
+        .op-card { background: #fff; border: 1px solid #eef2f7; border-left: 5px solid var(--c-accent); border-radius: var(--radius-card); margin-bottom: 10px; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.05); transition: box-shadow 0.2s; }
+        .op-card:hover { box-shadow: 0 8px 24px -4px rgba(0,0,0,0.09); }
+        .op-card.churn { border-left-color: #f97316; }
+        .op-card.ended { border-left-color: #94a3b8; }
+        .op-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; user-select: none; }
+        .op-badge { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); letter-spacing: 1px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 4px 10px; flex-shrink: 0; white-space: nowrap; }
+        .op-type { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; flex-shrink: 0; white-space: nowrap; border: 1px solid transparent; }
+        .op-type.retention { background: var(--c-accent-light); color: #6b7200; border-color: var(--c-accent); }
+        .op-type.new-biz   { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+        .op-type.upsale    { background: #f5f3ff; color: #6d28d9; border-color: #c4b5fd; }
+        .op-main { flex: 1; min-width: 0; }
+        .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: text; }
+        .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
+        .op-amt-block { text-align: right; flex-shrink: 0; }
+        .op-amt-total { font-size: 0.88rem; font-weight: 800; color: var(--c-text-main); }
+        .op-amt-gp    { font-size: 0.75rem; font-weight: 700; color: #16a34a; }
+        .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
+        .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
+
+        /* ── Hover actions ── */
+        .ac-actions { display: flex; align-items: center; gap: 6px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+        .op-card:hover .ac-actions { opacity: 1; }
+        .ac-action-btn  { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 0 14px; height: 31px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: 0.15s; white-space: nowrap; font-family: inherit; }
+        .ac-action-btn:hover  { border-color: var(--c-accent); background: var(--c-accent); color: #1e293b; }
+        .ac-action-icon { border: none; background: transparent; border-radius: 8px; width: 31px; height: 31px; display: flex; align-items: center; justify-content: center; color: var(--c-text-muted); cursor: pointer; transition: 0.15s; font-size: 1.05rem; }
+        .ac-action-icon:hover { background: #f1f5f9; color: var(--c-slate); }
+
+        /* ── Detail ── */
+        .op-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .op-card.open > .op-detail-body { max-height: 8000px; }
+        .op-detail-inner { padding: 20px 22px; background: #fafbfc; border-top: 1px solid #f1f5f9; }
+
+        /* ── Meta pills ── */
+        .op-meta-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .ac-pill { display: inline-flex; align-items: center; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; font-size: 0.78rem; }
+        .ac-pill-tag { padding: 5px 10px; background: #f1f5f9; color: #94a3b8; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; border-right: 1px solid #e2e8f0; white-space: nowrap; }
+        .ac-pill-val { padding: 5px 12px; font-weight: 700; color: #334155; background: #fff; white-space: nowrap; }
+
+        /* ── Info grid ── */
+        .op-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .op-info-box { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 15px; }
+        .op-info-label { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+        .op-info-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+        .op-info-row:last-child { margin-bottom: 0; }
+        .op-info-key { font-size: 0.7rem; color: #94a3b8; font-weight: 700; min-width: 65px; flex-shrink: 0; }
+        .op-info-val { font-size: 0.82rem; font-weight: 600; color: #334155; }
+
+        /* ── Links ── */
+        .op-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .op-link-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--c-border); background: #fff; border-radius: 10px; padding: 7px 14px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); text-decoration: none; transition: 0.15s; }
+        .op-link-btn:hover { border-color: var(--c-accent); background: var(--c-accent-light); color: #6b7200; }
+        .op-link-btn.disabled { opacity: 0.35; pointer-events: none; }
+
+        /* ── Remark ── */
+        .op-remark { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
+        .op-remark-label { display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
+        .op-remark-val { padding: 10px 13px; font-size: 0.83rem; color: #334155; line-height: 1.65; font-weight: 500; white-space: pre-line; }
+
+        /* ── QT section ── */
+        .op-qt-section { margin-top: 4px; }
+        .op-qt-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .op-qt-card { background: #fff; border: 1px solid #eef2f7; border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
+        .op-qt-card:last-child { margin-bottom: 0; }
+        .op-qt-head { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+        .op-qt-num { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); display: flex; align-items: center; gap: 6px; }
+        .op-qt-co { font-size: 0.68rem; font-weight: 800; background: #1e293b; color: #bdc432; border-radius: 6px; padding: 3px 9px; }
+        .op-qt-totals { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+        .op-qt-amt { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); }
+        .op-qt-gp  { font-size: 0.82rem; font-weight: 800; color: #16a34a; }
+
+        /* ── QT Table ── */
+        .op-qt-wrap { overflow-x: auto; }
+        .op-qt-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .op-qt-table th { padding: 8px 12px; text-align: left; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; background: #f8fafc; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
+        .op-qt-table th.r, .op-qt-table td.r { text-align: right; }
+        .op-qt-table td { padding: 9px 12px; color: #334155; font-weight: 500; border-bottom: 1px solid #f8fafc; vertical-align: top; line-height: 1.5; }
+        .op-qt-table tr:last-child td { border-bottom: none; }
+        .op-qt-table tfoot td { background: #f8fafc; font-weight: 800; color: var(--c-text-main); border-top: 1.5px solid #e2e8f0; }
+        .op-qt-table tfoot .gp { color: #16a34a; }
+        .op-bu { display: inline-flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 0.68rem; font-weight: 800; color: var(--c-slate); }
+        .op-qt-loading { padding: 20px; text-align: center; color: #94a3b8; font-size: 0.82rem; margin: 0; }
+        .op-qt-empty   { padding: 16px; text-align: center; color: #cbd5e1; font-size: 0.82rem; margin: 0; }
+
+        /* ── Floating menu ── */
+        .ac-floating-menu { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 150px; overflow: hidden; }
+        .ac-floating-menu button { width: 100%; border: none; background: none; padding: 10px 16px; text-align: left; font-size: 0.82rem; font-weight: 600; color: var(--c-text-main); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.12s; font-family: inherit; }
+        .ac-floating-menu button:hover { background: var(--c-bg); }
+        .ac-floating-menu button.danger:hover { background: #fff5f5; color: #ef4444; }
+        .ac-floating-menu hr { border: none; border-top: 1px solid var(--c-border); margin: 4px 0; }
+
+        /* ── Empty state ── */
         .empty-state { text-align: center; padding: 80px 20px; color: #94a3b8; }
         .empty-state i { font-size: 3rem; display: block; margin-bottom: 16px; }
         .empty-state h3 { font-size: 1rem; font-weight: 700; color: #64748b; margin-bottom: 8px; }
-        .empty-state p { font-size: 0.85rem; }
+        .empty-state p { font-size: 0.85rem; margin: 0; }
     </style>
 </head>
 <body>
 
-<section id="filter-zone" class="flt-wrapper">
+<section class="flt-wrapper">
     <div class="flt-inner">
         <div class="flt-row">
             <div class="flt-search">
                 <i class="bi bi-search"></i>
-                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search...">
+                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search opportunity, account, owner...">
             </div>
-            <button class="flt-btn-adv" id="toggleFilters"><i class="bi bi-sliders"></i> Advance</button>
-        </div>
-
-        <div class="flt-advanced-zone" id="advancedFilterZone">
-            <div class="flt-advanced-row">
-                <div class="status-seg">
-                    <button id="seg-all" class="seg-btn active" onclick="setStatusFilter('all')"><i class="bi bi-grid-fill"></i> All</button>
-                    <button id="seg-active" class="seg-btn" onclick="setStatusFilter('active')"><i class="bi bi-hourglass-split"></i> Active</button>
-                    <button id="seg-closed" class="seg-btn" onclick="setStatusFilter('closed')"><i class="bi bi-check-circle"></i> Closed</button>
-                </div>
-                <div class="flt-select-box"><span class="flt-select-tag">Owner</span>
-                    <select class="flt-select-input" id="filterOwner"><option value="">All Owner</option></select>
-                </div>
-                <button class="btn-reset" onclick="resetFilters()">RESET</button>
+            <div class="flt-select-box" id="flt-biz-wrap">
+                <span class="flt-select-tag">Type</span>
+                <select class="flt-select-input" id="filterBiz" onchange="setBizFilter(this.value)">
+                    <option value="">All Type</option>
+                </select>
+            </div>
+            <div class="flt-select-box" id="flt-owner-wrap">
+                <span class="flt-select-tag">Owner</span>
+                <select class="flt-select-input" id="filterOwner" onchange="setOwnerFilter(this.value)">
+                    <option value="">All Owner</option>
+                </select>
+            </div>
+            <div class="status-seg">
+                <button id="seg-all"    class="seg-btn"        onclick="setStatusFilter('all')">All</button>
+                <button id="seg-Active" class="seg-btn active" onclick="setStatusFilter('Active')"><i class="bi bi-circle-fill" style="font-size:0.5rem;color:#22c55e;"></i> Active</button>
+                <button id="seg-Churn"  class="seg-btn"        onclick="setStatusFilter('Churn')"><i class="bi bi-circle-fill" style="font-size:0.5rem;color:#f97316;"></i> Churn</button>
+                <button id="seg-End"    class="seg-btn"        onclick="setStatusFilter('End Contact')">End Contact</button>
+            </div>
+            <div class="status-seg seg-sm">
+                <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="A-Z"><i class="bi bi-sort-alpha-down"></i></button>
+                <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Latest"><i class="bi bi-clock"></i></button>
             </div>
         </div>
     </div>
 </section>
 
 <main class="flt-inner" style="padding: 24px 20px 120px;">
-    <div id="listContainer" class="row">
-        <div class="col-12 empty-state">
-            <i class="bi bi-briefcase"></i>
-            <h3>No opportunities yet</h3>
-            <p>Opportunities will appear here once data is connected.</p>
-        </div>
-    </div>
+    <div id="listContainer"></div>
 </main>
 
 <button class="fab-add" id="btn-add" title="New Opportunity" style="display:none;">
@@ -88,29 +172,313 @@
 <script>
     function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
     function safeLink(url) { if (!url) return '#'; const u = url.trim(); return (u.startsWith('http://') || u.startsWith('https://')) ? u : '#'; }
+    function fmtNum(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') : '—'; }
+    function fmtAmt(n) { return n != null && !isNaN(+n) && +n > 0 ? Number(n).toLocaleString('en-US') + ' ฿' : '—'; }
+    function gpPct(gp, amt) { return (gp && amt && +amt > 0) ? (+gp / +amt * 100).toFixed(1) + '%' : null; }
 
+    var allOpps = [];
+    let _canEdit = false, _canDel = false;
+    let _statusFilter = 'Active', _bizFilter = '', _ownerFilter = '', _sortFilter = 'latest';
+
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function fmtDate(d) {
+        if (!d) return '—';
+        const [yr, mo, dy] = String(d).substring(0, 10).split('-');
+        return `${+dy} ${MONTHS[+mo - 1]} ${+yr}`;
+    }
+    function pill(tag, val) {
+        return val ? `<span class="ac-pill"><span class="ac-pill-tag">${tag}</span><span class="ac-pill-val">${esc(String(val))}</span></span>` : '';
+    }
+    function typeClass(t) {
+        if (t === 'Retention')    return 'retention';
+        if (t === 'New Business') return 'new-biz';
+        if (t === 'Up Sale')      return 'upsale';
+        return '';
+    }
+    function cardClass(status) {
+        if (status === 'Churn')       return ' churn';
+        if (status === 'End Contact') return ' ended';
+        return '';
+    }
+
+    // ── Filters ──────────────────────────────────────────────────
+    function setBizFilter(val) {
+        _bizFilter = val;
+        document.getElementById('flt-biz-wrap')?.classList.toggle('active-filter', !!val);
+        renderList();
+    }
+    function setOwnerFilter(val) {
+        _ownerFilter = val;
+        document.getElementById('flt-owner-wrap')?.classList.toggle('active-filter', !!val);
+        renderList();
+    }
     function setStatusFilter(type) {
-        ['all', 'active', 'closed'].forEach(t => {
-            document.getElementById(`seg-${t}`)?.classList.toggle('active', t === type);
+        _statusFilter = type;
+        document.getElementById('seg-all')?.classList.toggle('active',   type === 'all');
+        document.getElementById('seg-Active')?.classList.toggle('active', type === 'Active');
+        document.getElementById('seg-Churn')?.classList.toggle('active',  type === 'Churn');
+        document.getElementById('seg-End')?.classList.toggle('active',    type === 'End Contact');
+        renderList();
+    }
+    function setSortFilter(type) {
+        _sortFilter = type;
+        ['name','latest'].forEach(t => document.getElementById(`sort-${t}`)?.classList.toggle('active', t === type));
+        renderList();
+    }
+    function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+    function populateFilters() {
+        const bizSel   = document.getElementById('filterBiz');
+        const ownerSel = document.getElementById('filterOwner');
+        const bizTypes = [...new Set(allOpps.map(o => o.business_type).filter(Boolean))].sort();
+        const owners   = [...new Set(allOpps.map(o => o.owner).filter(Boolean))].sort();
+        bizTypes.forEach(v => { const opt = document.createElement('option'); opt.value = v; opt.textContent = v; bizSel.appendChild(opt); });
+        owners.forEach(v =>   { const opt = document.createElement('option'); opt.value = v; opt.textContent = v; ownerSel.appendChild(opt); });
+    }
+
+    // ── Card render ───────────────────────────────────────────────
+    function cardActions(id) {
+        const hasMenu = _canEdit || _canDel;
+        return `<div class="ac-actions">
+            ${_canEdit ? `<button class="ac-action-btn" onclick="event.stopPropagation();editOpp('${esc(id)}')"><i class="bi bi-pencil"></i> Edit</button>` : ''}
+            ${hasMenu  ? `<button class="ac-action-icon" onclick="event.stopPropagation();showMenu(this,'${esc(id)}')" title="More"><i class="bi bi-three-dots-vertical"></i></button>` : ''}
+        </div>`;
+    }
+
+    function renderCard(o) {
+        const hasAmt = +o.total_amount > 0;
+        return `<div class="op-card${cardClass(o.status)}" data-id="${esc(o.opportunity_id)}">
+            <div class="op-header" onclick="toggleCard(this.closest('.op-card'))">
+                <span class="op-badge">${esc(o.opportunity_id)}</span>
+                ${o.business_type ? `<span class="op-type ${typeClass(o.business_type)}">${esc(o.business_type)}</span>` : ''}
+                <div class="op-main">
+                    <div class="op-name">${esc(o.opportunity_name || '')}</div>
+                    <div class="op-sub">${esc(o._account_name)}${o.owner ? ` <span style="color:#e2e8f0">|</span> ${esc(o.owner)}` : ''}</div>
+                </div>
+                ${hasAmt ? `<div class="op-amt-block">
+                    <div class="op-amt-total">${fmtAmt(o.total_amount)}</div>
+                    ${+o.total_gp > 0 ? `<div class="op-amt-gp">${fmtAmt(o.total_gp)}</div>` : ''}
+                </div>` : ''}
+                ${cardActions(o.opportunity_id)}
+                <i class="bi bi-chevron-down op-chevron"></i>
+            </div>
+            <div class="op-detail-body"></div>
+        </div>`;
+    }
+
+    // ── Detail render (static part) ───────────────────────────────
+    function renderDetail(o) {
+        const pct = gpPct(o.total_gp, o.total_amount);
+        const linkBtn = (icon, label, url) => {
+            const href = safeLink(url);
+            return `<a href="${href}" target="_blank" rel="noopener" class="op-link-btn${href === '#' ? ' disabled' : ''}"><i class="bi ${icon}"></i>${label}</a>`;
+        };
+        return `<div class="op-detail-inner">
+            <div class="op-meta-bar">
+                ${pill('Account',     o._account_name)}
+                ${pill('Company',     o._company_name)}
+                ${pill('Create By',   o.create_by)}
+                ${pill('Owner',       o.owner)}
+                ${pill('AM',          o.am)}
+                ${o.sub_am ? pill('Sub AM', o.sub_am) : ''}
+                ${pill('Lead Source', o.lead_source)}
+            </div>
+            <div class="op-info-grid">
+                <div class="op-info-box">
+                    <div class="op-info-label"><i class="bi bi-calendar3"></i>Key Dates</div>
+                    <div class="op-info-row"><span class="op-info-key">Signed</span><span class="op-info-val">${fmtDate(o.signed_date)}</span></div>
+                    <div class="op-info-row"><span class="op-info-key">Launch</span><span class="op-info-val">${fmtDate(o.launch_date)}</span></div>
+                    <div class="op-info-row"><span class="op-info-key">Created</span><span class="op-info-val">${fmtDate(o.create_date)}</span></div>
+                </div>
+                <div class="op-info-box">
+                    <div class="op-info-label"><i class="bi bi-cash-stack"></i>Summary</div>
+                    <div class="op-info-row"><span class="op-info-key">Amount</span><span class="op-info-val">${+o.total_amount > 0 ? fmtAmt(o.total_amount) : '—'}</span></div>
+                    <div class="op-info-row"><span class="op-info-key">GP</span><span class="op-info-val" style="color:#16a34a">${+o.total_gp > 0 ? fmtAmt(o.total_gp) : '—'}${pct ? ` <span style="font-size:0.7rem;color:#22c55e">(${pct})</span>` : ''}</span></div>
+                </div>
+            </div>
+            <div class="op-links">
+                ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
+                ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
+                ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
+            </div>
+            ${o.remark ? `<div class="op-remark">
+                <div class="op-remark-label"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
+                <div class="op-remark-val">${esc(o.remark)}</div>
+            </div>` : ''}
+            <div class="op-qt-section">
+                <div class="op-qt-title"><i class="bi bi-file-earmark-text"></i>Quotations</div>
+                <div class="op-qt-zone"><p class="op-qt-loading"><i class="bi bi-arrow-repeat"></i> Loading...</p></div>
+            </div>
+        </div>`;
+    }
+
+    // ── QT render (async) ─────────────────────────────────────────
+    function renderQT(qt) {
+        const items  = (qt.b_opportunity_qt_item || []).sort((a, b) => (a.no || 0) - (b.no || 0));
+        const totAmt = items.reduce((s, i) => s + (+i.amount || 0), 0);
+        const totGP  = items.reduce((s, i) => s + (+i.gp  || 0), 0);
+        const pct    = gpPct(totGP, totAmt);
+
+        const rows = items.length
+            ? items.map(i => `<tr>
+                <td class="r">${i.no ?? ''}</td>
+                <td><span class="op-bu">${esc(i.bu || '')}</span></td>
+                <td style="min-width:200px;white-space:pre-line">${esc(i.detail || '')}</td>
+                <td class="r">${i.qty ?? ''}</td>
+                <td class="r">${i.price != null ? fmtNum(i.price) : ''}</td>
+                <td class="r">${+i.discount ? fmtNum(i.discount) : '0'}</td>
+                <td class="r">${i.amount != null ? fmtNum(i.amount) : ''}</td>
+                <td class="r">${i.gp != null ? fmtNum(i.gp) : '<span style="color:#e2e8f0">—</span>'}</td>
+            </tr>`).join('')
+            : `<tr><td colspan="8" style="text-align:center;color:#cbd5e1;padding:16px">No items</td></tr>`;
+
+        return `<div class="op-qt-card">
+            <div class="op-qt-head">
+                <i class="bi bi-file-earmark-text" style="color:var(--c-muted)"></i>
+                <span class="op-qt-num">${esc(qt.qt_number || qt.qt_id)}</span>
+                ${qt.company_qt ? `<span class="op-qt-co">${esc(qt.company_qt)}</span>` : ''}
+                <div class="op-qt-totals">
+                    <span class="op-qt-amt">${fmtAmt(totAmt)}</span>
+                    ${totGP > 0 ? `<span class="op-qt-gp">${fmtAmt(totGP)}${pct ? ` <span style="font-size:0.68rem">(${pct})</span>` : ''}</span>` : ''}
+                </div>
+            </div>
+            <div class="op-qt-wrap">
+                <table class="op-qt-table">
+                    <thead><tr>
+                        <th class="r" style="width:40px">No.</th>
+                        <th>BU</th><th>Detail</th>
+                        <th class="r">Qty</th><th class="r">Price</th><th class="r">Discount</th>
+                        <th class="r">Amount</th><th class="r">GP</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                    ${items.length ? `<tfoot><tr>
+                        <td colspan="6" class="r" style="font-size:0.68rem;color:#94a3b8;font-weight:700">TOTAL</td>
+                        <td class="r">${totAmt > 0 ? fmtNum(totAmt) : '—'}</td>
+                        <td class="r gp">${totGP > 0 ? fmtNum(totGP) : '—'}</td>
+                    </tr></tfoot>` : ''}
+                </table>
+            </div>
+        </div>`;
+    }
+
+    async function loadQTs(oppId, zone) {
+        if (!zone) return;
+        try {
+            const { data } = await supabaseClient
+                .from('b_opportunity_qt')
+                .select('*, b_opportunity_qt_item(*)')
+                .eq('opportunity_id', oppId)
+                .order('qt_number');
+            if (!data || data.length === 0) {
+                zone.innerHTML = '<p class="op-qt-empty">No quotations yet</p>';
+                return;
+            }
+            zone.innerHTML = data.map(renderQT).join('');
+        } catch {
+            zone.innerHTML = '<p class="op-qt-empty">Failed to load quotations</p>';
+        }
+    }
+
+    // ── Card interactions ─────────────────────────────────────────
+    async function toggleCard(card) {
+        if (!card.classList.contains('open')) {
+            const detail = card.querySelector('.op-detail-body');
+            if (detail && !detail.innerHTML && card.dataset.id) {
+                const rec = allOpps.find(o => o.opportunity_id === card.dataset.id);
+                if (rec) {
+                    detail.innerHTML = renderDetail(rec);
+                    loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
+                }
+            }
+        }
+        card.classList.toggle('open');
+    }
+
+    function showMenu(btn, id) {
+        document.querySelectorAll('.ac-floating-menu').forEach(el => el.remove());
+        const rect = btn.getBoundingClientRect();
+        const menu = document.createElement('div');
+        menu.className = 'ac-floating-menu';
+        menu.style.cssText = `position:fixed;top:${rect.bottom + 4}px;right:${window.innerWidth - rect.right}px;z-index:500;`;
+        menu.innerHTML = `${_canDel ? `<button class="danger" onclick="deleteOpp('${esc(id)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : ''}`;
+        document.body.appendChild(menu);
+        setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
+    }
+
+    function editOpp(id) { /* BOppApp.openEdit(id) */ }
+
+    async function deleteOpp(id) {
+        const result = await Swal.fire({
+            title: 'Delete Opportunity?', text: `${id} and all its quotations will be permanently deleted.`,
+            icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Delete', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel'
         });
+        if (!result.isConfirmed) return;
+        const { error } = await supabaseClient.from('b_opportunity_list').delete().eq('opportunity_id', id);
+        if (error) { notify('error', 'Delete failed'); return; }
+        notify('success', 'Deleted');
+        allOpps = allOpps.filter(o => o.opportunity_id !== id);
+        renderList();
     }
 
-    function resetFilters() {
-        document.getElementById('globalSearch').value = '';
-        document.getElementById('filterOwner').value = '';
-        setStatusFilter('all');
+    // ── Data load ─────────────────────────────────────────────────
+    function renderList() {
+        const search = document.getElementById('globalSearch').value.trim().toLowerCase();
+        let filtered = search ? allOpps.filter(o => o._search.includes(search)) : allOpps;
+        if (_statusFilter !== 'all') filtered = filtered.filter(o => (o.status || 'Active') === _statusFilter);
+        if (_bizFilter)              filtered = filtered.filter(o => o.business_type === _bizFilter);
+        if (_ownerFilter)            filtered = filtered.filter(o => o.owner === _ownerFilter);
+
+        if (_sortFilter === 'latest') {
+            filtered = [...filtered].sort((a, b) => new Date(b.create_date || 0) - new Date(a.create_date || 0));
+        } else {
+            filtered = [...filtered].sort((a, b) => (a.opportunity_name || '').localeCompare(b.opportunity_name || '', 'th'));
+        }
+
+        const container = document.getElementById('listContainer');
+        if (!filtered.length) {
+            container.innerHTML = `<div class="empty-state"><i class="bi bi-briefcase"></i><h3>No opportunities found</h3><p>Try adjusting your search or filters.</p></div>`;
+            return;
+        }
+        container.innerHTML = filtered.map(renderCard).join('');
     }
 
-    document.getElementById('toggleFilters').addEventListener('click', function() {
-        const zone = document.getElementById('advancedFilterZone');
-        const isShow = zone.classList.toggle('show');
-        this.classList.toggle('active', isShow);
-    });
+    async function loadAllOpps() {
+        const [{ data: opps, error }, { data: accs }] = await Promise.all([
+            supabaseClient.from('b_opportunity_list').select('*'),
+            supabaseClient.from('b_account_list').select('account_id, account_name, company_name')
+        ]);
+        if (error) { console.error('[B-OPP]', error); return; }
+
+        const accMap = new Map((accs || []).map(a => [a.account_id, a]));
+        allOpps = (opps || []).map(o => {
+            const acc = accMap.get(o.account_id) || {};
+            return {
+                ...o,
+                _account_name: acc.account_name || o.account_id || '',
+                _company_name: acc.company_name || '',
+                _search: [o.opportunity_id, o.opportunity_name, acc.account_name, acc.company_name,
+                          o.business_type, o.owner, o.am, o.sub_am, o.lead_source, o.remark]
+                         .map(f => (f || '').toLowerCase()).join(' ')
+            };
+        });
+        populateFilters();
+        renderList();
+    }
+
+    document.getElementById('globalSearch').addEventListener('input', debounce(renderList, 250));
 
     async function initPage() {
         sessionStorage.removeItem('bx_perms_baccount');
         await initLayout(B_ACCOUNT_CONFIG);
-        if (canBaccount('new')) document.getElementById('btn-add').style.display = 'flex';
+        _canEdit = canBaccount('edit');
+        _canDel  = canBaccount('delete');
+        if (canBaccount('new')) {
+            const fab = document.getElementById('btn-add');
+            fab.style.display = 'flex';
+            fab.onclick = () => { /* BOppApp.openNew() */ };
+        }
+        await loadAllOpps();
     }
 
     initPage();
