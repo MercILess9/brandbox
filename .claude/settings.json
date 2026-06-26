@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\MercILess\\\\Brandbox\\\\brandbox\\\\supabase\")"
+      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\MercILess\\\\Brandbox\\\\brandbox\\\\supabase\")",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git add *)"
     ]
   }
 }
