@@ -317,11 +317,12 @@
     }
 
     async function loadAllAccounts() {
-        const { data } = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('b_account_list')
-            .select('account_id, account_name, company_name, status, address, tax_id, contact, document, payment, remark, create_by, create_date, update_by, update_date')
+            .select('*')
             .order('account_name', { ascending: true })
             .order('account_id',  { ascending: true });
+        if (error) { console.error('[B-ACCOUNT] loadAllAccounts error:', error); }
         allAccounts = data || [];
         renderList();
     }
