@@ -52,7 +52,6 @@
         .ac-action-icon:hover { border-color: #cbd5e1; background: var(--c-bg); color: #475569; }
 
         /* ── Detail last update (inside) ── */
-        .ac-last-update { font-size: 0.72rem; color: #94a3b8; display: inline-flex; align-items: center; gap: 5px; }
 
         /* ── Detail body ── */
         .ac-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
@@ -61,7 +60,10 @@
 
         .ac-detail-inner { padding: 20px 22px; background: #fafbfc; border-top: 1px solid #f1f5f9; }
         /* ── Detail meta bar ── */
-        .ac-meta-bar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+        .ac-meta-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .ac-pill { display: inline-flex; align-items: center; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; font-size: 0.78rem; }
+        .ac-pill-tag { padding: 5px 10px; background: #f1f5f9; color: #94a3b8; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; border-right: 1px solid #e2e8f0; white-space: nowrap; }
+        .ac-pill-val { padding: 5px 12px; font-weight: 700; color: #334155; background: #fff; white-space: nowrap; }
 
         /* ── Location panel (Address + Tax ID) — single container, internal divider ── */
         .ac-location { display: flex; background: #fff; border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
@@ -185,11 +187,22 @@
         return `${parseInt(mo)} ${months[parseInt(m)-1]} ${y}`;
     }
 
+    function pill(tag, val) {
+        if (!val) return '';
+        return `<span class="ac-pill"><span class="ac-pill-tag">${tag}</span><span class="ac-pill-val">${val}</span></span>`;
+    }
+
     function renderDetail(a) {
-        const hasTax     = a.tax_id && a.tax_id.trim();
-        const updateStr  = [a.update_by ? esc(a.update_by) : '', fmtDate(a.update_date || a.create_date)].filter(Boolean).join(' | ');
+        const hasTax    = a.tax_id && a.tax_id.trim();
+        const createBy  = a.create_by  ? esc(a.create_by)  : '';
+        const updateBy  = a.update_by  ? esc(a.update_by)  : '';
+        const updateDate = fmtDate(a.update_date || a.create_date);
+        const lastUpdate = [updateBy, updateDate].filter(Boolean).join(' · ');
         return `<div class="ac-detail-inner">
-            ${updateStr ? `<div class="ac-meta-bar"><span class="ac-last-update"><i class="bi bi-clock"></i>Last Update : ${updateStr}</span></div>` : ''}
+            <div class="ac-meta-bar">
+                ${pill('Create By', createBy)}
+                ${pill('Last Update', lastUpdate)}
+            </div>
             <div class="ac-location">
                 <div class="ac-location-addr">
                     <div class="ac-location-label"><i class="bi bi-geo-alt-fill"></i>Address</div>
