@@ -57,16 +57,20 @@
         .ac-owner-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--c-accent-light); border: 1px solid var(--c-accent); border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; color: #5a6000; font-weight: 700; }
         .ac-update-badge { display: inline-flex; align-items: center; gap: 5px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; color: #64748b; font-weight: 600; margin-left: auto; }
 
-        /* ── Info panel (B-QUEST style rows) ── */
-        .ac-info-panel { background: #fff; border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden; }
-        .ac-info-row { display: flex; align-items: flex-start; gap: 16px; padding: 10px 16px; border-bottom: 1px solid #f8fafc; }
-        .ac-info-row:last-child { border-bottom: none; }
-        .ac-info-label { display: flex; align-items: center; gap: 5px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; white-space: nowrap; min-width: 86px; padding-top: 2px; flex-shrink: 0; }
-        .ac-info-val { font-size: 0.84rem; color: #334155; line-height: 1.65; white-space: pre-line; font-weight: 500; max-height: 120px; overflow-y: auto; }
-        .ac-info-val.empty { color: #cbd5e1; font-weight: 400; }
-        .ac-info-val::-webkit-scrollbar { width: 3px; }
-        .ac-info-val::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
-        .ac-info-val.mono { font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 1.5px; font-size: 0.88rem; }
+        /* ── Detail columns layout ── */
+        .ac-addr-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .ac-addr-row .ac-box { flex: 1; }
+        .ac-taxid-box { flex: 0 0 160px; }
+        .ac-detail-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* ── Shared box ── */
+        .ac-box { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; overflow: hidden; }
+        .ac-box-label { display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
+        .ac-box-val { padding: 10px 13px; font-size: 0.83rem; color: #334155; line-height: 1.65; white-space: pre-line; max-height: 120px; overflow-y: auto; font-weight: 500; }
+        .ac-box-val.empty { color: #cbd5e1; font-weight: 400; }
+        .ac-box-val::-webkit-scrollbar { width: 3px; }
+        .ac-box-val::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+        .ac-taxid-val { padding: 10px 13px; font-family: 'Courier New', monospace; font-size: 0.88rem; font-weight: 700; color: #334155; letter-spacing: 1.5px; }
 
         /* ── Multi body (Level 2) ── */
         .ac-multi-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
@@ -157,31 +161,36 @@
             .map(([account, list]) => ({ account, list }));
     }
 
-    function infoRow(icon, label, value, cls = '') {
+    function box(icon, label, value) {
         const v = value && String(value).trim() ? value : null;
-        return `<div class="ac-info-row">
-            <div class="ac-info-label"><i class="bi ${icon}"></i>${label}</div>
-            <div class="ac-info-val${cls ? ' ' + cls : ''}${v ? '' : ' empty'}">${v ? esc(v) : '—'}</div>
+        return `<div class="ac-box">
+            <div class="ac-box-label"><i class="bi ${icon}"></i>${label}</div>
+            <div class="ac-box-val${v ? '' : ' empty'}">${v ? esc(v) : '—'}</div>
         </div>`;
     }
 
     function renderDetail(a) {
         const updateBy   = a.update_by   || '';
         const updateDate = a.update_date ? a.update_date.substring(0,10) : '';
-        const rows = [
-            infoRow('bi-geo-alt-fill',          'Address',  a.address),
-            infoRow('bi-hash',                  'Tax ID',   a.tax_id, 'mono'),
-            infoRow('bi-telephone-fill',        'Contact',  a.contact),
-            infoRow('bi-file-earmark-text-fill','Document', a.document),
-            infoRow('bi-credit-card-fill',      'Payment',  a.payment),
-            infoRow('bi-chat-left-text-fill',   'Remark',   a.remark),
-        ].join('');
+        const hasTax     = a.tax_id && a.tax_id.trim();
         return `<div class="ac-detail-inner">
             <div class="ac-meta-bar">
                 <span class="ac-owner-badge"><i class="bi bi-person-fill"></i>${esc(a.create_by || '—')}</span>
-                ${(updateBy || updateDate) ? `<span class="ac-update-badge"><i class="bi bi-clock"></i>Updated ${[updateBy ? esc(updateBy) : '', updateDate].filter(Boolean).join(' · ')}</span>` : ''}
+                ${(updateBy || updateDate) ? `<span class="ac-update-badge"><i class="bi bi-clock"></i>Updated · ${[updateBy ? esc(updateBy) : '', updateDate].filter(Boolean).join(' · ')}</span>` : ''}
             </div>
-            <div class="ac-info-panel">${rows}</div>
+            <div class="ac-addr-row">
+                ${box('bi-geo-alt-fill', 'Address', a.address)}
+                <div class="ac-box ac-taxid-box">
+                    <div class="ac-box-label"><i class="bi bi-hash"></i>Tax ID</div>
+                    <div class="${hasTax ? 'ac-taxid-val' : 'ac-box-val empty'}">${hasTax ? esc(a.tax_id) : '—'}</div>
+                </div>
+            </div>
+            <div class="ac-detail-2x2">
+                ${box('bi-telephone-fill',         'Contact',  a.contact)}
+                ${box('bi-file-earmark-text-fill', 'Document', a.document)}
+                ${box('bi-credit-card-fill',       'Payment',  a.payment)}
+                ${box('bi-chat-left-text-fill',    'Remark',   a.remark)}
+            </div>
         </div>`;
     }
 
