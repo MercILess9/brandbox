@@ -40,13 +40,19 @@
         .ac-company { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .ac-account-sub { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
-        .ac-last-update { font-size: 0.72rem; color: #94a3b8; display: flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0; }
-
         .ac-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; margin-left: 2px; }
         .ac-card.open > .ac-header .ac-chevron { transform: rotate(180deg); }
 
-        .ac-menu-btn { border: 1px solid transparent; background: transparent; color: var(--c-muted); border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.15s; font-size: 1rem; flex-shrink: 0; }
-        .ac-menu-btn:hover { background: var(--c-bg); border-color: var(--c-border); color: var(--c-slate); }
+        /* ── Hover actions (B-QUEST style) ── */
+        .ac-actions { display: flex; align-items: center; gap: 6px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+        .ac-card:hover .ac-actions { opacity: 1; }
+        .ac-action-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.15s; white-space: nowrap; font-family: inherit; }
+        .ac-action-btn:hover { border-color: #cbd5e1; background: var(--c-bg); color: #1e293b; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+        .ac-action-icon { border: 1px solid #e2e8f0; background: #fff; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: #94a3b8; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
+        .ac-action-icon:hover { border-color: #cbd5e1; background: var(--c-bg); color: #475569; }
+
+        /* ── Detail last update (inside) ── */
+        .ac-last-update { font-size: 0.72rem; color: #94a3b8; display: inline-flex; align-items: center; gap: 5px; margin-left: auto; }
 
         /* ── Detail body ── */
         .ac-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
@@ -170,11 +176,20 @@
         </div>`;
     }
 
+    function fmtDate(d) {
+        if (!d) return '';
+        const [y, m, mo] = d.substring(0,10).split('-');
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return `${parseInt(mo)} ${months[parseInt(m)-1]} ${y}`;
+    }
+
     function renderDetail(a) {
-        const hasTax = a.tax_id && a.tax_id.trim();
+        const hasTax     = a.tax_id && a.tax_id.trim();
+        const updateStr  = [a.update_by ? esc(a.update_by) : '', fmtDate(a.update_date)].filter(Boolean).join(' · ');
         return `<div class="ac-detail-inner">
             <div class="ac-meta-bar">
                 <span class="ac-owner-badge"><i class="bi bi-person-fill"></i>${esc(a.create_by || '—')}</span>
+                ${updateStr ? `<span class="ac-last-update"><i class="bi bi-clock"></i>Last Update : ${updateStr}</span>` : ''}
             </div>
             <div class="ac-addr-row">
                 ${box('bi-geo-alt-fill', 'Address', a.address)}
@@ -192,20 +207,12 @@
         </div>`;
     }
 
-    function menuBtn(accountId) {
-        if (!_canEdit && !_canDel) return '';
-        return `<button class="ac-menu-btn" onclick="event.stopPropagation();showMenu(this,'${esc(accountId)}')" title="Options">
-            <i class="bi bi-three-dots-vertical"></i>
-        </button>`;
-    }
-
-    function lastUpdateEl(a) {
-        const d = a.update_date ? a.update_date.substring(0,10) : (a.create_date ? a.create_date.substring(0,10) : '');
-        if (!d) return '';
-        const [y, m, mo] = d.split('-');
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const fmt = `${parseInt(mo)} ${months[parseInt(m)-1]} ${y}`;
-        return `<span class="ac-last-update"><i class="bi bi-clock"></i>Last Update : ${fmt}</span>`;
+    function cardActions(accountId) {
+        const actions = [];
+        if (_canEdit) actions.push(`<button class="ac-action-btn" onclick="event.stopPropagation();editAccount('${esc(accountId)}')"><i class="bi bi-pencil"></i> Edit</button>`);
+        actions.push(`<button class="ac-action-icon" onclick="event.stopPropagation();" title="Duplicate"><i class="bi bi-copy"></i></button>`);
+        if (_canDel) actions.push(`<button class="ac-action-icon" onclick="event.stopPropagation();showMenu(this,'${esc(accountId)}')" title="More"><i class="bi bi-three-dots-vertical"></i></button>`);
+        return actions.length ? `<div class="ac-actions">${actions.join('')}</div>` : '';
     }
 
     function renderSingleCard(a) {
@@ -217,8 +224,7 @@
                     <div class="ac-company">${esc(a.account_name)}</div>
                     <div class="ac-account-sub">${esc(a.company_name)}</div>
                 </div>
-                ${lastUpdateEl(a)}
-                ${menuBtn(a.account_id)}
+                ${cardActions(a.account_id)}
                 <i class="bi bi-chevron-down ac-chevron"></i>
             </div>
             <div class="ac-detail-body">${renderDetail(a)}</div>
@@ -236,7 +242,7 @@
                         <div class="ac-company" style="font-size:0.88rem;">${esc(a.company_name)}</div>
                     </div>
                     <span class="ac-sub-status ${isActive ? 'active' : 'inactive'}">${esc(a.status || 'Active')}</span>
-                    ${menuBtn(a.account_id)}
+                    ${cardActions(a.account_id)}
                     <i class="bi bi-chevron-down ac-chevron"></i>
                 </div>
                 <div class="ac-detail-body">${renderDetail(a)}</div>
@@ -297,9 +303,7 @@
         menu.className = 'ac-floating-menu';
         menu.style.cssText = `position:fixed;top:${rect.bottom + 4}px;right:${window.innerWidth - rect.right}px;z-index:500;`;
         menu.innerHTML = `
-            ${_canEdit ? `<button onclick="editAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-pencil"></i> Edit</button>` : ''}
-            <button class="muted" disabled><i class="bi bi-copy"></i> Duplicate</button>
-            ${_canDel  ? `<hr><button class="danger" onclick="deleteAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : ''}
+            ${_canDel ? `<button class="danger" onclick="deleteAccount('${esc(accountId)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : ''}
         `;
         document.body.appendChild(menu);
         setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
