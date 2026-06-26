@@ -14,6 +14,8 @@ const B_ACCOUNT_MODAL_HTML = `
     .bac-status-wrap.visible { display: flex; }
     #bac-header-status { border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.8rem; font-weight: 700; padding: 0 14px; background: #fff; color: #334155; cursor: pointer; font-family: inherit; height: 36px; outline: none; transition: 0.2s; }
     #bac-header-status:focus { border-color: #bdc432; box-shadow: 0 0 0 3px rgba(189,196,50,0.12); }
+    #bac-header-status.status-active   { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+    #bac-header-status.status-inactive { background: #f8fafc; color: #94a3b8; border-color: #e2e8f0; }
 
     /* ── Body ── */
     .bac-body { padding: 20px 28px; }
@@ -257,6 +259,7 @@ const BAccountApp = (() => {
         el('bac-payment').value = rec.payment || '';
         el('bac-remark').value = rec.remark || '';
         el('bac-header-status').value = rec.status || 'Active';
+        updateStatusStyle();
         el('bac-status-wrap').classList.add('visible');
         el('bac-btn-del').style.display = 'inline-flex';
         el('bac-save-icon').className = 'bi bi-check-circle-fill';
@@ -298,6 +301,13 @@ const BAccountApp = (() => {
             (a.company_name || '').trim().toLowerCase() === trimmed
         );
     }
+
+    function updateStatusStyle() {
+        const s = el('bac-header-status');
+        s.classList.toggle('status-active',   s.value === 'Active');
+        s.classList.toggle('status-inactive', s.value === 'Inactive');
+    }
+    el('bac-header-status').addEventListener('change', updateStatusStyle);
 
     function setDupWarn(show) {
         el('bac-dup-warn').classList.toggle('visible', show);
