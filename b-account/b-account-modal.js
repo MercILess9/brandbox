@@ -34,11 +34,9 @@ const B_ACCOUNT_MODAL_HTML = `
     .bq-input-modern:focus { outline: none; border-color: #bdc432; background: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.12); }
     .was-validated .bq-input-modern:invalid { border-color: #dc3545 !important; background-color: #fff8f8; }
 
-    /* Search icon inside input */
-    .bac-input-wrap { position: relative; }
-    .bac-input-wrap .bq-input-modern { padding-right: 38px; }
-    .bac-search-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #bdc432; font-size: 0.95rem; cursor: pointer; background: none; border: none; padding: 0; line-height: 1; transition: color 0.15s; }
-    .bac-search-icon:hover { color: #8a9000; }
+    /* Search button */
+    .bq-search-btn { width: 44px; height: 35px; flex-shrink: 0; border: 1px solid #bdc432; border-left: none; border-radius: 0 10px 10px 0; background: #f4f7a1; color: #7a8500; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: 0.2s; }
+    .bq-search-btn:hover { background: #bdc432; color: #fff; }
 
     /* Duplicate warning — absolute so it doesn't shift layout */
     .bac-company-wrap { position: relative; }
@@ -118,10 +116,10 @@ const B_ACCOUNT_MODAL_HTML = `
                         <div class="bac-top-row" style="margin-bottom:10px;">
                             <div style="flex:1; min-width:0;">
                                 <label class="bq-label-modern">Account Name <span style="color:#ef4444">*</span></label>
-                                <div class="bac-input-wrap">
+                                <div class="d-flex">
                                     <input type="text" id="bac-account-name" class="bq-input-modern"
-                                           style="margin:0;" placeholder="Select or type..." required>
-                                    <button type="button" class="bac-search-icon" onclick="BAccountApp.openOverlay()" tabindex="-1">
+                                           style="border-radius:10px 0 0 10px; margin:0;" placeholder="Select or type..." required>
+                                    <button type="button" class="bq-search-btn" onclick="BAccountApp.openOverlay()">
                                         <i class="bi bi-search"></i>
                                     </button>
                                 </div>
