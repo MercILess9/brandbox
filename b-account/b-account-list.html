@@ -64,20 +64,23 @@
         .ac-meta-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
         .ac-owner-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--c-accent-light); border: 1px solid var(--c-accent); border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; color: #5a6000; font-weight: 700; }
 
-        /* ── Detail columns layout ── */
-        .ac-addr-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .ac-addr-row .ac-box { flex: 1; }
-        .ac-taxid-box { flex: 0 0 160px; }
-        .ac-detail-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* ── Location panel (Address + Tax ID) — single container, internal divider ── */
+        .ac-location { display: flex; background: #fff; border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
+        .ac-location-addr { flex: 4; padding: 10px 14px; border-right: 1px solid #f1f5f9; min-width: 0; }
+        .ac-location-tax  { flex: 1; padding: 10px 14px; min-width: 130px; }
+        .ac-location-label { display: flex; align-items: center; gap: 5px; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 6px; }
+        .ac-location-val { font-size: 0.83rem; color: #334155; line-height: 1.6; white-space: pre-line; font-weight: 500; }
+        .ac-location-val.empty { color: #cbd5e1; font-weight: 400; }
+        .ac-location-tax .ac-location-val { font-family: 'Courier New', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 1.5px; }
 
-        /* ── Shared box ── */
+        /* ── 2x2 boxes ── */
+        .ac-detail-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .ac-box { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; overflow: hidden; }
         .ac-box-label { display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
         .ac-box-val { padding: 10px 13px; font-size: 0.83rem; color: #334155; line-height: 1.65; white-space: pre-line; max-height: 120px; overflow-y: auto; font-weight: 500; }
         .ac-box-val.empty { color: #cbd5e1; font-weight: 400; }
         .ac-box-val::-webkit-scrollbar { width: 3px; }
         .ac-box-val::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
-        .ac-taxid-val { padding: 10px 13px; font-family: 'Courier New', monospace; font-size: 0.88rem; font-weight: 700; color: #334155; letter-spacing: 1.5px; }
 
         /* ── Multi body (Level 2) ── */
         .ac-multi-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
@@ -191,11 +194,14 @@
                 <span class="ac-owner-badge"><i class="bi bi-person-fill"></i>${esc(a.create_by || '—')}</span>
                 ${updateStr ? `<span class="ac-last-update"><i class="bi bi-clock"></i>Last Update : ${updateStr}</span>` : ''}
             </div>
-            <div class="ac-addr-row">
-                ${box('bi-geo-alt-fill', 'Address', a.address)}
-                <div class="ac-box ac-taxid-box">
-                    <div class="ac-box-label"><i class="bi bi-hash"></i>Tax ID</div>
-                    <div class="${hasTax ? 'ac-taxid-val' : 'ac-box-val empty'}">${hasTax ? esc(a.tax_id) : '—'}</div>
+            <div class="ac-location">
+                <div class="ac-location-addr">
+                    <div class="ac-location-label"><i class="bi bi-geo-alt-fill"></i>Address</div>
+                    <div class="ac-location-val${a.address && a.address.trim() ? '' : ' empty'}">${a.address && a.address.trim() ? esc(a.address) : '—'}</div>
+                </div>
+                <div class="ac-location-tax">
+                    <div class="ac-location-label"><i class="bi bi-hash"></i>Tax ID</div>
+                    <div class="ac-location-val${hasTax ? '' : ' empty'}">${hasTax ? esc(a.tax_id) : '—'}</div>
                 </div>
             </div>
             <div class="ac-detail-2x2">
