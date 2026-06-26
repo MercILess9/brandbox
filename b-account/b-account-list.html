@@ -52,9 +52,10 @@
         .ac-sub-card.open > .ac-detail-body { max-height: 1200px; }
 
         .ac-detail-inner { padding: 20px 22px; background: #fafbfc; border-top: 1px solid #f1f5f9; }
-        /* ── Detail badges (create/update) ── */
-        .ac-meta-badges { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-        .ac-meta-badge { display: inline-flex; align-items: center; gap: 5px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #64748b; font-weight: 600; }
+        /* ── Detail meta bar ── */
+        .ac-meta-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .ac-owner-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--c-accent-light); border: 1px solid var(--c-accent); border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; color: #5a6000; font-weight: 700; }
+        .ac-update-badge { display: inline-flex; align-items: center; gap: 5px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; color: #64748b; font-weight: 600; margin-left: auto; }
 
         /* ── Info panel (B-QUEST style rows) ── */
         .ac-info-panel { background: #fff; border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden; }
@@ -62,6 +63,7 @@
         .ac-info-row:last-child { border-bottom: none; }
         .ac-info-label { display: flex; align-items: center; gap: 5px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; white-space: nowrap; min-width: 86px; padding-top: 2px; flex-shrink: 0; }
         .ac-info-val { font-size: 0.84rem; color: #334155; line-height: 1.65; white-space: pre-line; font-weight: 500; max-height: 120px; overflow-y: auto; }
+        .ac-info-val.empty { color: #cbd5e1; font-weight: 400; }
         .ac-info-val::-webkit-scrollbar { width: 3px; }
         .ac-info-val::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
         .ac-info-val.mono { font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 1.5px; font-size: 0.88rem; }
@@ -157,16 +159,15 @@
 
     function infoRow(icon, label, value, cls = '') {
         const v = value && String(value).trim() ? value : null;
-        if (!v) return '';
         return `<div class="ac-info-row">
             <div class="ac-info-label"><i class="bi ${icon}"></i>${label}</div>
-            <div class="ac-info-val${cls ? ' ' + cls : ''}">${esc(v)}</div>
+            <div class="ac-info-val${cls ? ' ' + cls : ''}${v ? '' : ' empty'}">${v ? esc(v) : '—'}</div>
         </div>`;
     }
 
     function renderDetail(a) {
-        const createStr = [a.create_by, a.create_date ? a.create_date.substring(0,10) : ''].filter(Boolean).join(' · ');
-        const updateStr = [a.update_by, a.update_date ? a.update_date.substring(0,10) : ''].filter(Boolean).join(' · ');
+        const updateBy   = a.update_by   || '';
+        const updateDate = a.update_date ? a.update_date.substring(0,10) : '';
         const rows = [
             infoRow('bi-geo-alt-fill',          'Address',  a.address),
             infoRow('bi-hash',                  'Tax ID',   a.tax_id, 'mono'),
@@ -174,13 +175,13 @@
             infoRow('bi-file-earmark-text-fill','Document', a.document),
             infoRow('bi-credit-card-fill',      'Payment',  a.payment),
             infoRow('bi-chat-left-text-fill',   'Remark',   a.remark),
-        ].filter(Boolean).join('');
+        ].join('');
         return `<div class="ac-detail-inner">
-            ${(createStr || updateStr) ? `<div class="ac-meta-badges">
-                ${createStr ? `<span class="ac-meta-badge"><i class="bi bi-person-fill"></i>Created · ${esc(createStr)}</span>` : ''}
-                ${updateStr ? `<span class="ac-meta-badge"><i class="bi bi-pencil-fill"></i>Updated · ${esc(updateStr)}</span>` : ''}
-            </div>` : ''}
-            ${rows ? `<div class="ac-info-panel">${rows}</div>` : ''}
+            <div class="ac-meta-bar">
+                <span class="ac-owner-badge"><i class="bi bi-person-fill"></i>${esc(a.create_by || '—')}</span>
+                ${(updateBy || updateDate) ? `<span class="ac-update-badge"><i class="bi bi-clock"></i>Updated ${[updateBy ? esc(updateBy) : '', updateDate].filter(Boolean).join(' · ')}</span>` : ''}
+            </div>
+            <div class="ac-info-panel">${rows}</div>
         </div>`;
     }
 
