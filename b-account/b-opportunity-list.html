@@ -85,15 +85,14 @@
         .op-card.open > .op-detail-body { max-height: 8000px; }
         .op-detail-inner { padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
-        /* ── Detail strip (single row) ── */
-        .od-strip { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
-        .od-group { display: flex; align-items: center; gap: 16px; padding: 0 20px; }
-        .od-group:first-child { padding-left: 0; }
-        .od-group + .od-group { border-left: 1px solid #e2e8f0; }
-        .od-item { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; }
-        .od-lbl { font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; }
-        .od-val { font-size: 0.78rem; font-weight: 600; color: #334155; }
-        .od-val.nil { color: #cbd5e1; font-weight: 500; }
+        /* ── Detail grid ── */
+        .od-grid { display: grid; grid-template-columns: auto 1fr 1.3fr auto; gap: 10px; align-items: stretch; }
+        .od-col { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 1px solid #eef2f7; border-radius: 10px; padding: 10px 12px; }
+        .od-col-title { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 1px; display: flex; align-items: center; gap: 4px; }
+        .od-row { display: flex; align-items: baseline; gap: 6px; }
+        .od-lbl { font-size: 0.68rem; font-weight: 700; color: #94a3b8; min-width: 64px; flex-shrink: 0; white-space: nowrap; }
+        .od-val { font-size: 0.78rem; font-weight: 600; color: #334155; white-space: nowrap; }
+        .od-val.nil { color: #cbd5e1; font-weight: 400; }
 
         /* ── Links ── */
         .op-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -323,34 +322,36 @@
         };
         const row = (lbl, val) =>
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
-        const item = (lbl, val) =>
-            `<div class="od-item"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
-        const dateItem = (lbl, val) =>
-            `<div class="od-item"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
+        const row = (lbl, val) =>
+            `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
+        const dateRow = (lbl, val) =>
+            `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
-            <div class="od-strip">
-                <div class="od-group">
-                    ${item('Owner', o.owner)}
-                    ${item('AM', o.am)}
-                    ${item('Sub AM', o.sub_am)}
-                    ${item('Lead', o.lead_source)}
+            <div class="od-grid">
+                <div class="od-col">
+                    <div class="od-col-title"><i class="bi bi-calendar3"></i>Dates</div>
+                    ${row('Create by', o.create_by)}
+                    ${dateRow('Create', o.create_date)}
+                    ${dateRow('Signed', o.signed_date)}
+                    ${dateRow('Launch', o.launch_date)}
                 </div>
-                <div class="od-group">
-                    ${item('Create by', o.create_by)}
-                    ${dateItem('Create', o.create_date)}
-                    ${dateItem('Signed', o.signed_date)}
-                    ${dateItem('Launch', o.launch_date)}
+                <div class="od-col">
+                    <div class="od-col-title"><i class="bi bi-people-fill"></i>People</div>
+                    ${row('Owner', o.owner)}
+                    ${row('AM', o.am)}
+                    ${row('Sub AM', o.sub_am)}
+                    ${row('Lead', o.lead_source)}
                 </div>
-                <div class="od-group">
+                <div class="od-col">
+                    <div class="od-col-title"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
+                    <div class="op-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1;font-size:0.78rem">No remark</span>'}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;justify-content:center;padding:0 4px;">
                     ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
                     ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
                     ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
                 </div>
             </div>
-            ${o.remark ? `<div class="od-remark-row">
-                <div class="od-remark-label"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
-                <div class="op-remark-val">${esc(o.remark)}</div>
-            </div>` : ''}
             <div class="op-qt-section">
                 <div class="op-qt-title"><i class="bi bi-file-earmark-text"></i>Quotations</div>
                 <div class="op-qt-zone"><p class="op-qt-loading"><i class="bi bi-arrow-repeat"></i> Loading...</p></div>
