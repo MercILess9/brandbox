@@ -86,13 +86,18 @@
         .op-detail-inner { padding: 14px 20px 18px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
         /* ── Detail grid ── */
-        .od-grid { display: grid; grid-template-columns: 1fr 1fr auto 1.4fr; gap: 14px; align-items: stretch; }
+        .od-grid { display: grid; grid-template-columns: 180px 1fr 1.6fr auto; gap: 12px; align-items: stretch; }
         .od-col { display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 14px; }
         .od-col-title { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }
         .od-row { display: flex; align-items: baseline; gap: 8px; }
         .od-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; min-width: 72px; flex-shrink: 0; white-space: nowrap; }
         .od-val { font-size: 0.8rem; font-weight: 600; color: #334155; }
         .od-val.nil { color: #cbd5e1; font-weight: 500; }
+        /* Col 1 — create info + date box */
+        .od-create-meta { display: flex; flex-direction: column; gap: 3px; }
+        .od-create-by { font-size: 0.68rem; color: #94a3b8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .od-create-date { font-size: 0.72rem; font-weight: 700; color: #64748b; }
+        .od-date-inner { border: 1px solid #eef2f7; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: #f8fafc; margin-top: auto; }
 
         /* ── Links ── */
         .op-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -327,6 +332,16 @@
         return `<div class="op-detail-inner">
             <div class="od-grid">
                 <div class="od-col">
+                    <div class="od-create-meta">
+                        <span class="od-create-by"><i class="bi bi-person" style="font-size:0.62rem"></i> ${o.create_by ? esc(o.create_by) : '—'}</span>
+                        <span class="od-create-date">${fmtDate(o.create_date)}</span>
+                    </div>
+                    <div class="od-date-inner">
+                        ${dateRow('Signed', o.signed_date)}
+                        ${dateRow('Launch', o.launch_date)}
+                    </div>
+                </div>
+                <div class="od-col">
                     <div class="od-col-title"><i class="bi bi-people-fill"></i>People</div>
                     ${row('Owner',       o.owner)}
                     ${row('AM',          o.am)}
@@ -334,21 +349,13 @@
                     ${row('Lead Source', o.lead_source)}
                 </div>
                 <div class="od-col">
-                    <div class="od-col-title"><i class="bi bi-calendar3"></i>Dates</div>
-                    ${dateRow('Create', o.create_date)}
-                    ${dateRow('Signed', o.signed_date)}
-                    ${dateRow('Launch', o.launch_date)}
+                    <div class="od-col-title"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
+                    <div class="op-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1">No remark...</span>'}</div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:8px;justify-content:center;">
                     ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
                     ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
                     ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
-                </div>
-                <div class="od-col">
-                    <div class="od-col-title"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
-                    <div class="op-remark">
-                        <div class="op-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1">No remark...</span>'}</div>
-                    </div>
                 </div>
             </div>
             <div class="op-qt-section">
