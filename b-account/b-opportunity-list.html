@@ -85,17 +85,14 @@
         .op-card.open > .op-detail-body { max-height: 8000px; }
         .op-detail-inner { padding: 14px 20px 18px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
-        /* ── People strip ── */
-        .od-people { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding-bottom: 10px; border-bottom: 1px solid #eef2f7; }
-        .od-person { display: flex; align-items: baseline; gap: 6px; }
-        .od-lbl { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; white-space: nowrap; }
-        .od-val { font-size: 0.8rem; font-weight: 600; color: #334155; white-space: nowrap; }
-        .od-val.nil { color: #cbd5e1; }
-
-        /* ── Dates + links strip ── */
-        .od-bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-        .od-dates { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-        .od-date { display: flex; align-items: baseline; gap: 6px; }
+        /* ── Detail grid ── */
+        .od-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr; gap: 14px; align-items: start; }
+        .od-col { display: flex; flex-direction: column; gap: 8px; }
+        .od-col-title { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }
+        .od-row { display: flex; align-items: baseline; gap: 8px; }
+        .od-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; min-width: 72px; flex-shrink: 0; white-space: nowrap; }
+        .od-val { font-size: 0.8rem; font-weight: 600; color: #334155; }
+        .od-val.nil { color: #cbd5e1; font-weight: 500; }
 
         /* ── Links ── */
         .op-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -105,8 +102,7 @@
 
         /* ── Remark ── */
         .op-remark { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; overflow: hidden; }
-        .op-remark-label { display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
-        .op-remark-val { padding: 10px 13px; font-size: 0.83rem; color: #334155; line-height: 1.65; font-weight: 500; white-space: pre-line; max-height: 120px; overflow-y: auto; }
+        .op-remark-val { padding: 10px 13px; font-size: 0.82rem; color: #334155; line-height: 1.65; font-weight: 500; white-space: pre-line; max-height: 120px; overflow-y: auto; }
 
         /* ── QT section ── */
         .op-qt-section { margin-top: 4px; }
@@ -325,35 +321,41 @@
             const href = safeLink(url);
             return `<a href="${href}" target="_blank" rel="noopener" class="op-link-btn${href === '#' ? ' disabled' : ''}"><i class="bi ${icon}"></i>${label}</a>`;
         };
-        const person = (lbl, val) =>
-            `<div class="od-person"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
-        const dateItem = (lbl, val) => val
-            ? `<div class="od-date"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`
-            : '';
+        const row = (lbl, val) =>
+            `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
+        const dateRow = (lbl, val) =>
+            `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
-            <div class="od-people">
-                ${person('Owner',       o.owner)}
-                ${person('AM',          o.am)}
-                ${person('Sub AM',      o.sub_am)}
-                ${person('Lead Source', o.lead_source)}
-                ${person('Created by',  o.create_by)}
-            </div>
-            <div class="od-bottom">
-                <div class="od-dates">
-                    ${dateItem('Create', o.create_date)}
-                    ${dateItem('Signed', o.signed_date)}
-                    ${dateItem('Launch', o.launch_date)}
+            <div class="od-grid">
+                <div class="od-col">
+                    <div class="od-col-title"><i class="bi bi-people-fill"></i>People</div>
+                    ${row('Owner',       o.owner)}
+                    ${row('AM',          o.am)}
+                    ${row('Sub AM',      o.sub_am)}
+                    ${row('Lead Source', o.lead_source)}
+                    ${row('Created by',  o.create_by)}
                 </div>
-                <div class="op-links">
-                    ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
-                    ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
-                    ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
+                <div class="od-col">
+                    <div class="od-col-title"><i class="bi bi-calendar3"></i>Dates</div>
+                    ${dateRow('Create', o.create_date)}
+                    ${dateRow('Signed', o.signed_date)}
+                    ${dateRow('Launch', o.launch_date)}
+                </div>
+                <div class="od-col">
+                    <div class="od-col-title"><i class="bi bi-link-45deg"></i>Links</div>
+                    <div class="op-links" style="flex-direction:column;align-items:flex-start;">
+                        ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
+                        ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
+                        ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
+                    </div>
+                </div>
+                <div class="od-col">
+                    <div class="od-col-title"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
+                    <div class="op-remark">
+                        <div class="op-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1">No remark...</span>'}</div>
+                    </div>
                 </div>
             </div>
-            ${o.remark ? `<div class="op-remark">
-                <div class="op-remark-label"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
-                <div class="op-remark-val">${esc(o.remark)}</div>
-            </div>` : ''}
             <div class="op-qt-section">
                 <div class="op-qt-title"><i class="bi bi-file-earmark-text"></i>Quotations</div>
                 <div class="op-qt-zone"><p class="op-qt-loading"><i class="bi bi-arrow-repeat"></i> Loading...</p></div>
