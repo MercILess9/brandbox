@@ -327,12 +327,17 @@
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
             <div class="od-grid">
-                <div class="od-col dates">
-                    <div class="od-col-title"><i class="bi bi-calendar3"></i>Dates</div>
-                    ${row('Create by', o.create_by)}
-                    ${dateRow('Create', o.create_date)}
-                    ${dateRow('Signed', o.signed_date)}
-                    ${dateRow('Launch', o.launch_date)}
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="od-col">
+                        <div class="od-col-title"><i class="bi bi-person"></i>Created</div>
+                        ${row('By', o.create_by)}
+                        ${dateRow('Date', o.create_date)}
+                    </div>
+                    <div class="od-col">
+                        <div class="od-col-title"><i class="bi bi-calendar3"></i>Key Dates</div>
+                        ${dateRow('Signed', o.signed_date)}
+                        ${dateRow('Launch', o.launch_date)}
+                    </div>
                 </div>
                 <div class="od-col people">
                     <div class="od-col-title"><i class="bi bi-people-fill"></i>People</div>
