@@ -43,12 +43,14 @@
         .op-main { flex: 1; min-width: 0; }
         .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: text; }
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
-        .op-amt-block { flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
-        .op-amt-row   { display: flex; align-items: baseline; gap: 7px; }
-        .op-amt-label { font-size: 0.63rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-        .op-amt-total { font-size: 0.88rem; font-weight: 800; color: var(--c-text-main); }
-        .op-amt-gp-label { font-size: 0.63rem; font-weight: 700; color: #16a34a; }
-        .op-amt-gp    { font-size: 0.82rem; font-weight: 700; color: #16a34a; }
+        .op-meta-badges { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+        .omb { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 5px 10px; display: flex; flex-direction: column; gap: 2px; }
+        .omb.gp  { background: #f0fdf4; border-color: #86efac; }
+        .omb-lbl { font-size: 0.6rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .omb-val { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
+        .omb.gp .omb-lbl { color: #16a34a; }
+        .omb.gp .omb-val { color: #16a34a; }
+        .omb-pct { font-size: 0.65rem; font-weight: 600; color: #22c55e; margin-left: 3px; }
         .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
         .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
 
@@ -179,6 +181,7 @@
     function fmtNum(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') : '—'; }
     function fmtAmt(n) { return n != null && !isNaN(+n) && +n > 0 ? Number(n).toLocaleString('en-US') + ' ฿' : '—'; }
     function gpPct(gp, amt) { return (gp && amt && +amt > 0) ? (+gp / +amt * 100).toFixed(1) + '%' : null; }
+    function fmtDate(s) { if (!s) return '—'; const d = new Date(s); const p = n => String(n).padStart(2,'0'); return `${p(d.getDate())}/${p(d.getMonth()+1)}/${String(d.getFullYear()).slice(2)}`; }
 
     var allOpps = [];
     let _canEdit = false, _canDel = false;
@@ -267,16 +270,24 @@
                     <div class="op-name">${esc(o.opportunity_name || '')}</div>
                     <div class="op-sub">${esc(o._account_name)}${o._company_name ? ` <span style="color:#e2e8f0">|</span> ${esc(o._company_name)}` : ''}</div>
                 </div>
-                ${hasAmt ? `<div class="op-amt-block">
-                    <div class="op-amt-row">
-                        <span class="op-amt-label">Amount</span>
-                        <span class="op-amt-total">${fmtAmt(o.total_amount)}</span>
-                    </div>
-                    ${+o.total_gp > 0 ? `<div class="op-amt-row">
-                        <span class="op-amt-gp-label">GP${gpPct(o.total_gp, o.total_amount) ? ` ${gpPct(o.total_gp, o.total_amount)}` : ''}</span>
-                        <span class="op-amt-gp">${fmtAmt(o.total_gp)}</span>
+                <div class="op-meta-badges">
+                    ${hasAmt ? `<div class="omb">
+                        <span class="omb-lbl">Amount</span>
+                        <span class="omb-val">${fmtAmt(o.total_amount)}</span>
                     </div>` : ''}
-                </div>` : ''}
+                    ${+o.total_gp > 0 ? `<div class="omb gp">
+                        <span class="omb-lbl">GP</span>
+                        <span class="omb-val">${fmtAmt(o.total_gp)}${gpPct(o.total_gp, o.total_amount) ? `<span class="omb-pct">(${gpPct(o.total_gp, o.total_amount)})</span>` : ''}</span>
+                    </div>` : ''}
+                    ${o.owner ? `<div class="omb">
+                        <span class="omb-lbl">Owner</span>
+                        <span class="omb-val">${esc(o.owner)}</span>
+                    </div>` : ''}
+                    ${o.update_date ? `<div class="omb">
+                        <span class="omb-lbl">Updated</span>
+                        <span class="omb-val">${fmtDate(o.update_date)}</span>
+                    </div>` : ''}
+                </div>
                 ${cardActions(o.opportunity_id)}
                 <i class="bi bi-chevron-down op-chevron"></i>
             </div>
