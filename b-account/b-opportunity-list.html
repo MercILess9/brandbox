@@ -92,9 +92,9 @@
         .ac-action-icon:hover { background: #f1f5f9; color: var(--c-slate); }
 
         /* ── Detail ── */
-        .op-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-        .op-card.open > .op-detail-body { max-height: 8000px; }
-        .op-detail-inner { padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
+        .op-detail-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s ease; }
+        .op-card.open > .op-detail-body { grid-template-rows: 1fr; }
+        .op-detail-inner { overflow: hidden; padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
         /* ── Detail grid ── */
         .od-grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr auto; gap: 10px; align-items: stretch; }
@@ -223,6 +223,7 @@
 
 <main class="flt-inner" style="padding: 24px 20px 120px;">
     <div id="listContainer"></div>
+    <div id="scrollTrigger" style="height:1px;"></div>
 </main>
 
 <button class="fab-add" id="btn-add" title="New Opportunity" style="display:none;">
@@ -230,6 +231,7 @@
 </button>
 
 <script>
+    // ── Helpers ──────────────────────────────────────────────────────────────
     function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
     function safeLink(url) { if (!url) return '#'; const u = url.trim(); return (u.startsWith('http://') || u.startsWith('https://')) ? u : '#'; }
     function fmtNum(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') : '—'; }
@@ -241,13 +243,6 @@
         const [yr, mo, dy] = String(d).substring(0, 10).split('-');
         return `${+dy} ${MONTHS[+mo - 1]} ${+yr}`;
     }
-
-    var allOpps = [];
-    var _buMap = new Map();
-    var _cfgBU = [], _cfgStatus = [];
-    let _canEdit = false, _canDel = false;
-    let _typeFilter = '', _statusFilter = '', _buFilter = '', _ownerFilter = '', _amFilter = '', _subAmFilter = '', _leadFilter = '', _sortFilter = 'latest';
-
     function typeClass(t) {
         if (t === 'Retention')    return 'retention';
         if (t === 'New Business') return 'new-biz';
@@ -259,12 +254,24 @@
         if (status === 'End Contact') return ' ended';
         return '';
     }
+    function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
-    // ── Filters ──────────────────────────────────────────────────
+    // ── State ─────────────────────────────────────────────────────────────────
+    var _searchIndex = new Map(); // opportunity_id → searchString (lightweight)
+    var _cardData    = new Map(); // opportunity_id → full enriched record (loaded pages)
+    var _accMap      = new Map(); // account_id → {account_name, company_name}
+    var _buMap       = new Map(); // opportunity_id → Set<company_qt>
+    var _cfgBU = [], _cfgStatus = [];
+    let _canEdit = false, _canDel = false;
+    let _typeFilter = '', _statusFilter = '', _buFilter = '', _ownerFilter = '', _amFilter = '', _subAmFilter = '', _leadFilter = '', _sortFilter = 'latest';
+    let _searchText = '';
+    let _page = 0, _hasMore = true, _fetching = false;
+
+    // ── Filters ───────────────────────────────────────────────────────────────
     function setTypeFilter(val) {
         _typeFilter = val;
         document.querySelectorAll('#typePillGroup .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.type === val));
-        renderList();
+        applyFilters();
     }
     function setDropFilter(key, val) {
         if (key === 'status') _statusFilter = val;
@@ -274,7 +281,12 @@
         else if (key === 'subam') _subAmFilter = val;
         else if (key === 'lead')  _leadFilter = val;
         document.getElementById(`flt-${key}-wrap`)?.classList.toggle('active-filter', !!val);
-        renderList();
+        applyFilters();
+    }
+    function setSortFilter(type) {
+        _sortFilter = type;
+        ['name','latest'].forEach(t => document.getElementById(`sort-${t}`)?.classList.toggle('active', t === type));
+        applyFilters();
     }
     function toggleAdvanced() {
         document.getElementById('advancedFilterZone').classList.toggle('show');
@@ -286,42 +298,160 @@
             document.getElementById(`flt-${k}-wrap`)?.classList.remove('active-filter');
             const sel = document.getElementById(id); if (sel) sel.value = '';
         });
-        renderList();
+        applyFilters();
     }
-    function setSortFilter(type) {
-        _sortFilter = type;
-        ['name','latest'].forEach(t => document.getElementById(`sort-${t}`)?.classList.toggle('active', t === type));
-        renderList();
-    }
-    function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
-
-    function applyDefaultOwnerFilter() {
-        const user = JSON.parse(sessionStorage.getItem('bx_user') || '{}');
-        if (!user.codename || user.level === 'god') return;
-        const sel = document.getElementById('filterOwner');
-        const exists = [...sel.options].some(o => o.value === user.codename);
-        if (!exists) return;
-        _ownerFilter = user.codename;
-        sel.value = user.codename;
-        document.getElementById('flt-owner-wrap')?.classList.add('active-filter');
+    function applyFilters() {
+        _cardData.clear();
+        fetchPage(true);
     }
 
-    function populateAdvancedFilters() {
+    // ── Master data (lightweight, one-time load) ───────────────────────────────
+    function populateFilters(idx) {
         const fill = (id, vals) => {
             const sel = document.getElementById(id);
             if (!sel) return;
             vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
         };
-        const uniq = key => [...new Set(allOpps.map(o => o[key]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'th'));
+        const uniq = key => [...new Set(idx.map(o => o[key]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'th'));
         fill('filterOwner', uniq('owner'));
         fill('filterAM',    uniq('am'));
         fill('filterSubAM', uniq('sub_am'));
         fill('filterLead',  uniq('lead_source'));
-        fill('filterBU',     _cfgBU);
+        fill('filterBU',    _cfgBU);
         fill('filterStatus', _cfgStatus);
     }
 
-    // ── Card render ───────────────────────────────────────────────
+    function applyDefaultOwnerFilter() {
+        const user = JSON.parse(sessionStorage.getItem('bx_user') || '{}');
+        if (!user.codename || user.level === 'god') return;
+        const sel = document.getElementById('filterOwner');
+        if (![...sel.options].some(o => o.value === user.codename)) return;
+        _ownerFilter = user.codename;
+        sel.value = user.codename;
+        document.getElementById('flt-owner-wrap')?.classList.add('active-filter');
+    }
+
+    async function loadMasterData() {
+        const [{ data: idx, error }, { data: accs }, { data: qts }, { data: cfg }] = await Promise.all([
+            supabaseClient.from('b_opportunity_list')
+                .select('opportunity_id, opportunity_name, owner, am, sub_am, lead_source, business_type, status, remark, account_id'),
+            supabaseClient.from('b_account_list').select('account_id, account_name, company_name'),
+            supabaseClient.from('b_opportunity_qt').select('opportunity_id, company_qt').not('company_qt', 'is', null),
+            supabaseClient.from('b_opp_config').select('type, value').in('type', ['bu', 'status']).order('value')
+        ]);
+        if (error) { console.error('[B-OPP]', error); return; }
+
+        _accMap = new Map((accs || []).map(a => [a.account_id, a]));
+
+        _buMap = new Map();
+        (qts || []).forEach(q => {
+            if (!q.company_qt) return;
+            if (!_buMap.has(q.opportunity_id)) _buMap.set(q.opportunity_id, new Set());
+            _buMap.get(q.opportunity_id).add(q.company_qt);
+        });
+
+        _cfgBU     = (cfg || []).filter(c => c.type === 'bu').map(c => c.value);
+        _cfgStatus = (cfg || []).filter(c => c.type === 'status').map(c => c.value);
+
+        _searchIndex = new Map();
+        (idx || []).forEach(o => {
+            const acc = _accMap.get(o.account_id) || {};
+            _searchIndex.set(o.opportunity_id, [
+                o.opportunity_id, o.opportunity_name, acc.account_name, acc.company_name,
+                o.business_type, o.status, o.owner, o.am, o.sub_am, o.lead_source, o.remark
+            ].map(f => (f || '').toLowerCase()).join(' '));
+        });
+
+        populateFilters(idx || []);
+        applyDefaultOwnerFilter();
+    }
+
+    // ── Fetch page (server-side paginated) ────────────────────────────────────
+    async function fetchPage(reset = false) {
+        if (_fetching || (!reset && !_hasMore)) return;
+        _fetching = true;
+
+        if (reset) {
+            _page = 0;
+            _hasMore = true;
+            document.getElementById('listContainer').innerHTML = '';
+        }
+
+        // Build ID filter: intersect search index result + BU map
+        let idFilter = null;
+
+        if (_buFilter) {
+            idFilter = new Set([..._buMap.entries()]
+                .filter(([, buSet]) => buSet.has(_buFilter))
+                .map(([id]) => id));
+        }
+
+        if (_searchText) {
+            const searchIds = new Set([..._searchIndex.entries()]
+                .filter(([, text]) => text.includes(_searchText))
+                .map(([id]) => id));
+            idFilter = idFilter
+                ? new Set([...idFilter].filter(id => searchIds.has(id)))
+                : searchIds;
+        }
+
+        if (idFilter !== null && idFilter.size === 0) {
+            showEmpty();
+            _hasMore = false;
+            _fetching = false;
+            return;
+        }
+
+        let query = supabaseClient.from('b_opportunity_list').select('*');
+        if (idFilter)      query = query.in('opportunity_id', [...idFilter]);
+        if (_typeFilter)   query = query.eq('business_type', _typeFilter);
+        if (_statusFilter) query = query.eq('status', _statusFilter);
+        if (_ownerFilter)  query = query.eq('owner', _ownerFilter);
+        if (_amFilter)     query = query.eq('am', _amFilter);
+        if (_subAmFilter)  query = query.eq('sub_am', _subAmFilter);
+        if (_leadFilter)   query = query.eq('lead_source', _leadFilter);
+
+        query = _sortFilter === 'latest'
+            ? query.order('create_date', { ascending: false })
+            : query.order('opportunity_name', { ascending: true });
+
+        query = query.range(_page * 10, _page * 10 + 9);
+
+        try {
+            const { data, error } = await query;
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                if (_page === 0) showEmpty();
+                _hasMore = false;
+                return;
+            }
+
+            if (data.length < 10) _hasMore = false;
+
+            const enriched = data.map(o => {
+                const acc = _accMap.get(o.account_id) || {};
+                return { ...o, _account_name: acc.account_name || o.account_id || '', _company_name: acc.company_name || '' };
+            });
+            enriched.forEach(o => _cardData.set(o.opportunity_id, o));
+
+            const tmp = document.createElement('div');
+            tmp.innerHTML = enriched.map(renderCard).join('');
+            document.getElementById('listContainer').append(...tmp.children);
+            _page++;
+        } catch(e) {
+            console.error('[B-OPP]', e);
+        } finally {
+            _fetching = false;
+        }
+    }
+
+    function showEmpty() {
+        document.getElementById('listContainer').innerHTML =
+            `<div class="empty-state"><i class="bi bi-briefcase"></i><h3>No opportunities found</h3><p>Try adjusting your search or filters.</p></div>`;
+    }
+
+    // ── Card render ───────────────────────────────────────────────────────────
     function cardActions(id) {
         const hasMenu = _canEdit || _canDel;
         return `<div class="ac-actions">
@@ -376,7 +506,7 @@
         </div>`;
     }
 
-    // ── Detail render (static part) ───────────────────────────────
+    // ── Detail render ─────────────────────────────────────────────────────────
     function renderDetail(o) {
         const linkBtn = (icon, label, url) => {
             const href = safeLink(url);
@@ -384,8 +514,6 @@
         };
         const row = (lbl, val) =>
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
-        const dateRow = (lbl, val) =>
-            `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
             <div class="od-grid">
                 <div style="display:flex;flex-direction:column;gap:8px;">
@@ -426,14 +554,13 @@
         </div>`;
     }
 
-    // ── QT render (async) ─────────────────────────────────────────
-    function renderQT(qt, idx) {
+    // ── QT render ─────────────────────────────────────────────────────────────
+    function renderQT(qt) {
         const items  = (qt.b_opportunity_qt_item || []).sort((a, b) => (a.no || 0) - (b.no || 0));
         const totAmt = items.reduce((s, i) => s + (+i.amount || 0), 0);
         const totGP  = items.reduce((s, i) => s + (+i.gp  || 0), 0);
         const pct    = gpPct(totGP, totAmt);
-
-        const rows = items.length
+        const rows   = items.length
             ? items.map(i => `<tr>
                 <td class="r">${i.no ?? ''}</td>
                 <td class="c"><span class="op-bu">${esc(i.bu || '')}</span></td>
@@ -445,7 +572,6 @@
                 <td class="r">${i.gp != null && i.gp !== 0 ? `<span style="color:#16a34a;font-weight:700">${fmtNum(i.gp)}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
             </tr>`).join('')
             : `<tr><td colspan="8" style="text-align:center;color:#cbd5e1;padding:16px">No items</td></tr>`;
-
         return `<div class="op-qt-card">
             <div class="op-qt-head">
                 <i class="bi bi-file-earmark-text" style="color:var(--c-muted)"></i>
@@ -489,29 +615,29 @@
                 .select('*, b_opportunity_qt_item(*)')
                 .eq('opportunity_id', oppId)
                 .order('qt_number');
-            if (!data || data.length === 0) {
-                zone.innerHTML = '<p class="op-qt-empty">No quotations yet</p>';
-                return;
-            }
-            zone.innerHTML = data.map((qt, i) => renderQT(qt, i)).join('');
+            zone.innerHTML = (data && data.length)
+                ? data.map(renderQT).join('')
+                : '<p class="op-qt-empty">No quotations yet</p>';
         } catch {
             zone.innerHTML = '<p class="op-qt-empty">Failed to load quotations</p>';
         }
     }
 
-    // ── Card interactions ─────────────────────────────────────────
-    async function toggleCard(card) {
-        if (!card.classList.contains('open')) {
-            const detail = card.querySelector('.op-detail-body');
-            if (detail && !detail.innerHTML && card.dataset.id) {
-                const rec = allOpps.find(o => o.opportunity_id === card.dataset.id);
-                if (rec) {
-                    detail.innerHTML = renderDetail(rec);
-                    loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
-                }
+    // ── Card interactions ─────────────────────────────────────────────────────
+    function toggleCard(card) {
+        if (card.classList.contains('open')) {
+            card.classList.remove('open');
+            return;
+        }
+        const detail = card.querySelector('.op-detail-body');
+        if (!detail.innerHTML && card.dataset.id) {
+            const rec = _cardData.get(card.dataset.id);
+            if (rec) {
+                detail.innerHTML = renderDetail(rec);
+                loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
             }
         }
-        card.classList.toggle('open');
+        requestAnimationFrame(() => card.classList.add('open'));
     }
 
     function showMenu(btn, id) {
@@ -520,7 +646,7 @@
         const menu = document.createElement('div');
         menu.className = 'ac-floating-menu';
         menu.style.cssText = `position:fixed;top:${rect.bottom + 4}px;right:${window.innerWidth - rect.right}px;z-index:500;`;
-        menu.innerHTML = `${_canDel ? `<button class="danger" onclick="deleteOpp('${esc(id)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : ''}`;
+        menu.innerHTML = _canDel ? `<button class="danger" onclick="deleteOpp('${esc(id)}');this.closest('.ac-floating-menu').remove()"><i class="bi bi-trash3"></i> Delete</button>` : '';
         document.body.appendChild(menu);
         setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
     }
@@ -537,73 +663,15 @@
         const { error } = await supabaseClient.from('b_opportunity_list').delete().eq('opportunity_id', id);
         if (error) { notify('error', 'Delete failed'); return; }
         notify('success', 'Deleted');
-        allOpps = allOpps.filter(o => o.opportunity_id !== id);
-        renderList();
+        _searchIndex.delete(id);
+        applyFilters();
     }
 
-    // ── Data load ─────────────────────────────────────────────────
-    function renderList() {
-        const search = document.getElementById('globalSearch').value.trim().toLowerCase();
-        let filtered = search ? allOpps.filter(o => o._search.includes(search)) : allOpps;
-        if (_typeFilter)   filtered = filtered.filter(o => o.business_type === _typeFilter);
-        if (_statusFilter) filtered = filtered.filter(o => (o.status || 'Active') === _statusFilter);
-        if (_buFilter)     filtered = filtered.filter(o => _buMap.get(o.opportunity_id)?.has(_buFilter));
-        if (_ownerFilter)  filtered = filtered.filter(o => o.owner === _ownerFilter);
-        if (_amFilter)     filtered = filtered.filter(o => o.am === _amFilter);
-        if (_subAmFilter)  filtered = filtered.filter(o => o.sub_am === _subAmFilter);
-        if (_leadFilter)   filtered = filtered.filter(o => o.lead_source === _leadFilter);
-
-        if (_sortFilter === 'latest') {
-            filtered = [...filtered].sort((a, b) => new Date(b.create_date || 0) - new Date(a.create_date || 0));
-        } else {
-            filtered = [...filtered].sort((a, b) => (a.opportunity_name || '').localeCompare(b.opportunity_name || '', 'th'));
-        }
-
-        const container = document.getElementById('listContainer');
-        if (!filtered.length) {
-            container.innerHTML = `<div class="empty-state"><i class="bi bi-briefcase"></i><h3>No opportunities found</h3><p>Try adjusting your search or filters.</p></div>`;
-            return;
-        }
-        container.innerHTML = filtered.map(renderCard).join('');
-    }
-
-    async function loadAllOpps() {
-        const [{ data: opps, error }, { data: accs }, { data: qts }, { data: cfg }] = await Promise.all([
-            supabaseClient.from('b_opportunity_list').select('*'),
-            supabaseClient.from('b_account_list').select('account_id, account_name, company_name'),
-            supabaseClient.from('b_opportunity_qt').select('opportunity_id, company_qt').not('company_qt', 'is', null),
-            supabaseClient.from('b_opp_config').select('type, value').in('type', ['bu', 'status']).order('value')
-        ]);
-        if (error) { console.error('[B-OPP]', error); return; }
-
-        _cfgBU     = (cfg || []).filter(c => c.type === 'bu').map(c => c.value);
-        _cfgStatus = (cfg || []).filter(c => c.type === 'status').map(c => c.value);
-
-        _buMap = new Map();
-        (qts || []).forEach(q => {
-            if (!q.company_qt) return;
-            if (!_buMap.has(q.opportunity_id)) _buMap.set(q.opportunity_id, new Set());
-            _buMap.get(q.opportunity_id).add(q.company_qt);
-        });
-
-        const accMap = new Map((accs || []).map(a => [a.account_id, a]));
-        allOpps = (opps || []).map(o => {
-            const acc = accMap.get(o.account_id) || {};
-            return {
-                ...o,
-                _account_name: acc.account_name || o.account_id || '',
-                _company_name: acc.company_name || '',
-                _search: [o.opportunity_id, o.opportunity_name, acc.account_name, acc.company_name,
-                          o.business_type, o.status, o.owner, o.am, o.sub_am, o.lead_source, o.remark]
-                         .map(f => (f || '').toLowerCase()).join(' ')
-            };
-        });
-        populateAdvancedFilters();
-        applyDefaultOwnerFilter();
-        renderList();
-    }
-
-    document.getElementById('globalSearch').addEventListener('input', debounce(renderList, 250));
+    // ── Init ──────────────────────────────────────────────────────────────────
+    document.getElementById('globalSearch').addEventListener('input', debounce(e => {
+        _searchText = e.target.value.trim().toLowerCase();
+        applyFilters();
+    }, 300));
 
     async function initPage() {
         sessionStorage.removeItem('bx_perms_baccount');
@@ -615,10 +683,16 @@
             fab.style.display = 'flex';
             fab.onclick = () => { /* BOppApp.openNew() */ };
         }
-        await loadAllOpps();
+        await loadMasterData();
     }
 
-    initPage();
+    const _observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) fetchPage();
+    }, { rootMargin: '200px' });
+
+    initPage().then(() => {
+        _observer.observe(document.getElementById('scrollTrigger'));
+    });
 </script>
 </body>
 </html>
