@@ -115,21 +115,21 @@
 <section class="flt-wrapper">
     <div class="flt-inner">
         <div class="flt-row">
+            <div class="status-seg seg-sm">
+                <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="Sort A-Z"><i class="bi bi-sort-alpha-down"></i></button>
+                <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Sort by Latest"><i class="bi bi-clock"></i></button>
+            </div>
             <div class="flt-search">
                 <i class="bi bi-search"></i>
-                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search...">
+                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search">
             </div>
-            <button id="type-single" class="type-btn" onclick="setTypeFilter('single')"><i class="bi bi-person-fill"></i> Single</button>
-            <button id="type-group"  class="type-btn" onclick="setTypeFilter('group')"><i class="bi bi-people-fill"></i> Group</button>
             <div class="status-seg seg-sm">
                 <button id="seg-all"      class="seg-btn"        onclick="setStatusFilter('all')">All</button>
                 <button id="seg-active"   class="seg-btn active" onclick="setStatusFilter('active')"><i class="bi bi-circle-fill" style="font-size:0.55rem;"></i> Active</button>
                 <button id="seg-inactive" class="seg-btn"        onclick="setStatusFilter('inactive')"><i class="bi bi-circle" style="font-size:0.55rem;"></i> Inactive</button>
             </div>
-            <div class="status-seg seg-sm">
-                <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="Sort A-Z"><i class="bi bi-sort-alpha-down"></i></button>
-                <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Sort by Latest"><i class="bi bi-clock"></i></button>
-            </div>
+            <button id="type-single" class="type-btn" onclick="setTypeFilter('single')"><i class="bi bi-person-fill"></i> Single</button>
+            <button id="type-group"  class="type-btn" onclick="setTypeFilter('group')"><i class="bi bi-people-fill"></i> Group</button>
         </div>
     </div>
 </section>
