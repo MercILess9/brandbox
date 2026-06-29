@@ -167,6 +167,10 @@
 <section class="flt-wrapper">
     <div class="flt-inner">
         <div class="flt-row">
+            <div class="seg-sm">
+                <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="A-Z"><i class="bi bi-sort-alpha-down"></i></button>
+                <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Latest"><i class="bi bi-clock"></i></button>
+            </div>
             <div class="flt-search">
                 <i class="bi bi-search"></i>
                 <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search">
@@ -182,10 +186,6 @@
                 <select class="flt-select-input" id="filterBU" onchange="setDropFilter('bu',this.value)">
                     <option value="">All BU</option>
                 </select>
-            </div>
-            <div class="seg-sm">
-                <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="A-Z"><i class="bi bi-sort-alpha-down"></i></button>
-                <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Latest"><i class="bi bi-clock"></i></button>
             </div>
             <button class="flt-btn-adv" id="toggleFilters" onclick="toggleAdvanced()"><i class="bi bi-sliders"></i> Advance</button>
         </div>
