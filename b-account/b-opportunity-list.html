@@ -624,7 +624,7 @@
     }
 
     // ── Card interactions ─────────────────────────────────────────────────────
-    function toggleCard(card) {
+    async function toggleCard(card) {
         if (card.classList.contains('open')) {
             card.classList.remove('open');
             return;
@@ -634,7 +634,7 @@
             const rec = _cardData.get(card.dataset.id);
             if (rec) {
                 detail.innerHTML = renderDetail(rec);
-                loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
+                await loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
             }
         }
         requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('open')));
