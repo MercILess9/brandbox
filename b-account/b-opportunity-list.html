@@ -34,6 +34,9 @@
         .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 13px; font-size: 0.72rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
         .seg-btn:last-child { border-right: none; }
         .seg-btn.active { background: var(--c-accent); color: #1e293b; }
+        #typePillGroup .seg-btn[data-type="New Business"].active { background: #eff6ff; color: #1d4ed8; }
+        #typePillGroup .seg-btn[data-type="Retention"].active    { background: #f5f3ff; color: #6d28d9; }
+        #typePillGroup .seg-btn[data-type="Up Sale"].active      { background: #f0fdfa; color: #0d7a70; }
         .seg-btn:not(.active):hover { background: var(--c-bg); }
         .seg-sm { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
         .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; font-family: inherit; white-space: nowrap; }
