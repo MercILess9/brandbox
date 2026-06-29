@@ -43,9 +43,12 @@
         .op-main { flex: 1; min-width: 0; }
         .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: text; }
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
-        .op-amt-block { text-align: right; flex-shrink: 0; }
+        .op-amt-block { flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+        .op-amt-row   { display: flex; align-items: baseline; gap: 7px; }
+        .op-amt-label { font-size: 0.63rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
         .op-amt-total { font-size: 0.88rem; font-weight: 800; color: var(--c-text-main); }
-        .op-amt-gp    { font-size: 0.75rem; font-weight: 700; color: #16a34a; }
+        .op-amt-gp-label { font-size: 0.63rem; font-weight: 700; color: #16a34a; }
+        .op-amt-gp    { font-size: 0.82rem; font-weight: 700; color: #16a34a; }
         .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
         .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
 
@@ -265,8 +268,14 @@
                     <div class="op-sub">${esc(o._account_name)}${o._company_name ? ` <span style="color:#e2e8f0">|</span> ${esc(o._company_name)}` : ''}</div>
                 </div>
                 ${hasAmt ? `<div class="op-amt-block">
-                    <div class="op-amt-total">${fmtAmt(o.total_amount)}</div>
-                    ${+o.total_gp > 0 ? `<div class="op-amt-gp">${fmtAmt(o.total_gp)}</div>` : ''}
+                    <div class="op-amt-row">
+                        <span class="op-amt-label">Amount</span>
+                        <span class="op-amt-total">${fmtAmt(o.total_amount)}</span>
+                    </div>
+                    ${+o.total_gp > 0 ? `<div class="op-amt-row">
+                        <span class="op-amt-gp-label">GP${gpPct(o.total_gp, o.total_amount) ? ` ${gpPct(o.total_gp, o.total_amount)}` : ''}</span>
+                        <span class="op-amt-gp">${fmtAmt(o.total_gp)}</span>
+                    </div>` : ''}
                 </div>` : ''}
                 ${cardActions(o.opportunity_id)}
                 <i class="bi bi-chevron-down op-chevron"></i>
