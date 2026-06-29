@@ -16,17 +16,27 @@
         /* ── Filter ── */
         .flt-wrapper { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .flt-inner { max-width: 1300px; margin: 0 auto; }
-        .flt-row { display: flex; align-items: center; gap: 12px; }
-        .flt-search { position: relative; flex: 1; }
+        .flt-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+        .flt-search { position: relative; flex: 1; min-width: 120px; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
         .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
-        .status-seg { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
-        .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 16px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
+        .flt-pill-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .flt-pill { border: 1.5px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; font-family: inherit; }
+        .flt-pill.active { background: var(--c-accent); border-color: var(--c-accent); color: #1e293b; }
+        .flt-pill:not(.active):hover { background: var(--c-bg); }
+        .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-family: inherit; white-space: nowrap; }
+        .flt-btn-adv:hover { background: var(--c-bg); border-color: #cbd5e1; }
+        .flt-btn-adv.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
+        .flt-advanced-zone { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s ease; opacity: 0; border-top: 1px dashed transparent; }
+        .flt-advanced-zone.show { max-height: 120px; opacity: 1; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e2e8f0; }
+        .flt-advanced-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+        .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 13px; font-size: 0.72rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
         .seg-btn:last-child { border-right: none; }
         .seg-btn.active { background: var(--c-accent); color: #1e293b; }
         .seg-btn:not(.active):hover { background: var(--c-bg); }
         .seg-sm { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
-        .seg-sm .seg-btn { padding: 0 13px; font-size: 0.72rem; }
+        .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; font-family: inherit; white-space: nowrap; }
+        .btn-reset:hover { background: #f8fafc; color: var(--c-text-main); border-color: #cbd5e1; }
 
         /* ── Cards ── */
         .op-card { background: #fff; border: 1px solid #eef2f7; border-left: 5px solid var(--c-accent); border-radius: var(--radius-card); margin-bottom: 8px; box-shadow: 0 1px 4px -1px rgba(0,0,0,0.06); transition: box-shadow 0.2s, transform 0.2s; }
@@ -155,29 +165,62 @@
         <div class="flt-row">
             <div class="flt-search">
                 <i class="bi bi-search"></i>
-                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search opportunity, account, owner...">
+                <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search">
             </div>
-            <div class="flt-select-box" id="flt-biz-wrap">
-                <span class="flt-select-tag">Type</span>
-                <select class="flt-select-input" id="filterBiz" onchange="setBizFilter(this.value)">
-                    <option value="">All Type</option>
-                </select>
+            <div class="flt-pill-group" id="typePillGroup">
+                <button class="flt-pill active" data-type="" onclick="setTypeFilter('')">All</button>
+                <button class="flt-pill" data-type="New Business" onclick="setTypeFilter('New Business')">New Business</button>
+                <button class="flt-pill" data-type="Retention" onclick="setTypeFilter('Retention')">Retention</button>
+                <button class="flt-pill" data-type="Up Sale" onclick="setTypeFilter('Up Sale')">Up Sale</button>
             </div>
-            <div class="flt-select-box" id="flt-owner-wrap">
-                <span class="flt-select-tag">Owner</span>
-                <select class="flt-select-input" id="filterOwner" onchange="setOwnerFilter(this.value)">
-                    <option value="">All Owner</option>
-                </select>
-            </div>
-            <div class="status-seg">
-                <button id="seg-all"    class="seg-btn"        onclick="setStatusFilter('all')">All</button>
-                <button id="seg-Active" class="seg-btn active" onclick="setStatusFilter('Active')"><i class="bi bi-circle-fill" style="font-size:0.5rem;color:#22c55e;"></i> Active</button>
-                <button id="seg-Churn"  class="seg-btn"        onclick="setStatusFilter('Churn')"><i class="bi bi-circle-fill" style="font-size:0.5rem;color:#f97316;"></i> Churn</button>
-                <button id="seg-End"    class="seg-btn"        onclick="setStatusFilter('End Contact')">End Contact</button>
-            </div>
-            <div class="status-seg seg-sm">
+            <div class="seg-sm">
                 <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="A-Z"><i class="bi bi-sort-alpha-down"></i></button>
                 <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Latest"><i class="bi bi-clock"></i></button>
+            </div>
+            <button class="flt-btn-adv" id="toggleFilters" onclick="toggleAdvanced()"><i class="bi bi-sliders"></i> Advance</button>
+        </div>
+        <div class="flt-advanced-zone" id="advancedFilterZone">
+            <div class="flt-advanced-row">
+                <div class="flt-select-box" id="flt-status-wrap">
+                    <span class="flt-select-tag">Status</span>
+                    <select class="flt-select-input" id="filterStatus" onchange="setDropFilter('status',this.value)">
+                        <option value="">All</option>
+                        <option value="Active">Active</option>
+                        <option value="Churn">Churn</option>
+                        <option value="End Contact">End Contact</option>
+                    </select>
+                </div>
+                <div class="flt-select-box" id="flt-bu-wrap">
+                    <span class="flt-select-tag">BU</span>
+                    <select class="flt-select-input" id="filterBU" onchange="setDropFilter('bu',this.value)">
+                        <option value="">All BU</option>
+                    </select>
+                </div>
+                <div class="flt-select-box" id="flt-owner-wrap">
+                    <span class="flt-select-tag">Owner</span>
+                    <select class="flt-select-input" id="filterOwner" onchange="setDropFilter('owner',this.value)">
+                        <option value="">All Owner</option>
+                    </select>
+                </div>
+                <div class="flt-select-box" id="flt-am-wrap">
+                    <span class="flt-select-tag">AM</span>
+                    <select class="flt-select-input" id="filterAM" onchange="setDropFilter('am',this.value)">
+                        <option value="">All AM</option>
+                    </select>
+                </div>
+                <div class="flt-select-box" id="flt-subam-wrap">
+                    <span class="flt-select-tag">Sub AM</span>
+                    <select class="flt-select-input" id="filterSubAM" onchange="setDropFilter('subam',this.value)">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="flt-select-box" id="flt-lead-wrap">
+                    <span class="flt-select-tag">Lead</span>
+                    <select class="flt-select-input" id="filterLead" onchange="setDropFilter('lead',this.value)">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <button class="btn-reset" onclick="resetFilters()">RESET</button>
             </div>
         </div>
     </div>
@@ -201,7 +244,7 @@
 
     var allOpps = [];
     let _canEdit = false, _canDel = false;
-    let _statusFilter = 'Active', _bizFilter = '', _ownerFilter = '', _sortFilter = 'latest';
+    let _typeFilter = '', _statusFilter = '', _buFilter = '', _ownerFilter = '', _amFilter = '', _subAmFilter = '', _leadFilter = '', _sortFilter = 'latest';
 
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     function fmtDate(d) {
@@ -225,22 +268,36 @@
     }
 
     // ── Filters ──────────────────────────────────────────────────
-    function setBizFilter(val) {
-        _bizFilter = val;
-        document.getElementById('flt-biz-wrap')?.classList.toggle('active-filter', !!val);
+    function setTypeFilter(val) {
+        _typeFilter = val;
+        document.querySelectorAll('#typePillGroup .flt-pill').forEach(b => b.classList.toggle('active', b.dataset.type === val));
         renderList();
     }
-    function setOwnerFilter(val) {
-        _ownerFilter = val;
-        document.getElementById('flt-owner-wrap')?.classList.toggle('active-filter', !!val);
+    function setDropFilter(key, val) {
+        if (key === 'status') _statusFilter = val;
+        else if (key === 'bu')    _buFilter = val;
+        else if (key === 'owner') _ownerFilter = val;
+        else if (key === 'am')    _amFilter = val;
+        else if (key === 'subam') _subAmFilter = val;
+        else if (key === 'lead')  _leadFilter = val;
+        document.getElementById(`flt-${key}-wrap`)?.classList.toggle('active-filter', !!val);
         renderList();
     }
-    function setStatusFilter(type) {
-        _statusFilter = type;
-        document.getElementById('seg-all')?.classList.toggle('active',   type === 'all');
-        document.getElementById('seg-Active')?.classList.toggle('active', type === 'Active');
-        document.getElementById('seg-Churn')?.classList.toggle('active',  type === 'Churn');
-        document.getElementById('seg-End')?.classList.toggle('active',    type === 'End Contact');
+    function toggleAdvanced() {
+        document.getElementById('advancedFilterZone').classList.toggle('show');
+        document.getElementById('toggleFilters').classList.toggle('active');
+    }
+    function resetFilters() {
+        _statusFilter = ''; _buFilter = ''; _ownerFilter = ''; _amFilter = ''; _subAmFilter = ''; _leadFilter = '';
+        ['status','bu','owner','am','subam','lead'].forEach(k => {
+            document.getElementById(`flt-${k}-wrap`)?.classList.remove('active-filter');
+        });
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterBU').value = '';
+        document.getElementById('filterOwner').value = '';
+        document.getElementById('filterAM').value = '';
+        document.getElementById('filterSubAM').value = '';
+        document.getElementById('filterLead').value = '';
         renderList();
     }
     function setSortFilter(type) {
@@ -250,19 +307,17 @@
     }
     function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
-    function populateOwnerFilter() {
-        const ownerSel = document.getElementById('filterOwner');
-        const owners = [...new Set(allOpps.map(o => o.owner).filter(Boolean))].sort();
-        owners.forEach(v => { const opt = document.createElement('option'); opt.value = v; opt.textContent = v; ownerSel.appendChild(opt); });
-    }
-
-    function populateBizFilter(configs) {
-        const bizSel = document.getElementById('filterBiz');
-        (configs || []).forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.value; opt.textContent = c.value;
-            bizSel.appendChild(opt);
-        });
+    function populateAdvancedFilters() {
+        const fill = (id, vals) => {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
+        };
+        const uniq = key => [...new Set(allOpps.map(o => o[key]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'th'));
+        fill('filterOwner', uniq('owner'));
+        fill('filterAM',    uniq('am'));
+        fill('filterSubAM', uniq('sub_am'));
+        fill('filterLead',  uniq('lead_source'));
     }
 
     // ── Card render ───────────────────────────────────────────────
@@ -489,9 +544,12 @@
     function renderList() {
         const search = document.getElementById('globalSearch').value.trim().toLowerCase();
         let filtered = search ? allOpps.filter(o => o._search.includes(search)) : allOpps;
-        if (_statusFilter !== 'all') filtered = filtered.filter(o => (o.status || 'Active') === _statusFilter);
-        if (_bizFilter)              filtered = filtered.filter(o => o.business_type === _bizFilter);
-        if (_ownerFilter)            filtered = filtered.filter(o => o.owner === _ownerFilter);
+        if (_typeFilter)   filtered = filtered.filter(o => o.business_type === _typeFilter);
+        if (_statusFilter) filtered = filtered.filter(o => (o.status || 'Active') === _statusFilter);
+        if (_ownerFilter)  filtered = filtered.filter(o => o.owner === _ownerFilter);
+        if (_amFilter)     filtered = filtered.filter(o => o.am === _amFilter);
+        if (_subAmFilter)  filtered = filtered.filter(o => o.sub_am === _subAmFilter);
+        if (_leadFilter)   filtered = filtered.filter(o => o.lead_source === _leadFilter);
 
         if (_sortFilter === 'latest') {
             filtered = [...filtered].sort((a, b) => new Date(b.create_date || 0) - new Date(a.create_date || 0));
@@ -508,14 +566,11 @@
     }
 
     async function loadAllOpps() {
-        const [{ data: opps, error }, { data: accs }, { data: configs }] = await Promise.all([
+        const [{ data: opps, error }, { data: accs }] = await Promise.all([
             supabaseClient.from('b_opportunity_list').select('*'),
-            supabaseClient.from('b_account_list').select('account_id, account_name, company_name'),
-            supabaseClient.from('b_opp_config').select('value').eq('type', 'business_type').order('value')
+            supabaseClient.from('b_account_list').select('account_id, account_name, company_name')
         ]);
         if (error) { console.error('[B-OPP]', error); return; }
-
-        populateBizFilter(configs);
 
         const accMap = new Map((accs || []).map(a => [a.account_id, a]));
         allOpps = (opps || []).map(o => {
@@ -525,11 +580,11 @@
                 _account_name: acc.account_name || o.account_id || '',
                 _company_name: acc.company_name || '',
                 _search: [o.opportunity_id, o.opportunity_name, acc.account_name, acc.company_name,
-                          o.business_type, o.owner, o.am, o.sub_am, o.lead_source, o.remark]
+                          o.business_type, o.status, o.owner, o.am, o.sub_am, o.lead_source, o.remark]
                          .map(f => (f || '').toLowerCase()).join(' ')
             };
         });
-        populateOwnerFilter();
+        populateAdvancedFilters();
         renderList();
     }
 
