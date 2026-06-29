@@ -310,6 +310,19 @@
     }
     function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
+    function applyDefaultOwnerFilter() {
+        const user = JSON.parse(sessionStorage.getItem('bx_user') || '{}');
+        if (!user.codename || user.level === 'god') return;
+        const sel = document.getElementById('filterOwner');
+        const exists = [...sel.options].some(o => o.value === user.codename);
+        if (!exists) return;
+        _ownerFilter = user.codename;
+        sel.value = user.codename;
+        document.getElementById('flt-owner-wrap')?.classList.add('active-filter');
+        document.getElementById('advancedFilterZone')?.classList.add('show');
+        document.getElementById('toggleFilters')?.classList.add('active');
+    }
+
     function populateAdvancedFilters() {
         const fill = (id, vals) => {
             const sel = document.getElementById(id);
@@ -607,6 +620,7 @@
             };
         });
         populateAdvancedFilters();
+        applyDefaultOwnerFilter();
         renderList();
     }
 
