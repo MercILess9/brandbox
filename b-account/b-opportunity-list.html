@@ -44,17 +44,13 @@
         .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: text; }
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
         .op-meta-badges { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
-        .omb { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-        .omb-section { padding: 5px 12px; display: flex; flex-direction: column; gap: 1px; }
-        .omb-section + .omb-section { border-top: 1px solid var(--c-border); background: #f0fdf4; }
-        .omb-lbl { font-size: 0.6rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-        .omb-section + .omb-section .omb-lbl { color: #16a34a; }
-        .omb-val { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
-        .omb-section + .omb-section .omb-val { color: #16a34a; }
-        .omb-pct { font-size: 0.65rem; font-weight: 600; color: #22c55e; margin-left: 3px; }
-        .omb-plain { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 5px 12px; display: flex; flex-direction: column; gap: 1px; }
-        .omb-plain .omb-lbl { font-size: 0.6rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-        .omb-plain .omb-val { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
+        .omb { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 6px 12px; display: flex; flex-direction: column; gap: 4px; }
+        .omb-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+        .omb-lbl { font-size: 0.7rem; font-weight: 600; color: var(--c-text-muted); min-width: 72px; }
+        .omb-colon { font-size: 0.7rem; color: var(--c-border); }
+        .omb-val { font-size: 0.8rem; font-weight: 800; color: var(--c-text-main); }
+        .omb-row.gp .omb-lbl { color: #16a34a; }
+        .omb-row.gp .omb-val { color: #16a34a; }
         .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
         .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
 
@@ -276,22 +272,30 @@
                 </div>
                 <div class="op-meta-badges">
                     ${hasAmt ? `<div class="omb">
-                        <div class="omb-section">
+                        <div class="omb-row">
                             <span class="omb-lbl">Amount</span>
+                            <span class="omb-colon">:</span>
                             <span class="omb-val">${fmtAmt(o.total_amount)}</span>
                         </div>
-                        ${+o.total_gp > 0 ? `<div class="omb-section">
-                            <span class="omb-lbl">GP${gpPct(o.total_gp, o.total_amount) ? `<span class="omb-pct"> (${gpPct(o.total_gp, o.total_amount)})</span>` : ''}</span>
+                        ${+o.total_gp > 0 ? `<div class="omb-row gp">
+                            <span class="omb-lbl">GP${gpPct(o.total_gp, o.total_amount) ? ` ${gpPct(o.total_gp, o.total_amount)}` : ''}</span>
+                            <span class="omb-colon">:</span>
                             <span class="omb-val">${fmtAmt(o.total_gp)}</span>
                         </div>` : ''}
                     </div>` : ''}
-                    ${o.owner ? `<div class="omb-plain">
-                        <span class="omb-lbl">Owner</span>
-                        <span class="omb-val">${esc(o.owner)}</span>
+                    ${o.owner ? `<div class="omb">
+                        <div class="omb-row">
+                            <span class="omb-lbl">Owner</span>
+                            <span class="omb-colon">:</span>
+                            <span class="omb-val">${esc(o.owner)}</span>
+                        </div>
                     </div>` : ''}
-                    ${o.update_date ? `<div class="omb-plain">
-                        <span class="omb-lbl">Updated</span>
-                        <span class="omb-val">${fmtDate(o.update_date)}</span>
+                    ${o.update_date ? `<div class="omb">
+                        <div class="omb-row">
+                            <span class="omb-lbl">Updated</span>
+                            <span class="omb-colon">:</span>
+                            <span class="omb-val">${fmtDate(o.update_date)}</span>
+                        </div>
                     </div>` : ''}
                 </div>
                 ${cardActions(o.opportunity_id)}
