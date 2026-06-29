@@ -33,43 +33,50 @@
         .op-card:hover { box-shadow: 0 8px 28px -4px rgba(0,0,0,0.11); transform: translateY(-1px); }
         .op-card.churn { border-left-color: #f97316; }
         .op-card.ended { border-left-color: #64748b; }
+
+        /* ── Header layout ── */
         .op-header { display: flex; align-items: center; gap: 14px; padding: 12px 18px; cursor: pointer; user-select: none; }
-        .op-id-col { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; align-items: center; min-width: 100px; }
+
+        /* ── ID + type col ── */
+        .op-id-col { display: flex; flex-direction: column; gap: 6px; align-items: center; min-width: 100px; flex-shrink: 0; }
         .op-badge { font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.8px; white-space: nowrap; user-select: text; cursor: text; }
-        .op-type { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; white-space: nowrap; border: 1px solid transparent; }
+        .op-type { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; white-space: nowrap; border: 1px solid; }
         .op-type.retention { background: #f5f3ff; color: #6d28d9; border-color: #c4b5fd; }
         .op-type.new-biz   { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
         .op-type.upsale    { background: #f0fdfa; color: #0d7a70; border-color: #5eead4; }
+
+        /* ── Name + sub ── */
         .op-main { flex: 1; min-width: 0; }
         .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; user-select: text; line-height: 1.3; }
         .op-sub  { font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
-        .op-meta-badges { display: flex; gap: 28px; flex-shrink: 0; align-items: center; }
+
         /* ── Amount/GP block ── */
-        .omb-amt { flex-shrink: 0; width: 190px; display: flex; flex-direction: column; gap: 3px; }
+        .op-meta-badges { display: flex; gap: 28px; align-items: center; flex-shrink: 0; }
+        .omb-amt { width: 190px; display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
         .omb-amt-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-        .omb-amt-lbl { font-size: 0.68rem; font-weight: 600; color: #64748b; white-space: nowrap; }
-        .omb-amt-val { font-size: 0.75rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; }
-        .omb-gp-lbl { font-size: 0.68rem; font-weight: 600; color: #16a34a; }
-        .omb-gp-val { font-size: 0.75rem; font-weight: 800; color: #16a34a; white-space: nowrap; }
+        .omb-lbl { font-size: 0.68rem; font-weight: 600; white-space: nowrap; }
+        .omb-lbl.amt { color: #64748b; }
+        .omb-lbl.gp  { color: #16a34a; }
+        .omb-val { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+        .omb-val.amt { color: var(--c-text-main); }
+        .omb-val.gp  { color: #16a34a; font-weight: 800; }
         .omb-bar-wrap { height: 3px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 2px; }
         .omb-bar-fill { height: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; }
         .omb-bar-foot { display: flex; justify-content: flex-end; margin-top: 1px; }
-        .omb-bar-pct { font-size: 0.72rem; font-weight: 700; color: #16a34a; }
+        .omb-bar-pct  { font-size: 0.72rem; font-weight: 700; color: #16a34a; }
+
         /* ── Owner/date block ── */
-        .omb-meta { flex-shrink: 0; width: 148px; border-left: 2px solid #e2e8f0; padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+        .omb-meta { width: 148px; border-left: 2px solid #e2e8f0; padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 6px; flex-shrink: 0; }
         .omb-owner-row { display: flex; align-items: center; gap: 6px; }
-        .omb-owner-row i { font-size: 0.7rem; color: #64748b; flex-shrink: 0; }
+        .omb-owner-row i, .omb-meta-date i { font-size: 0.68rem; color: #64748b; }
         .omb-meta-owner { font-size: 0.7rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .omb-meta-date { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #64748b; white-space: nowrap; padding-left: 2px; }
-        .omb-meta-date i { font-size: 0.65rem; }
-        .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
-        .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
+        .omb-meta-date { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #64748b; white-space: nowrap; }
 
         /* ── Hover actions ── */
         .ac-actions { display: flex; align-items: center; gap: 6px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
         .op-card:hover .ac-actions { opacity: 1; }
-        .ac-action-btn  { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 0 14px; height: 31px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: 0.15s; white-space: nowrap; font-family: inherit; }
-        .ac-action-btn:hover  { border-color: var(--c-accent); background: var(--c-accent); color: #1e293b; }
+        .ac-action-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 0 14px; height: 31px; font-size: 0.75rem; font-weight: 600; color: var(--c-slate); cursor: pointer; transition: 0.15s; white-space: nowrap; font-family: inherit; }
+        .ac-action-btn:hover { border-color: var(--c-accent); background: var(--c-accent); color: #1e293b; }
         .ac-action-icon { border: none; background: transparent; border-radius: 8px; width: 31px; height: 31px; display: flex; align-items: center; justify-content: center; color: var(--c-text-muted); cursor: pointer; transition: 0.15s; font-size: 1.05rem; }
         .ac-action-icon:hover { background: #f1f5f9; color: var(--c-slate); }
 
@@ -269,11 +276,32 @@
         </div>`;
     }
 
+    function renderAmtBlock(o, hasAmt, hasGP, pct, pctNum) {
+        if (!hasAmt) return '';
+        return `<div class="omb-amt">
+            <div class="omb-amt-row"><span class="omb-lbl amt">Amount</span><span class="omb-val amt">${fmtAmt(o.total_amount)}</span></div>
+            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP</span><span class="omb-val gp">${fmtAmt(o.total_gp)}</span></div>
+            <div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>
+            <div class="omb-bar-foot"><span class="omb-bar-pct">${pct}</span></div>` : ''}
+        </div>`;
+    }
+
+    function renderMetaBlock(o) {
+        if (!o.owner && !o.update_date) return '';
+        return `<div class="omb-meta">
+            ${o.owner ? `<div class="omb-owner-row"><i class="bi bi-person-fill"></i><span class="omb-meta-owner">${esc(o.owner)}</span></div>` : ''}
+            ${o.update_date ? `<div class="omb-meta-date"><i class="bi bi-clock"></i>${fmtDate(o.update_date)}</div>` : ''}
+        </div>`;
+    }
+
     function renderCard(o) {
         const hasAmt = +o.total_amount > 0;
         const hasGP  = +o.total_gp > 0;
         const pct    = gpPct(o.total_gp, o.total_amount);
         const pctNum = hasGP && hasAmt ? Math.min(+o.total_gp / +o.total_amount * 100, 100).toFixed(1) : 0;
+        const sub    = o._company_name
+            ? `${esc(o._account_name)} <span style="color:#e2e8f0">|</span> ${esc(o._company_name)}`
+            : esc(o._account_name);
         return `<div class="op-card${cardClass(o.status)}" data-id="${esc(o.opportunity_id)}">
             <div class="op-header" onclick="toggleCard(this.closest('.op-card'))">
                 <div class="op-id-col">
@@ -282,28 +310,11 @@
                 </div>
                 <div class="op-main">
                     <div class="op-name">${esc(o.opportunity_name || '')}</div>
-                    <div class="op-sub">${esc(o._account_name)}${o._company_name ? ` <span style="color:#e2e8f0">|</span> ${esc(o._company_name)}` : ''}</div>
+                    <div class="op-sub">${sub}</div>
                 </div>
                 <div class="op-meta-badges">
-                    ${hasAmt ? `<div class="omb-amt">
-                        <div class="omb-amt-row">
-                            <span class="omb-amt-lbl">Amount</span>
-                            <span class="omb-amt-val">${fmtAmt(o.total_amount)}</span>
-                        </div>
-                        ${hasGP ? `<div class="omb-amt-row">
-                            <span class="omb-gp-lbl">GP</span>
-                            <span class="omb-gp-val">${fmtAmt(o.total_gp)}</span>
-                        </div>
-                        <div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>
-                        <div class="omb-bar-foot"><span class="omb-bar-pct">${pct}</span></div>` : ''}
-                    </div>` : ''}
-                    ${(o.update_date || o.owner) ? `<div class="omb-meta">
-                        ${o.owner ? `<div class="omb-owner-row">
-                            <i class="bi bi-person-fill"></i>
-                            <span class="omb-meta-owner">${esc(o.owner)}</span>
-                        </div>` : ''}
-                        ${o.update_date ? `<div class="omb-meta-date"><i class="bi bi-clock"></i>${fmtDate(o.update_date)}</div>` : ''}
-                    </div>` : ''}
+                    ${renderAmtBlock(o, hasAmt, hasGP, pct, pctNum)}
+                    ${renderMetaBlock(o)}
                 </div>
                 ${cardActions(o.opportunity_id)}
             </div>
