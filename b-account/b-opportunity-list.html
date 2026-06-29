@@ -43,15 +43,21 @@
         .op-main { flex: 1; min-width: 0; }
         .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: text; }
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
-        .op-meta-badges { display: flex; gap: 16px; flex-shrink: 0; align-items: center; }
-        .omb { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 6px 12px; display: flex; flex-direction: column; gap: 4px; }
-        .omb-row { display: grid; grid-template-columns: auto auto 1fr; gap: 0 6px; align-items: baseline; white-space: nowrap; }
-        .omb-lbl { font-size: 0.7rem; font-weight: 700; color: #64748b; }
-        .omb-colon { font-size: 0.7rem; font-weight: 700; color: #94a3b8; }
-        .omb-val { font-size: 0.8rem; font-weight: 800; color: var(--c-text-main); text-align: right; }
-        .omb-row.gp .omb-lbl { color: #16a34a; }
-        .omb-row.gp .omb-colon { color: #86efac; }
-        .omb-row.gp .omb-val { color: #16a34a; }
+        .op-meta-badges { display: flex; gap: 20px; flex-shrink: 0; align-items: center; }
+        /* ── Amount/GP block ── */
+        .omb-amt { flex-shrink: 0; min-width: 180px; }
+        .omb-amt-nums { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+        .omb-amt-group { display: flex; flex-direction: column; gap: 1px; }
+        .omb-amt-lbl { font-size: 0.6rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
+        .omb-amt-val { font-size: 0.88rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
+        .omb-sep { color: #e2e8f0; font-size: 0.8rem; align-self: center; }
+        .omb-gp-lbl { font-size: 0.6rem; font-weight: 600; color: #86efac; text-transform: uppercase; letter-spacing: 0.3px; }
+        .omb-gp-val { font-size: 0.88rem; font-weight: 800; color: #16a34a; white-space: nowrap; }
+        .omb-bar-wrap { height: 4px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+        .omb-bar-fill { height: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; }
+        .omb-bar-foot { display: flex; justify-content: flex-end; margin-top: 2px; }
+        .omb-bar-pct { font-size: 0.62rem; font-weight: 700; color: #16a34a; }
+        /* ── Owner/date block ── */
         .omb-meta { text-align: right; flex-shrink: 0; }
         .omb-meta-date { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
         .omb-meta-owner { font-size: 0.72rem; color: #94a3b8; white-space: nowrap; margin-top: 2px; }
@@ -264,6 +270,9 @@
 
     function renderCard(o) {
         const hasAmt = +o.total_amount > 0;
+        const hasGP  = +o.total_gp > 0;
+        const pct    = gpPct(o.total_gp, o.total_amount);
+        const pctNum = hasGP && hasAmt ? Math.min(+o.total_gp / +o.total_amount * 100, 100).toFixed(1) : 0;
         return `<div class="op-card${cardClass(o.status)}" data-id="${esc(o.opportunity_id)}">
             <div class="op-header" onclick="toggleCard(this.closest('.op-card'))">
                 <div class="op-id-col">
@@ -275,17 +284,20 @@
                     <div class="op-sub">${esc(o._account_name)}${o._company_name ? ` <span style="color:#e2e8f0">|</span> ${esc(o._company_name)}` : ''}</div>
                 </div>
                 <div class="op-meta-badges">
-                    ${hasAmt ? `<div class="omb">
-                        <div class="omb-row">
-                            <span class="omb-lbl">Amount</span>
-                            <span class="omb-colon">:</span>
-                            <span class="omb-val">${fmtAmt(o.total_amount)}</span>
+                    ${hasAmt ? `<div class="omb-amt">
+                        <div class="omb-amt-nums">
+                            <div class="omb-amt-group">
+                                <span class="omb-amt-lbl">Amount</span>
+                                <span class="omb-amt-val">${fmtAmt(o.total_amount)}</span>
+                            </div>
+                            ${hasGP ? `<span class="omb-sep">|</span>
+                            <div class="omb-amt-group">
+                                <span class="omb-gp-lbl">GP</span>
+                                <span class="omb-gp-val">${fmtAmt(o.total_gp)}</span>
+                            </div>` : ''}
                         </div>
-                        ${+o.total_gp > 0 ? `<div class="omb-row gp">
-                            <span class="omb-lbl">GP${gpPct(o.total_gp, o.total_amount) ? ` ${gpPct(o.total_gp, o.total_amount)}` : ''}</span>
-                            <span class="omb-colon">:</span>
-                            <span class="omb-val">${fmtAmt(o.total_gp)}</span>
-                        </div>` : ''}
+                        ${hasGP ? `<div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>
+                        <div class="omb-bar-foot"><span class="omb-bar-pct">${pct}</span></div>` : ''}
                     </div>` : ''}
                     ${(o.update_date || o.owner) ? `<div class="omb-meta">
                         ${o.update_date ? `<div class="omb-meta-date">${fmtDate(o.update_date)}</div>` : ''}
@@ -293,7 +305,6 @@
                     </div>` : ''}
                 </div>
                 ${cardActions(o.opportunity_id)}
-                <i class="bi bi-chevron-down op-chevron"></i>
             </div>
             <div class="op-detail-body"></div>
         </div>`;
