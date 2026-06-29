@@ -45,11 +45,12 @@
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
         .op-meta-badges { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
         .omb { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 6px 12px; display: flex; flex-direction: column; gap: 4px; }
-        .omb-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
-        .omb-lbl { font-size: 0.7rem; font-weight: 600; color: var(--c-text-muted); min-width: 72px; }
-        .omb-colon { font-size: 0.7rem; color: var(--c-border); }
-        .omb-val { font-size: 0.8rem; font-weight: 800; color: var(--c-text-main); }
+        .omb-row { display: grid; grid-template-columns: auto auto 1fr; gap: 0 6px; align-items: baseline; white-space: nowrap; }
+        .omb-lbl { font-size: 0.7rem; font-weight: 700; color: #64748b; }
+        .omb-colon { font-size: 0.7rem; font-weight: 700; color: #94a3b8; }
+        .omb-val { font-size: 0.8rem; font-weight: 800; color: var(--c-text-main); text-align: right; }
         .omb-row.gp .omb-lbl { color: #16a34a; }
+        .omb-row.gp .omb-colon { color: #86efac; }
         .omb-row.gp .omb-val { color: #16a34a; }
         .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
         .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
