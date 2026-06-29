@@ -20,10 +20,6 @@
         .flt-search { position: relative; flex: 1; min-width: 140px; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
         .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
-        .flt-pill-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        .flt-pill { border: 1.5px solid #e2e8f0; background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; font-family: inherit; }
-        .flt-pill.active { background: var(--c-accent); border-color: var(--c-accent); color: #1e293b; }
-        .flt-pill:not(.active):hover { background: var(--c-bg); }
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-family: inherit; white-space: nowrap; }
         .flt-btn-adv:hover { background: var(--c-bg); border-color: #cbd5e1; }
         .flt-btn-adv.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
@@ -40,7 +36,6 @@
         #typePillGroup .seg-btn[data-type="Retention"].active    { background: #f5f3ff; color: #6d28d9; }
         #typePillGroup .seg-btn[data-type="Up Sale"].active      { background: #f0fdfa; color: #0d7a70; }
         .seg-btn:not(.active):hover { background: var(--c-bg); }
-        .seg-sm { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
         .btn-reset { border: 1px solid #e2e8f0; background: #fff; color: #94a3b8; font-size: 0.7rem; font-weight: 800; border-radius: 8px; padding: 6px 15px; cursor: pointer; transition: 0.2s; font-family: inherit; white-space: nowrap; }
         .btn-reset:hover { background: #f8fafc; color: var(--c-text-main); border-color: #cbd5e1; }
 
@@ -111,11 +106,8 @@
         .od-lbl::after { content: " :"; }
         .od-val { font-size: 0.82rem; font-weight: 700; color: #1e293b; white-space: nowrap; }
         .od-val.nil { color: #cbd5e1; font-weight: 400; }
-        .od-val-stack { display: flex; flex-direction: column; gap: 1px; }
-        .od-val-sub { font-size: 0.7rem; font-weight: 500; color: #64748b; }
 
         /* ── Links ── */
-        .op-links { display: flex; gap: 8px; flex-wrap: wrap; }
         .op-link-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--c-border); background: #fff; border-radius: 10px; padding: 7px 14px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); text-decoration: none; transition: 0.15s; }
         .op-link-btn:hover { border-color: var(--c-accent); background: var(--c-accent-light); color: #6b7200; }
         .op-link-btn.disabled { opacity: 1; pointer-events: none; border: 1px dashed #d1d5db; background: #f8fafc; color: #cbd5e1; }
@@ -169,7 +161,7 @@
 <section class="flt-wrapper">
     <div class="flt-inner">
         <div class="flt-row">
-            <div class="seg-sm">
+            <div class="status-seg">
                 <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Latest"><i class="bi bi-clock"></i></button>
                 <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="A-Z"><i class="bi bi-sort-alpha-down"></i></button>
             </div>
@@ -243,21 +235,19 @@
     function fmtNum(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') : '—'; }
     function fmtAmt(n) { return n != null && !isNaN(+n) && +n > 0 ? Number(n).toLocaleString('en-US') + ' ฿' : '—'; }
     function gpPct(gp, amt) { return (gp && amt && +amt > 0) ? (+gp / +amt * 100).toFixed(1) + '%' : null; }
-    function fmtDate(s) { if (!s) return '—'; const d = new Date(s); const p = n => String(n).padStart(2,'0'); return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()+543}`; }
-
-    var allOpps = [];
-    let _canEdit = false, _canDel = false;
-    let _typeFilter = '', _statusFilter = '', _buFilter = '', _ownerFilter = '', _amFilter = '', _subAmFilter = '', _leadFilter = '', _sortFilter = 'latest';
-
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     function fmtDate(d) {
         if (!d) return '—';
         const [yr, mo, dy] = String(d).substring(0, 10).split('-');
         return `${+dy} ${MONTHS[+mo - 1]} ${+yr}`;
     }
-    function pill(tag, val) {
-        return val ? `<span class="ac-pill"><span class="ac-pill-tag">${tag}</span><span class="ac-pill-val">${esc(String(val))}</span></span>` : '';
-    }
+
+    var allOpps = [];
+    var _buMap = new Map();
+    var _cfgBU = [], _cfgStatus = [];
+    let _canEdit = false, _canDel = false;
+    let _typeFilter = '', _statusFilter = '', _buFilter = '', _ownerFilter = '', _amFilter = '', _subAmFilter = '', _leadFilter = '', _sortFilter = 'latest';
+
     function typeClass(t) {
         if (t === 'Retention')    return 'retention';
         if (t === 'New Business') return 'new-biz';
@@ -292,15 +282,10 @@
     }
     function resetFilters() {
         _statusFilter = ''; _buFilter = ''; _ownerFilter = ''; _amFilter = ''; _subAmFilter = ''; _leadFilter = '';
-        ['status','bu','owner','am','subam','lead'].forEach(k => {
+        [['status','filterStatus'],['bu','filterBU'],['owner','filterOwner'],['am','filterAM'],['subam','filterSubAM'],['lead','filterLead']].forEach(([k, id]) => {
             document.getElementById(`flt-${k}-wrap`)?.classList.remove('active-filter');
+            const sel = document.getElementById(id); if (sel) sel.value = '';
         });
-        document.getElementById('filterStatus').value = '';
-        document.getElementById('filterBU').value = '';
-        document.getElementById('filterOwner').value = '';
-        document.getElementById('filterAM').value = '';
-        document.getElementById('filterSubAM').value = '';
-        document.getElementById('filterLead').value = '';
         renderList();
     }
     function setSortFilter(type) {
@@ -582,9 +567,6 @@
         container.innerHTML = filtered.map(renderCard).join('');
     }
 
-    var _buMap = new Map(); // opportunity_id → Set<company_qt>
-    var _cfgBU = [], _cfgStatus = [];
-
     async function loadAllOpps() {
         const [{ data: opps, error }, { data: accs }, { data: qts }, { data: cfg }] = await Promise.all([
             supabaseClient.from('b_opportunity_list').select('*'),
@@ -597,7 +579,6 @@
         _cfgBU     = (cfg || []).filter(c => c.type === 'bu').map(c => c.value);
         _cfgStatus = (cfg || []).filter(c => c.type === 'status').map(c => c.value);
 
-        // build BU map
         _buMap = new Map();
         (qts || []).forEach(q => {
             if (!q.company_qt) return;
