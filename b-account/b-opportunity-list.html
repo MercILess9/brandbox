@@ -87,11 +87,19 @@
 
         /* ── Detail grid ── */
         .od-grid { display: grid; grid-template-columns: auto 1fr 1.3fr auto; gap: 10px; align-items: stretch; }
-        .od-col { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 1px solid #eef2f7; border-radius: 10px; padding: 10px 12px; }
-        .od-col-title { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 1px; display: flex; align-items: center; gap: 4px; }
+        .od-col { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 1px solid #eef2f7; border-top: 3px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; }
+        .od-col.dates  { border-top-color: #64748b; }
+        .od-col.people { border-top-color: #bdc432; }
+        .od-col.remark { border-top-color: #f59e0b; }
+        .od-col.links  { border-top-color: #60a5fa; align-items: flex-start; justify-content: center; }
+        .od-col-title { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 1px; display: flex; align-items: center; gap: 4px; }
+        .od-col.dates  .od-col-title { color: #64748b; }
+        .od-col.people .od-col-title { color: #7a8a00; }
+        .od-col.remark .od-col-title { color: #d97706; }
+        .od-col.links  .od-col-title { color: #3b82f6; }
         .od-row { display: flex; align-items: baseline; gap: 6px; }
-        .od-lbl { font-size: 0.68rem; font-weight: 700; color: #94a3b8; min-width: 64px; flex-shrink: 0; white-space: nowrap; }
-        .od-val { font-size: 0.78rem; font-weight: 600; color: #334155; white-space: nowrap; }
+        .od-lbl { font-size: 0.6rem; font-weight: 700; color: #94a3b8; min-width: 60px; flex-shrink: 0; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px; }
+        .od-val { font-size: 0.82rem; font-weight: 700; color: #1e293b; white-space: nowrap; }
         .od-val.nil { color: #cbd5e1; font-weight: 400; }
 
         /* ── Links ── */
@@ -326,25 +334,26 @@
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
             <div class="od-grid">
-                <div class="od-col">
+                <div class="od-col dates">
                     <div class="od-col-title"><i class="bi bi-calendar3"></i>Dates</div>
                     ${row('Create by', o.create_by)}
                     ${dateRow('Create', o.create_date)}
                     ${dateRow('Signed', o.signed_date)}
                     ${dateRow('Launch', o.launch_date)}
                 </div>
-                <div class="od-col">
+                <div class="od-col people">
                     <div class="od-col-title"><i class="bi bi-people-fill"></i>People</div>
                     ${row('Owner', o.owner)}
                     ${row('AM', o.am)}
                     ${row('Sub AM', o.sub_am)}
                     ${row('Lead', o.lead_source)}
                 </div>
-                <div class="od-col">
+                <div class="od-col remark">
                     <div class="od-col-title"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
-                    <div class="op-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1;font-size:0.78rem">No remark</span>'}</div>
+                    <div class="op-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1;font-size:0.78rem;font-weight:400">No remark</span>'}</div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:6px;justify-content:center;padding:0 4px;">
+                <div class="od-col links">
+                    <div class="od-col-title"><i class="bi bi-link-45deg"></i>Links</div>
                     ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
                     ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
                     ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
