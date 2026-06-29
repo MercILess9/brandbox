@@ -192,9 +192,6 @@
                     <span class="flt-select-tag">Status</span>
                     <select class="flt-select-input" id="filterStatus" onchange="setDropFilter('status',this.value)">
                         <option value="">All</option>
-                        <option value="Active">Active</option>
-                        <option value="Churn">Churn</option>
-                        <option value="End Contact">End Contact</option>
                     </select>
                 </div>
                 <div class="flt-select-box" id="flt-owner-wrap">
@@ -319,9 +316,8 @@
         fill('filterAM',    uniq('am'));
         fill('filterSubAM', uniq('sub_am'));
         fill('filterLead',  uniq('lead_source'));
-        // BU from QT map
-        const buVals = [...new Set([..._buMap.values()].flatMap(s => [...s]))].sort();
-        fill('filterBU', buVals);
+        fill('filterBU',     _cfgBU);
+        fill('filterStatus', _cfgStatus);
     }
 
     // ── Card render ───────────────────────────────────────────────
@@ -571,14 +567,19 @@
     }
 
     var _buMap = new Map(); // opportunity_id → Set<company_qt>
+    var _cfgBU = [], _cfgStatus = [];
 
     async function loadAllOpps() {
-        const [{ data: opps, error }, { data: accs }, { data: qts }] = await Promise.all([
+        const [{ data: opps, error }, { data: accs }, { data: qts }, { data: cfg }] = await Promise.all([
             supabaseClient.from('b_opportunity_list').select('*'),
             supabaseClient.from('b_account_list').select('account_id, account_name, company_name'),
-            supabaseClient.from('b_opportunity_qt').select('opportunity_id, company_qt').not('company_qt', 'is', null)
+            supabaseClient.from('b_opportunity_qt').select('opportunity_id, company_qt').not('company_qt', 'is', null),
+            supabaseClient.from('b_opp_config').select('type, value').in('type', ['bu', 'status']).order('value')
         ]);
         if (error) { console.error('[B-OPP]', error); return; }
+
+        _cfgBU     = (cfg || []).filter(c => c.type === 'bu').map(c => c.value);
+        _cfgStatus = (cfg || []).filter(c => c.type === 'status').map(c => c.value);
 
         // build BU map
         _buMap = new Map();
