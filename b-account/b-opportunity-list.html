@@ -94,7 +94,7 @@
         /* ── Detail ── */
         .op-detail-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s ease; }
         .op-card.open > .op-detail-body { grid-template-rows: 1fr; }
-        .op-detail-inner { overflow: hidden; padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
+        .op-detail-inner { overflow: hidden; min-height: 0; padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
         /* ── Detail grid ── */
         .od-grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr auto; gap: 10px; align-items: stretch; }
@@ -624,7 +624,7 @@
     }
 
     // ── Card interactions ─────────────────────────────────────────────────────
-    async function toggleCard(card) {
+    function toggleCard(card) {
         if (card.classList.contains('open')) {
             card.classList.remove('open');
             return;
@@ -634,7 +634,7 @@
             const rec = _cardData.get(card.dataset.id);
             if (rec) {
                 detail.innerHTML = renderDetail(rec);
-                await loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
+                loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
             }
         }
         requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('open')));
