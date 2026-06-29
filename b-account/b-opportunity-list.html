@@ -413,7 +413,8 @@
             ? query.order('create_date', { ascending: false })
             : query.order('opportunity_name', { ascending: true });
 
-        query = query.range(_page * 10, _page * 10 + 9);
+        const from = _page * 10;
+        query = query.range(from, from + 9);
 
         try {
             const { data, error } = await query;
@@ -451,10 +452,9 @@
 
     // ── Card render ───────────────────────────────────────────────────────────
     function cardActions(id) {
-        const hasMenu = _canEdit || _canDel;
         return `<div class="ac-actions">
             ${_canEdit ? `<button class="ac-action-btn" onclick="event.stopPropagation();editOpp('${esc(id)}')"><i class="bi bi-pencil"></i> Edit</button>` : ''}
-            ${hasMenu  ? `<button class="ac-action-icon" onclick="event.stopPropagation();showMenu(this,'${esc(id)}')" title="More"><i class="bi bi-three-dots-vertical"></i></button>` : ''}
+            ${_canDel  ? `<button class="ac-action-icon" onclick="event.stopPropagation();showMenu(this,'${esc(id)}')" title="More"><i class="bi bi-three-dots-vertical"></i></button>` : ''}
         </div>`;
     }
 
@@ -626,7 +626,7 @@
 
         if (card.classList.contains('open')) {
             detail.style.height = detail.scrollHeight + 'px';
-            detail.offsetHeight;
+            void detail.offsetHeight;
             detail.style.transition = 'height 0.3s ease';
             detail.style.height = '0';
             card.classList.remove('open');
@@ -647,7 +647,7 @@
         const h = detail.scrollHeight;
         detail.style.transition = 'none';
         detail.style.height = '0';
-        detail.offsetHeight;
+        void detail.offsetHeight;
         detail.style.transition = 'height 0.35s ease';
         detail.style.height = h + 'px';
         card.classList.add('open');
