@@ -43,7 +43,7 @@
         .op-main { flex: 1; min-width: 0; }
         .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: text; }
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
-        .op-meta-badges { display: flex; gap: 20px; flex-shrink: 0; align-items: center; }
+        .op-meta-badges { display: flex; gap: 20px; flex-shrink: 0; align-items: center; padding-left: 12px; }
         /* ── Amount/GP block ── */
         .omb-amt { flex-shrink: 0; width: 190px; display: flex; flex-direction: column; gap: 3px; }
         .omb-amt-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
@@ -52,7 +52,7 @@
         .omb-gp-lbl { font-size: 0.68rem; font-weight: 600; color: #16a34a; }
         .omb-gp-val { font-size: 0.82rem; font-weight: 800; color: #16a34a; white-space: nowrap; }
         .omb-bar-wrap { height: 3px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 2px; }
-        .omb-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; }
+        .omb-bar-fill { height: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; }
         .omb-bar-foot { display: flex; justify-content: flex-end; margin-top: 1px; }
         .omb-bar-pct { font-size: 0.6rem; font-weight: 700; color: #16a34a; }
         /* ── Owner/date block ── */
@@ -292,7 +292,7 @@
                             <span class="omb-gp-lbl">GP</span>
                             <span class="omb-gp-val">${fmtAmt(o.total_gp)}</span>
                         </div>
-                        <div class="omb-bar-wrap"><div class="omb-bar-fill"></div></div>
+                        <div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>
                         <div class="omb-bar-foot"><span class="omb-bar-pct">${pct}</span></div>` : ''}
                     </div>` : ''}
                     ${(o.update_date || o.owner) ? `<div class="omb-meta">
