@@ -110,9 +110,9 @@
         /* ── QT section ── */
         .op-qt-section { margin-top: 4px; }
         .op-qt-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .op-qt-card { background: #fff; border: 1px solid #eef2f7; border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
+        .op-qt-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
         .op-qt-card:last-child { margin-bottom: 0; }
-        .op-qt-head { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+        .op-qt-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
         .op-qt-num { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); display: flex; align-items: center; gap: 6px; }
         .op-qt-co { font-size: 0.68rem; font-weight: 800; background: #1e293b; color: #bdc432; border-radius: 6px; padding: 3px 9px; }
         .op-qt-totals { margin-left: auto; display: flex; align-items: center; gap: 16px; }
@@ -371,9 +371,7 @@
     }
 
     // ── QT render (async) ─────────────────────────────────────────
-    const QT_COLORS = ['#6366f1','#0ea5e9','#f59e0b','#bdc432','#f43f5e','#14b8a6'];
     function renderQT(qt, idx) {
-        const color = QT_COLORS[idx % QT_COLORS.length];
         const items  = (qt.b_opportunity_qt_item || []).sort((a, b) => (a.no || 0) - (b.no || 0));
         const totAmt = items.reduce((s, i) => s + (+i.amount || 0), 0);
         const totGP  = items.reduce((s, i) => s + (+i.gp  || 0), 0);
@@ -392,8 +390,8 @@
             </tr>`).join('')
             : `<tr><td colspan="8" style="text-align:center;color:#cbd5e1;padding:16px">No items</td></tr>`;
 
-        return `<div class="op-qt-card" style="border-left:4px solid ${color}">
-            <div class="op-qt-head" style="background:${color}14">
+        return `<div class="op-qt-card">
+            <div class="op-qt-head">
                 <i class="bi bi-file-earmark-text" style="color:var(--c-muted)"></i>
                 <span class="op-qt-num">${esc(qt.qt_number || qt.qt_id)}</span>
                 ${qt.company_qt ? `<span class="op-qt-co">${esc(qt.company_qt)}</span>` : ''}
