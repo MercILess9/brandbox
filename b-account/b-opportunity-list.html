@@ -173,6 +173,12 @@
                 <button class="flt-pill" data-type="Retention" onclick="setTypeFilter('Retention')">Retention</button>
                 <button class="flt-pill" data-type="Up Sale" onclick="setTypeFilter('Up Sale')">Up Sale</button>
             </div>
+            <div class="flt-select-box" id="flt-bu-wrap">
+                <span class="flt-select-tag">BU</span>
+                <select class="flt-select-input" id="filterBU" onchange="setDropFilter('bu',this.value)">
+                    <option value="">All BU</option>
+                </select>
+            </div>
             <div class="seg-sm">
                 <button id="sort-name"   class="seg-btn"        onclick="setSortFilter('name')"   title="A-Z"><i class="bi bi-sort-alpha-down"></i></button>
                 <button id="sort-latest" class="seg-btn active" onclick="setSortFilter('latest')" title="Latest"><i class="bi bi-clock"></i></button>
@@ -188,12 +194,6 @@
                         <option value="Active">Active</option>
                         <option value="Churn">Churn</option>
                         <option value="End Contact">End Contact</option>
-                    </select>
-                </div>
-                <div class="flt-select-box" id="flt-bu-wrap">
-                    <span class="flt-select-tag">BU</span>
-                    <select class="flt-select-input" id="filterBU" onchange="setDropFilter('bu',this.value)">
-                        <option value="">All BU</option>
                     </select>
                 </div>
                 <div class="flt-select-box" id="flt-owner-wrap">
