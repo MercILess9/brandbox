@@ -319,6 +319,9 @@
         fill('filterAM',    uniq('am'));
         fill('filterSubAM', uniq('sub_am'));
         fill('filterLead',  uniq('lead_source'));
+        // BU from QT map
+        const buVals = [...new Set([..._buMap.values()].flatMap(s => [...s]))].sort();
+        fill('filterBU', buVals);
     }
 
     // ── Card render ───────────────────────────────────────────────
@@ -547,6 +550,7 @@
         let filtered = search ? allOpps.filter(o => o._search.includes(search)) : allOpps;
         if (_typeFilter)   filtered = filtered.filter(o => o.business_type === _typeFilter);
         if (_statusFilter) filtered = filtered.filter(o => (o.status || 'Active') === _statusFilter);
+        if (_buFilter)     filtered = filtered.filter(o => _buMap.get(o.opportunity_id)?.has(_buFilter));
         if (_ownerFilter)  filtered = filtered.filter(o => o.owner === _ownerFilter);
         if (_amFilter)     filtered = filtered.filter(o => o.am === _amFilter);
         if (_subAmFilter)  filtered = filtered.filter(o => o.sub_am === _subAmFilter);
@@ -566,12 +570,23 @@
         container.innerHTML = filtered.map(renderCard).join('');
     }
 
+    var _buMap = new Map(); // opportunity_id → Set<company_qt>
+
     async function loadAllOpps() {
-        const [{ data: opps, error }, { data: accs }] = await Promise.all([
+        const [{ data: opps, error }, { data: accs }, { data: qts }] = await Promise.all([
             supabaseClient.from('b_opportunity_list').select('*'),
-            supabaseClient.from('b_account_list').select('account_id, account_name, company_name')
+            supabaseClient.from('b_account_list').select('account_id, account_name, company_name'),
+            supabaseClient.from('b_opportunity_qt').select('opportunity_id, company_qt').not('company_qt', 'is', null)
         ]);
         if (error) { console.error('[B-OPP]', error); return; }
+
+        // build BU map
+        _buMap = new Map();
+        (qts || []).forEach(q => {
+            if (!q.company_qt) return;
+            if (!_buMap.has(q.opportunity_id)) _buMap.set(q.opportunity_id, new Set());
+            _buMap.get(q.opportunity_id).add(q.company_qt);
+        });
 
         const accMap = new Map((accs || []).map(a => [a.account_id, a]));
         allOpps = (opps || []).map(o => {
