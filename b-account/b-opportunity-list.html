@@ -10,6 +10,7 @@
     <script src="/system/system.js"></script>
     <script src="b-account.js"></script>
     <link rel="stylesheet" href="b-account.css">
+    <script src="b-opportunity-modal.js" defer></script>
     <style>
         body { padding-bottom: 120px; }
 
@@ -668,7 +669,7 @@
         setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
     }
 
-    function editOpp(id) { /* BOppApp.openEdit(id) */ }
+    function editOpp(id) { BOppApp.openEdit(id); }
 
     async function deleteOpp(id) {
         const result = await Swal.fire({
@@ -698,7 +699,7 @@
         if (canBaccount('new')) {
             const fab = document.getElementById('btn-add');
             fab.style.display = 'flex';
-            fab.onclick = () => { /* BOppApp.openNew() */ };
+            fab.onclick = () => BOppApp.openNew();
         }
         await loadMasterData();
     }
