@@ -83,23 +83,17 @@
         /* ── Detail ── */
         .op-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .op-card.open > .op-detail-body { max-height: 8000px; }
-        .op-detail-inner { padding: 14px 20px 18px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
+        .op-detail-inner { padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
-        /* ── Detail grid ── */
-        .od-grid { display: grid; grid-template-columns: 160px 1fr auto; gap: 12px; align-items: stretch; }
-        .od-remark-row { border-top: 1px solid #eef2f7; padding-top: 10px; display: flex; flex-direction: column; gap: 5px; }
-        .od-remark-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; display: flex; align-items: center; gap: 5px; }
-        .od-col { display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 14px; }
-        .od-col-title { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }
-        .od-row { display: flex; align-items: baseline; gap: 8px; }
-        .od-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; min-width: 72px; flex-shrink: 0; white-space: nowrap; }
-        .od-val { font-size: 0.8rem; font-weight: 600; color: #334155; }
+        /* ── Detail strip (single row) ── */
+        .od-strip { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+        .od-group { display: flex; align-items: center; gap: 16px; padding: 0 20px; }
+        .od-group:first-child { padding-left: 0; }
+        .od-group + .od-group { border-left: 1px solid #e2e8f0; }
+        .od-item { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; }
+        .od-lbl { font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; }
+        .od-val { font-size: 0.78rem; font-weight: 600; color: #334155; }
         .od-val.nil { color: #cbd5e1; font-weight: 500; }
-        /* Col 1 — create info + date box */
-        .od-create-meta { display: flex; flex-direction: column; gap: 3px; }
-        .od-create-by { font-size: 0.68rem; color: #94a3b8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .od-create-date { font-size: 0.72rem; font-weight: 700; color: #64748b; }
-        .od-date-inner { border: 1px solid #eef2f7; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: #f8fafc; margin-top: auto; width: fit-content; }
 
         /* ── Links ── */
         .op-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -329,28 +323,25 @@
         };
         const row = (lbl, val) =>
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
-        const dateRow = (lbl, val) =>
-            `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
+        const item = (lbl, val) =>
+            `<div class="od-item"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
+        const dateItem = (lbl, val) =>
+            `<div class="od-item"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
-            <div class="od-grid">
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                    <div class="od-create-meta">
-                        <span class="od-create-by"><i class="bi bi-person" style="font-size:0.62rem"></i> ${o.create_by ? esc(o.create_by) : '—'}</span>
-                        <span class="od-create-date">${fmtDate(o.create_date)}</span>
-                    </div>
-                    <div class="od-date-inner">
-                        ${dateRow('Signed', o.signed_date)}
-                        ${dateRow('Launch', o.launch_date)}
-                    </div>
+            <div class="od-strip">
+                <div class="od-group">
+                    ${item('Owner', o.owner)}
+                    ${item('AM', o.am)}
+                    ${item('Sub AM', o.sub_am)}
+                    ${item('Lead', o.lead_source)}
                 </div>
-                <div class="od-col">
-                    <div class="od-col-title"><i class="bi bi-people-fill"></i>People</div>
-                    ${row('Owner',       o.owner)}
-                    ${row('AM',          o.am)}
-                    ${row('Sub AM',      o.sub_am)}
-                    ${row('Lead Source', o.lead_source)}
+                <div class="od-group">
+                    ${item('Create by', o.create_by)}
+                    ${dateItem('Create', o.create_date)}
+                    ${dateItem('Signed', o.signed_date)}
+                    ${dateItem('Launch', o.launch_date)}
                 </div>
-                <div style="display:flex;flex-direction:column;gap:8px;justify-content:center;">
+                <div class="od-group">
                     ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
                     ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
                     ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
