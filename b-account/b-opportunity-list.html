@@ -83,25 +83,22 @@
         /* ── Detail ── */
         .op-detail-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .op-card.open > .op-detail-body { max-height: 8000px; }
-        .op-detail-inner { padding: 20px 22px; background: #fafbfc; border-top: 1px solid #f1f5f9; }
+        .op-detail-inner { padding: 14px 20px 18px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
-        /* ── Meta pills ── */
-        .op-meta-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-        .ac-pill { display: inline-flex; align-items: center; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; font-size: 0.78rem; }
-        .ac-pill-tag { padding: 5px 10px; background: #f1f5f9; color: #94a3b8; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; border-right: 1px solid #e2e8f0; white-space: nowrap; }
-        .ac-pill-val { padding: 5px 12px; font-weight: 700; color: #334155; background: #fff; white-space: nowrap; }
+        /* ── People strip ── */
+        .od-people { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding-bottom: 10px; border-bottom: 1px solid #eef2f7; }
+        .od-person { display: flex; align-items: baseline; gap: 6px; }
+        .od-lbl { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; white-space: nowrap; }
+        .od-val { font-size: 0.8rem; font-weight: 600; color: #334155; white-space: nowrap; }
+        .od-val.nil { color: #cbd5e1; }
 
-        /* ── Info grid ── */
-        .op-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .op-info-box { background: #fff; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 15px; }
-        .op-info-label { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
-        .op-info-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; }
-        .op-info-row:last-child { margin-bottom: 0; }
-        .op-info-key { font-size: 0.7rem; color: #94a3b8; font-weight: 700; min-width: 65px; flex-shrink: 0; }
-        .op-info-val { font-size: 0.82rem; font-weight: 600; color: #334155; }
+        /* ── Dates + links strip ── */
+        .od-bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        .od-dates { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .od-date { display: flex; align-items: baseline; gap: 6px; }
 
         /* ── Links ── */
-        .op-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .op-links { display: flex; gap: 8px; flex-wrap: wrap; }
         .op-link-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--c-border); background: #fff; border-radius: 10px; padding: 7px 14px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); text-decoration: none; transition: 0.15s; }
         .op-link-btn:hover { border-color: var(--c-accent); background: var(--c-accent-light); color: #6b7200; }
         .op-link-btn.disabled { opacity: 0.35; pointer-events: none; }
@@ -324,38 +321,34 @@
 
     // ── Detail render (static part) ───────────────────────────────
     function renderDetail(o) {
-        const pct = gpPct(o.total_gp, o.total_amount);
         const linkBtn = (icon, label, url) => {
             const href = safeLink(url);
             return `<a href="${href}" target="_blank" rel="noopener" class="op-link-btn${href === '#' ? ' disabled' : ''}"><i class="bi ${icon}"></i>${label}</a>`;
         };
+        const person = (lbl, val) =>
+            `<div class="od-person"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
+        const dateItem = (lbl, val) => val
+            ? `<div class="od-date"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`
+            : '';
         return `<div class="op-detail-inner">
-            <div class="op-meta-bar">
-                ${pill('Account',     o._account_name)}
-                ${pill('Company',     o._company_name)}
-                ${pill('Create By',   o.create_by)}
-                ${pill('Owner',       o.owner)}
-                ${pill('AM',          o.am)}
-                ${o.sub_am ? pill('Sub AM', o.sub_am) : ''}
-                ${pill('Lead Source', o.lead_source)}
+            <div class="od-people">
+                ${person('Owner',       o.owner)}
+                ${person('AM',          o.am)}
+                ${person('Sub AM',      o.sub_am)}
+                ${person('Lead Source', o.lead_source)}
+                ${person('Created by',  o.create_by)}
             </div>
-            <div class="op-info-grid">
-                <div class="op-info-box">
-                    <div class="op-info-label"><i class="bi bi-calendar3"></i>Key Dates</div>
-                    <div class="op-info-row"><span class="op-info-key">Signed</span><span class="op-info-val">${fmtDate(o.signed_date)}</span></div>
-                    <div class="op-info-row"><span class="op-info-key">Launch</span><span class="op-info-val">${fmtDate(o.launch_date)}</span></div>
-                    <div class="op-info-row"><span class="op-info-key">Created</span><span class="op-info-val">${fmtDate(o.create_date)}</span></div>
+            <div class="od-bottom">
+                <div class="od-dates">
+                    ${dateItem('Create', o.create_date)}
+                    ${dateItem('Signed', o.signed_date)}
+                    ${dateItem('Launch', o.launch_date)}
                 </div>
-                <div class="op-info-box">
-                    <div class="op-info-label"><i class="bi bi-cash-stack"></i>Summary</div>
-                    <div class="op-info-row"><span class="op-info-key">Amount</span><span class="op-info-val">${+o.total_amount > 0 ? fmtAmt(o.total_amount) : '—'}</span></div>
-                    <div class="op-info-row"><span class="op-info-key">GP</span><span class="op-info-val" style="color:#16a34a">${+o.total_gp > 0 ? fmtAmt(o.total_gp) : '—'}${pct ? ` <span style="font-size:0.7rem;color:#22c55e">(${pct})</span>` : ''}</span></div>
+                <div class="op-links">
+                    ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
+                    ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
+                    ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
                 </div>
-            </div>
-            <div class="op-links">
-                ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
-                ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
-                ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
             </div>
             ${o.remark ? `<div class="op-remark">
                 <div class="op-remark-label"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
