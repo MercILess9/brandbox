@@ -92,9 +92,8 @@
         .ac-action-icon:hover { background: #f1f5f9; color: var(--c-slate); }
 
         /* ── Detail ── */
-        .op-detail-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s ease; }
-        .op-card.open > .op-detail-body { grid-template-rows: 1fr; }
-        .op-detail-inner { overflow: hidden; min-height: 0; padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
+        .op-detail-body { overflow: hidden; height: 0; }
+        .op-detail-inner { padding: 10px 20px 14px; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
 
         /* ── Detail grid ── */
         .od-grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr auto; gap: 10px; align-items: stretch; }
@@ -625,11 +624,21 @@
 
     // ── Card interactions ─────────────────────────────────────────────────────
     function toggleCard(card) {
+        const detail = card.querySelector('.op-detail-body');
+
         if (card.classList.contains('open')) {
+            detail.style.height = detail.scrollHeight + 'px';
+            detail.offsetHeight;
+            detail.style.transition = 'height 0.3s ease';
+            detail.style.height = '0';
             card.classList.remove('open');
+            detail.addEventListener('transitionend', () => {
+                detail.style.height = '';
+                detail.style.transition = '';
+            }, { once: true });
             return;
         }
-        const detail = card.querySelector('.op-detail-body');
+
         if (!detail.innerHTML && card.dataset.id) {
             const rec = _cardData.get(card.dataset.id);
             if (rec) {
@@ -637,7 +646,17 @@
                 loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
             }
         }
-        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('open')));
+        const h = detail.scrollHeight;
+        detail.style.transition = 'none';
+        detail.style.height = '0';
+        detail.offsetHeight;
+        detail.style.transition = 'height 0.35s ease';
+        detail.style.height = h + 'px';
+        card.classList.add('open');
+        detail.addEventListener('transitionend', () => {
+            detail.style.height = 'auto';
+            detail.style.transition = '';
+        }, { once: true });
     }
 
     function showMenu(btn, id) {
