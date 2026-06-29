@@ -73,8 +73,7 @@
         .omb-val.gp  { color: #16a34a; font-weight: 800; }
         .omb-bar-wrap { height: 3px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 2px; }
         .omb-bar-fill { height: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; }
-        .omb-bar-foot { display: flex; justify-content: flex-end; margin-top: 1px; }
-        .omb-bar-pct  { font-size: 0.72rem; font-weight: 700; color: #16a34a; }
+        .omb-bar-pct  { font-size: 0.65rem; font-weight: 700; color: #16a34a; }
 
         /* ── Owner/date block ── */
         .omb-meta { width: 148px; border-left: 2px solid #e2e8f0; padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 6px; flex-shrink: 0; }
@@ -463,9 +462,8 @@
         if (!hasAmt) return '';
         return `<div class="omb-amt">
             <div class="omb-amt-row"><span class="omb-lbl amt">Amount</span><span class="omb-val amt">${fmtAmt(o.total_amount)}</span></div>
-            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP</span><span class="omb-val gp">${fmtAmt(o.total_gp)}</span></div>
-            <div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>
-            <div class="omb-bar-foot"><span class="omb-bar-pct">${pct}</span></div>` : ''}
+            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP${pct ? ` <span class="omb-bar-pct">${pct}</span>` : ''}</span><span class="omb-val gp">${fmtAmt(o.total_gp)}</span></div>
+            <div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>` : ''}
         </div>`;
     }
 
