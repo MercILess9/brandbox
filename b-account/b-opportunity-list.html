@@ -322,8 +322,6 @@
         };
         const row = (lbl, val) =>
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
-        const row = (lbl, val) =>
-            `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
         const dateRow = (lbl, val) =>
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
