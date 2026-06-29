@@ -88,8 +88,8 @@
         /* ── Detail grid ── */
         .od-grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr auto; gap: 10px; align-items: stretch; }
         .od-col { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 1px solid #eef2f7; border-radius: 10px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-        .od-col.links { justify-content: center; }
-        .od-col-title { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+        .od-links-col { display: flex; flex-direction: column; gap: 8px; justify-content: center; align-self: stretch; }
+        .od-lbl-icon { font-size: 0.65rem; color: #94a3b8; flex-shrink: 0; }
         .od-row { display: flex; align-items: center; gap: 8px; }
         .od-lbl { font-size: 0.6rem; font-weight: 700; color: #94a3b8; min-width: 72px; flex-shrink: 0; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px; }
         .od-lbl::after { content: " :"; }
@@ -332,8 +332,8 @@
             <div class="od-grid">
                 <div style="display:flex;flex-direction:column;gap:8px;">
                     <div class="od-col">
-                        <div class="od-col-title"><i class="bi bi-person"></i>Created</div>
                         <div class="od-row">
+                            <i class="bi bi-person od-lbl-icon"></i>
                             <span class="od-lbl">Create By</span>
                             <div class="od-val-stack">
                                 <span class="od-val${o.create_by ? '' : ' nil'}">${o.create_by ? esc(o.create_by) : '—'}</span>
@@ -342,24 +342,23 @@
                         </div>
                     </div>
                     <div class="od-col" style="flex:1;">
-                        <div class="od-col-title"><i class="bi bi-calendar3"></i>Key Dates</div>
-                        ${dateRow('Signed', o.signed_date)}
-                        ${dateRow('Launch', o.launch_date)}
+                        <div class="od-row"><i class="bi bi-calendar3 od-lbl-icon"></i><span class="od-lbl">Signed</span><span class="od-val">${fmtDate(o.signed_date)}</span></div>
+                        <div class="od-row"><i class="bi bi-rocket od-lbl-icon"></i><span class="od-lbl">Launch</span><span class="od-val">${fmtDate(o.launch_date)}</span></div>
                     </div>
                 </div>
-                <div class="od-col people" style="align-self:stretch;">
-                    <div class="od-col-title"><i class="bi bi-people-fill"></i>People</div>
-                    ${row('Owner', o.owner)}
+                <div class="od-col" style="align-self:stretch;">
+                    <div class="od-row"><i class="bi bi-people-fill od-lbl-icon"></i><span class="od-lbl">Owner</span><span class="od-val${o.owner ? '' : ' nil'}">${o.owner ? esc(o.owner) : '—'}</span></div>
                     ${row('AM', o.am)}
                     ${row('Sub AM', o.sub_am)}
                     ${row('Lead', o.lead_source)}
                 </div>
-                <div class="od-col remark">
-                    <div class="od-col-title"><i class="bi bi-chat-left-text-fill"></i>Remark</div>
-                    <div class="op-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1;font-size:0.78rem;font-weight:400">No remark</span>'}</div>
+                <div class="od-col">
+                    <div class="od-row" style="align-items:flex-start;">
+                        <i class="bi bi-chat-left-text-fill od-lbl-icon" style="margin-top:3px;"></i>
+                        <div class="op-remark-val" style="flex:1;">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1;font-size:0.78rem;font-weight:400">No remark</span>'}</div>
+                    </div>
                 </div>
-                <div class="od-col links">
-                    <div class="od-col-title"><i class="bi bi-link-45deg"></i>Links</div>
+                <div class="od-links-col">
                     ${linkBtn('bi-cloud-fill',             'Materials', o.materials)}
                     ${linkBtn('bi-file-earmark-text-fill', 'Proposal',  o.proposal)}
                     ${linkBtn('bi-megaphone-fill',         'Campaign',  o.campaign)}
