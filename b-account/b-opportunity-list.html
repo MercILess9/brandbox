@@ -127,8 +127,6 @@
         .op-qt-table th.c, .op-qt-table td.c { text-align: center; }
         .op-qt-table td { padding: 9px 12px; color: #334155; font-weight: 500; border-bottom: 1px solid #f8fafc; vertical-align: top; line-height: 1.5; }
         .op-qt-table tr:last-child td { border-bottom: none; }
-        .op-qt-table tfoot td { background: #f8fafc; font-weight: 800; color: var(--c-text-main); border-top: 1.5px solid #e2e8f0; }
-        .op-qt-table tfoot .gp { color: #16a34a; }
         .op-bu { display: inline-flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 0.68rem; font-weight: 800; color: var(--c-slate); }
         .op-qt-loading { padding: 20px; text-align: center; color: #94a3b8; font-size: 0.82rem; margin: 0; }
         .op-qt-empty   { padding: 16px; text-align: center; color: #cbd5e1; font-size: 0.82rem; margin: 0; }
@@ -408,11 +406,6 @@
                         <th class="r">Amount</th><th class="r">GP</th>
                     </tr></thead>
                     <tbody>${rows}</tbody>
-                    ${items.length ? `<tfoot><tr>
-                        <td colspan="6" class="r" style="font-size:0.68rem;color:#94a3b8;font-weight:700">TOTAL</td>
-                        <td class="r">${totAmt > 0 ? fmtNum(totAmt) : '—'}</td>
-                        <td class="r gp">${totGP > 0 ? fmtNum(totGP) : '—'}</td>
-                    </tr></tfoot>` : ''}
                 </table>
             </div>
         </div>`;
