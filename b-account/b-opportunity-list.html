@@ -115,9 +115,12 @@
         .op-qt-head { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
         .op-qt-num { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); display: flex; align-items: center; gap: 6px; }
         .op-qt-co { font-size: 0.68rem; font-weight: 800; background: #1e293b; color: #bdc432; border-radius: 6px; padding: 3px 9px; }
-        .op-qt-totals { margin-left: auto; display: flex; align-items: center; gap: 14px; }
-        .op-qt-amt { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); }
-        .op-qt-gp  { font-size: 0.82rem; font-weight: 800; color: #16a34a; }
+        .op-qt-totals { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .op-qt-stat { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+        .op-qt-stat-val { font-size: 0.88rem; font-weight: 800; color: var(--c-text-main); }
+        .op-qt-stat-val.gp { color: #16a34a; }
+        .op-qt-stat-lbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; }
+        .op-qt-stat-div { width: 1px; height: 28px; background: #e2e8f0; }
 
         /* ── QT Table ── */
         .op-qt-wrap { overflow-x: auto; }
@@ -393,8 +396,15 @@
                 <span class="op-qt-num">${esc(qt.qt_number || qt.qt_id)}</span>
                 ${qt.company_qt ? `<span class="op-qt-co">${esc(qt.company_qt)}</span>` : ''}
                 <div class="op-qt-totals">
-                    <span class="op-qt-amt">${fmtAmt(totAmt)}</span>
-                    ${totGP > 0 ? `<span class="op-qt-gp">${fmtAmt(totGP)}${pct ? ` <span style="font-size:0.68rem">(${pct})</span>` : ''}</span>` : ''}
+                    <div class="op-qt-stat">
+                        <span class="op-qt-stat-val">${fmtAmt(totAmt)}</span>
+                        <span class="op-qt-stat-lbl">Amount</span>
+                    </div>
+                    ${totGP > 0 ? `<div class="op-qt-stat-div"></div>
+                    <div class="op-qt-stat">
+                        <span class="op-qt-stat-val gp">${fmtAmt(totGP)}</span>
+                        <span class="op-qt-stat-lbl">GP${pct ? ` · ${pct}` : ''}</span>
+                    </div>` : ''}
                 </div>
             </div>
             <div class="op-qt-wrap">
