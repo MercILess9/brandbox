@@ -34,8 +34,9 @@
         .op-card.churn { border-left-color: #f97316; }
         .op-card.ended { border-left-color: #94a3b8; }
         .op-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; user-select: none; }
-        .op-badge { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); letter-spacing: 1px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 4px 10px; flex-shrink: 0; white-space: nowrap; }
-        .op-type { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; flex-shrink: 0; white-space: nowrap; border: 1px solid transparent; }
+        .op-id-col { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; align-items: flex-start; }
+        .op-badge { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); letter-spacing: 1px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 4px 10px; white-space: nowrap; }
+        .op-type { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; white-space: nowrap; border: 1px solid transparent; }
         .op-type.retention { background: var(--c-accent-light); color: #6b7200; border-color: var(--c-accent); }
         .op-type.new-biz   { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
         .op-type.upsale    { background: #f5f3ff; color: #6d28d9; border-color: #c4b5fd; }
@@ -255,11 +256,13 @@
         const hasAmt = +o.total_amount > 0;
         return `<div class="op-card${cardClass(o.status)}" data-id="${esc(o.opportunity_id)}">
             <div class="op-header" onclick="toggleCard(this.closest('.op-card'))">
-                <span class="op-badge">${esc(o.opportunity_id)}</span>
-                ${o.business_type ? `<span class="op-type ${typeClass(o.business_type)}">${esc(o.business_type)}</span>` : ''}
+                <div class="op-id-col">
+                    <span class="op-badge">${esc(o.opportunity_id)}</span>
+                    ${o.business_type ? `<span class="op-type ${typeClass(o.business_type)}">${esc(o.business_type)}</span>` : ''}
+                </div>
                 <div class="op-main">
                     <div class="op-name">${esc(o.opportunity_name || '')}</div>
-                    <div class="op-sub">${esc(o._account_name)}${o.owner ? ` <span style="color:#e2e8f0">|</span> ${esc(o.owner)}` : ''}</div>
+                    <div class="op-sub">${esc(o._account_name)}${o._company_name ? ` <span style="color:#e2e8f0">|</span> ${esc(o._company_name)}` : ''}</div>
                 </div>
                 ${hasAmt ? `<div class="op-amt-block">
                     <div class="op-amt-total">${fmtAmt(o.total_amount)}</div>
