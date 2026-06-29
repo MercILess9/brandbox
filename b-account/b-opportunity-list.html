@@ -344,7 +344,7 @@
                     </div>
                 </div>
                 <div class="od-col" style="align-self:stretch;">
-                    <div class="od-row"><i class="bi bi-people-fill od-lbl-icon"></i><span class="od-lbl">Owner</span><span class="od-val${o.owner ? '' : ' nil'}">${o.owner ? esc(o.owner) : '—'}</span></div>
+                    ${row('Owner', o.owner)}
                     ${row('AM', o.am)}
                     ${row('Sub AM', o.sub_am)}
                     ${row('Lead', o.lead_source)}
