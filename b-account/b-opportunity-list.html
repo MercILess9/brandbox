@@ -43,7 +43,7 @@
         .op-main { flex: 1; min-width: 0; }
         .op-name { font-size: 0.95rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: text; }
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
-        .op-meta-badges { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+        .op-meta-badges { display: flex; gap: 16px; flex-shrink: 0; align-items: center; }
         .omb { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 6px 12px; display: flex; flex-direction: column; gap: 4px; }
         .omb-row { display: grid; grid-template-columns: auto auto 1fr; gap: 0 6px; align-items: baseline; white-space: nowrap; }
         .omb-lbl { font-size: 0.7rem; font-weight: 700; color: #64748b; }
@@ -52,6 +52,9 @@
         .omb-row.gp .omb-lbl { color: #16a34a; }
         .omb-row.gp .omb-colon { color: #86efac; }
         .omb-row.gp .omb-val { color: #16a34a; }
+        .omb-meta { text-align: right; flex-shrink: 0; }
+        .omb-meta-date { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
+        .omb-meta-owner { font-size: 0.72rem; color: #94a3b8; white-space: nowrap; margin-top: 2px; }
         .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
         .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
 
@@ -182,7 +185,7 @@
     function fmtNum(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') : '—'; }
     function fmtAmt(n) { return n != null && !isNaN(+n) && +n > 0 ? Number(n).toLocaleString('en-US') + ' ฿' : '—'; }
     function gpPct(gp, amt) { return (gp && amt && +amt > 0) ? (+gp / +amt * 100).toFixed(1) + '%' : null; }
-    function fmtDate(s) { if (!s) return '—'; const d = new Date(s); const p = n => String(n).padStart(2,'0'); return `${p(d.getDate())}/${p(d.getMonth()+1)}/${String(d.getFullYear()).slice(2)}`; }
+    function fmtDate(s) { if (!s) return '—'; const d = new Date(s); const p = n => String(n).padStart(2,'0'); return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()+543}`; }
 
     var allOpps = [];
     let _canEdit = false, _canDel = false;
@@ -284,19 +287,9 @@
                             <span class="omb-val">${fmtAmt(o.total_gp)}</span>
                         </div>` : ''}
                     </div>` : ''}
-                    ${o.owner ? `<div class="omb">
-                        <div class="omb-row">
-                            <span class="omb-lbl">Owner</span>
-                            <span class="omb-colon">:</span>
-                            <span class="omb-val">${esc(o.owner)}</span>
-                        </div>
-                    </div>` : ''}
-                    ${o.update_date ? `<div class="omb">
-                        <div class="omb-row">
-                            <span class="omb-lbl">Updated</span>
-                            <span class="omb-colon">:</span>
-                            <span class="omb-val">${fmtDate(o.update_date)}</span>
-                        </div>
+                    ${(o.update_date || o.owner) ? `<div class="omb-meta">
+                        ${o.update_date ? `<div class="omb-meta-date">${fmtDate(o.update_date)}</div>` : ''}
+                        ${o.owner ? `<div class="omb-meta-owner">${esc(o.owner)}</div>` : ''}
                     </div>` : ''}
                 </div>
                 ${cardActions(o.opportunity_id)}
