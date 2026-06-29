@@ -17,7 +17,7 @@
         .flt-wrapper { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .flt-inner { max-width: 1300px; margin: 0 auto; }
         .flt-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
-        .flt-search { position: relative; flex: 0 1 300px; min-width: 120px; }
+        .flt-search { position: relative; flex: 1; min-width: 120px; max-width: 320px; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
         .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
         .flt-pill-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
@@ -34,6 +34,7 @@
         .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 13px; font-size: 0.72rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
         .seg-btn:last-child { border-right: none; }
         .seg-btn.active { background: var(--c-accent); color: #1e293b; }
+        #typePillGroup { width: 420px; flex-shrink: 0; }
         #typePillGroup .seg-btn { flex: 1 1 0; min-width: 0; }
         #typePillGroup .seg-btn[data-type="New Business"].active { background: #eff6ff; color: #1d4ed8; }
         #typePillGroup .seg-btn[data-type="Retention"].active    { background: #f5f3ff; color: #6d28d9; }
