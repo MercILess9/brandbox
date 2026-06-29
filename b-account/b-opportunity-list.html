@@ -335,10 +335,7 @@
                         <div class="od-row">
                             <i class="bi bi-person od-lbl-icon"></i>
                             <span class="od-lbl">Create By</span>
-                            <div class="od-val-stack">
-                                <span class="od-val${o.create_by ? '' : ' nil'}">${o.create_by ? esc(o.create_by) : '—'}</span>
-                                <span class="od-val-sub">${fmtDate(o.create_date)}</span>
-                            </div>
+                            <span class="od-val${o.create_by ? '' : ' nil'}">${o.create_by ? esc(o.create_by) : '—'}</span>
                         </div>
                     </div>
                     <div class="od-col" style="flex:1;">
