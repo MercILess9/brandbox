@@ -30,6 +30,7 @@
         .flt-advanced-zone { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s ease; opacity: 0; border-top: 1px dashed transparent; }
         .flt-advanced-zone.show { max-height: 120px; opacity: 1; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e2e8f0; }
         .flt-advanced-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+        .status-seg { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
         .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 13px; font-size: 0.72rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
         .seg-btn:last-child { border-right: none; }
         .seg-btn.active { background: var(--c-accent); color: #1e293b; }
@@ -167,11 +168,11 @@
                 <i class="bi bi-search"></i>
                 <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search">
             </div>
-            <div class="flt-pill-group" id="typePillGroup">
-                <button class="flt-pill active" data-type="" onclick="setTypeFilter('')">All</button>
-                <button class="flt-pill" data-type="New Business" onclick="setTypeFilter('New Business')">New Business</button>
-                <button class="flt-pill" data-type="Retention" onclick="setTypeFilter('Retention')">Retention</button>
-                <button class="flt-pill" data-type="Up Sale" onclick="setTypeFilter('Up Sale')">Up Sale</button>
+            <div class="status-seg" id="typePillGroup">
+                <button class="seg-btn active" data-type="" onclick="setTypeFilter('')"><i class="bi bi-grid-fill"></i> All</button>
+                <button class="seg-btn" data-type="New Business" onclick="setTypeFilter('New Business')">New Business</button>
+                <button class="seg-btn" data-type="Retention" onclick="setTypeFilter('Retention')">Retention</button>
+                <button class="seg-btn" data-type="Up Sale" onclick="setTypeFilter('Up Sale')">Up Sale</button>
             </div>
             <div class="flt-select-box" id="flt-bu-wrap">
                 <span class="flt-select-tag">BU</span>
@@ -270,7 +271,7 @@
     // ── Filters ──────────────────────────────────────────────────
     function setTypeFilter(val) {
         _typeFilter = val;
-        document.querySelectorAll('#typePillGroup .flt-pill').forEach(b => b.classList.toggle('active', b.dataset.type === val));
+        document.querySelectorAll('#typePillGroup .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.type === val));
         renderList();
     }
     function setDropFilter(key, val) {
