@@ -29,11 +29,11 @@
         .seg-sm .seg-btn { padding: 0 13px; font-size: 0.72rem; }
 
         /* ── Cards ── */
-        .op-card { background: #fff; border: 1px solid #eef2f7; border-left: 5px solid var(--c-accent); border-radius: var(--radius-card); margin-bottom: 10px; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.05); transition: box-shadow 0.2s; }
-        .op-card:hover { box-shadow: 0 8px 24px -4px rgba(0,0,0,0.09); }
+        .op-card { background: #fff; border: 1px solid #eef2f7; border-left: 5px solid var(--c-accent); border-radius: var(--radius-card); margin-bottom: 8px; box-shadow: 0 1px 4px -1px rgba(0,0,0,0.06); transition: box-shadow 0.2s, transform 0.2s; }
+        .op-card:hover { box-shadow: 0 8px 28px -4px rgba(0,0,0,0.11); transform: translateY(-1px); }
         .op-card.churn { border-left-color: #f97316; }
         .op-card.ended { border-left-color: #94a3b8; }
-        .op-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; user-select: none; }
+        .op-header { display: flex; align-items: center; gap: 14px; padding: 12px 18px; cursor: pointer; user-select: none; }
         .op-id-col { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; align-items: flex-start; }
         .op-badge { font-size: 0.68rem; font-weight: 800; color: var(--c-muted); letter-spacing: 1px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 8px; padding: 4px 10px; white-space: nowrap; }
         .op-type { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; white-space: nowrap; border: 1px solid transparent; }
@@ -56,10 +56,12 @@
         .omb-bar-foot { display: flex; justify-content: flex-end; margin-top: 1px; }
         .omb-bar-pct { font-size: 0.72rem; font-weight: 700; color: #16a34a; }
         /* ── Owner/date block ── */
-        .omb-meta { flex-shrink: 0; width: 120px; border-left: 2px solid #e2e8f0; padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
-        .omb-meta-owner { font-size: 0.78rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; }
-        .omb-meta-date { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #94a3b8; white-space: nowrap; }
-        .omb-meta-date i { font-size: 0.65rem; }
+        .omb-meta { flex-shrink: 0; width: 148px; border-left: 2px solid #e2e8f0; padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+        .omb-owner-row { display: flex; align-items: center; gap: 8px; }
+        .omb-avatar { width: 26px; height: 26px; border-radius: 50%; background: #f7f9e3; border: 1.5px solid #d4db77; color: #5a6100; font-size: 0.62rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .omb-meta-owner { font-size: 0.76rem; font-weight: 700; color: var(--c-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .omb-meta-date { display: flex; align-items: center; gap: 4px; font-size: 0.68rem; color: #94a3b8; white-space: nowrap; padding-left: 2px; }
+        .omb-meta-date i { font-size: 0.62rem; }
         .op-chevron { color: var(--c-muted); font-size: 0.8rem; transition: transform 0.25s; flex-shrink: 0; }
         .op-card.open > .op-header .op-chevron { transform: rotate(180deg); }
 
@@ -296,7 +298,10 @@
                         <div class="omb-bar-foot"><span class="omb-bar-pct">${pct}</span></div>` : ''}
                     </div>` : ''}
                     ${(o.update_date || o.owner) ? `<div class="omb-meta">
-                        ${o.owner ? `<div class="omb-meta-owner">${esc(o.owner)}</div>` : ''}
+                        ${o.owner ? `<div class="omb-owner-row">
+                            <div class="omb-avatar">${esc(o.owner.charAt(0))}</div>
+                            <span class="omb-meta-owner">${esc(o.owner)}</span>
+                        </div>` : ''}
                         ${o.update_date ? `<div class="omb-meta-date"><i class="bi bi-clock"></i>${fmtDate(o.update_date)}</div>` : ''}
                     </div>` : ''}
                 </div>
