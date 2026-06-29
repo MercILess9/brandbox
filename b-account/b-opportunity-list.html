@@ -45,18 +45,16 @@
         .op-sub  { font-size: 0.8rem; color: var(--c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; user-select: text; }
         .op-meta-badges { display: flex; gap: 20px; flex-shrink: 0; align-items: center; }
         /* ── Amount/GP block ── */
-        .omb-amt { flex-shrink: 0; width: 210px; }
-        .omb-amt-nums { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
-        .omb-amt-group { display: flex; flex-direction: column; gap: 1px; }
-        .omb-amt-lbl { font-size: 0.6rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
-        .omb-amt-val { font-size: 0.88rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
-        .omb-sep { color: #e2e8f0; font-size: 0.8rem; align-self: center; }
-        .omb-gp-lbl { font-size: 0.6rem; font-weight: 600; color: #86efac; text-transform: uppercase; letter-spacing: 0.3px; }
-        .omb-gp-val { font-size: 0.88rem; font-weight: 800; color: #16a34a; white-space: nowrap; }
-        .omb-bar-wrap { height: 4px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+        .omb-amt { flex-shrink: 0; width: 190px; display: flex; flex-direction: column; gap: 3px; }
+        .omb-amt-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .omb-amt-lbl { font-size: 0.68rem; font-weight: 600; color: #94a3b8; white-space: nowrap; }
+        .omb-amt-val { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
+        .omb-gp-lbl { font-size: 0.68rem; font-weight: 600; color: #16a34a; }
+        .omb-gp-val { font-size: 0.82rem; font-weight: 800; color: #16a34a; white-space: nowrap; }
+        .omb-bar-wrap { height: 3px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 2px; }
         .omb-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; }
-        .omb-bar-foot { display: flex; justify-content: flex-end; margin-top: 2px; }
-        .omb-bar-pct { font-size: 0.62rem; font-weight: 700; color: #16a34a; }
+        .omb-bar-foot { display: flex; justify-content: flex-end; margin-top: 1px; }
+        .omb-bar-pct { font-size: 0.6rem; font-weight: 700; color: #16a34a; }
         /* ── Owner/date block ── */
         .omb-meta { text-align: right; flex-shrink: 0; width: 110px; padding-right: 4px; border-left: 2px solid #e2e8f0; padding-left: 14px; }
         .omb-meta-date { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
