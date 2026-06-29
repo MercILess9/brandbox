@@ -371,7 +371,9 @@
     }
 
     // ── QT render (async) ─────────────────────────────────────────
-    function renderQT(qt) {
+    const QT_COLORS = ['#6366f1','#0ea5e9','#f59e0b','#bdc432','#f43f5e','#14b8a6'];
+    function renderQT(qt, idx) {
+        const color = QT_COLORS[idx % QT_COLORS.length];
         const items  = (qt.b_opportunity_qt_item || []).sort((a, b) => (a.no || 0) - (b.no || 0));
         const totAmt = items.reduce((s, i) => s + (+i.amount || 0), 0);
         const totGP  = items.reduce((s, i) => s + (+i.gp  || 0), 0);
@@ -390,8 +392,8 @@
             </tr>`).join('')
             : `<tr><td colspan="8" style="text-align:center;color:#cbd5e1;padding:16px">No items</td></tr>`;
 
-        return `<div class="op-qt-card">
-            <div class="op-qt-head">
+        return `<div class="op-qt-card" style="border-left:4px solid ${color}">
+            <div class="op-qt-head" style="background:${color}14">
                 <i class="bi bi-file-earmark-text" style="color:var(--c-muted)"></i>
                 <span class="op-qt-num">${esc(qt.qt_number || qt.qt_id)}</span>
                 ${qt.company_qt ? `<span class="op-qt-co">${esc(qt.company_qt)}</span>` : ''}
@@ -437,7 +439,7 @@
                 zone.innerHTML = '<p class="op-qt-empty">No quotations yet</p>';
                 return;
             }
-            zone.innerHTML = data.map(renderQT).join('');
+            zone.innerHTML = data.map((qt, i) => renderQT(qt, i)).join('');
         } catch {
             zone.innerHTML = '<p class="op-qt-empty">Failed to load quotations</p>';
         }
