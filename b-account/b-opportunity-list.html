@@ -97,7 +97,7 @@
         .od-create-meta { display: flex; flex-direction: column; gap: 3px; }
         .od-create-by { font-size: 0.68rem; color: #94a3b8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .od-create-date { font-size: 0.72rem; font-weight: 700; color: #64748b; }
-        .od-date-inner { border: 1px solid #eef2f7; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: #f8fafc; margin-top: auto; }
+        .od-date-inner { border: 1px solid #eef2f7; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: #f8fafc; margin-top: auto; width: fit-content; }
 
         /* ── Links ── */
         .op-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -331,7 +331,7 @@
             `<div class="od-row"><span class="od-lbl">${lbl}</span><span class="od-val">${fmtDate(val)}</span></div>`;
         return `<div class="op-detail-inner">
             <div class="od-grid">
-                <div class="od-col">
+                <div style="display:flex;flex-direction:column;gap:8px;">
                     <div class="od-create-meta">
                         <span class="od-create-by"><i class="bi bi-person" style="font-size:0.62rem"></i> ${o.create_by ? esc(o.create_by) : '—'}</span>
                         <span class="od-create-date">${fmtDate(o.create_date)}</span>
