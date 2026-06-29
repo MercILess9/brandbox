@@ -637,7 +637,7 @@
                 loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
             }
         }
-        requestAnimationFrame(() => card.classList.add('open'));
+        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('open')));
     }
 
     function showMenu(btn, id) {
