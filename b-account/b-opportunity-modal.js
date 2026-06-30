@@ -33,15 +33,11 @@ const B_OPP_MODAL_HTML = `
     /* ── Section cards ── */
     .bopp-card { background: #fff; border-radius: 16px; border: 1px solid #eef2f7; padding: 15px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .bopp-card-hd { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 11px; display: flex; align-items: center; gap: 6px; }
-    .bopp-outer { display: grid; grid-template-columns: 1fr 25%; gap: 12px; margin-bottom: 12px; align-items: start; }
-    .bopp-left { display: flex; flex-direction: column; gap: 12px; }
-    .bopp-left2 { display: flex; gap: 14px; align-items: stretch; }
-    .bopp-left2-links { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-    .bopp-left2-div { width: 1px; background: #eef2f7; flex-shrink: 0; }
-    .bopp-left2-remark { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-    .bopp-date-row { display: flex; gap: 10px; }
-    .bopp-date-row > div { flex: 1; min-width: 0; }
-    .bopp-right-panel { display: flex; flex-direction: column; gap: 10px; }
+    .bopp-row1 { display: grid; grid-template-columns: 7fr 3fr; gap: 12px; margin-bottom: 12px; align-items: start; }
+    .bopp-row2 { display: grid; grid-template-columns: 35fr 35fr 30fr; gap: 12px; margin-bottom: 12px; align-items: start; }
+    .bopp-row1 > .bopp-card, .bopp-row2 > .bopp-card { margin-bottom: 0; display: flex; flex-direction: column; gap: 10px; }
+    .bopp-date-group .bq-lbl { text-align: center; }
+    .bopp-date-group .bq-inp { text-align: center; text-align-last: center; }
     .bopp-right-panel .bq-lbl { text-align: center; }
     .bopp-right-panel .bq-inp { text-align: center; text-align-last: center; }
 
@@ -183,71 +179,74 @@ const B_OPP_MODAL_HTML = `
 
                 <div class="bopp-body">
 
-                    <!-- Outer 80/20 -->
-                    <div class="bopp-outer">
+                    <!-- Row 1: 70% Names | 30% Dates -->
+                    <div class="bopp-row1">
 
-                        <!-- LEFT 80% -->
-                        <div class="bopp-left">
-
-                            <!-- Left 1: ACC 50 | Company 50 / OPP Name full -->
-                            <div class="bopp-card">
-                                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                                    <div style="flex:1; min-width:0;">
-                                        <label class="bq-lbl">Account Name <span style="color:#ef4444">*</span></label>
-                                        <div class="d-flex">
-                                            <input type="text" id="bopp-acc-name" class="bq-inp" style="border-radius:10px 0 0 10px;" placeholder="Select account..." readonly required>
-                                            <button type="button" class="bopp-search-btn" onclick="BOppApp.openOverlay()"><i class="bi bi-search"></i></button>
-                                        </div>
-                                    </div>
-                                    <div style="flex:1; min-width:0;">
-                                        <label class="bq-lbl">Company <span style="color:#ef4444">*</span></label>
-                                        <select id="bopp-company-sel" class="bq-inp" required>
-                                            <option value="">Select company...</option>
-                                        </select>
+                        <!-- Names card -->
+                        <div class="bopp-card">
+                            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                                <div style="flex:1; min-width:0;">
+                                    <label class="bq-lbl">Account Name <span style="color:#ef4444">*</span></label>
+                                    <div class="d-flex">
+                                        <input type="text" id="bopp-acc-name" class="bq-inp" style="border-radius:10px 0 0 10px;" placeholder="Select account..." readonly required>
+                                        <button type="button" class="bopp-search-btn" onclick="BOppApp.openOverlay()"><i class="bi bi-search"></i></button>
                                     </div>
                                 </div>
-                                <div>
-                                    <label class="bq-lbl">Opportunity Name <span style="color:#ef4444">*</span></label>
-                                    <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
+                                <div style="flex:1; min-width:0;">
+                                    <label class="bq-lbl">Company <span style="color:#ef4444">*</span></label>
+                                    <select id="bopp-company-sel" class="bq-inp" required>
+                                        <option value="">Select company...</option>
+                                    </select>
                                 </div>
                             </div>
-
-                            <!-- Left 2: [Dates+Links | Remark] -->
-                            <div class="bopp-card bopp-left2">
-                                <div class="bopp-left2-links">
-                                    <div class="bopp-date-row">
-                                        <div>
-                                            <label class="bq-lbl">Signed Date</label>
-                                            <input type="date" id="bopp-signed" class="bq-inp">
-                                        </div>
-                                        <div>
-                                            <label class="bq-lbl">Launch Date</label>
-                                            <input type="date" id="bopp-launch" class="bq-inp">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
-                                        <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://drive.google.com/...">
-                                    </div>
-                                    <div>
-                                        <label class="bq-lbl"><i class="bi bi-file-earmark-text-fill"></i> Proposal</label>
-                                        <input type="text" id="bopp-proposal" class="bq-inp" placeholder="https://drive.google.com/...">
-                                    </div>
-                                    <div>
-                                        <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
-                                        <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://drive.google.com/...">
-                                    </div>
-                                </div>
-                                <div class="bopp-left2-div"></div>
-                                <div class="bopp-left2-remark">
-                                    <label class="bq-lbl">Remark</label>
-                                    <textarea id="bopp-remark" class="bq-inp bq-ta" style="flex:1; min-height:120px;" placeholder="Note..."></textarea>
-                                </div>
+                            <div>
+                                <label class="bq-lbl">Opportunity Name <span style="color:#ef4444">*</span></label>
+                                <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
                             </div>
+                        </div>
 
-                        </div><!-- /bopp-left -->
+                        <!-- Dates card (text-center) -->
+                        <div class="bopp-card bopp-date-group">
+                            <div class="bopp-card-hd" style="justify-content:center;"><i class="bi bi-calendar3"></i> Timeline</div>
+                            <div>
+                                <label class="bq-lbl">Signed Date</label>
+                                <input type="date" id="bopp-signed" class="bq-inp">
+                            </div>
+                            <div>
+                                <label class="bq-lbl">Launch Date</label>
+                                <input type="date" id="bopp-launch" class="bq-inp">
+                            </div>
+                        </div>
 
-                        <!-- RIGHT 20%: 5 Dropdowns centered -->
+                    </div><!-- /bopp-row1 -->
+
+                    <!-- Row 2: 35% Links | 35% Remark | 30% Dropdowns -->
+                    <div class="bopp-row2">
+
+                        <!-- Links card -->
+                        <div class="bopp-card">
+                            <div class="bopp-card-hd"><i class="bi bi-link-45deg"></i> Links</div>
+                            <div>
+                                <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
+                                <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://drive.google.com/...">
+                            </div>
+                            <div>
+                                <label class="bq-lbl"><i class="bi bi-file-earmark-text-fill"></i> Proposal</label>
+                                <input type="text" id="bopp-proposal" class="bq-inp" placeholder="https://drive.google.com/...">
+                            </div>
+                            <div>
+                                <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
+                                <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://drive.google.com/...">
+                            </div>
+                        </div>
+
+                        <!-- Remark card -->
+                        <div class="bopp-card" style="display:flex; flex-direction:column;">
+                            <div class="bopp-card-hd"><i class="bi bi-chat-left-text"></i> Remark</div>
+                            <textarea id="bopp-remark" class="bq-inp bq-ta" style="flex:1; min-height:100px;" placeholder="Note..."></textarea>
+                        </div>
+
+                        <!-- Dropdowns card -->
                         <div class="bopp-card bopp-right-panel">
                             <div class="bopp-card-hd" style="justify-content:center;"><i class="bi bi-sliders"></i> Details</div>
                             <div>
@@ -277,7 +276,7 @@ const B_OPP_MODAL_HTML = `
                             </div>
                         </div>
 
-                    </div><!-- /bopp-outer -->
+                    </div><!-- /bopp-row2 -->
 
                     <!-- Quotations -->
                     <div class="bopp-qt-lbl"><i class="bi bi-file-earmark-text"></i> Quotations</div>
