@@ -927,6 +927,7 @@ const BOppApp = (() => {
             _loaded = false;
             if (typeof loadMasterData === 'function') await loadMasterData();
             if (typeof applyFilters  === 'function')  applyFilters();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
         } catch (err) {
             console.error('[B-OPP modal]', err);

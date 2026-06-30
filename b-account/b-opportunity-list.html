@@ -309,7 +309,10 @@
         const fill = (id, vals) => {
             const sel = document.getElementById(id);
             if (!sel) return;
+            const cur = sel.value;
+            while (sel.options.length > 1) sel.remove(1);
             vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
+            sel.value = cur;
         };
         const uniq = key => [...new Set(idx.map(o => o[key]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'th'));
         fill('filterOwner', uniq('owner'));
