@@ -124,7 +124,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-btn-del-qt:hover { background: #fee2e2; border-color: #ef4444; }
     .bopp-btn-dup { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 8px; padding: 4px 13px; font-size: 0.73rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; }
     .bopp-btn-dup:hover { border-color: #94a3b8; background: #f8fafc; }
-    .bopp-btn-add-qt { width: 70%; border: 1.5px dashed #d1d5db; background: #fff; color: #94a3b8; border-radius: 10px; padding: 7px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 7px; margin: 6px auto 0; }
+    .bopp-btn-add-qt { width: 70%; border: 1.5px dashed #d1d5db; background: #fff; color: #94a3b8; border-radius: 10px; padding: 7px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 7px; }
     .bopp-btn-add-qt:hover { border-color: #bdc432; color: #6b7200; background: #fffef0; }
 
     /* ── Account overlay ── */
@@ -141,8 +141,11 @@ const B_OPP_MODAL_HTML = `
     .bopp-btn-del:hover { background: #fecaca; }
     .bopp-btn-undo { border: none; background: #bdc432; color: #1e293b; border-radius: 10px; font-weight: 800; height: 40px; padding: 0 16px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
     .bopp-btn-undo:hover { background: #a3b020; }
-    .bopp-btn-undo-qt { border: none; background: #bdc432; color: #1e293b; border-radius: 8px; font-weight: 800; height: 30px; padding: 0 12px; font-size: 0.73rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
-    .bopp-btn-undo-qt:hover { background: #a3b020; }
+    .bopp-btn-undo-qt { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 8px; font-weight: 700; height: 30px; padding: 0 13px; font-size: 0.73rem; cursor: pointer; font-family: inherit; transition: 0.15s; display: inline-flex; align-items: center; gap: 5px; }
+    .bopp-btn-undo-qt:hover { border-color: #bdc432; background: #fffef0; color: #6b7200; }
+    .bopp-add-qt-row { position: relative; margin-top: 6px; display: flex; justify-content: center; }
+    .bopp-btn-undo-area { position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 8px; font-weight: 700; height: 30px; padding: 0 13px; font-size: 0.73rem; cursor: pointer; font-family: inherit; transition: 0.15s; display: inline-flex; align-items: center; gap: 5px; }
+    .bopp-btn-undo-area:hover { border-color: #bdc432; background: #fffef0; color: #6b7200; }
     .bopp-btn-cancel { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 18px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
     .bopp-btn-cancel:hover { background: #f8fafc; border-color: #cbd5e1; }
     .bopp-btn-save { background: #1e293b; color: #bdc432; border: none; padding: 0 24px; border-radius: 10px; font-weight: 800; height: 40px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); font-family: inherit; }
@@ -279,9 +282,14 @@ const B_OPP_MODAL_HTML = `
                     <!-- Quotations -->
                     <div class="bopp-qt-lbl"><i class="bi bi-file-earmark-text"></i> Quotations</div>
                     <div id="bopp-qt-container"></div>
-                    <button type="button" class="bopp-btn-add-qt" onclick="BOppApp.addQT()">
-                        <i class="bi bi-plus-circle"></i> Add Quotation
-                    </button>
+                    <div class="bopp-add-qt-row">
+                        <button type="button" class="bopp-btn-add-qt" onclick="BOppApp.addQT()">
+                            <i class="bi bi-plus-circle"></i> Add Quotation
+                        </button>
+                        <button type="button" class="bopp-btn-undo-area" id="bopp-undo-qt-area" style="display:none;" onclick="BOppApp.undo()">
+                            <i class="bi bi-arrow-counterclockwise"></i> Undo
+                        </button>
+                    </div>
 
                 </div>
 
@@ -304,7 +312,6 @@ const B_OPP_MODAL_HTML = `
                 </div>
 
                 <div class="bopp-footer">
-                    <button type="button" class="bopp-btn-undo" id="bopp-btn-undo" style="display:none;" onclick="BOppApp.undo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
                     <button type="button" class="bopp-btn-del" id="bopp-btn-del">
                         <i class="bi bi-trash3"></i> Delete
                     </button>
@@ -603,9 +610,9 @@ const BOppApp = (() => {
     }
 
     function updateUndoBtn() {
-        // Main footer: only for QT-level deletions
-        const mainBtn = el('bopp-btn-undo');
-        if (mainBtn) mainBtn.style.display = _undoStack.some(a => a.type === 'qt') ? '' : 'none';
+        // QT-area undo (for QT deletions)
+        const areaBtn = el('bopp-undo-qt-area');
+        if (areaBtn) areaBtn.style.display = _undoStack.some(a => a.type === 'qt') ? '' : 'none';
         // Per-QT buttons: for item deletions within that QT
         document.querySelectorAll('[data-undo-qt]').forEach(btn => {
             btn.style.display = _undoStack.some(a => a.type === 'item' && a.qtTmpId === btn.dataset.undoQt) ? '' : 'none';
