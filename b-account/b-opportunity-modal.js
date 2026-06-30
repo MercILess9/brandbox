@@ -401,11 +401,21 @@ const BOppApp = (() => {
     function populateCompanies(accountName, selectedId) {
         const companies = _accounts.filter(a => a.account_name === accountName);
         const sel = el('bopp-company-sel');
-        sel.innerHTML = companies.length
-            ? companies.map(c => `<option value="${escA(c.account_id)}"${c.account_id === selectedId ? ' selected' : ''}>${escH(c.company_name || c.account_id)}</option>`).join('')
-            : '<option value="">—</option>';
+        if (!companies.length) {
+            sel.innerHTML = '<option value="">—</option>';
+            sel.disabled = false;
+            el('bopp-account-id').value = '';
+            return;
+        }
+        const opts = companies.map(c => `<option value="${escA(c.account_id)}"${c.account_id === selectedId ? ' selected' : ''}>${escH(c.company_name || c.account_id)}</option>`).join('');
+        if (companies.length === 1) {
+            sel.innerHTML = opts;
+            sel.value = companies[0].account_id;
+        } else {
+            sel.innerHTML = `<option value="">Select company...</option>` + opts;
+            sel.value = selectedId || '';
+        }
         sel.disabled = false;
-        if (!selectedId && companies.length) sel.value = companies[0].account_id;
         el('bopp-account-id').value = sel.value;
     }
 
