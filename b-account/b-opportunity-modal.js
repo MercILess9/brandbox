@@ -17,7 +17,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-status-sel option { background: #1e293b; }
 
     /* ── Totals strip ── */
-    .bopp-totals { background: #fff; border-bottom: 1px solid #f1f5f9; padding: 11px 28px; display: flex; align-items: center; gap: 20px; }
+    .bopp-totals { background: #fff; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; padding: 11px 28px; display: flex; align-items: center; gap: 20px; }
     .bopp-total-box { display: flex; flex-direction: column; gap: 2px; }
     .bopp-total-lbl { font-size: 0.58rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; }
     .bopp-total-val { font-size: 0.9rem; font-weight: 800; color: #1e293b; }
@@ -165,24 +165,6 @@ const B_OPP_MODAL_HTML = `
                 </div>
             </div>
 
-            <!-- Totals strip -->
-            <div class="bopp-totals">
-                <div class="bopp-total-box">
-                    <span class="bopp-total-lbl">Total Amount</span>
-                    <span class="bopp-total-val" id="bopp-grand-amt">0.00</span>
-                </div>
-                <div class="bopp-total-div"></div>
-                <div class="bopp-total-bar-wrap">
-                    <div class="bopp-total-bar-fill" id="bopp-grand-bar" style="width:0%"></div>
-                </div>
-                <div class="bopp-total-div"></div>
-                <div class="bopp-total-box">
-                    <span class="bopp-total-lbl">Total GP</span>
-                    <span class="bopp-total-val gp" id="bopp-grand-gp">0.00</span>
-                </div>
-                <span class="bopp-total-pct" id="bopp-grand-pct"></span>
-            </div>
-
             <!-- Form -->
             <form id="bopp-form" novalidate>
                 <input type="hidden" id="bopp-editing-id">
@@ -286,6 +268,24 @@ const B_OPP_MODAL_HTML = `
                         <i class="bi bi-plus-circle"></i> Add Quotation
                     </button>
 
+                </div>
+
+                <!-- Totals strip -->
+                <div class="bopp-totals">
+                    <div class="bopp-total-box">
+                        <span class="bopp-total-lbl">Total Amount</span>
+                        <span class="bopp-total-val" id="bopp-grand-amt">0.00</span>
+                    </div>
+                    <div class="bopp-total-div"></div>
+                    <div class="bopp-total-bar-wrap">
+                        <div class="bopp-total-bar-fill" id="bopp-grand-bar" style="width:0%"></div>
+                    </div>
+                    <div class="bopp-total-div"></div>
+                    <div class="bopp-total-box">
+                        <span class="bopp-total-lbl">Total GP</span>
+                        <span class="bopp-total-val gp" id="bopp-grand-gp">0.00</span>
+                    </div>
+                    <span class="bopp-total-pct" id="bopp-grand-pct"></span>
                 </div>
 
                 <div class="bopp-footer">
