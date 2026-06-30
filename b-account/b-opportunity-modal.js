@@ -33,6 +33,8 @@ const B_OPP_MODAL_HTML = `
     /* ── Section cards ── */
     .bopp-card { background: #fff; border-radius: 16px; border: 1px solid #eef2f7; padding: 15px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .bopp-card-hd { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 11px; display: flex; align-items: center; gap: 6px; }
+    .bopp-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .bopp-2col > .bopp-card { margin-bottom: 0; display: flex; flex-direction: column; gap: 10px; }
 
     /* ── Grid ── */
     .bopp-row { display: flex; gap: 12px; margin-bottom: 10px; }
@@ -51,16 +53,6 @@ const B_OPP_MODAL_HTML = `
     .was-validated .bq-inp:invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-search-btn { width: 42px; height: 35px; flex-shrink: 0; border: 1px solid #bdc432; border-left: none; border-radius: 0 10px 10px 0; background: #f4f7a1; color: #7a8500; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
     .bopp-search-btn:hover { background: #bdc432; color: #1e293b; }
-
-    /* ── Type seg ── */
-    .bopp-type-seg { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; height: 35px; transition: 0.2s; }
-    .bopp-type-seg.err { border-color: #dc3545; box-shadow: 0 0 0 3px rgba(220,53,69,0.12); }
-    .bopp-tsb { flex: 1; border: none; border-right: 1.5px solid #e2e8f0; background: #fff; font-size: 0.72rem; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; font-family: inherit; white-space: nowrap; }
-    .bopp-tsb:last-child { border-right: none; }
-    .bopp-tsb:not(.active):hover { background: #f8fafc; }
-    .bopp-tsb[data-t="New Business"].active { background: #eff6ff; color: #1d4ed8; }
-    .bopp-tsb[data-t="Retention"].active    { background: #f5f3ff; color: #6d28d9; }
-    .bopp-tsb[data-t="Up Sale"].active      { background: #f0fdfa; color: #0d7a70; }
 
     /* ── QT section ── */
     .bopp-qt-lbl { font-size: 0.62rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
@@ -182,7 +174,7 @@ const B_OPP_MODAL_HTML = `
 
                 <div class="bopp-body">
 
-                    <!-- Account card -->
+                    <!-- Account card — full width -->
                     <div class="bopp-card">
                         <div class="bopp-card-hd"><i class="bi bi-building"></i> Account</div>
                         <div class="bopp-row">
@@ -200,82 +192,75 @@ const B_OPP_MODAL_HTML = `
                                 </select>
                             </div>
                         </div>
-                        <div class="bopp-row" style="margin-bottom:0">
-                            <div class="bopp-col">
+                    </div>
+
+                    <!-- 2-column: left = text fields, right = dropdowns -->
+                    <div class="bopp-2col">
+
+                        <!-- LEFT: Opportunity Name + Links + Remark -->
+                        <div class="bopp-card">
+                            <div class="bopp-card-hd"><i class="bi bi-briefcase"></i> Opportunity</div>
+                            <div>
                                 <label class="bq-lbl">Opportunity Name <span style="color:#ef4444">*</span></label>
                                 <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Details card -->
-                    <div class="bopp-card">
-                        <div class="bopp-card-hd"><i class="bi bi-grid-3x3-gap"></i> Details</div>
-                        <div class="bopp-row">
-                            <div class="bopp-col-2">
-                                <label class="bq-lbl">Business Type <span style="color:#ef4444">*</span></label>
-                                <div class="bopp-type-seg" id="bopp-type-seg">
-                                    <button type="button" class="bopp-tsb" data-t="New Business" onclick="BOppApp.setType('New Business')">New Business</button>
-                                    <button type="button" class="bopp-tsb" data-t="Retention" onclick="BOppApp.setType('Retention')">Retention</button>
-                                    <button type="button" class="bopp-tsb" data-t="Up Sale" onclick="BOppApp.setType('Up Sale')">Up Sale</button>
-                                </div>
-                            </div>
-                            <div class="bopp-col">
-                                <label class="bq-lbl">Lead Source</label>
-                                <select id="bopp-lead" class="bq-inp"><option value="">—</option></select>
-                            </div>
-                        </div>
-                        <div class="bopp-row">
-                            <div class="bopp-col">
-                                <label class="bq-lbl">Owner <span style="color:#ef4444">*</span></label>
-                                <select id="bopp-owner" class="bq-inp" required><option value="">—</option></select>
-                            </div>
-                            <div class="bopp-col">
-                                <label class="bq-lbl">AM</label>
-                                <select id="bopp-am" class="bq-inp"><option value="">—</option></select>
-                            </div>
-                            <div class="bopp-col">
-                                <label class="bq-lbl">Sub AM</label>
-                                <select id="bopp-subam" class="bq-inp"><option value="">—</option></select>
-                            </div>
-                        </div>
-                        <div class="bopp-row" style="margin-bottom:0">
-                            <div class="bopp-col">
-                                <label class="bq-lbl">Signed Date</label>
-                                <input type="date" id="bopp-signed" class="bq-inp">
-                            </div>
-                            <div class="bopp-col">
-                                <label class="bq-lbl">Launch Date</label>
-                                <input type="date" id="bopp-launch" class="bq-inp">
-                            </div>
-                            <div class="bopp-col-2"></div>
-                        </div>
-                    </div>
-
-                    <!-- Links + Remark card -->
-                    <div class="bopp-card">
-                        <div class="bopp-card-hd"><i class="bi bi-link-45deg"></i> Links & Remark</div>
-                        <div class="bopp-row">
-                            <div class="bopp-col">
+                            <div>
                                 <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
                                 <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://drive.google.com/...">
                             </div>
-                            <div class="bopp-col">
+                            <div>
                                 <label class="bq-lbl"><i class="bi bi-file-earmark-text-fill"></i> Proposal</label>
                                 <input type="text" id="bopp-proposal" class="bq-inp" placeholder="https://drive.google.com/...">
                             </div>
-                            <div class="bopp-col">
+                            <div>
                                 <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
                                 <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://drive.google.com/...">
                             </div>
-                        </div>
-                        <div class="bopp-row" style="margin-bottom:0">
-                            <div class="bopp-col">
+                            <div style="flex:1; display:flex; flex-direction:column;">
                                 <label class="bq-lbl">Remark</label>
-                                <textarea id="bopp-remark" class="bq-inp bq-ta" placeholder="Note..."></textarea>
+                                <textarea id="bopp-remark" class="bq-inp bq-ta" style="flex:1; min-height:80px;" placeholder="Note..."></textarea>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- RIGHT: Dropdowns / Classifications -->
+                        <div class="bopp-card">
+                            <div class="bopp-card-hd"><i class="bi bi-sliders"></i> Details</div>
+                            <div>
+                                <label class="bq-lbl">Business Type <span style="color:#ef4444">*</span></label>
+                                <select id="bopp-type" class="bq-inp" required>
+                                    <option value="">— Select type —</option>
+                                    <option value="New Business">New Business</option>
+                                    <option value="Retention">Retention</option>
+                                    <option value="Up Sale">Up Sale</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="bq-lbl">Lead Source</label>
+                                <select id="bopp-lead" class="bq-inp"><option value="">—</option></select>
+                            </div>
+                            <div>
+                                <label class="bq-lbl">Owner <span style="color:#ef4444">*</span></label>
+                                <select id="bopp-owner" class="bq-inp" required><option value="">—</option></select>
+                            </div>
+                            <div>
+                                <label class="bq-lbl">AM</label>
+                                <select id="bopp-am" class="bq-inp"><option value="">—</option></select>
+                            </div>
+                            <div>
+                                <label class="bq-lbl">Sub AM</label>
+                                <select id="bopp-subam" class="bq-inp"><option value="">—</option></select>
+                            </div>
+                            <div>
+                                <label class="bq-lbl">Signed Date</label>
+                                <input type="date" id="bopp-signed" class="bq-inp">
+                            </div>
+                            <div>
+                                <label class="bq-lbl">Launch Date</label>
+                                <input type="date" id="bopp-launch" class="bq-inp">
+                            </div>
+                        </div>
+
+                    </div><!-- /bopp-2col -->
 
                     <!-- Quotations -->
                     <div class="bopp-qt-lbl"><i class="bi bi-file-earmark-text"></i> Quotations</div>
@@ -326,7 +311,6 @@ const BOppApp = (() => {
     let _leadList  = [];
     let _qts       = []; // [{tmpId, qt_id, qt_number, company_qt, items:[], _totAmt, _totGP}]
     let _qtCounter = 0;
-    let _currentType = '';
 
     function getBsModal() {
         if (!_bsModal) _bsModal = new bootstrap.Modal(el('b-opp-modal'));
@@ -400,13 +384,6 @@ const BOppApp = (() => {
     el('bopp-company-sel').addEventListener('change', function() {
         el('bopp-account-id').value = this.value;
     });
-
-    // ── Business Type ─────────────────────────────────────────────────────────
-    function setType(val) {
-        _currentType = val;
-        el('bopp-type-seg').classList.remove('err');
-        el('bopp-type-seg').querySelectorAll('.bopp-tsb').forEach(b => b.classList.toggle('active', b.dataset.t === val));
-    }
 
     // ── QT helpers ────────────────────────────────────────────────────────────
     function genQTNum() {
@@ -630,9 +607,7 @@ const BOppApp = (() => {
             const e = el(id); if (e) e.value = '';
         });
         el('bopp-company-sel').innerHTML = '<option value="">Select company...</option>';
-        el('bopp-type-seg').querySelectorAll('.bopp-tsb').forEach(b => b.classList.remove('active'));
-        el('bopp-type-seg').classList.remove('err');
-        _currentType = '';
+        el('bopp-type').value = '';
         ['bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
         el('bopp-status-sel').classList.remove('visible');
         el('bopp-grand-amt').textContent = '0.00';
@@ -680,7 +655,7 @@ const BOppApp = (() => {
         }
 
         el('bopp-opp-name').value = opp.opportunity_name || '';
-        setType(opp.business_type || '');
+        el('bopp-type').value = opp.business_type || '';
         el('bopp-lead').value   = opp.lead_source || '';
         el('bopp-owner').value  = opp.owner       || '';
         el('bopp-am').value     = opp.am           || '';
@@ -734,11 +709,6 @@ const BOppApp = (() => {
         if (!el('bopp-form').checkValidity()) return;
 
         if (!el('bopp-account-id').value) { notify('warning', 'กรุณาเลือก Account'); return; }
-        if (!_currentType) {
-            el('bopp-type-seg').classList.add('err');
-            notify('warning', 'กรุณาเลือก Business Type');
-            return;
-        }
 
         const user   = getBxUser();
         const saveBtn = el('bopp-btn-save');
@@ -750,7 +720,7 @@ const BOppApp = (() => {
         const payload = {
             account_id:       el('bopp-account-id').value,
             opportunity_name: el('bopp-opp-name').value.trim(),
-            business_type:    _currentType,
+            business_type:    el('bopp-type').value || null,
             lead_source:      el('bopp-lead').value    || null,
             owner:            el('bopp-owner').value   || null,
             am:               el('bopp-am').value       || null,
@@ -872,5 +842,5 @@ const BOppApp = (() => {
     // Reset _editingId when modal closed
     el('b-opp-modal').addEventListener('hidden.bs.modal', () => { _editingId = null; });
 
-    return { openNew, openEdit, openOverlay, closeOverlay, setType, addQT, addItem, removeItem, removeQT, dupQT };
+    return { openNew, openEdit, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT };
 })();
