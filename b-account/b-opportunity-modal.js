@@ -489,8 +489,10 @@ const BOppApp = (() => {
             </div>
             <div class="bopp-qt-foot">
                 <button type="button" class="bopp-btn-add-item" onclick="BOppApp.addItem('${escA(qt.tmpId)}')"><i class="bi bi-plus"></i> Add Item</button>
-                <button type="button" class="bopp-btn-del-qt" onclick="BOppApp.removeQT('${escA(qt.tmpId)}')"><i class="bi bi-trash3"></i> Delete</button>
-                <button type="button" class="bopp-btn-dup" onclick="BOppApp.dupQT('${escA(qt.tmpId)}')"><i class="bi bi-copy"></i> Duplicate</button>
+                <div style="display:flex;gap:6px;">
+                    <button type="button" class="bopp-btn-dup" onclick="BOppApp.dupQT('${escA(qt.tmpId)}')"><i class="bi bi-copy"></i> Duplicate</button>
+                    <button type="button" class="bopp-btn-del-qt" onclick="BOppApp.removeQT('${escA(qt.tmpId)}')"><i class="bi bi-trash3"></i> Delete</button>
+                </div>
             </div>
         </div>`;
     }
@@ -600,10 +602,19 @@ const BOppApp = (() => {
         if (btn) btn.disabled = _undoStack.length === 0;
     }
 
-    function removeQT(tmpId) {
+    async function removeQT(tmpId) {
         const qtIdx = _qts.findIndex(q => q.tmpId === tmpId);
         if (qtIdx < 0) return;
-        _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(_qts[qtIdx])) });
+        const qt = _qts[qtIdx];
+        const label = qt.qt_number ? `QT "${qt.qt_number}"` : 'this quotation';
+        const result = await Swal.fire({
+            title: 'Delete Quotation?', text: `Delete ${label} and all its items?`,
+            icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Delete', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel',
+            reverseButtons: true
+        });
+        if (!result.isConfirmed) return;
+        _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(qt)) });
         _qts.splice(qtIdx, 1);
         el('bopp-qt-container').querySelector(`[data-qt-card="${tmpId}"]`)?.remove();
         recalcTotals();
