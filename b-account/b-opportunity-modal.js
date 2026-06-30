@@ -13,10 +13,10 @@ const B_OPP_MODAL_HTML = `
     .bopp-header-right { display: flex; align-items: center; gap: 12px; }
     .bopp-hdr-totals { display: flex; align-items: center; gap: 14px; margin-right: 4px; }
     .bopp-hdr-tbox { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
-    .bopp-hdr-tval { font-size: 0.88rem; font-weight: 800; color: #fff; }
+    .bopp-hdr-tval { font-size: 1.05rem; font-weight: 800; color: #fff; }
     .bopp-hdr-tval.gp { color: #bdc432; }
     .bopp-hdr-tlbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.4); }
-    .bopp-hdr-pct-badge { background: #bdc432; color: #1e293b; border-radius: 100px; padding: 10px 16px; font-size: 0.85rem; font-weight: 800; line-height: 1; white-space: nowrap; }
+    .bopp-hdr-pct-badge { background: #bdc432; color: #1e293b; border-radius: 100px; padding: 5px 10px; font-size: 0.85rem; font-weight: 800; line-height: 1; white-space: nowrap; }
     .bopp-hdr-pct-badge:empty { display: none; }
     .bopp-hdr-tdiv { width: 1px; height: 26px; background: rgba(255,255,255,0.15); }
     .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; transition: background-color 0.2s, border-color 0.2s, color 0.2s; text-align: center; text-align-last: center; }
