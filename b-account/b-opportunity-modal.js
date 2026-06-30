@@ -70,6 +70,7 @@ const B_OPP_MODAL_HTML = `
     .was-validated .bopp-iinp:invalid,
     .bq-inp.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-qt-num.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
+    .bopp-qt-co.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-search-btn { width: 42px; height: 35px; flex-shrink: 0; border: 1px solid #bdc432; border-left: none; border-radius: 0 10px 10px 0; background: #f4f7a1; color: #7a8500; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
     .bopp-search-btn:hover { background: #bdc432; color: #1e293b; }
 
@@ -584,6 +585,7 @@ const BOppApp = (() => {
             const card = inp.closest('[data-qt-card]');
             const qt = card && findQT(card.dataset.qtCard);
             if (qt) qt.company_qt = inp.value;
+            inp.classList.remove('is-invalid');
         }
     });
 
@@ -835,6 +837,14 @@ const BOppApp = (() => {
             if (numInp && !numInp.value.trim()) { numInp.classList.add('is-invalid'); if (!firstEmptyName) firstEmptyName = numInp; }
         });
         if (firstEmptyName) { firstEmptyName.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstEmptyName.focus(); return; }
+        // รอบ 1.5: Company QT — กรอบแดง ไม่มี toast
+        let firstEmptyCoQT = null;
+        _qts.forEach(qt => {
+            const card = qtContainer.querySelector(`[data-qt-card="${qt.tmpId}"]`);
+            const coSel = card?.querySelector('.bopp-qt-co');
+            if (coSel && !coSel.value) { coSel.classList.add('is-invalid'); if (!firstEmptyCoQT) firstEmptyCoQT = coSel; }
+        });
+        if (firstEmptyCoQT) { firstEmptyCoQT.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstEmptyCoQT.focus(); return; }
         // รอบ 2: ยอดเงิน — toast เตือน
         const noAmtQT = _qts.find(qt => !(qt._totAmt > 0));
         if (noAmtQT) {
