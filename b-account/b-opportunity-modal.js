@@ -39,6 +39,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-left-card { display: flex; flex-direction: column; }
     .bopp-remark-wrap { flex: 1; display: flex; flex-direction: column; }
     .bopp-remark-wrap .bq-ta { flex: 1; min-height: 80px; }
+    .bopp-right-col .bopp-card { background: #f8fafc; }
     .bopp-irow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .bopp-irow:last-child { margin-bottom: 0; }
     .bopp-ilbl { font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; min-width: 54px; white-space: nowrap; }
@@ -218,8 +219,8 @@ const B_OPP_MODAL_HTML = `
                             </div>
                         </div>
 
-                        <!-- Right 28% -->
-                        <div style="display:flex; flex-direction:column; gap:12px;">
+                        <!-- Right 30% -->
+                        <div class="bopp-right-col" style="display:flex; flex-direction:column; gap:12px;">
                             <div class="bopp-card">
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Type <span style="color:#ef4444">*</span></span>
