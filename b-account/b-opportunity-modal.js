@@ -139,7 +139,6 @@ const B_OPP_MODAL_HTML = `
     .bopp-btn-del:hover { background: #fecaca; }
     .bopp-btn-undo { border: none; background: #bdc432; color: #1e293b; border-radius: 10px; font-weight: 800; height: 40px; padding: 0 16px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
     .bopp-btn-undo:hover { background: #a3b020; }
-    .bopp-btn-undo:disabled { opacity: 0.3; pointer-events: none; }
     .bopp-btn-cancel { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 18px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
     .bopp-btn-cancel:hover { background: #f8fafc; border-color: #cbd5e1; }
     .bopp-btn-save { background: #1e293b; color: #bdc432; border: none; padding: 0 24px; border-radius: 10px; font-weight: 800; height: 40px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); font-family: inherit; }
@@ -301,7 +300,7 @@ const B_OPP_MODAL_HTML = `
                 </div>
 
                 <div class="bopp-footer">
-                    <button type="button" class="bopp-btn-undo" id="bopp-btn-undo" disabled onclick="BOppApp.undo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
+                    <button type="button" class="bopp-btn-undo" id="bopp-btn-undo" style="display:none;" onclick="BOppApp.undo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
                     <button type="button" class="bopp-btn-del" id="bopp-btn-del">
                         <i class="bi bi-trash3"></i> Delete
                     </button>
@@ -599,7 +598,7 @@ const BOppApp = (() => {
 
     function updateUndoBtn() {
         const btn = el('bopp-btn-undo');
-        if (btn) btn.disabled = _undoStack.length === 0;
+        if (btn) btn.style.display = _undoStack.length ? '' : 'none';
     }
 
     async function removeQT(tmpId) {
