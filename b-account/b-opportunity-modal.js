@@ -39,7 +39,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-left-card { display: flex; flex-direction: column; }
     .bopp-remark-wrap { flex: 1; display: flex; flex-direction: column; }
     .bopp-remark-wrap .bq-ta { flex: 1; min-height: 80px; }
-    .bopp-right-col .bopp-card { background: #f8fafc; }
+    .bopp-right-col .bopp-card { border-top: 2px solid #bdc432; }
     .bopp-irow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .bopp-irow:last-child { margin-bottom: 0; }
     .bopp-ilbl { font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; min-width: 54px; white-space: nowrap; }
