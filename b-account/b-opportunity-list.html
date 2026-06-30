@@ -64,13 +64,17 @@
 
         /* ── Amount/GP block ── */
         .op-meta-badges { display: flex; gap: 28px; align-items: center; flex-shrink: 0; }
-        .omb-amt { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .omb-tbox { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
-        .omb-tval { font-size: 0.92rem; font-weight: 800; color: var(--c-text-main); white-space: nowrap; }
-        .omb-tval.gp { color: #16a34a; }
-        .omb-tlbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #94a3b8; }
-        .omb-tdiv { width: 1px; height: 24px; background: #e2e8f0; flex-shrink: 0; }
-        .omb-pct-badge { background: #dcfce7; color: #16a34a; border-radius: 100px; padding: 3px 9px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; line-height: 1.4; }
+        .omb-amt { width: 190px; display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+        .omb-amt-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .omb-lbl { font-size: 0.68rem; font-weight: 600; white-space: nowrap; }
+        .omb-lbl.amt { color: #64748b; }
+        .omb-lbl.gp  { color: #16a34a; }
+        .omb-val { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+        .omb-val.amt { color: var(--c-text-main); }
+        .omb-val.gp  { color: #16a34a; font-weight: 800; }
+        .omb-bar-wrap { height: 3px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 2px; }
+        .omb-bar-fill { height: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; }
+        .omb-bar-pct  { font-size: 0.65rem; font-weight: 700; color: #16a34a; }
 
         /* ── Owner/date block ── */
         .omb-meta { width: 148px; border-left: 2px solid #e2e8f0; padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 6px; flex-shrink: 0; }
@@ -462,8 +466,9 @@
     function renderAmtBlock(o, hasAmt, hasGP, pct, pctNum) {
         if (!hasAmt) return '';
         return `<div class="omb-amt">
-            <div class="omb-tbox"><span class="omb-tval">${fmtAmt(o.total_amount)}</span><span class="omb-tlbl">Amount</span></div>
-            ${hasGP ? `<div class="omb-tdiv"></div><div class="omb-tbox"><span class="omb-tval gp">${fmtAmt(o.total_gp)}</span><span class="omb-tlbl">GP</span></div>${pct ? `<span class="omb-pct-badge">${pct}</span>` : ''}` : ''}
+            <div class="omb-amt-row"><span class="omb-lbl amt">Amount</span><span class="omb-val amt">${fmtAmt(o.total_amount)}</span></div>
+            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP${pct ? ` <span class="omb-bar-pct">${pct}</span>` : ''}</span><span class="omb-val gp">${fmtAmt(o.total_gp)}</span></div>
+            <div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>` : ''}
         </div>`;
     }
 
