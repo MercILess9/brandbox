@@ -33,7 +33,7 @@ const B_OPP_MODAL_HTML = `
     /* ── Section cards ── */
     .bopp-card { background: #fff; border-radius: 16px; border: 1px solid #eef2f7; padding: 15px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .bopp-card-hd { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 11px; display: flex; align-items: center; gap: 6px; }
-    .bopp-outer { display: grid; grid-template-columns: 72fr 28fr; gap: 14px; align-items: start; }
+    .bopp-outer { display: grid; grid-template-columns: 64fr 36fr; gap: 14px; align-items: start; }
     .bopp-outer > .bopp-card { margin-bottom: 0; }
     .bopp-divider { height: 1px; background: #f1f5f9; margin: 12px 0; }
     .bopp-left-card { display: flex; flex-direction: column; }
