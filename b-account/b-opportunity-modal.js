@@ -11,7 +11,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-header-icon { color: #bdc432; font-size: 1rem; }
     .bopp-header-title { color: #fff; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.2px; }
     .bopp-header-right { display: flex; align-items: center; gap: 12px; }
-    .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23e2e8f0' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; transition: 0.2s; text-align: center; text-align-last: center; }
+    .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; transition: background-color 0.2s, border-color 0.2s, color 0.2s; text-align: center; text-align-last: center; }
     .bopp-status-sel:focus { border-color: rgba(255,255,255,0.4); }
     .bopp-status-sel option { background: #1e293b; color: #e2e8f0; }
 
@@ -646,15 +646,13 @@ const BOppApp = (() => {
         const sel = el('bopp-status-sel');
         const c = STATUS_COLORS[sel.value];
         if (c) {
-            sel.style.background  = c.bg;
-            sel.style.color       = c.text;
-            sel.style.borderColor = c.bg;
-            sel.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='${encodeURIComponent(c.text)}' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`;
+            sel.style.backgroundColor = c.bg;
+            sel.style.color           = c.text;
+            sel.style.borderColor     = c.bg;
         } else {
-            sel.style.background  = 'rgba(255,255,255,0.08)';
-            sel.style.color       = '#e2e8f0';
-            sel.style.borderColor = 'rgba(255,255,255,0.2)';
-            sel.style.backgroundImage = '';
+            sel.style.backgroundColor = 'rgba(255,255,255,0.08)';
+            sel.style.color           = '#e2e8f0';
+            sel.style.borderColor     = 'rgba(255,255,255,0.2)';
         }
     }
 
