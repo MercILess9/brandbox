@@ -44,6 +44,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-ilbl { font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; min-width: 54px; white-space: nowrap; }
     .bopp-iinp { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 10px; font-size: 0.82rem; color: #334155; height: 32px; font-family: inherit; box-sizing: border-box; transition: 0.2s; }
     .bopp-iinp:focus { outline: none; border-color: #bdc432; background: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.12); }
+    select.bopp-iinp { text-align: center; text-align-last: center; }
 
     /* ── Grid ── */
     .bopp-row { display: flex; gap: 12px; margin-bottom: 10px; }
@@ -231,40 +232,43 @@ const B_OPP_MODAL_HTML = `
                         </div>
 
                         <!-- Right 28% -->
-                        <div class="bopp-card">
-                            <div class="bopp-irow">
-                                <span class="bopp-ilbl">Type <span style="color:#ef4444">*</span></span>
-                                <select id="bopp-type" class="bopp-iinp" required>
-                                    <option value="">—</option>
-                                    <option value="New Business">New Business</option>
-                                    <option value="Retention">Retention</option>
-                                    <option value="Up Sale">Up Sale</option>
-                                </select>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <div class="bopp-card">
+                                <div class="bopp-irow">
+                                    <span class="bopp-ilbl">Type <span style="color:#ef4444">*</span></span>
+                                    <select id="bopp-type" class="bopp-iinp" required>
+                                        <option value="">—</option>
+                                        <option value="New Business">New Business</option>
+                                        <option value="Retention">Retention</option>
+                                        <option value="Up Sale">Up Sale</option>
+                                    </select>
+                                </div>
+                                <div class="bopp-irow">
+                                    <span class="bopp-ilbl">Lead</span>
+                                    <select id="bopp-lead" class="bopp-iinp"><option value="">—</option></select>
+                                </div>
+                                <div class="bopp-irow">
+                                    <span class="bopp-ilbl">Owner <span style="color:#ef4444">*</span></span>
+                                    <select id="bopp-owner" class="bopp-iinp" required><option value="">—</option></select>
+                                </div>
+                                <div class="bopp-irow">
+                                    <span class="bopp-ilbl">AM</span>
+                                    <select id="bopp-am" class="bopp-iinp"><option value="">—</option></select>
+                                </div>
+                                <div class="bopp-irow">
+                                    <span class="bopp-ilbl">Sub AM</span>
+                                    <select id="bopp-subam" class="bopp-iinp"><option value="">—</option></select>
+                                </div>
                             </div>
-                            <div class="bopp-irow">
-                                <span class="bopp-ilbl">Lead</span>
-                                <select id="bopp-lead" class="bopp-iinp"><option value="">—</option></select>
-                            </div>
-                            <div class="bopp-irow">
-                                <span class="bopp-ilbl">Owner <span style="color:#ef4444">*</span></span>
-                                <select id="bopp-owner" class="bopp-iinp" required><option value="">—</option></select>
-                            </div>
-                            <div class="bopp-irow">
-                                <span class="bopp-ilbl">AM</span>
-                                <select id="bopp-am" class="bopp-iinp"><option value="">—</option></select>
-                            </div>
-                            <div class="bopp-irow">
-                                <span class="bopp-ilbl">Sub AM</span>
-                                <select id="bopp-subam" class="bopp-iinp"><option value="">—</option></select>
-                            </div>
-                            <div class="bopp-divider"></div>
-                            <div class="bopp-irow">
-                                <span class="bopp-ilbl">Signed</span>
-                                <input type="date" id="bopp-signed" class="bopp-iinp">
-                            </div>
-                            <div class="bopp-irow">
-                                <span class="bopp-ilbl">Launch</span>
-                                <input type="date" id="bopp-launch" class="bopp-iinp">
+                            <div class="bopp-card">
+                                <div class="bopp-irow">
+                                    <span class="bopp-ilbl">Signed</span>
+                                    <input type="date" id="bopp-signed" class="bopp-iinp">
+                                </div>
+                                <div class="bopp-irow">
+                                    <span class="bopp-ilbl">Launch</span>
+                                    <input type="date" id="bopp-launch" class="bopp-iinp">
+                                </div>
                             </div>
                         </div>
 
