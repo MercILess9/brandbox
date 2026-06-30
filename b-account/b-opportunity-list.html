@@ -20,7 +20,9 @@
         .flt-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
         .flt-search { position: relative; flex: 1; min-width: 140px; }
         .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
-        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
+        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 36px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
+        .flt-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: none; line-height: 1; font-size: 0.85rem; }
+        .flt-search-clear:hover { color: #475569; }
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-family: inherit; white-space: nowrap; }
         .flt-btn-adv:hover { background: var(--c-bg); border-color: #cbd5e1; }
         .flt-btn-adv.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
@@ -168,6 +170,7 @@
             <div class="flt-search">
                 <i class="bi bi-search"></i>
                 <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search">
+                <button class="flt-search-clear" id="searchClear" onclick="clearSearch()" tabindex="-1"><i class="bi bi-x-lg"></i></button>
             </div>
             <div class="status-seg" id="typePillGroup">
                 <button class="seg-btn active" data-type="" onclick="setTypeFilter('')"><i class="bi bi-grid-fill"></i> All</button>
@@ -692,8 +695,18 @@
     // ── Init ──────────────────────────────────────────────────────────────────
     document.getElementById('globalSearch').addEventListener('input', debounce(e => {
         _searchText = e.target.value.trim().toLowerCase();
+        document.getElementById('searchClear').style.display = _searchText ? '' : 'none';
         applyFilters();
     }, 300));
+
+    function clearSearch() {
+        const inp = document.getElementById('globalSearch');
+        inp.value = '';
+        _searchText = '';
+        document.getElementById('searchClear').style.display = 'none';
+        inp.focus();
+        applyFilters();
+    }
 
     async function initPage() {
         sessionStorage.removeItem('bx_perms_baccount');
