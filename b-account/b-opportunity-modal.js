@@ -47,7 +47,7 @@ const B_OPP_MODAL_HTML = `
     select.bopp-iinp { text-align: center; text-align-last: center; }
     input[type=date].bopp-iinp { text-align: center; }
     .bopp-acc-wrap { position: relative; }
-    .bopp-acc-wrap::after { content: '\276F'; position: absolute; right: 13px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #bdc432; font-size: 0.75rem; font-weight: 900; pointer-events: none; }
+    .bopp-acc-wrap::after { content: '❯'; position: absolute; right: 13px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #bdc432; font-size: 0.75rem; font-weight: 900; pointer-events: none; }
     #bopp-acc-name { text-align: center; border-color: #bdc432; background: #fffef5; padding-right: 30px; }
     #bopp-acc-name:hover { background: #f4f7a1; }
     #bopp-company-sel { text-align: center; text-align-last: center; }
