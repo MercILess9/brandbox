@@ -35,10 +35,10 @@ const B_OPP_MODAL_HTML = `
     .bopp-card-hd { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 11px; display: flex; align-items: center; gap: 6px; }
     .bopp-2col { display: grid; grid-template-columns: 1fr 30%; gap: 12px; margin-bottom: 12px; }
     .bopp-2col > .bopp-card { margin-bottom: 0; display: flex; flex-direction: column; gap: 10px; }
-    .bopp-link-row { display: flex; gap: 10px; }
-    .bopp-link-row > div { flex: 1; min-width: 0; }
-    .bopp-date-row { display: flex; gap: 10px; }
-    .bopp-date-row > div { flex: 1; min-width: 0; }
+    .bopp-top-inner { display: flex; gap: 12px; align-items: stretch; }
+    .bopp-top-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+    .bopp-top-acc-row { display: flex; gap: 10px; }
+    .bopp-top-dates { width: 160px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
 
     /* ── Grid ── */
     .bopp-row { display: flex; gap: 12px; margin-bottom: 10px; }
@@ -178,51 +178,31 @@ const B_OPP_MODAL_HTML = `
 
                 <div class="bopp-body">
 
-                    <!-- Account card — full width -->
+                    <!-- Top card: Account + Opp Name (left) | Dates (right) -->
                     <div class="bopp-card">
-                        <div class="bopp-card-hd"><i class="bi bi-building"></i> Account</div>
-                        <div class="bopp-row">
-                            <div class="bopp-col-2">
-                                <label class="bq-lbl">Account Name <span style="color:#ef4444">*</span></label>
-                                <div class="d-flex">
-                                    <input type="text" id="bopp-acc-name" class="bq-inp" style="border-radius:10px 0 0 10px;" placeholder="Select account..." readonly required>
-                                    <button type="button" class="bopp-search-btn" onclick="BOppApp.openOverlay()"><i class="bi bi-search"></i></button>
-                                </div>
-                            </div>
-                            <div class="bopp-col">
-                                <label class="bq-lbl">Company <span style="color:#ef4444">*</span></label>
-                                <select id="bopp-company-sel" class="bq-inp" required>
-                                    <option value="">Select company...</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 70/30: left = content fields, right = 5 dropdowns -->
-                    <div class="bopp-2col">
-
-                        <!-- LEFT 70%: Name + Links row + Dates row + Remark -->
-                        <div class="bopp-card">
-                            <div class="bopp-card-hd"><i class="bi bi-briefcase"></i> Opportunity</div>
-                            <div>
-                                <label class="bq-lbl">Opportunity Name <span style="color:#ef4444">*</span></label>
-                                <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
-                            </div>
-                            <div class="bopp-link-row">
-                                <div>
-                                    <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
-                                    <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://...">
+                        <div class="bopp-top-inner">
+                            <div class="bopp-top-main">
+                                <div class="bopp-top-acc-row">
+                                    <div style="flex:1.6; min-width:0;">
+                                        <label class="bq-lbl">Account Name <span style="color:#ef4444">*</span></label>
+                                        <div class="d-flex">
+                                            <input type="text" id="bopp-acc-name" class="bq-inp" style="border-radius:10px 0 0 10px;" placeholder="Select account..." readonly required>
+                                            <button type="button" class="bopp-search-btn" onclick="BOppApp.openOverlay()"><i class="bi bi-search"></i></button>
+                                        </div>
+                                    </div>
+                                    <div style="flex:1; min-width:0;">
+                                        <label class="bq-lbl">Company <span style="color:#ef4444">*</span></label>
+                                        <select id="bopp-company-sel" class="bq-inp" required>
+                                            <option value="">Select company...</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label class="bq-lbl"><i class="bi bi-file-earmark-text-fill"></i> Proposal</label>
-                                    <input type="text" id="bopp-proposal" class="bq-inp" placeholder="https://...">
-                                </div>
-                                <div>
-                                    <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
-                                    <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://...">
+                                    <label class="bq-lbl">Opportunity Name <span style="color:#ef4444">*</span></label>
+                                    <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
                                 </div>
                             </div>
-                            <div class="bopp-date-row">
+                            <div class="bopp-top-dates">
                                 <div>
                                     <label class="bq-lbl">Signed Date</label>
                                     <input type="date" id="bopp-signed" class="bq-inp">
@@ -231,6 +211,27 @@ const B_OPP_MODAL_HTML = `
                                     <label class="bq-lbl">Launch Date</label>
                                     <input type="date" id="bopp-launch" class="bq-inp">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 70/30: left = content fields, right = 5 dropdowns -->
+                    <div class="bopp-2col">
+
+                        <!-- LEFT 70%: Links + Remark -->
+                        <div class="bopp-card">
+                            <div class="bopp-card-hd"><i class="bi bi-link-45deg"></i> Links & Remark</div>
+                            <div>
+                                <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
+                                <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://drive.google.com/...">
+                            </div>
+                            <div>
+                                <label class="bq-lbl"><i class="bi bi-file-earmark-text-fill"></i> Proposal</label>
+                                <input type="text" id="bopp-proposal" class="bq-inp" placeholder="https://drive.google.com/...">
+                            </div>
+                            <div>
+                                <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
+                                <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://drive.google.com/...">
                             </div>
                             <div style="flex:1; display:flex; flex-direction:column;">
                                 <label class="bq-lbl">Remark</label>
