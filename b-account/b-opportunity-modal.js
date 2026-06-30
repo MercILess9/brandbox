@@ -868,9 +868,9 @@ const BOppApp = (() => {
             total_gp:         grandGP  || null,
         };
 
+        let _newOppId = null;
         try {
             let oppId = _editingId;
-            let _newOppId = null;
             if (_editingId) {
                 payload.status    = el('bopp-status-sel').value;
                 payload.update_by = user?.codename || null;
