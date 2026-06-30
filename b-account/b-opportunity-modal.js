@@ -72,8 +72,9 @@ const B_OPP_MODAL_HTML = `
 
     /* ── QT section ── */
     .bopp-qt-lbl { font-size: 0.62rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    .bopp-qt-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+    .bopp-qt-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 10px; overflow: hidden; border-left: 3px solid #bdc432; }
     .bopp-qt-head { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 9px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .bopp-qt-badge { background: #1e293b; color: #bdc432; border-radius: 7px; padding: 3px 9px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.3px; flex-shrink: 0; white-space: nowrap; }
     .bopp-qt-num { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; width: 148px; font-family: inherit; outline: none; transition: 0.2s; flex-shrink: 0; }
     .bopp-qt-num:focus { border-color: #bdc432; box-shadow: 0 0 0 2px rgba(189,196,50,0.15); }
     .bopp-qt-co { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; outline: none; font-family: inherit; cursor: pointer; min-width: 140px; text-align: center; text-align-last: center; }
@@ -432,12 +433,12 @@ const BOppApp = (() => {
         </tr>`;
     }
 
-    function renderQTCard(qt) {
+    function renderQTCard(qt, idx = 0) {
         const tAmt = qt._totAmt || 0, tGP = qt._totGP || 0;
         const buOpts = `<option value="" disabled${!qt.company_qt ? ' selected' : ''} hidden>— Company QT —</option>` + buildOpts(_buList, qt.company_qt);
         return `<div class="bopp-qt-card" data-qt-card="${escA(qt.tmpId)}">
             <div class="bopp-qt-head">
-                <i class="bi bi-file-earmark-text" style="color:#94a3b8;font-size:0.9rem;flex-shrink:0;"></i>
+                <span class="bopp-qt-badge">QT ${idx + 1}</span>
                 <input type="text" class="bopp-qt-num" value="${escA(qt.qt_number)}" data-field="qt_number" placeholder="QT....">
                 <select class="bopp-qt-co" data-field="company_qt">${buOpts}</select>
                 <div class="bopp-qt-totals">
@@ -481,7 +482,7 @@ const BOppApp = (() => {
 
     function _appendQTToDOM(qt) {
         const tmp = document.createElement('div');
-        tmp.innerHTML = renderQTCard(qt);
+        tmp.innerHTML = renderQTCard(qt, _qts.length - 1);
         el('bopp-qt-container').append(...tmp.children);
         updateQTDeleteBtns();
         updateItemTrashBtns(qt);
@@ -491,7 +492,7 @@ const BOppApp = (() => {
         const container = el('bopp-qt-container');
         if (!_qts.length) { container.innerHTML = ''; return; }
         const tmp = document.createElement('div');
-        tmp.innerHTML = _qts.map(renderQTCard).join('');
+        tmp.innerHTML = _qts.map((qt, i) => renderQTCard(qt, i)).join('');
         container.innerHTML = '';
         container.append(...tmp.children);
         updateQTDeleteBtns();
