@@ -124,6 +124,7 @@
         .op-qt-stat-val.gp { color: #16a34a; }
         .op-qt-stat-lbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; }
         .op-qt-stat-div { width: 1px; height: 28px; background: #e2e8f0; }
+        .op-qt-pct-badge { background: #dcfce7; color: #16a34a; border-radius: 100px; padding: 3px 9px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; line-height: 1.4; }
 
         /* ── QT Table ── */
         .op-qt-wrap { overflow-x: auto; }
@@ -581,8 +582,8 @@
                     ${totGP > 0 ? `<div class="op-qt-stat-div"></div>
                     <div class="op-qt-stat">
                         <span class="op-qt-stat-val gp">${fmtAmt(totGP)}</span>
-                        <span class="op-qt-stat-lbl">GP${pct ? ` · <span style="color:#16a34a">${pct}</span>` : ''}</span>
-                    </div>` : ''}
+                        <span class="op-qt-stat-lbl">GP</span>
+                    </div>${pct ? `<span class="op-qt-pct-badge">${pct}</span>` : ''}` : ''}
                 </div>
             </div>
             <div class="op-qt-wrap">
