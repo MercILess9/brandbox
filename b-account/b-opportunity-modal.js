@@ -141,6 +141,8 @@ const B_OPP_MODAL_HTML = `
     .bopp-btn-del:hover { background: #fecaca; }
     .bopp-btn-undo { border: none; background: #bdc432; color: #1e293b; border-radius: 10px; font-weight: 800; height: 40px; padding: 0 16px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
     .bopp-btn-undo:hover { background: #a3b020; }
+    .bopp-btn-undo-qt { border: none; background: #bdc432; color: #1e293b; border-radius: 8px; font-weight: 800; height: 30px; padding: 0 12px; font-size: 0.73rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+    .bopp-btn-undo-qt:hover { background: #a3b020; }
     .bopp-btn-cancel { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 18px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
     .bopp-btn-cancel:hover { background: #f8fafc; border-color: #cbd5e1; }
     .bopp-btn-save { background: #1e293b; color: #bdc432; border: none; padding: 0 24px; border-radius: 10px; font-weight: 800; height: 40px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); font-family: inherit; }
@@ -490,7 +492,8 @@ const BOppApp = (() => {
             </div>
             <div class="bopp-qt-foot">
                 <button type="button" class="bopp-btn-add-item" onclick="BOppApp.addItem('${escA(qt.tmpId)}')"><i class="bi bi-plus"></i> Add Item</button>
-                <div style="display:flex;gap:6px;">
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <button type="button" class="bopp-btn-undo-qt" data-undo-qt="${escA(qt.tmpId)}" style="display:none;" onclick="BOppApp.undo('${escA(qt.tmpId)}')"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
                     <button type="button" class="bopp-btn-dup" onclick="BOppApp.dupQT('${escA(qt.tmpId)}')"><i class="bi bi-copy"></i> Duplicate</button>
                     <button type="button" class="bopp-btn-del-qt" onclick="BOppApp.removeQT('${escA(qt.tmpId)}')"><i class="bi bi-trash3"></i> Delete</button>
                 </div>
@@ -600,8 +603,13 @@ const BOppApp = (() => {
     }
 
     function updateUndoBtn() {
-        const btn = el('bopp-btn-undo');
-        if (btn) btn.style.display = _undoStack.length ? '' : 'none';
+        // Main footer: only for QT-level deletions
+        const mainBtn = el('bopp-btn-undo');
+        if (mainBtn) mainBtn.style.display = _undoStack.some(a => a.type === 'qt') ? '' : 'none';
+        // Per-QT buttons: for item deletions within that QT
+        document.querySelectorAll('[data-undo-qt]').forEach(btn => {
+            btn.style.display = _undoStack.some(a => a.type === 'item' && a.qtTmpId === btn.dataset.undoQt) ? '' : 'none';
+        });
     }
 
     async function removeQT(tmpId) {
@@ -642,17 +650,19 @@ const BOppApp = (() => {
         updateUndoBtn();
     }
 
-    function undo() {
-        if (!_undoStack.length) return;
-        const action = _undoStack.pop();
-        if (action.type === 'item') {
+    function undo(qtTmpId) {
+        if (qtTmpId) {
+            // Undo last item deletion for this specific QT
+            const stackIdx = [..._undoStack].map((a,i) => ({a,i})).reverse().find(({a}) => a.type === 'item' && a.qtTmpId === qtTmpId)?.i;
+            if (stackIdx == null) return;
+            const action = _undoStack.splice(stackIdx, 1)[0];
             const qt = _qts.find(q => q.tmpId === action.qtTmpId);
-            if (qt) {
-                qt.items.splice(action.idx, 0, action.item);
-                reRenderQTBody(qt);
-                recalcTotals();
-            }
-        } else if (action.type === 'qt') {
+            if (qt) { qt.items.splice(action.idx, 0, action.item); reRenderQTBody(qt); recalcTotals(); }
+        } else {
+            // Undo last QT deletion
+            const stackIdx = [..._undoStack].map((a,i) => ({a,i})).reverse().find(({a}) => a.type === 'qt')?.i;
+            if (stackIdx == null) return;
+            const action = _undoStack.splice(stackIdx, 1)[0];
             _qts.splice(action.qtIdx, 0, action.qt);
             renderAllQTs();
             recalcTotals();
