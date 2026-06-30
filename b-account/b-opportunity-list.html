@@ -414,7 +414,7 @@
         if (_leadFilter)   query = query.eq('lead_source', _leadFilter);
 
         query = _sortFilter === 'latest'
-            ? query.order('create_date', { ascending: false })
+            ? query.order('create_date', { ascending: false, nullsFirst: false })
             : query.order('opportunity_name', { ascending: true });
 
         const from = _page * 10;
