@@ -487,6 +487,8 @@ const BOppApp = (() => {
         tmp.innerHTML = _qts.map(renderQTCard).join('');
         container.innerHTML = '';
         container.append(...tmp.children);
+        updateQTDeleteBtns();
+        _qts.forEach(qt => updateItemTrashBtns(qt));
     }
 
     function reRenderQTBody(qt) {
@@ -574,6 +576,8 @@ const BOppApp = (() => {
         const tmp = document.createElement('div');
         tmp.innerHTML = renderQTCard(qt);
         el('bopp-qt-container').append(...tmp.children);
+        updateQTDeleteBtns();
+        updateItemTrashBtns(qt);
     }
 
     function updateUndoBtn() {
@@ -581,22 +585,47 @@ const BOppApp = (() => {
         if (btn) btn.style.display = _undoStack.length ? '' : 'none';
     }
 
+    function isEmptyItem(item) {
+        return !item.detail?.trim() && (+item.price||0) === 0 && (+item.qty||0) <= 1 && (+item.discount||0) === 0 && (+item.gp||0) === 0;
+    }
+
+    function isEmptyQT(qt) {
+        return !qt.qt_number?.trim() && !qt.company_qt && qt.items.every(isEmptyItem);
+    }
+
+    function updateQTDeleteBtns() {
+        document.querySelectorAll('.bopp-btn-del-qt').forEach(btn => {
+            btn.style.display = _qts.length > 1 ? '' : 'none';
+        });
+    }
+
+    function updateItemTrashBtns(qt) {
+        const tbody = el(`bopp-tbody-${qt.tmpId}`);
+        if (!tbody) return;
+        tbody.querySelectorAll('.bopp-item-rm').forEach(btn => {
+            btn.style.display = qt.items.length > 1 ? '' : 'none';
+        });
+    }
+
     async function removeQT(tmpId) {
         const qtIdx = _qts.findIndex(q => q.tmpId === tmpId);
         if (qtIdx < 0) return;
         const qt = _qts[qtIdx];
-        const label = qt.qt_number ? `QT "${qt.qt_number}"` : 'this quotation';
-        const result = await Swal.fire({
-            title: 'Delete Quotation?', text: `Delete ${label} and all its items?`,
-            icon: 'warning', showCancelButton: true,
-            confirmButtonText: 'Delete', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel',
-            reverseButtons: true
-        });
-        if (!result.isConfirmed) return;
-        _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(qt)) });
+        if (!isEmptyQT(qt)) {
+            const label = qt.qt_number ? `QT "${qt.qt_number}"` : 'this quotation';
+            const result = await Swal.fire({
+                title: 'Delete Quotation?', text: `Delete ${label} and all its items?`,
+                icon: 'warning', showCancelButton: true,
+                confirmButtonText: 'Delete', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel',
+                reverseButtons: true
+            });
+            if (!result.isConfirmed) return;
+            _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(qt)) });
+        }
         _qts.splice(qtIdx, 1);
         el('bopp-qt-container').querySelector(`[data-qt-card="${tmpId}"]`)?.remove();
         recalcTotals();
+        updateQTDeleteBtns();
         updateUndoBtn();
     }
 
@@ -605,16 +634,18 @@ const BOppApp = (() => {
         if (!qt) return;
         qt.items.push(newItem());
         reRenderQTBody(qt);
+        updateItemTrashBtns(qt);
         recalcTotals();
     }
 
     function removeItem(qtTmpId, idx) {
         const qt = _qts.find(q => q.tmpId === qtTmpId);
         if (!qt || qt.items.length <= 1) return;
-        _undoStack.push({ type: 'item', qtTmpId, idx, item: { ...qt.items[idx] } });
+        if (!isEmptyItem(qt.items[idx])) _undoStack.push({ type: 'item', qtTmpId, idx, item: { ...qt.items[idx] } });
         qt.items.splice(idx, 1);
         qt.items.forEach((item) => { item.amount = Math.max(0, (+item.qty||0) * (+item.price||0) - (+item.discount||0)); });
         reRenderQTBody(qt);
+        updateItemTrashBtns(qt);
         recalcTotals();
         updateUndoBtn();
     }
@@ -624,7 +655,7 @@ const BOppApp = (() => {
         const action = _undoStack.pop();
         if (action.type === 'item') {
             const qt = _qts.find(q => q.tmpId === action.qtTmpId);
-            if (qt) { qt.items.splice(action.idx, 0, action.item); reRenderQTBody(qt); recalcTotals(); }
+            if (qt) { qt.items.splice(action.idx, 0, action.item); reRenderQTBody(qt); updateItemTrashBtns(qt); recalcTotals(); }
         } else if (action.type === 'qt') {
             _qts.splice(action.qtIdx, 0, action.qt);
             renderAllQTs();
@@ -647,6 +678,8 @@ const BOppApp = (() => {
         const tmp = document.createElement('div');
         tmp.innerHTML = renderQTCard(dup);
         el('bopp-qt-container').append(...tmp.children);
+        updateQTDeleteBtns();
+        updateItemTrashBtns(dup);
         recalcTotals();
     }
 
