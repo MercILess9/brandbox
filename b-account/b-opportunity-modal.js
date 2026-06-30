@@ -890,10 +890,12 @@ const BOppApp = (() => {
                 if (error) throw error;
                 await _deleteOppQTs(_editingId);
             } else {
+                const now = new Date().toISOString();
                 payload.status      = 'Active';
                 payload.create_by   = user?.codename || null;
+                payload.create_date = now;
                 payload.update_by   = user?.codename || null;
-                payload.update_date = new Date().toISOString();
+                payload.update_date = now;
                 const { data, error } = await supabaseClient.from('b_opportunity_list').insert(payload).select('opportunity_id').single();
                 if (error) throw error;
                 oppId = data.opportunity_id;
