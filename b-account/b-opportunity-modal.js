@@ -442,7 +442,7 @@ const BOppApp = (() => {
         return `<div class="bopp-qt-card" data-qt-card="${escA(qt.tmpId)}">
             <div class="bopp-qt-head">
                 <i class="bi bi-file-earmark-text" style="color:#94a3b8;font-size:0.9rem;flex-shrink:0;"></i>
-                <input type="text" class="bopp-qt-num" value="${escA(qt.qt_number)}" data-field="qt_number" placeholder="QT Number">
+                <input type="text" class="bopp-qt-num" value="${escA(qt.qt_number)}" data-field="qt_number" placeholder="QT25060001...">
                 <select class="bopp-qt-co" data-field="company_qt">${buOpts}</select>
                 <div class="bopp-qt-totals">
                     <div class="bopp-qt-tbox">
@@ -571,7 +571,7 @@ const BOppApp = (() => {
     // ── Public QT operations ──────────────────────────────────────────────────
     function addQT() {
         _qtCounter++;
-        const qt = { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: genQTNum(), company_qt: '', items: [newItem()], _totAmt: 0, _totGP: 0 };
+        const qt = { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: '', company_qt: '', items: [newItem()], _totAmt: 0, _totGP: 0 };
         _qts.push(qt);
         const tmp = document.createElement('div');
         tmp.innerHTML = renderQTCard(qt);
