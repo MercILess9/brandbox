@@ -16,7 +16,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-hdr-tval { font-size: 0.88rem; font-weight: 800; color: #fff; }
     .bopp-hdr-tval.gp { color: #bdc432; }
     .bopp-hdr-tlbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.4); }
-    .bopp-hdr-tpct { color: #bdc432; font-weight: 800; }
+    .bopp-hdr-tpct { color: #bdc432; font-weight: 800; font-size: 0.8rem; margin-left: 5px; }
     .bopp-hdr-tdiv { width: 1px; height: 26px; background: rgba(255,255,255,0.15); }
     .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; transition: background-color 0.2s, border-color 0.2s, color 0.2s; text-align: center; text-align-last: center; }
     .bopp-status-sel:focus { border-color: rgba(255,255,255,0.4); }
@@ -173,6 +173,7 @@ const B_OPP_MODAL_HTML = `
                     <div class="bopp-header-bar"></div>
                     <i class="bi bi-briefcase-fill bopp-header-icon"></i>
                     <span class="bopp-header-title" id="bopp-modal-title">New Opportunity</span>
+                    <select id="bopp-status-sel" class="bopp-status-sel" style="display:none;"></select>
                 </div>
                 <div class="bopp-header-right">
                     <div class="bopp-hdr-totals" id="bopp-hdr-totals">
@@ -182,11 +183,10 @@ const B_OPP_MODAL_HTML = `
                         </div>
                         <div class="bopp-hdr-tdiv"></div>
                         <div class="bopp-hdr-tbox">
-                            <span class="bopp-hdr-tval gp" id="bopp-hdr-gp">0</span>
-                            <span class="bopp-hdr-tlbl">GP <span class="bopp-hdr-tpct" id="bopp-hdr-pct"></span></span>
+                            <div class="bopp-hdr-tval gp"><span id="bopp-hdr-gp">0</span><span class="bopp-hdr-tpct" id="bopp-hdr-pct"></span></div>
+                            <span class="bopp-hdr-tlbl">GP</span>
                         </div>
                     </div>
-                    <select id="bopp-status-sel" class="bopp-status-sel"></select>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
             </div>
@@ -686,8 +686,8 @@ const BOppApp = (() => {
         el('bopp-modal-title').textContent  = isEdit ? oppId : 'New Opportunity';
         el('bopp-save-icon').className      = isEdit ? 'bi bi-check-circle-fill' : 'bi bi-plus-circle-fill';
         el('bopp-save-label').textContent   = isEdit ? 'Save Changes' : 'Create Opportunity';
-        el('bopp-btn-del').style.display        = isEdit ? 'flex' : 'none';
-        el('bopp-status-sel').style.visibility  = isEdit ? '' : 'hidden';
+        el('bopp-btn-del').style.display     = isEdit ? 'flex' : 'none';
+        el('bopp-status-sel').style.display  = isEdit ? '' : 'none';
         if (isEdit) updateStatusColor();
     }
 
@@ -700,8 +700,8 @@ const BOppApp = (() => {
         companySel.innerHTML = '<option value="">Select company...</option>';
         companySel.disabled = true;
         ['bopp-type','bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
-        el('bopp-status-sel').selectedIndex   = 0;
-        el('bopp-status-sel').style.visibility = 'hidden';
+        el('bopp-status-sel').selectedIndex = 0;
+        el('bopp-status-sel').style.display  = 'none';
         el('bopp-qt-container').innerHTML = '';
         _qts = []; _qtCounter = 0; _undoStack = [];
         recalcTotals();
