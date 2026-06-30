@@ -282,11 +282,11 @@ const B_OPP_MODAL_HTML = `
                             </div>
                             <div class="bopp-card">
                                 <div class="bopp-irow">
-                                    <span class="bopp-ilbl">Signed Date</span>
+                                    <span class="bopp-ilbl">Signed Date <span style="color:#ef4444">*</span></span>
                                     <input type="date" id="bopp-signed" class="bopp-iinp" required>
                                 </div>
                                 <div class="bopp-irow">
-                                    <span class="bopp-ilbl">Launch Date</span>
+                                    <span class="bopp-ilbl">Launch Date <span style="color:#ef4444">*</span></span>
                                     <input type="date" id="bopp-launch" class="bopp-iinp" required>
                                 </div>
                             </div>
@@ -799,9 +799,15 @@ const BOppApp = (() => {
             return;
         }
         if (!el('bopp-account-id').value) { notify('warning', 'กรุณาเลือก Account'); return; }
-        const invalidQT = _qts.find(qt => !qt.qt_number.trim() || !(qt._totAmt > 0));
+        if (!_qts.length) { notify('warning', 'กรุณาเพิ่ม QT อย่างน้อย 1 รายการ'); return; }
+        const qtContainer = el('bopp-qt-container');
+        const invalidQT = _qts.find(qt => {
+            const card = qtContainer.querySelector(`[data-qt-card="${qt.tmpId}"]`);
+            const numVal = card?.querySelector('.bopp-qt-num')?.value.trim() || '';
+            return !numVal || !(qt._totAmt > 0);
+        });
         if (invalidQT) {
-            const card = el('bopp-qt-container').querySelector(`[data-qt-card="${invalidQT.tmpId}"]`);
+            const card = qtContainer.querySelector(`[data-qt-card="${invalidQT.tmpId}"]`);
             const numInp = card?.querySelector('.bopp-qt-num');
             if (numInp) { numInp.classList.add('is-invalid'); numInp.scrollIntoView({ behavior: 'smooth', block: 'center' }); numInp.focus(); }
             notify('warning', 'แต่ละ QT ต้องมีชื่อ QT และยอดเงิน');
