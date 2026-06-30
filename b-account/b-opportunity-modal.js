@@ -872,14 +872,17 @@ const BOppApp = (() => {
         try {
             let oppId = _editingId;
             if (_editingId) {
-                payload.status    = el('bopp-status-sel').value;
-                payload.update_by = user?.codename || null;
+                payload.status      = el('bopp-status-sel').value;
+                payload.update_by   = user?.codename || null;
+                payload.update_date = new Date().toISOString();
                 const { error } = await supabaseClient.from('b_opportunity_list').update(payload).eq('opportunity_id', _editingId);
                 if (error) throw error;
                 await _deleteOppQTs(_editingId);
             } else {
-                payload.status    = 'Active';
-                payload.create_by = user?.codename || null;
+                payload.status      = 'Active';
+                payload.create_by   = user?.codename || null;
+                payload.update_by   = user?.codename || null;
+                payload.update_date = new Date().toISOString();
                 const { data, error } = await supabaseClient.from('b_opportunity_list').insert(payload).select('opportunity_id').single();
                 if (error) throw error;
                 oppId = data.opportunity_id;
