@@ -308,27 +308,16 @@ const BOppApp = (() => {
     const escA = s => s ? String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;') : '';
     const escH = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
     const fmtN = n => (!isNaN(+n) && n != null) ? (+n).toLocaleString('en-US') : '0';
-    const fmtG = n => (!isNaN(+n) && n != null) ? (+n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2}) : '0.00';
     const getBxUser = () => { try { return JSON.parse(sessionStorage.getItem('bx_user')); } catch { return null; } };
 
-    // ── State ─────────────────────────────────────────────────────────────────
-    let _bsModal   = null;
-    let _editingId = null;
-    let _loaded    = false;
-    let _accounts  = []; // [{account_id, account_name, company_name}]
-    let _accNames  = []; // unique account names for overlay
-    let _profiles  = [];
-    let _buList    = [];
-    let _statusList = [];
-    let _leadList  = [];
-    let _qts       = []; // [{tmpId, qt_id, qt_number, company_qt, items:[], _totAmt, _totGP}]
-    let _qtCounter = 0;
-    let _undoStack = [];
+    let _bsModal = null, _editingId = null, _loaded = false;
+    let _accounts = [], _accNames = [], _profiles = [];
+    let _buList = [], _statusList = [], _leadList = [];
+    let _qts = [], _qtCounter = 0, _undoStack = [];
 
-    function getBsModal() {
-        if (!_bsModal) _bsModal = new bootstrap.Modal(el('b-opp-modal'));
-        return _bsModal;
-    }
+    const findQT    = id  => _qts.find(q => q.tmpId === id);
+    const getBsModal = () => _bsModal || (_bsModal = new bootstrap.Modal(el('b-opp-modal')));
+    const buildOpts  = (list, sel = '') => list.map(v => `<option value="${escA(v)}"${v === sel ? ' selected' : ''}>${escH(v)}</option>`).join('');
 
     // ── Load helper data (once per page) ─────────────────────────────────────
     async function loadHelpers() {
@@ -338,26 +327,23 @@ const BOppApp = (() => {
             supabaseClient.from('profiles').select('codename').neq('level','god').order('codename'),
             supabaseClient.from('b_opp_config').select('type, value').in('type',['bu','status','lead_source']).order('value')
         ]);
-        _accounts  = accs  || [];
-        _profiles  = (profs || []).map(p => p.codename).filter(Boolean);
-        _buList    = (cfg  || []).filter(c => c.type === 'bu').map(c => c.value);
+        _accounts   = accs || [];
+        _profiles   = (profs || []).map(p => p.codename).filter(Boolean);
+        _buList     = (cfg || []).filter(c => c.type === 'bu').map(c => c.value);
         _statusList = (cfg || []).filter(c => c.type === 'status').map(c => c.value);
-        _leadList  = (cfg  || []).filter(c => c.type === 'lead_source').map(c => c.value);
-        _accNames  = [...new Set(_accounts.map(a => a.account_name).filter(Boolean))].sort((a,b) => a.localeCompare(b,'th'));
+        _leadList   = (cfg || []).filter(c => c.type === 'lead_source').map(c => c.value);
+        _accNames   = [...new Set(_accounts.map(a => a.account_name).filter(Boolean))].sort((a,b) => a.localeCompare(b,'th'));
         _loaded = true;
         buildDropdowns();
     }
 
     function buildDropdowns() {
-        const peopleOpts = _profiles.map(p => `<option value="${escA(p)}">${escH(p)}</option>`).join('');
         const blank = '<option value="" disabled selected hidden></option>';
-        const peopleOptsBlank = blank + peopleOpts;
-        el('bopp-owner').innerHTML = blank + peopleOpts;
-        ['bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.innerHTML = peopleOptsBlank; });
-        el('bopp-lead').innerHTML = blank + _leadList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('');
-        el('bopp-status-sel').innerHTML = _statusList.length
-            ? _statusList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('')
-            : '<option value="Active">Active</option>';
+        const pplOpts = buildOpts(_profiles);
+        el('bopp-owner').innerHTML = blank + pplOpts;
+        ['bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.innerHTML = blank + pplOpts; });
+        el('bopp-lead').innerHTML = blank + buildOpts(_leadList);
+        el('bopp-status-sel').innerHTML = _statusList.length ? buildOpts(_statusList) : '<option value="Active">Active</option>';
     }
 
     // ── Account overlay ───────────────────────────────────────────────────────
@@ -368,7 +354,7 @@ const BOppApp = (() => {
         setTimeout(() => el('bopp-ov-input').focus(), 50);
     }
 
-    function closeOverlay() { el('bopp-overlay').classList.remove('open'); }
+    const closeOverlay = () => el('bopp-overlay').classList.remove('open');
 
     function renderOverlayList(q) {
         q = q.trim().toLowerCase();
@@ -399,26 +385,19 @@ const BOppApp = (() => {
         el('bopp-account-id').value = sel.value;
     }
 
-    el('bopp-company-sel').addEventListener('change', function() {
-        el('bopp-account-id').value = this.value;
-    });
+    el('bopp-company-sel').addEventListener('change', function() { el('bopp-account-id').value = this.value; });
 
     // ── QT helpers ────────────────────────────────────────────────────────────
     function genQTNum() {
         const d = new Date();
-        const yy = String(d.getFullYear()).slice(-2);
-        const mm = String(d.getMonth()+1).padStart(2,'0');
-        return `QT${yy}${mm}${String(Math.floor(Math.random()*9000)+1000)}`;
+        return `QT${String(d.getFullYear()).slice(-2)}${String(d.getMonth()+1).padStart(2,'0')}${String(Math.floor(Math.random()*9000)+1000)}`;
     }
 
-    function newItem() {
-        return { item_id: null, bu: '', detail: '', qty: 1, price: 0, discount: 0, amount: 0, gp: 0 };
-    }
+    const newItem = () => ({ item_id: null, bu: '', detail: '', qty: 1, price: 0, discount: 0, amount: 0, gp: 0 });
 
     function renderItemRow(qtTmpId, item, idx) {
-        const amt = +item.amount || 0;
-        const gp  = +item.gp    || 0;
-        const buOpts = '<option value="">—</option>' + _buList.map(b => `<option value="${escA(b)}"${item.bu === b?' selected':''}>${escH(b)}</option>`).join('');
+        const amt = +item.amount || 0, gp = +item.gp || 0;
+        const buOpts = '<option value="">—</option>' + _buList.map(b => `<option value="${escA(b)}"${item.bu === b ? ' selected' : ''}>${escH(b)}</option>`).join('');
         return `<tr data-qt="${escA(qtTmpId)}" data-item="${idx}">
             <td class="bopp-item-no c">${idx+1}</td>
             <td><select class="bopp-item-sel" data-field="bu">${buOpts}</select></td>
@@ -433,9 +412,8 @@ const BOppApp = (() => {
     }
 
     function renderQTCard(qt) {
-        const items = qt.items.map((item, idx) => renderItemRow(qt.tmpId, item, idx)).join('');
-        const buOpts = `<option value="" disabled${!qt.company_qt?' selected':''} hidden>— Company QT —</option>` + _buList.map(b => `<option value="${escA(b)}"${qt.company_qt===b?' selected':''}>${escH(b)}</option>`).join('');
         const tAmt = qt._totAmt || 0, tGP = qt._totGP || 0;
+        const buOpts = `<option value="" disabled${!qt.company_qt ? ' selected' : ''} hidden>— Company QT —</option>` + buildOpts(_buList, qt.company_qt);
         return `<div class="bopp-qt-card" data-qt-card="${escA(qt.tmpId)}">
             <div class="bopp-qt-head">
                 <i class="bi bi-file-earmark-text" style="color:#94a3b8;font-size:0.9rem;flex-shrink:0;"></i>
@@ -466,7 +444,7 @@ const BOppApp = (() => {
                         <th class="r" style="width:96px">GP</th>
                         <th style="width:36px"></th>
                     </tr></thead>
-                    <tbody id="bopp-tbody-${escA(qt.tmpId)}">${items}</tbody>
+                    <tbody id="bopp-tbody-${escA(qt.tmpId)}">${qt.items.map((item, idx) => renderItemRow(qt.tmpId, item, idx)).join('')}</tbody>
                 </table>
             </div>
             <div class="bopp-qt-foot">
@@ -479,6 +457,14 @@ const BOppApp = (() => {
         </div>`;
     }
 
+    function _appendQTToDOM(qt) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = renderQTCard(qt);
+        el('bopp-qt-container').append(...tmp.children);
+        updateQTDeleteBtns();
+        updateItemTrashBtns(qt);
+    }
+
     function renderAllQTs() {
         const container = el('bopp-qt-container');
         if (!_qts.length) { container.innerHTML = ''; return; }
@@ -487,44 +473,39 @@ const BOppApp = (() => {
         container.innerHTML = '';
         container.append(...tmp.children);
         updateQTDeleteBtns();
-        _qts.forEach(qt => updateItemTrashBtns(qt));
+        _qts.forEach(updateItemTrashBtns);
     }
 
-    function reRenderQTBody(qt) {
+    const reRenderQTBody = qt => {
         const tbody = el(`bopp-tbody-${qt.tmpId}`);
         if (tbody) tbody.innerHTML = qt.items.map((item, idx) => renderItemRow(qt.tmpId, item, idx)).join('');
-    }
+    };
 
     // ── Totals ────────────────────────────────────────────────────────────────
     function recalcTotals() {
-        let grandAmt = 0, grandGP = 0;
+        const container = el('bopp-qt-container');
         _qts.forEach(qt => {
-            let qAmt = 0, qGP = 0;
-            qt.items.forEach(i => { qAmt += +i.amount||0; qGP += +i.gp||0; });
-            qt._totAmt = qAmt; qt._totGP = qGP;
-            const card = el('bopp-qt-container').querySelector(`[data-qt-card="${qt.tmpId}"]`);
-            if (card) {
-                const aEl = card.querySelector('[data-qt-amt]'); if (aEl) aEl.textContent = fmtN(qAmt);
-                const gEl = card.querySelector('[data-qt-gp]');  if (gEl) gEl.textContent  = fmtN(qGP);
-                const pEl = card.querySelector('[data-qt-pct]');  if (pEl) pEl.textContent = qAmt>0&&qGP>0 ? `${(qGP/qAmt*100).toFixed(1)}%` : '';
-            }
-            grandAmt += qAmt; grandGP += qGP;
+            qt._totAmt = qt.items.reduce((s,i) => s + (+i.amount||0), 0);
+            qt._totGP  = qt.items.reduce((s,i) => s + (+i.gp||0), 0);
+            const card = container.querySelector(`[data-qt-card="${qt.tmpId}"]`);
+            if (!card) return;
+            card.querySelector('[data-qt-amt]').textContent = fmtN(qt._totAmt);
+            card.querySelector('[data-qt-gp]').textContent  = fmtN(qt._totGP);
+            card.querySelector('[data-qt-pct]').textContent = qt._totAmt > 0 && qt._totGP > 0 ? `${(qt._totGP/qt._totAmt*100).toFixed(1)}%` : '';
         });
     }
 
     // ── QT event delegation ───────────────────────────────────────────────────
     el('bopp-qt-container').addEventListener('input', e => {
-        const inp = e.target;
-        const field = inp.dataset.field;
+        const inp = e.target, field = inp.dataset.field;
         if (!field) return;
 
         const row = inp.closest('tr[data-qt][data-item]');
         if (row) {
-            const qt = _qts.find(q => q.tmpId === row.dataset.qt);
-            const idx = +row.dataset.item;
+            const qt = findQT(row.dataset.qt), idx = +row.dataset.item;
             if (!qt || idx >= qt.items.length) return;
             const item = qt.items[idx];
-            if (field === 'qty')      { item.qty = Math.floor(+inp.value) || 0; inp.value = item.qty || ''; }
+            if      (field === 'qty')      { item.qty = Math.floor(+inp.value) || 0; inp.value = item.qty || ''; }
             else if (field === 'price')    item.price    = +inp.value || 0;
             else if (field === 'discount') item.discount = +inp.value || 0;
             else if (field === 'gp')       item.gp       = +inp.value || 0;
@@ -542,68 +523,46 @@ const BOppApp = (() => {
 
         if (field === 'qt_number') {
             const card = inp.closest('[data-qt-card]');
-            const qt = card && _qts.find(q => q.tmpId === card.dataset.qtCard);
+            const qt = card && findQT(card.dataset.qtCard);
             if (qt) qt.qt_number = inp.value;
         }
     });
 
     el('bopp-qt-container').addEventListener('change', e => {
-        const inp = e.target;
-        const field = inp.dataset.field;
+        const inp = e.target, field = inp.dataset.field;
         if (!field) return;
-
         const row = inp.closest('tr[data-qt][data-item]');
         if (row && field === 'bu') {
-            const qt = _qts.find(q => q.tmpId === row.dataset.qt);
-            const idx = +row.dataset.item;
+            const qt = findQT(row.dataset.qt), idx = +row.dataset.item;
             if (qt && idx < qt.items.length) qt.items[idx].bu = inp.value;
             return;
         }
-
         if (field === 'company_qt') {
             const card = inp.closest('[data-qt-card]');
-            const qt = card && _qts.find(q => q.tmpId === card.dataset.qtCard);
+            const qt = card && findQT(card.dataset.qtCard);
             if (qt) qt.company_qt = inp.value;
         }
     });
+
+    // ── UI state ──────────────────────────────────────────────────────────────
+    const updateUndoBtn      = () => { const b = el('bopp-btn-undo'); if (b) b.style.display = _undoStack.length ? '' : 'none'; };
+    const isEmptyItem        = item => !item.detail?.trim() && (+item.price||0) === 0 && (+item.qty||0) <= 1 && (+item.discount||0) === 0 && (+item.gp||0) === 0;
+    const isEmptyQT          = qt   => !qt.qt_number?.trim() && !qt.company_qt && qt.items.every(isEmptyItem);
+    const updateQTDeleteBtns = ()   => document.querySelectorAll('.bopp-btn-del-qt').forEach(b => { b.style.display = _qts.length > 1 ? '' : 'none'; });
+
+    function updateItemTrashBtns(qt) {
+        const tbody = el(`bopp-tbody-${qt.tmpId}`);
+        if (!tbody) return;
+        const show = qt.items.length > 1 ? '' : 'none';
+        tbody.querySelectorAll('.bopp-item-rm').forEach(b => { b.style.display = show; });
+    }
 
     // ── Public QT operations ──────────────────────────────────────────────────
     function addQT() {
         _qtCounter++;
         const qt = { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: '', company_qt: '', items: [newItem()], _totAmt: 0, _totGP: 0 };
         _qts.push(qt);
-        const tmp = document.createElement('div');
-        tmp.innerHTML = renderQTCard(qt);
-        el('bopp-qt-container').append(...tmp.children);
-        updateQTDeleteBtns();
-        updateItemTrashBtns(qt);
-    }
-
-    function updateUndoBtn() {
-        const btn = el('bopp-btn-undo');
-        if (btn) btn.style.display = _undoStack.length ? '' : 'none';
-    }
-
-    function isEmptyItem(item) {
-        return !item.detail?.trim() && (+item.price||0) === 0 && (+item.qty||0) <= 1 && (+item.discount||0) === 0 && (+item.gp||0) === 0;
-    }
-
-    function isEmptyQT(qt) {
-        return !qt.qt_number?.trim() && !qt.company_qt && qt.items.every(isEmptyItem);
-    }
-
-    function updateQTDeleteBtns() {
-        document.querySelectorAll('.bopp-btn-del-qt').forEach(btn => {
-            btn.style.display = _qts.length > 1 ? '' : 'none';
-        });
-    }
-
-    function updateItemTrashBtns(qt) {
-        const tbody = el(`bopp-tbody-${qt.tmpId}`);
-        if (!tbody) return;
-        tbody.querySelectorAll('.bopp-item-rm').forEach(btn => {
-            btn.style.display = qt.items.length > 1 ? '' : 'none';
-        });
+        _appendQTToDOM(qt);
     }
 
     async function removeQT(tmpId) {
@@ -612,13 +571,13 @@ const BOppApp = (() => {
         const qt = _qts[qtIdx];
         if (!isEmptyQT(qt)) {
             const label = qt.qt_number ? `QT "${qt.qt_number}"` : 'this quotation';
-            const result = await Swal.fire({
+            const { isConfirmed } = await Swal.fire({
                 title: 'Delete Quotation?', text: `Delete ${label} and all its items?`,
                 icon: 'warning', showCancelButton: true,
                 confirmButtonText: 'Delete', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel',
                 reverseButtons: true
             });
-            if (!result.isConfirmed) return;
+            if (!isConfirmed) return;
             _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(qt)) });
         }
         _qts.splice(qtIdx, 1);
@@ -629,7 +588,7 @@ const BOppApp = (() => {
     }
 
     function addItem(qtTmpId) {
-        const qt = _qts.find(q => q.tmpId === qtTmpId);
+        const qt = findQT(qtTmpId);
         if (!qt) return;
         qt.items.push(newItem());
         reRenderQTBody(qt);
@@ -638,11 +597,11 @@ const BOppApp = (() => {
     }
 
     function removeItem(qtTmpId, idx) {
-        const qt = _qts.find(q => q.tmpId === qtTmpId);
+        const qt = findQT(qtTmpId);
         if (!qt || qt.items.length <= 1) return;
         if (!isEmptyItem(qt.items[idx])) _undoStack.push({ type: 'item', qtTmpId, idx, item: { ...qt.items[idx] } });
         qt.items.splice(idx, 1);
-        qt.items.forEach((item) => { item.amount = Math.max(0, (+item.qty||0) * (+item.price||0) - (+item.discount||0)); });
+        qt.items.forEach(i => { i.amount = Math.max(0, (+i.qty||0) * (+i.price||0) - (+i.discount||0)); });
         reRenderQTBody(qt);
         updateItemTrashBtns(qt);
         recalcTotals();
@@ -653,7 +612,7 @@ const BOppApp = (() => {
         if (!_undoStack.length) return;
         const action = _undoStack.pop();
         if (action.type === 'item') {
-            const qt = _qts.find(q => q.tmpId === action.qtTmpId);
+            const qt = findQT(action.qtTmpId);
             if (qt) { qt.items.splice(action.idx, 0, action.item); reRenderQTBody(qt); updateItemTrashBtns(qt); recalcTotals(); }
         } else if (action.type === 'qt') {
             _qts.splice(action.qtIdx, 0, action.qt);
@@ -664,61 +623,52 @@ const BOppApp = (() => {
     }
 
     function dupQT(srcTmpId) {
-        const src = _qts.find(q => q.tmpId === srcTmpId);
+        const src = findQT(srcTmpId);
         if (!src) return;
         _qtCounter++;
-        const dup = {
-            tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: genQTNum(),
-            company_qt: src.company_qt,
-            items: src.items.map(i => ({ ...i, item_id: null })),
-            _totAmt: src._totAmt, _totGP: src._totGP
-        };
+        const dup = { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: genQTNum(), company_qt: src.company_qt, items: src.items.map(i => ({ ...i, item_id: null })), _totAmt: src._totAmt, _totGP: src._totGP };
         _qts.push(dup);
-        const tmp = document.createElement('div');
-        tmp.innerHTML = renderQTCard(dup);
-        el('bopp-qt-container').append(...tmp.children);
-        updateQTDeleteBtns();
-        updateItemTrashBtns(dup);
+        _appendQTToDOM(dup);
         recalcTotals();
     }
 
-    // ── Reset form ────────────────────────────────────────────────────────────
+    // ── Modal mode / Reset ────────────────────────────────────────────────────
+    function _setModalMode(isEdit, oppId) {
+        el('bopp-modal-title').textContent = isEdit ? 'Edit Opportunity' : 'New Opportunity';
+        el('bopp-save-icon').className     = isEdit ? 'bi bi-check-circle-fill' : 'bi bi-plus-circle-fill';
+        el('bopp-save-label').textContent  = isEdit ? 'Save Changes' : 'Create Opportunity';
+        el('bopp-btn-del').style.display   = isEdit ? 'flex' : 'none';
+    }
+
     function resetForm() {
         el('bopp-form').classList.remove('was-validated');
         ['bopp-editing-id','bopp-account-id','bopp-acc-name','bopp-opp-name',
-         'bopp-signed','bopp-launch','bopp-materials','bopp-proposal','bopp-campaign','bopp-remark'].forEach(id => {
-            const e = el(id); if (e) e.value = '';
-        });
+         'bopp-signed','bopp-launch','bopp-materials','bopp-proposal','bopp-campaign','bopp-remark']
+            .forEach(id => { const e = el(id); if (e) e.value = ''; });
         const companySel = el('bopp-company-sel');
         companySel.innerHTML = '<option value="">Select company...</option>';
         companySel.disabled = true;
-        el('bopp-type').value = '';
-        ['bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
-        el('bopp-status-sel').classList.remove('visible');
+        ['bopp-type','bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
+        el('bopp-status-sel').selectedIndex = 0;
         el('bopp-qt-container').innerHTML = '';
         _qts = []; _qtCounter = 0; _undoStack = [];
         updateUndoBtn();
     }
 
-    // ── Open new ──────────────────────────────────────────────────────────────
+    // ── Open modal ────────────────────────────────────────────────────────────
     async function openNew() {
         resetForm();
         await loadHelpers();
-        // Auto-set owner to current user
         const user = getBxUser();
         if (user?.codename) {
             const ownerSel = el('bopp-owner');
             if ([...ownerSel.options].some(o => o.value === user.codename)) ownerSel.value = user.codename;
         }
         addQT();
-        el('bopp-modal-title').textContent = 'New Opportunity';
-        el('bopp-save-icon').className = 'bi bi-plus-circle-fill';
-        el('bopp-save-label').textContent = 'Create Opportunity';
-        el('bopp-btn-del').style.display = 'none';
+        _setModalMode(false);
         getBsModal().show();
     }
 
-    // ── Open edit ─────────────────────────────────────────────────────────────
     async function openEdit(oppId) {
         resetForm();
         await loadHelpers();
@@ -731,45 +681,32 @@ const BOppApp = (() => {
         el('bopp-account-id').value = opp.account_id || '';
 
         const acc = _accounts.find(a => a.account_id === opp.account_id);
-        if (acc) {
-            el('bopp-acc-name').value = acc.account_name || '';
-            populateCompanies(acc.account_name, opp.account_id);
-        }
+        if (acc) { el('bopp-acc-name').value = acc.account_name || ''; populateCompanies(acc.account_name, opp.account_id); }
 
-        el('bopp-opp-name').value = opp.opportunity_name || '';
-        el('bopp-type').value = opp.business_type || '';
-        el('bopp-lead').value   = opp.lead_source || '';
-        el('bopp-owner').value  = opp.owner       || '';
-        el('bopp-am').value     = opp.am           || '';
-        el('bopp-subam').value  = opp.sub_am       || '';
-        el('bopp-signed').value  = opp.signed_date ? String(opp.signed_date).slice(0,10) : '';
-        el('bopp-launch').value  = opp.launch_date ? String(opp.launch_date).slice(0,10) : '';
-        el('bopp-materials').value = opp.materials || '';
-        el('bopp-proposal').value  = opp.proposal  || '';
-        el('bopp-campaign').value  = opp.campaign  || '';
-        el('bopp-remark').value    = opp.remark    || '';
+        [['bopp-opp-name','opportunity_name'],['bopp-type','business_type'],['bopp-lead','lead_source'],
+         ['bopp-owner','owner'],['bopp-am','am'],['bopp-subam','sub_am'],
+         ['bopp-materials','materials'],['bopp-proposal','proposal'],['bopp-campaign','campaign'],['bopp-remark','remark']]
+            .forEach(([id, field]) => { el(id).value = opp[field] || ''; });
 
+        el('bopp-signed').value = opp.signed_date ? String(opp.signed_date).slice(0,10) : '';
+        el('bopp-launch').value = opp.launch_date ? String(opp.launch_date).slice(0,10) : '';
         el('bopp-status-sel').value = opp.status || (_statusList[0] || 'Active');
-        el('bopp-status-sel').classList.add('visible');
 
-        // Load QTs
         const { data: qts } = await supabaseClient.from('b_opportunity_qt')
             .select('*, b_opportunity_qt_item(*)')
             .eq('opportunity_id', oppId)
             .order('qt_number');
 
-        if (qts && qts.length) {
+        if (qts?.length) {
             qts.forEach(qt => {
                 _qtCounter++;
                 const items = (qt.b_opportunity_qt_item || [])
                     .sort((a,b) => (a.no||0)-(b.no||0))
                     .map(i => ({ item_id: i.item_id, bu: i.bu||'', detail: i.detail||'', qty: +i.qty||1, price: +i.price||0, discount: +i.discount||0, amount: +i.amount||0, gp: +i.gp||0 }));
-                _qts.push({
-                    tmpId: `qt-${_qtCounter}`, qt_id: qt.qt_id, qt_number: qt.qt_number||'', company_qt: qt.company_qt||'',
+                _qts.push({ tmpId: `qt-${_qtCounter}`, qt_id: qt.qt_id, qt_number: qt.qt_number||'', company_qt: qt.company_qt||'',
                     items: items.length ? items : [newItem()],
-                    _totAmt: items.reduce((s,i)=>s+(+i.amount||0),0),
-                    _totGP:  items.reduce((s,i)=>s+(+i.gp||0),0)
-                });
+                    _totAmt: items.reduce((s,i) => s+(+i.amount||0), 0),
+                    _totGP:  items.reduce((s,i) => s+(+i.gp||0), 0) });
             });
         } else {
             addQT();
@@ -777,11 +714,17 @@ const BOppApp = (() => {
 
         renderAllQTs();
         recalcTotals();
-        el('bopp-modal-title').textContent = 'Edit Opportunity';
-        el('bopp-save-icon').className = 'bi bi-check-circle-fill';
-        el('bopp-save-label').textContent = 'Save Changes';
-        el('bopp-btn-del').style.display = 'flex';
+        _setModalMode(true, oppId);
         getBsModal().show();
+    }
+
+    // ── DB helpers ────────────────────────────────────────────────────────────
+    async function _deleteOppQTs(oppId) {
+        const { data: oldQts } = await supabaseClient.from('b_opportunity_qt').select('qt_id').eq('opportunity_id', oppId);
+        if (oldQts?.length) {
+            await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', oldQts.map(q => q.qt_id));
+            await supabaseClient.from('b_opportunity_qt').delete().eq('opportunity_id', oppId);
+        }
     }
 
     // ── Submit ────────────────────────────────────────────────────────────────
@@ -789,26 +732,25 @@ const BOppApp = (() => {
         e.preventDefault();
         el('bopp-form').classList.add('was-validated');
         if (!el('bopp-form').checkValidity()) return;
-
         if (!el('bopp-account-id').value) { notify('warning', 'กรุณาเลือก Account'); return; }
 
-        const user   = getBxUser();
+        const user = getBxUser();
         const saveBtn = el('bopp-btn-save');
         saveBtn.disabled = true;
 
-        let grandAmt = 0, grandGP = 0;
-        _qts.forEach(qt => qt.items.forEach(i => { grandAmt += +i.amount||0; grandGP += +i.gp||0; }));
+        const grandAmt = _qts.reduce((s,qt) => s + qt.items.reduce((ss,i) => ss + (+i.amount||0), 0), 0);
+        const grandGP  = _qts.reduce((s,qt) => s + qt.items.reduce((ss,i) => ss + (+i.gp||0), 0), 0);
 
         const payload = {
             account_id:       el('bopp-account-id').value,
             opportunity_name: el('bopp-opp-name').value.trim(),
-            business_type:    el('bopp-type').value || null,
+            business_type:    el('bopp-type').value    || null,
             lead_source:      el('bopp-lead').value    || null,
             owner:            el('bopp-owner').value   || null,
-            am:               el('bopp-am').value       || null,
-            sub_am:           el('bopp-subam').value    || null,
-            signed_date:      el('bopp-signed').value   || null,
-            launch_date:      el('bopp-launch').value   || null,
+            am:               el('bopp-am').value      || null,
+            sub_am:           el('bopp-subam').value   || null,
+            signed_date:      el('bopp-signed').value  || null,
+            launch_date:      el('bopp-launch').value  || null,
             materials:        el('bopp-materials').value.trim() || null,
             proposal:         el('bopp-proposal').value.trim()  || null,
             campaign:         el('bopp-campaign').value.trim()  || null,
@@ -819,28 +761,18 @@ const BOppApp = (() => {
 
         try {
             let oppId = _editingId;
-
             if (_editingId) {
                 payload.status    = el('bopp-status-sel').value;
                 payload.update_by = user?.codename || null;
                 const { error } = await supabaseClient.from('b_opportunity_list').update(payload).eq('opportunity_id', _editingId);
                 if (error) throw error;
+                await _deleteOppQTs(_editingId);
             } else {
                 payload.status    = 'Active';
                 payload.create_by = user?.codename || null;
                 const { data, error } = await supabaseClient.from('b_opportunity_list').insert(payload).select('opportunity_id').single();
                 if (error) throw error;
                 oppId = data.opportunity_id;
-            }
-
-            // Replace QTs: delete old, insert new
-            if (_editingId) {
-                const { data: oldQts } = await supabaseClient.from('b_opportunity_qt').select('qt_id').eq('opportunity_id', _editingId);
-                if (oldQts && oldQts.length) {
-                    const ids = oldQts.map(q => q.qt_id);
-                    await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', ids);
-                    await supabaseClient.from('b_opportunity_qt').delete().eq('opportunity_id', _editingId);
-                }
             }
 
             for (const qt of _qts) {
@@ -850,18 +782,13 @@ const BOppApp = (() => {
                     .insert({ opportunity_id: oppId, qt_number: qt.qt_number.trim() || null, company_qt: qt.company_qt || null })
                     .select('qt_id').single();
                 if (qtErr) throw qtErr;
-
                 const itemRows = qt.items
                     .filter(i => i.detail.trim() || +i.price > 0)
                     .map((i, idx) => ({
                         qt_id: qtRow.qt_id, no: idx+1,
-                        bu:       i.bu       || null,
-                        detail:   i.detail.trim() || null,
-                        qty:      +i.qty      || null,
-                        price:    +i.price    || null,
-                        discount: +i.discount || null,
-                        amount:   +i.amount   || null,
-                        gp:       +i.gp       || null,
+                        bu: i.bu || null, detail: i.detail.trim() || null,
+                        qty: +i.qty || null, price: +i.price || null,
+                        discount: +i.discount || null, amount: +i.amount || null, gp: +i.gp || null,
                     }));
                 if (itemRows.length) {
                     const { error: itemErr } = await supabaseClient.from('b_opportunity_qt_item').insert(itemRows);
@@ -873,7 +800,6 @@ const BOppApp = (() => {
             notify('success', _editingId ? 'Saved' : 'Opportunity created');
             _editingId = null;
             _loaded = false;
-
             if (typeof loadMasterData === 'function') await loadMasterData();
             if (typeof applyFilters  === 'function')  applyFilters();
 
@@ -888,20 +814,14 @@ const BOppApp = (() => {
     // ── Delete ────────────────────────────────────────────────────────────────
     async function handleDelete() {
         if (!_editingId) return;
-        const result = await Swal.fire({
+        const { isConfirmed } = await Swal.fire({
             title: 'Delete Opportunity?', text: `${_editingId} and all its quotations will be permanently deleted.`,
             icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete',
             confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel'
         });
-        if (!result.isConfirmed) return;
-
+        if (!isConfirmed) return;
         try {
-            const { data: oldQts } = await supabaseClient.from('b_opportunity_qt').select('qt_id').eq('opportunity_id', _editingId);
-            if (oldQts && oldQts.length) {
-                const ids = oldQts.map(q => q.qt_id);
-                await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', ids);
-                await supabaseClient.from('b_opportunity_qt').delete().eq('opportunity_id', _editingId);
-            }
+            await _deleteOppQTs(_editingId);
             const { error } = await supabaseClient.from('b_opportunity_list').delete().eq('opportunity_id', _editingId);
             if (error) throw error;
             getBsModal().hide();
@@ -917,11 +837,8 @@ const BOppApp = (() => {
         }
     }
 
-    // ── Wire form events ──────────────────────────────────────────────────────
     el('bopp-form').addEventListener('submit', handleSubmit);
     el('bopp-btn-del').addEventListener('click', handleDelete);
-
-    // Reset _editingId when modal closed
     el('b-opp-modal').addEventListener('hidden.bs.modal', () => { _editingId = null; });
 
     return { openNew, openEdit, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT, undo };
