@@ -18,8 +18,10 @@
         .flt-inner { max-width: 1300px; margin: 0 auto; }
         .flt-row { display: flex; align-items: center; gap: 12px; }
         .flt-search { position: relative; flex: 1; }
-        .flt-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); }
-        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 15px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
+        .flt-search > i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); pointer-events: none; z-index: 1; }
+        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 34px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
+        .flt-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: none; font-size: 0.82rem; line-height: 1; z-index: 1; }
+        .flt-search-clear:hover { color: #475569; }
         .status-seg { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; height: 38px; }
         .seg-btn { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 18px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; flex: 1; min-width: 80px; }
         .seg-btn:last-child { border-right: none; }
@@ -122,6 +124,7 @@
             <div class="flt-search">
                 <i class="bi bi-search"></i>
                 <input type="text" class="flt-search-input" id="globalSearch" placeholder="Search">
+                <button class="flt-search-clear" id="searchClear" onclick="clearSearch()" tabindex="-1"><i class="bi bi-x-lg"></i></button>
             </div>
             <div class="status-seg seg-sm">
                 <button id="seg-all"      class="seg-btn"        onclick="setStatusFilter('all')">All</button>
@@ -365,7 +368,18 @@
         renderList();
     }
 
+    document.getElementById('globalSearch').addEventListener('input', function() {
+        document.getElementById('searchClear').style.display = this.value ? 'block' : 'none';
+    });
     document.getElementById('globalSearch').addEventListener('input', debounce(renderList, 250));
+
+    function clearSearch() {
+        const inp = document.getElementById('globalSearch');
+        inp.value = '';
+        document.getElementById('searchClear').style.display = 'none';
+        inp.focus();
+        renderList();
+    }
 
     async function initPage() {
         sessionStorage.removeItem('bx_perms_baccount');
