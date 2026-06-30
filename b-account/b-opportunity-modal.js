@@ -914,7 +914,7 @@ const BOppApp = (() => {
 
         } catch (err) {
             console.error('[B-OPP modal]', err);
-            notify('Error', 'Save failed', 'error');
+            notify('Error', err?.message || 'Save failed', 'error');
         } finally {
             saveBtn.disabled = false;
         }
