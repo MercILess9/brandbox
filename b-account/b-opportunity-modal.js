@@ -281,11 +281,11 @@ const B_OPP_MODAL_HTML = `
                             <div class="bopp-card">
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Signed Date</span>
-                                    <input type="date" id="bopp-signed" class="bopp-iinp">
+                                    <input type="date" id="bopp-signed" class="bopp-iinp" required>
                                 </div>
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Launch Date</span>
-                                    <input type="date" id="bopp-launch" class="bopp-iinp">
+                                    <input type="date" id="bopp-launch" class="bopp-iinp" required>
                                 </div>
                             </div>
                         </div>
@@ -792,6 +792,8 @@ const BOppApp = (() => {
         el('bopp-form').classList.add('was-validated');
         if (!el('bopp-form').checkValidity()) return;
         if (!el('bopp-account-id').value) { notify('warning', 'กรุณาเลือก Account'); return; }
+        const invalidQT = _qts.find(qt => !qt.qt_number.trim() || !(qt._totAmt > 0));
+        if (invalidQT) { notify('warning', 'แต่ละ QT ต้องมีชื่อ QT และยอดเงิน'); return; }
 
         const user = getBxUser();
         const saveBtn = el('bopp-btn-save');
