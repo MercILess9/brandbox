@@ -122,7 +122,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-btn-del-qt:hover { background: #fee2e2; border-color: #ef4444; }
     .bopp-btn-dup { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 8px; padding: 4px 13px; font-size: 0.73rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; }
     .bopp-btn-dup:hover { border-color: #94a3b8; background: #f8fafc; }
-    .bopp-btn-add-qt { width: 100%; border: 2px dashed #d1d5db; background: #fff; color: #94a3b8; border-radius: 12px; padding: 11px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+    .bopp-btn-add-qt { width: 70%; border: 1.5px dashed #d1d5db; background: #fff; color: #94a3b8; border-radius: 10px; padding: 7px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 4px; }
     .bopp-btn-add-qt:hover { border-color: #bdc432; color: #6b7200; background: #fffef0; }
 
     /* ── Account overlay ── */
