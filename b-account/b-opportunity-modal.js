@@ -137,8 +137,8 @@ const B_OPP_MODAL_HTML = `
     .bopp-footer { padding: 13px 28px; display: flex; align-items: center; gap: 10px; background: #fff; border-top: 1px solid #f1f5f9; }
     .bopp-btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 0 18px; border-radius: 10px; font-weight: 700; height: 40px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-family: inherit; display: none; align-items: center; gap: 6px; }
     .bopp-btn-del:hover { background: #fecaca; }
-    .bopp-btn-undo { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 16px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-    .bopp-btn-undo:hover { background: #f8fafc; border-color: #94a3b8; color: #334155; }
+    .bopp-btn-undo { border: none; background: #bdc432; color: #1e293b; border-radius: 10px; font-weight: 800; height: 40px; padding: 0 16px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+    .bopp-btn-undo:hover { background: #a3b020; }
     .bopp-btn-undo:disabled { opacity: 0.3; pointer-events: none; }
     .bopp-btn-cancel { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 18px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
     .bopp-btn-cancel:hover { background: #f8fafc; border-color: #cbd5e1; }
@@ -301,11 +301,11 @@ const B_OPP_MODAL_HTML = `
                 </div>
 
                 <div class="bopp-footer">
+                    <button type="button" class="bopp-btn-undo" id="bopp-btn-undo" disabled onclick="BOppApp.undo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
                     <button type="button" class="bopp-btn-del" id="bopp-btn-del">
                         <i class="bi bi-trash3"></i> Delete
                     </button>
                     <div style="flex:1"></div>
-                    <button type="button" class="bopp-btn-undo" id="bopp-btn-undo" disabled onclick="BOppApp.undo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
                     <button type="button" class="bopp-btn-cancel" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="bopp-btn-save" id="bopp-btn-save">
                         <i class="bi bi-plus-circle-fill" id="bopp-save-icon"></i>
