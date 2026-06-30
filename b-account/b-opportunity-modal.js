@@ -16,16 +16,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-status-sel:focus { border-color: #bdc432; }
     .bopp-status-sel option { background: #1e293b; }
 
-    /* ── Totals strip ── */
-    .bopp-totals { background: #fff; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; padding: 11px 28px; display: flex; align-items: center; gap: 20px; }
-    .bopp-total-box { display: flex; flex-direction: column; gap: 2px; }
-    .bopp-total-lbl { font-size: 0.58rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; }
-    .bopp-total-val { font-size: 0.9rem; font-weight: 800; color: #1e293b; }
-    .bopp-total-val.gp { color: #16a34a; }
-    .bopp-total-pct { font-size: 0.72rem; font-weight: 700; color: #16a34a; align-self: flex-end; margin-bottom: 2px; }
-    .bopp-total-bar-wrap { flex: 1; height: 3px; background: #e2e8f0; border-radius: 99px; overflow: hidden; align-self: flex-end; margin-bottom: 6px; }
-    .bopp-total-bar-fill { height: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; transition: width 0.35s ease; }
-    .bopp-total-div { width: 1px; height: 28px; background: #e2e8f0; flex-shrink: 0; }
+
 
     /* ── Body ── */
     .bopp-body { padding: 18px 28px 12px; max-height: calc(100vh - 268px); overflow-y: auto; }
@@ -293,23 +284,7 @@ const B_OPP_MODAL_HTML = `
 
                 </div>
 
-                <!-- Totals strip -->
-                <div class="bopp-totals">
-                    <div class="bopp-total-box">
-                        <span class="bopp-total-lbl">Total Amount</span>
-                        <span class="bopp-total-val" id="bopp-grand-amt">0.00</span>
-                    </div>
-                    <div class="bopp-total-div"></div>
-                    <div class="bopp-total-bar-wrap">
-                        <div class="bopp-total-bar-fill" id="bopp-grand-bar" style="width:0%"></div>
-                    </div>
-                    <div class="bopp-total-div"></div>
-                    <div class="bopp-total-box">
-                        <span class="bopp-total-lbl">Total GP</span>
-                        <span class="bopp-total-val gp" id="bopp-grand-gp">0.00</span>
-                    </div>
-                    <span class="bopp-total-pct" id="bopp-grand-pct"></span>
-                </div>
+
 
                 <div class="bopp-footer">
                     <button type="button" class="bopp-btn-del" id="bopp-btn-del">
@@ -537,11 +512,6 @@ const BOppApp = (() => {
             }
             grandAmt += qAmt; grandGP += qGP;
         });
-        el('bopp-grand-amt').textContent = fmtG(grandAmt);
-        el('bopp-grand-gp').textContent  = fmtG(grandGP);
-        const pct = grandAmt > 0 ? (grandGP / grandAmt * 100).toFixed(1) : 0;
-        el('bopp-grand-pct').textContent = grandAmt > 0 ? `${pct}%` : '';
-        el('bopp-grand-bar').style.width = `${Math.min(+pct, 100)}%`;
     }
 
     // ── QT event delegation ───────────────────────────────────────────────────
@@ -707,10 +677,6 @@ const BOppApp = (() => {
         el('bopp-type').value = '';
         ['bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
         el('bopp-status-sel').classList.remove('visible');
-        el('bopp-grand-amt').textContent = '0.00';
-        el('bopp-grand-gp').textContent  = '0.00';
-        el('bopp-grand-pct').textContent = '';
-        el('bopp-grand-bar').style.width = '0%';
         el('bopp-qt-container').innerHTML = '';
         _qts = []; _qtCounter = 0; _undoStack = [];
         updateUndoBtn();
