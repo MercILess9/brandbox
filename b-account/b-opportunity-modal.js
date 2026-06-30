@@ -194,14 +194,11 @@ const B_OPP_MODAL_HTML = `
                             <div style="display:flex; gap:10px; margin-bottom:10px;">
                                 <div style="flex:1; min-width:0;">
                                     <label class="bq-lbl">Account Name <span style="color:#ef4444">*</span></label>
-                                    <div class="d-flex">
-                                        <input type="text" id="bopp-acc-name" class="bq-inp" style="border-radius:10px 0 0 10px;" placeholder="Select account..." readonly required>
-                                        <button type="button" class="bopp-search-btn" onclick="BOppApp.openOverlay()"><i class="bi bi-search"></i></button>
-                                    </div>
+                                    <input type="text" id="bopp-acc-name" class="bq-inp" placeholder="Select account..." readonly required onclick="BOppApp.openOverlay()" style="cursor:pointer;">
                                 </div>
                                 <div style="flex:1; min-width:0;">
                                     <label class="bq-lbl">Company <span style="color:#ef4444">*</span></label>
-                                    <select id="bopp-company-sel" class="bq-inp" required>
+                                    <select id="bopp-company-sel" class="bq-inp" required disabled>
                                         <option value="">Select company...</option>
                                     </select>
                                 </div>
@@ -391,11 +388,13 @@ const BOppApp = (() => {
     // ── Account / Company ─────────────────────────────────────────────────────
     function populateCompanies(accountName, selectedId) {
         const companies = _accounts.filter(a => a.account_name === accountName);
-        el('bopp-company-sel').innerHTML = companies.length
+        const sel = el('bopp-company-sel');
+        sel.innerHTML = companies.length
             ? companies.map(c => `<option value="${escA(c.account_id)}"${c.account_id === selectedId ? ' selected' : ''}>${escH(c.company_name || c.account_id)}</option>`).join('')
             : '<option value="">—</option>';
-        if (!selectedId && companies.length) el('bopp-company-sel').value = companies[0].account_id;
-        el('bopp-account-id').value = el('bopp-company-sel').value;
+        sel.disabled = false;
+        if (!selectedId && companies.length) sel.value = companies[0].account_id;
+        el('bopp-account-id').value = sel.value;
     }
 
     el('bopp-company-sel').addEventListener('change', function() {
@@ -623,7 +622,9 @@ const BOppApp = (() => {
          'bopp-signed','bopp-launch','bopp-materials','bopp-proposal','bopp-campaign','bopp-remark'].forEach(id => {
             const e = el(id); if (e) e.value = '';
         });
-        el('bopp-company-sel').innerHTML = '<option value="">Select company...</option>';
+        const companySel = el('bopp-company-sel');
+        companySel.innerHTML = '<option value="">Select company...</option>';
+        companySel.disabled = true;
         el('bopp-type').value = '';
         ['bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
         el('bopp-status-sel').classList.remove('visible');
