@@ -1,7 +1,7 @@
 const B_OPP_MODAL_HTML = `
 <style>
     /* ── Modal shell ── */
-    #b-opp-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.15); display: flex; flex-direction: column; max-height: calc(100vh - 56px); }
+    #b-opp-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.15); display: flex; flex-direction: column; height: calc(100vh - 56px); max-height: calc(100vh - 56px); }
     #bopp-form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
     .bopp-modal-wrap { max-width: 1200px !important; }
 
