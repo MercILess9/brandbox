@@ -207,22 +207,26 @@ const B_OPP_MODAL_HTML = `
                                 <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
                             </div>
                             <div class="bopp-divider"></div>
-                            <div style="margin-bottom:8px;">
-                                <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
-                                <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://drive.google.com/...">
-                            </div>
-                            <div style="margin-bottom:8px;">
-                                <label class="bq-lbl"><i class="bi bi-file-earmark-text-fill"></i> Proposal</label>
-                                <input type="text" id="bopp-proposal" class="bq-inp" placeholder="https://drive.google.com/...">
-                            </div>
-                            <div style="margin-bottom:10px;">
-                                <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
-                                <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://drive.google.com/...">
-                            </div>
-                            <div class="bopp-divider"></div>
-                            <div class="bopp-remark-wrap">
-                                <label class="bq-lbl">Remark</label>
-                                <textarea id="bopp-remark" class="bq-inp bq-ta" placeholder="Note..."></textarea>
+                            <div style="display:flex; gap:14px; align-items:stretch;">
+                                <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:8px;">
+                                    <div>
+                                        <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
+                                        <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://drive.google.com/...">
+                                    </div>
+                                    <div>
+                                        <label class="bq-lbl"><i class="bi bi-file-earmark-text-fill"></i> Proposal</label>
+                                        <input type="text" id="bopp-proposal" class="bq-inp" placeholder="https://drive.google.com/...">
+                                    </div>
+                                    <div>
+                                        <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
+                                        <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://drive.google.com/...">
+                                    </div>
+                                </div>
+                                <div style="width:1px; background:#f1f5f9; flex-shrink:0;"></div>
+                                <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+                                    <label class="bq-lbl">Remark</label>
+                                    <textarea id="bopp-remark" class="bq-inp bq-ta" style="flex:1;" placeholder="Note..."></textarea>
+                                </div>
                             </div>
                         </div>
 
