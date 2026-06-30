@@ -736,7 +736,7 @@ const BOppApp = (() => {
         await loadHelpers();
 
         const { data: opp, error } = await supabaseClient.from('b_opportunity_list').select('*').eq('opportunity_id', oppId).single();
-        if (error || !opp) { notify('error', 'Load failed'); return; }
+        if (error || !opp) { notify('Error', 'Load failed', 'error'); return; }
 
         _editingId = oppId;
         el('bopp-editing-id').value = oppId;
@@ -798,8 +798,8 @@ const BOppApp = (() => {
             if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
             return;
         }
-        if (!el('bopp-account-id').value) { notify('warning', 'กรุณาเลือก Account'); return; }
-        if (!_qts.length) { notify('warning', 'กรุณาเพิ่ม QT อย่างน้อย 1 รายการ'); return; }
+        if (!el('bopp-account-id').value) { notify('แจ้งเตือน', 'กรุณาเลือก Account', 'warning'); return; }
+        if (!_qts.length) { notify('แจ้งเตือน', 'กรุณาเพิ่ม QT อย่างน้อย 1 รายการ', 'warning'); return; }
         const qtContainer = el('bopp-qt-container');
         const invalidQT = _qts.find(qt => {
             const card = qtContainer.querySelector(`[data-qt-card="${qt.tmpId}"]`);
@@ -810,7 +810,7 @@ const BOppApp = (() => {
             const card = qtContainer.querySelector(`[data-qt-card="${invalidQT.tmpId}"]`);
             const numInp = card?.querySelector('.bopp-qt-num');
             if (numInp) { numInp.classList.add('is-invalid'); numInp.scrollIntoView({ behavior: 'smooth', block: 'center' }); numInp.focus(); }
-            notify('warning', 'แต่ละ QT ต้องมีชื่อ QT และยอดเงิน');
+            notify('แจ้งเตือน', 'แต่ละ QT ต้องมีชื่อ QT และยอดเงิน', 'warning');
             return;
         }
 
@@ -877,7 +877,7 @@ const BOppApp = (() => {
             }
 
             getBsModal().hide();
-            notify('success', _editingId ? 'Saved' : 'Opportunity created');
+            notify('Success', _editingId ? 'Saved' : 'Opportunity created', 'success');
             _editingId = null;
             _loaded = false;
             if (typeof loadMasterData === 'function') await loadMasterData();
@@ -885,7 +885,7 @@ const BOppApp = (() => {
 
         } catch (err) {
             console.error('[B-OPP modal]', err);
-            notify('error', 'Save failed');
+            notify('Error', 'Save failed', 'error');
         } finally {
             saveBtn.disabled = false;
         }
@@ -905,7 +905,7 @@ const BOppApp = (() => {
             const { error } = await supabaseClient.from('b_opportunity_list').delete().eq('opportunity_id', _editingId);
             if (error) throw error;
             getBsModal().hide();
-            notify('success', 'Deleted');
+            notify('Success', 'Deleted', 'success');
             const delId = _editingId;
             _editingId = null;
             _loaded = false;
@@ -913,7 +913,7 @@ const BOppApp = (() => {
             if (typeof applyFilters === 'function') applyFilters();
         } catch (err) {
             console.error('[B-OPP modal]', err);
-            notify('error', 'Delete failed');
+            notify('Error', 'Delete failed', 'error');
         }
     }
 
