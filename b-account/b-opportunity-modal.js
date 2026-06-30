@@ -85,9 +85,9 @@ const B_OPP_MODAL_HTML = `
     .bopp-qt-totals { margin-left: auto; display: flex; align-items: center; gap: 14px; }
     .bopp-qt-tbox { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
     .bopp-qt-tval { font-size: 0.88rem; font-weight: 800; color: #1e293b; }
-    .bopp-qt-tval.gp { color: #bdc432; }
+    .bopp-qt-tval.gp { color: #16a34a; }
     .bopp-qt-tlbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #94a3b8; }
-    .bopp-qt-pct-badge { background: #f4f7a1; color: #6b7200; border-radius: 100px; padding: 4px 9px; font-size: 0.78rem; font-weight: 800; line-height: 1; white-space: nowrap; }
+    .bopp-qt-pct-badge { background: #dcfce7; color: #16a34a; border-radius: 100px; padding: 4px 9px; font-size: 0.78rem; font-weight: 800; line-height: 1; white-space: nowrap; }
     .bopp-qt-pct-badge:empty { display: none; }
     .bopp-qt-tdiv { width: 1px; height: 26px; background: #e2e8f0; }
     .bopp-qt-rm { border: none; background: none; color: #94a3b8; cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: 0.15s; display: flex; align-items: center; flex-shrink: 0; }
