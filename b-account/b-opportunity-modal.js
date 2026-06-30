@@ -825,7 +825,7 @@ const BOppApp = (() => {
             if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
             return;
         }
-        if (!_qts.length) { notify('แจ้งเตือน', 'กรุณาเพิ่ม QT อย่างน้อย 1 รายการ', 'warning'); return; }
+        if (!_qts.length) { notify('','กรุณาเพิ่ม QT อย่างน้อย 1 รายการ', 'warning'); return; }
         const qtContainer = el('bopp-qt-container');
         // รอบ 1: ชื่อ QT — กรอบแดง ไม่มี toast
         let firstEmptyName = null;
@@ -838,7 +838,7 @@ const BOppApp = (() => {
         // รอบ 2: ยอดเงิน — toast เตือน
         const noAmtQT = _qts.find(qt => !(qt._totAmt > 0));
         if (noAmtQT) {
-            notify('แจ้งเตือน', 'Quotation amount required', 'warning');
+            notify('','Quotation amount required', 'warning');
             qtContainer.querySelector(`[data-qt-card="${noAmtQT.tmpId}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
