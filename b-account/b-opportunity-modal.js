@@ -66,7 +66,9 @@ const B_OPP_MODAL_HTML = `
     .bq-inp[readonly] { cursor: pointer; }
     .bq-inp[readonly]:hover { border-color: #bdc432; }
     .bq-ta { height: auto; min-height: 76px; padding: 9px 12px; resize: none; line-height: 1.6; }
-    .was-validated .bq-inp:invalid { border-color: #dc3545 !important; background: #fff8f8; }
+    .was-validated .bq-inp:invalid,
+    .was-validated .bopp-iinp:invalid { border-color: #dc3545 !important; background: #fff8f8; }
+    .bopp-qt-num.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-search-btn { width: 42px; height: 35px; flex-shrink: 0; border: 1px solid #bdc432; border-left: none; border-radius: 0 10px 10px 0; background: #f4f7a1; color: #7a8500; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
     .bopp-search-btn:hover { background: #bdc432; color: #1e293b; }
 
@@ -553,6 +555,7 @@ const BOppApp = (() => {
             const card = inp.closest('[data-qt-card]');
             const qt = card && findQT(card.dataset.qtCard);
             if (qt) qt.qt_number = inp.value;
+            inp.classList.remove('is-invalid');
         }
     });
 
@@ -790,10 +793,20 @@ const BOppApp = (() => {
     async function handleSubmit(e) {
         e.preventDefault();
         el('bopp-form').classList.add('was-validated');
-        if (!el('bopp-form').checkValidity()) return;
+        if (!el('bopp-form').checkValidity()) {
+            const first = el('bopp-form').querySelector(':invalid');
+            if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
+            return;
+        }
         if (!el('bopp-account-id').value) { notify('warning', 'กรุณาเลือก Account'); return; }
         const invalidQT = _qts.find(qt => !qt.qt_number.trim() || !(qt._totAmt > 0));
-        if (invalidQT) { notify('warning', 'แต่ละ QT ต้องมีชื่อ QT และยอดเงิน'); return; }
+        if (invalidQT) {
+            const card = el('bopp-qt-container').querySelector(`[data-qt-card="${invalidQT.tmpId}"]`);
+            const numInp = card?.querySelector('.bopp-qt-num');
+            if (numInp) { numInp.classList.add('is-invalid'); numInp.scrollIntoView({ behavior: 'smooth', block: 'center' }); numInp.focus(); }
+            notify('warning', 'แต่ละ QT ต้องมีชื่อ QT และยอดเงิน');
+            return;
+        }
 
         const user = getBxUser();
         const saveBtn = el('bopp-btn-save');
