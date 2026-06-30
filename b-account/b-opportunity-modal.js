@@ -810,7 +810,6 @@ const BOppApp = (() => {
         if (!el('bopp-account-id').value) {
             accInp.classList.add('is-invalid');
             accInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            accInp.click();
             return;
         }
         accInp.classList.remove('is-invalid');
