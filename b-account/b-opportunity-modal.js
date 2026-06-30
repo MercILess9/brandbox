@@ -430,6 +430,11 @@ const BOppApp = (() => {
         return `QT${String(d.getFullYear()).slice(-2)}${String(d.getMonth()+1).padStart(2,'0')}${String(Math.floor(Math.random()*9000)+1000)}`;
     }
 
+    function genQTId() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        return 'Q-' + Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+
     const newItem = () => ({ item_id: null, bu: '', detail: '', qty: 1, price: 0, discount: 0, amount: 0, gp: 0 });
 
     function renderItemRow(qtTmpId, item, idx) {
@@ -903,7 +908,7 @@ const BOppApp = (() => {
                 const validItems = qt.items.filter(i => i.detail.trim() || +i.price > 0 || +i.qty > 1);
                 if (!qt.qt_number.trim() && !validItems.length) continue;
                 const { data: qtRow, error: qtErr } = await supabaseClient.from('b_opportunity_qt')
-                    .insert({ opportunity_id: oppId, qt_number: qt.qt_number.trim() || null, company_qt: qt.company_qt || null })
+                    .insert({ qt_id: genQTId(), opportunity_id: oppId, qt_number: qt.qt_number.trim() || null, company_qt: qt.company_qt || null })
                     .select('qt_id').single();
                 if (qtErr) throw qtErr;
                 const itemRows = qt.items
