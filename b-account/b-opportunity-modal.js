@@ -187,20 +187,20 @@ const B_OPP_MODAL_HTML = `
                         <div class="bopp-card bopp-left-card">
                             <div style="display:flex; gap:10px; margin-bottom:10px;">
                                 <div style="flex:1; min-width:0;">
-                                    <label class="bq-lbl">Account Name <span style="color:#ef4444">*</span></label>
+                                    <label class="bq-lbl"><i class="bi bi-person-lines-fill"></i> Account Name <span style="color:#ef4444">*</span></label>
                                     <div class="bopp-acc-wrap">
                                         <input type="text" id="bopp-acc-name" class="bq-inp" placeholder="Select account..." readonly required onclick="BOppApp.openOverlay()" style="cursor:pointer; width:100%;">
                                     </div>
                                 </div>
                                 <div style="flex:1; min-width:0;">
-                                    <label class="bq-lbl">Company <span style="color:#ef4444">*</span></label>
+                                    <label class="bq-lbl"><i class="bi bi-building"></i> Company <span style="color:#ef4444">*</span></label>
                                     <select id="bopp-company-sel" class="bq-inp" required disabled>
                                         <option value="">Select company...</option>
                                     </select>
                                 </div>
                             </div>
                             <div style="margin-bottom:10px;">
-                                <label class="bq-lbl">Opportunity Name <span style="color:#ef4444">*</span></label>
+                                <label class="bq-lbl"><i class="bi bi-briefcase-fill"></i> Opportunity Name <span style="color:#ef4444">*</span></label>
                                 <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
                             </div>
                             <div class="bopp-divider"></div>
