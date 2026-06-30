@@ -258,11 +258,11 @@ const B_OPP_MODAL_HTML = `
                             </div>
                             <div class="bopp-card">
                                 <div class="bopp-irow">
-                                    <span class="bopp-ilbl">Signed</span>
+                                    <span class="bopp-ilbl">Signed Date</span>
                                     <input type="date" id="bopp-signed" class="bopp-iinp">
                                 </div>
                                 <div class="bopp-irow">
-                                    <span class="bopp-ilbl">Launch</span>
+                                    <span class="bopp-ilbl">Launch Date</span>
                                     <input type="date" id="bopp-launch" class="bopp-iinp">
                                 </div>
                             </div>
