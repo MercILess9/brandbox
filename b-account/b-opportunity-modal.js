@@ -75,7 +75,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-qt-lbl { font-size: 0.62rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
     .bopp-qt-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
     .bopp-qt-head { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 9px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .bopp-qt-num { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; width: 148px; font-family: 'Courier New', monospace; outline: none; transition: 0.2s; flex-shrink: 0; }
+    .bopp-qt-num { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; width: 148px; font-family: inherit; outline: none; transition: 0.2s; flex-shrink: 0; }
     .bopp-qt-num:focus { border-color: #bdc432; box-shadow: 0 0 0 2px rgba(189,196,50,0.15); }
     .bopp-qt-co { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; outline: none; font-family: inherit; cursor: pointer; min-width: 140px; }
     .bopp-qt-co:focus { border-color: #bdc432; }
@@ -102,8 +102,9 @@ const B_OPP_MODAL_HTML = `
     .bopp-item-inp.r { text-align: right; }
     .bopp-item-inp[type=number] { -moz-appearance: textfield; }
     .bopp-item-inp[type=number]::-webkit-inner-spin-button { display: none; }
-    .bopp-item-sel { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 0.78rem; color: #334155; outline: none; cursor: pointer; }
+    .bopp-item-sel { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 0.78rem; color: #334155; outline: none; cursor: pointer; text-align: center; text-align-last: center; }
     .bopp-item-sel:focus { background: #f4f7a1; }
+    .bopp-item-ta { height: auto; min-height: calc(3 * 1.5em + 10px); max-height: calc(3 * 1.5em + 10px); overflow-y: auto; resize: none; vertical-align: top; padding-top: 5px; }
     .bopp-item-amt { font-size: 0.78rem; font-weight: 600; color: #1e293b; text-align: right; white-space: nowrap; }
     .bopp-item-no { color: #94a3b8; font-size: 0.7rem; font-weight: 700; }
     .bopp-item-rm { border: none; background: none; color: #cbd5e1; cursor: pointer; padding: 2px 5px; border-radius: 4px; font-size: 0.9rem; transition: 0.15s; }
@@ -113,6 +114,8 @@ const B_OPP_MODAL_HTML = `
     .bopp-qt-foot { padding: 9px 14px; display: flex; justify-content: space-between; align-items: center; background: #fafbfc; border-top: 1px solid #f1f5f9; }
     .bopp-btn-add-item { border: 1px dashed #d1d5db; background: #fff; color: #64748b; border-radius: 8px; padding: 4px 13px; font-size: 0.73rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; }
     .bopp-btn-add-item:hover { border-color: #bdc432; background: #f4f7a1; color: #6b7200; }
+    .bopp-btn-del-qt { border: 1px solid #fecaca; background: #fff; color: #ef4444; border-radius: 8px; padding: 4px 13px; font-size: 0.73rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; }
+    .bopp-btn-del-qt:hover { background: #fee2e2; border-color: #ef4444; }
     .bopp-btn-dup { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 8px; padding: 4px 13px; font-size: 0.73rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; }
     .bopp-btn-dup:hover { border-color: #94a3b8; background: #f8fafc; }
     .bopp-btn-add-qt { width: 100%; border: 2px dashed #d1d5db; background: #fff; color: #94a3b8; border-radius: 12px; padding: 11px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
@@ -428,19 +431,18 @@ const BOppApp = (() => {
         return `<tr data-qt="${escA(qtTmpId)}" data-item="${idx}">
             <td class="bopp-item-no c">${idx+1}</td>
             <td><select class="bopp-item-sel" data-field="bu">${buOpts}</select></td>
-            <td><input type="text" class="bopp-item-inp" data-field="detail" value="${escA(item.detail)}" placeholder="Description..."></td>
+            <td><textarea class="bopp-item-inp bopp-item-ta" data-field="detail" placeholder="Description..." rows="3">${escH(item.detail||'')}</textarea></td>
             <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0"></td>
             <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"></td>
             <td><input type="number" class="bopp-item-inp r" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"></td>
             <td class="bopp-item-amt" data-amt>${amt > 0 ? fmtN(amt) : '0'}</td>
             <td><input type="number" class="bopp-item-inp r" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}"></td>
-            <td><button type="button" class="bopp-item-rm" onclick="BOppApp.removeItem('${escA(qtTmpId)}',${idx})"><i class="bi bi-x"></i></button></td>
         </tr>`;
     }
 
     function renderQTCard(qt) {
         const items = qt.items.map((item, idx) => renderItemRow(qt.tmpId, item, idx)).join('');
-        const buOpts = '<option value="">— Company QT —</option>' + _buList.map(b => `<option value="${escA(b)}"${qt.company_qt===b?' selected':''}>${escH(b)}</option>`).join('');
+        const buOpts = `<option value="" disabled${!qt.company_qt?' selected':''} hidden>— Company QT —</option>` + _buList.map(b => `<option value="${escA(b)}"${qt.company_qt===b?' selected':''}>${escH(b)}</option>`).join('');
         const tAmt = qt._totAmt || 0, tGP = qt._totGP || 0;
         return `<div class="bopp-qt-card" data-qt-card="${escA(qt.tmpId)}">
             <div class="bopp-qt-head">
@@ -458,7 +460,6 @@ const BOppApp = (() => {
                         <span class="bopp-qt-tlbl">GP</span>
                     </div>
                 </div>
-                <button type="button" class="bopp-qt-rm" onclick="BOppApp.removeQT('${escA(qt.tmpId)}')" title="Remove"><i class="bi bi-x-lg" style="font-size:0.8rem;"></i></button>
             </div>
             <div class="bopp-item-wrap">
                 <table class="bopp-item-tbl">
@@ -471,13 +472,13 @@ const BOppApp = (() => {
                         <th class="r" style="width:100px">Discount</th>
                         <th class="r" style="width:108px">Amount</th>
                         <th class="r" style="width:96px">GP</th>
-                        <th style="width:30px"></th>
                     </tr></thead>
                     <tbody id="bopp-tbody-${escA(qt.tmpId)}">${items}</tbody>
                 </table>
             </div>
             <div class="bopp-qt-foot">
                 <button type="button" class="bopp-btn-add-item" onclick="BOppApp.addItem('${escA(qt.tmpId)}')"><i class="bi bi-plus"></i> Add Item</button>
+                <button type="button" class="bopp-btn-del-qt" onclick="BOppApp.removeQT('${escA(qt.tmpId)}')"><i class="bi bi-trash3"></i> Delete</button>
                 <button type="button" class="bopp-btn-dup" onclick="BOppApp.dupQT('${escA(qt.tmpId)}')"><i class="bi bi-copy"></i> Duplicate</button>
             </div>
         </div>`;
