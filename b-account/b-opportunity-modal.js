@@ -183,7 +183,7 @@ const B_OPP_MODAL_HTML = `
                         <div class="bopp-hdr-tdiv"></div>
                         <div class="bopp-hdr-tbox">
                             <span class="bopp-hdr-tval gp" id="bopp-hdr-gp">0</span>
-                            <span class="bopp-hdr-tlbl">GP <span id="bopp-hdr-pct"></span></span>
+                            <span class="bopp-hdr-tlbl">GP <span class="bopp-hdr-tpct" id="bopp-hdr-pct"></span></span>
                         </div>
                     </div>
                     <select id="bopp-status-sel" class="bopp-status-sel"></select>
@@ -686,8 +686,8 @@ const BOppApp = (() => {
         el('bopp-modal-title').textContent  = isEdit ? oppId : 'New Opportunity';
         el('bopp-save-icon').className      = isEdit ? 'bi bi-check-circle-fill' : 'bi bi-plus-circle-fill';
         el('bopp-save-label').textContent   = isEdit ? 'Save Changes' : 'Create Opportunity';
-        el('bopp-btn-del').style.display    = isEdit ? 'flex' : 'none';
-        el('bopp-status-sel').style.display = isEdit ? '' : 'none';
+        el('bopp-btn-del').style.display        = isEdit ? 'flex' : 'none';
+        el('bopp-status-sel').style.visibility  = isEdit ? '' : 'hidden';
         if (isEdit) updateStatusColor();
     }
 
@@ -700,10 +700,11 @@ const BOppApp = (() => {
         companySel.innerHTML = '<option value="">Select company...</option>';
         companySel.disabled = true;
         ['bopp-type','bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
-        el('bopp-status-sel').selectedIndex = 0;
-        el('bopp-status-sel').style.display = 'none';
+        el('bopp-status-sel').selectedIndex   = 0;
+        el('bopp-status-sel').style.visibility = 'hidden';
         el('bopp-qt-container').innerHTML = '';
         _qts = []; _qtCounter = 0; _undoStack = [];
+        recalcTotals();
         updateUndoBtn();
     }
 
