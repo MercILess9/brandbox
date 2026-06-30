@@ -1,3 +1,7 @@
+function fmtNum(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') : '—'; }
+function fmtAmt(n) { return n != null && !isNaN(+n) && +n > 0 ? Number(n).toLocaleString('en-US') + ' ฿' : '—'; }
+function gpPct(gp, amt) { return (gp && amt && +amt > 0) ? (+gp / +amt * 100).toFixed(1) + '%' : null; }
+
 const B_ACCOUNT_CONFIG = {
     projectName: "B-ACCOUNT",
     accessKey: 'baccount',

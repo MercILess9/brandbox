@@ -186,8 +186,6 @@
     let isFetching = false;
     let hasMore = true;
 
-    function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
-    function safeLink(url) { if (!url) return '#'; const u = url.trim(); return (u.startsWith('http://') || u.startsWith('https://')) ? u : '#'; }
 
     // --- Helpers ---
     function setupDefaultOptions(el, label) {

@@ -14,6 +14,13 @@
 
 body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); color: var(--c-text-main); margin: 0; }
 
+/* ── Search bar ── */
+.flt-search { position: relative; flex: 1; min-width: 140px; }
+.flt-search > i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); pointer-events: none; z-index: 1; }
+.flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 34px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
+.flt-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: none; font-size: 0.82rem; line-height: 1; z-index: 1; }
+.flt-search-clear:hover { color: #475569; }
+
 /* ── Shared Filter ── */
 .flt-pill { border: 1.5px solid var(--c-border); background: #fff; border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
 .flt-pill i { font-size: 0.8rem; }
