@@ -446,7 +446,7 @@ const BOppApp = (() => {
             <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"></td>
             <td><input type="number" class="bopp-item-inp r bopp-item-disc-inp" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"></td>
             <td class="bopp-item-amt" data-amt>${amt > 0 ? fmtN(amt) : '0'}</td>
-            <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"><div class="bopp-item-gp-pct" data-gp-pct>${amt>0&&gp>0?`${(gp/amt*100).toFixed(1)}%`:''}</div></td>
+            <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"></td>
             <td class="c"><button type="button" class="bopp-item-rm" onclick="BOppApp.removeItem('${escA(qtTmpId)}',${idx})" title="Delete row"><i class="bi bi-trash3"></i></button></td>
         </tr>`;
     }
@@ -556,14 +556,8 @@ const BOppApp = (() => {
                 item.amount = Math.max(0, item.qty * item.price - item.discount);
                 const amtCell = row.querySelector('[data-amt]');
                 if (amtCell) amtCell.textContent = item.amount > 0 ? fmtN(item.amount) : '0';
-                const pctEl = row.querySelector('[data-gp-pct]');
-                if (pctEl) pctEl.textContent = item.amount > 0 && item.gp > 0 ? `${(item.gp/item.amount*100).toFixed(1)}%` : '';
             }
-            if (field === 'gp') {
-                inp.style.color = item.gp > 0 ? '#16a34a' : '#cbd5e1';
-                const pctEl = row.querySelector('[data-gp-pct]');
-                if (pctEl) pctEl.textContent = item.amount > 0 && item.gp > 0 ? `${(item.gp/item.amount*100).toFixed(1)}%` : '';
-            }
+            if (field === 'gp') inp.style.color = item.gp > 0 ? '#16a34a' : '#cbd5e1';
             recalcTotals();
             return;
         }
