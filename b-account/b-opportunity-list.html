@@ -18,10 +18,10 @@
         .flt-wrapper { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .flt-inner { max-width: 1300px; margin: 0 auto; }
         .flt-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
-        .flt-search { position: relative; flex: 1; min-width: 140px; display: flex; align-items: center; background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; }
-        .flt-search i { position: absolute; left: 15px; color: var(--c-text-muted); pointer-events: none; }
-        .flt-search-input { background: transparent; border: none; border-radius: 12px; padding: 8px 8px 8px 40px; font-size: 0.85rem; flex: 1; min-width: 0; outline: none; }
-        .flt-search-clear { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px 10px 4px 4px; display: none; flex-shrink: 0; font-size: 0.82rem; line-height: 1; }
+        .flt-search { position: relative; flex: 1; min-width: 140px; }
+        .flt-search > i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--c-text-muted); pointer-events: none; z-index: 1; }
+        .flt-search-input { background: var(--c-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 34px 8px 40px; font-size: 0.85rem; width: 100%; outline: none; box-sizing: border-box; }
+        .flt-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: none; font-size: 0.82rem; line-height: 1; z-index: 1; }
         .flt-search-clear:hover { color: #475569; }
         .flt-btn-adv { border: 1px solid #e2e8f0; background: #fff; border-radius: 10px; padding: 0 15px; height: 38px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-family: inherit; white-space: nowrap; }
         .flt-btn-adv:hover { background: var(--c-bg); border-color: #cbd5e1; }
