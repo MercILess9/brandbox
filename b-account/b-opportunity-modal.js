@@ -356,7 +356,7 @@ const BOppApp = (() => {
         const peopleOpts = _profiles.map(p => `<option value="${escA(p)}">${escH(p)}</option>`).join('');
         const blank = '<option value="" disabled selected hidden></option>';
         const peopleOptsBlank = blank + peopleOpts;
-        el('bopp-owner').innerHTML = peopleOpts;
+        el('bopp-owner').innerHTML = blank + peopleOpts;
         ['bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.innerHTML = peopleOptsBlank; });
         el('bopp-lead').innerHTML = blank + _leadList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('');
         el('bopp-status-sel').innerHTML = _statusList.length
