@@ -253,8 +253,8 @@ const B_OPP_MODAL_HTML = `
                                     <select id="bopp-owner" class="bopp-iinp" required></select>
                                 </div>
                                 <div class="bopp-irow">
-                                    <span class="bopp-ilbl">Lead</span>
-                                    <select id="bopp-lead" class="bopp-iinp"></select>
+                                    <span class="bopp-ilbl">Lead <span style="color:#ef4444">*</span></span>
+                                    <select id="bopp-lead" class="bopp-iinp" required></select>
                                 </div>
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">AM</span>
