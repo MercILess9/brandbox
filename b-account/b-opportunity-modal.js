@@ -45,6 +45,9 @@ const B_OPP_MODAL_HTML = `
     .bopp-iinp { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 10px; font-size: 0.82rem; color: #334155; height: 32px; font-family: inherit; box-sizing: border-box; transition: 0.2s; }
     .bopp-iinp:focus { outline: none; border-color: #bdc432; background: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.12); }
     select.bopp-iinp { text-align: center; text-align-last: center; }
+    input[type=date].bopp-iinp { text-align: center; }
+    #bopp-acc-name { text-align: center; }
+    #bopp-company-sel { text-align: center; text-align-last: center; }
 
     /* ── Grid ── */
     .bopp-row { display: flex; gap: 12px; margin-bottom: 10px; }
