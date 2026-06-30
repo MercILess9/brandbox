@@ -242,7 +242,7 @@ const B_OPP_MODAL_HTML = `
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Type <span style="color:#ef4444">*</span></span>
                                     <select id="bopp-type" class="bopp-iinp" required>
-                                        <option value=""></option>
+                                        <option value="" disabled selected hidden></option>
                                         <option value="New Business">New Business</option>
                                         <option value="Retention">Retention</option>
                                         <option value="Up Sale">Up Sale</option>
@@ -354,10 +354,11 @@ const BOppApp = (() => {
 
     function buildDropdowns() {
         const peopleOpts = _profiles.map(p => `<option value="${escA(p)}">${escH(p)}</option>`).join('');
-        const peopleOptsBlank = '<option value=""></option>' + peopleOpts;
+        const blank = '<option value="" disabled selected hidden></option>';
+        const peopleOptsBlank = blank + peopleOpts;
         el('bopp-owner').innerHTML = peopleOpts;
         ['bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.innerHTML = peopleOptsBlank; });
-        el('bopp-lead').innerHTML = '<option value=""></option>' + _leadList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('');
+        el('bopp-lead').innerHTML = blank + _leadList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('');
         el('bopp-status-sel').innerHTML = _statusList.length
             ? _statusList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('')
             : '<option value="Active">Active</option>';
