@@ -899,7 +899,7 @@ const BOppApp = (() => {
                         qt_id: qtRow.qt_id, no: idx+1,
                         bu: i.bu || null, detail: i.detail.trim() || null,
                         qty: +i.qty || null, price: +i.price || null,
-                        discount: +i.discount || null, amount: +i.amount || null, gp: +i.gp || null,
+                        discount: +i.discount || null, gp: +i.gp || null,
                     }));
                 if (itemRows.length) {
                     const { error: itemErr } = await supabaseClient.from('b_opportunity_qt_item').insert(itemRows);
