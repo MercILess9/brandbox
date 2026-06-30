@@ -77,7 +77,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-qt-head { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 9px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .bopp-qt-num { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; width: 148px; font-family: inherit; outline: none; transition: 0.2s; flex-shrink: 0; }
     .bopp-qt-num:focus { border-color: #bdc432; box-shadow: 0 0 0 2px rgba(189,196,50,0.15); }
-    .bopp-qt-co { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; outline: none; font-family: inherit; cursor: pointer; min-width: 140px; }
+    .bopp-qt-co { border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; padding: 0 10px; height: 30px; font-size: 0.8rem; font-weight: 700; color: #1e293b; outline: none; font-family: inherit; cursor: pointer; min-width: 140px; text-align: center; text-align-last: center; }
     .bopp-qt-co:focus { border-color: #bdc432; }
     .bopp-qt-totals { margin-left: auto; display: flex; align-items: center; gap: 14px; }
     .bopp-qt-tbox { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
@@ -99,13 +99,17 @@ const B_OPP_MODAL_HTML = `
     .bopp-item-tbl tbody tr:hover td { background: #f8fafc; }
     .bopp-item-inp { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 0.78rem; color: #334155; outline: none; padding: 3px 5px; border-radius: 5px; box-sizing: border-box; }
     .bopp-item-inp:focus { background: #f4f7a1; }
+    .bopp-item-disc-inp { color: #ef4444; }
+    .bopp-item-disc-inp::placeholder { color: #fca5a5; }
     .bopp-item-inp.r { text-align: right; }
     .bopp-item-inp[type=number] { -moz-appearance: textfield; }
     .bopp-item-inp[type=number]::-webkit-inner-spin-button { display: none; }
     .bopp-item-sel { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 0.78rem; color: #334155; outline: none; cursor: pointer; text-align: center; text-align-last: center; }
     .bopp-item-sel:focus { background: #f4f7a1; }
     .bopp-item-ta { height: auto; min-height: calc(3 * 1.5em + 10px); max-height: calc(3 * 1.5em + 10px); overflow-y: auto; resize: none; vertical-align: top; padding-top: 5px; }
-    .bopp-item-amt { font-size: 0.78rem; font-weight: 600; color: #1e293b; text-align: right; white-space: nowrap; }
+    .bopp-item-amt { font-size: 0.78rem; font-weight: 700; color: #1e293b; text-align: right; white-space: nowrap; }
+    .bopp-item-disc { font-size: 0.78rem; color: #ef4444; text-align: right; white-space: nowrap; }
+    .bopp-item-gp-val { font-size: 0.78rem; font-weight: 700; text-align: right; white-space: nowrap; }
     .bopp-item-no { color: #94a3b8; font-size: 0.7rem; font-weight: 700; }
     .bopp-item-rm { border: none; background: none; color: #cbd5e1; cursor: pointer; padding: 2px 5px; border-radius: 4px; font-size: 0.9rem; transition: 0.15s; }
     .bopp-item-rm:hover { background: #fee2e2; color: #ef4444; }
@@ -432,11 +436,11 @@ const BOppApp = (() => {
             <td class="bopp-item-no c">${idx+1}</td>
             <td><select class="bopp-item-sel" data-field="bu">${buOpts}</select></td>
             <td><textarea class="bopp-item-inp bopp-item-ta" data-field="detail" placeholder="Description..." rows="3">${escH(item.detail||'')}</textarea></td>
-            <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0"></td>
+            <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0" step="1"></td>
             <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"></td>
-            <td><input type="number" class="bopp-item-inp r" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"></td>
+            <td><input type="number" class="bopp-item-inp r bopp-item-disc-inp" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"></td>
             <td class="bopp-item-amt" data-amt>${amt > 0 ? fmtN(amt) : '0'}</td>
-            <td><input type="number" class="bopp-item-inp r" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}"></td>
+            <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"></td>
         </tr>`;
     }
 
