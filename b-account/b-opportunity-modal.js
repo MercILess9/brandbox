@@ -33,7 +33,7 @@ const B_OPP_MODAL_HTML = `
     /* ── Section cards ── */
     .bopp-card { background: #fff; border-radius: 16px; border: 1px solid #eef2f7; padding: 15px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .bopp-card-hd { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 11px; display: flex; align-items: center; gap: 6px; }
-    .bopp-outer { display: grid; grid-template-columns: 64fr 36fr; gap: 14px; align-items: start; }
+    .bopp-outer { display: grid; grid-template-columns: 70fr 30fr; gap: 14px; align-items: start; }
     .bopp-outer > .bopp-card { margin-bottom: 0; }
     .bopp-divider { height: 1px; background: #f1f5f9; margin: 12px 0; }
     .bopp-left-card { display: flex; flex-direction: column; }
@@ -240,7 +240,6 @@ const B_OPP_MODAL_HTML = `
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Type <span style="color:#ef4444">*</span></span>
                                     <select id="bopp-type" class="bopp-iinp" required>
-                                        <option value="">—</option>
                                         <option value="New Business">New Business</option>
                                         <option value="Retention">Retention</option>
                                         <option value="Up Sale">Up Sale</option>
@@ -248,19 +247,19 @@ const B_OPP_MODAL_HTML = `
                                 </div>
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Lead</span>
-                                    <select id="bopp-lead" class="bopp-iinp"><option value="">—</option></select>
+                                    <select id="bopp-lead" class="bopp-iinp"></select>
                                 </div>
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Owner <span style="color:#ef4444">*</span></span>
-                                    <select id="bopp-owner" class="bopp-iinp" required><option value="">—</option></select>
+                                    <select id="bopp-owner" class="bopp-iinp" required></select>
                                 </div>
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">AM</span>
-                                    <select id="bopp-am" class="bopp-iinp"><option value="">—</option></select>
+                                    <select id="bopp-am" class="bopp-iinp"></select>
                                 </div>
                                 <div class="bopp-irow">
                                     <span class="bopp-ilbl">Sub AM</span>
-                                    <select id="bopp-subam" class="bopp-iinp"><option value="">—</option></select>
+                                    <select id="bopp-subam" class="bopp-iinp"></select>
                                 </div>
                             </div>
                             <div class="bopp-card">
@@ -351,9 +350,9 @@ const BOppApp = (() => {
     }
 
     function buildDropdowns() {
-        const peopleOpts = '<option value="">—</option>' + _profiles.map(p => `<option value="${escA(p)}">${escH(p)}</option>`).join('');
+        const peopleOpts = _profiles.map(p => `<option value="${escA(p)}">${escH(p)}</option>`).join('');
         ['bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.innerHTML = peopleOpts; });
-        el('bopp-lead').innerHTML = '<option value="">—</option>' + _leadList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('');
+        el('bopp-lead').innerHTML = _leadList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('');
         el('bopp-status-sel').innerHTML = _statusList.length
             ? _statusList.map(v => `<option value="${escA(v)}">${escH(v)}</option>`).join('')
             : '<option value="Active">Active</option>';
