@@ -436,11 +436,12 @@ const BOppApp = (() => {
             <td class="bopp-item-no c">${idx+1}</td>
             <td><select class="bopp-item-sel" data-field="bu">${buOpts}</select></td>
             <td><textarea class="bopp-item-inp bopp-item-ta" data-field="detail" placeholder="Description..." rows="3">${escH(item.detail||'')}</textarea></td>
-            <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0" step="1"></td>
+            <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0" step="1" inputmode="numeric"></td>
             <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"></td>
             <td><input type="number" class="bopp-item-inp r bopp-item-disc-inp" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"></td>
             <td class="bopp-item-amt" data-amt>${amt > 0 ? fmtN(amt) : '0'}</td>
             <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"></td>
+            <td class="c"><button type="button" class="bopp-item-rm" onclick="BOppApp.removeItem('${escA(qtTmpId)}',${idx})" title="Delete row"><i class="bi bi-trash3"></i></button></td>
         </tr>`;
     }
 
@@ -476,6 +477,7 @@ const BOppApp = (() => {
                         <th class="r" style="width:100px">Discount</th>
                         <th class="r" style="width:108px">Amount</th>
                         <th class="r" style="width:96px">GP</th>
+                        <th style="width:36px"></th>
                     </tr></thead>
                     <tbody id="bopp-tbody-${escA(qt.tmpId)}">${items}</tbody>
                 </table>
@@ -535,7 +537,7 @@ const BOppApp = (() => {
             const idx = +row.dataset.item;
             if (!qt || idx >= qt.items.length) return;
             const item = qt.items[idx];
-            if (field === 'qty')      item.qty      = +inp.value || 0;
+            if (field === 'qty')      { item.qty = Math.floor(+inp.value) || 0; inp.value = item.qty || ''; }
             else if (field === 'price')    item.price    = +inp.value || 0;
             else if (field === 'discount') item.discount = +inp.value || 0;
             else if (field === 'gp')       item.gp       = +inp.value || 0;
