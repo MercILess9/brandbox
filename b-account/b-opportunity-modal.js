@@ -870,6 +870,7 @@ const BOppApp = (() => {
 
         try {
             let oppId = _editingId;
+            let _newOppId = null;
             if (_editingId) {
                 payload.status    = el('bopp-status-sel').value;
                 payload.update_by = user?.codename || null;
@@ -882,6 +883,7 @@ const BOppApp = (() => {
                 const { data, error } = await supabaseClient.from('b_opportunity_list').insert(payload).select('opportunity_id').single();
                 if (error) throw error;
                 oppId = data.opportunity_id;
+                _newOppId = oppId;
             }
 
             for (const qt of _qts) {
@@ -914,6 +916,7 @@ const BOppApp = (() => {
 
         } catch (err) {
             console.error('[B-OPP modal]', err);
+            if (_newOppId) await supabaseClient.from('b_opportunity_list').delete().eq('opportunity_id', _newOppId);
             notify('Error', err?.message || 'Save failed', 'error');
         } finally {
             saveBtn.disabled = false;
