@@ -67,7 +67,8 @@ const B_OPP_MODAL_HTML = `
     .bq-inp[readonly]:hover { border-color: #bdc432; }
     .bq-ta { height: auto; min-height: 76px; padding: 9px 12px; resize: none; line-height: 1.6; }
     .was-validated .bq-inp:invalid,
-    .was-validated .bopp-iinp:invalid { border-color: #dc3545 !important; background: #fff8f8; }
+    .was-validated .bopp-iinp:invalid,
+    .bq-inp.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-qt-num.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-search-btn { width: 42px; height: 35px; flex-shrink: 0; border: 1px solid #bdc432; border-left: none; border-radius: 0 10px 10px 0; background: #f4f7a1; color: #7a8500; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
     .bopp-search-btn:hover { background: #bdc432; color: #1e293b; }
@@ -392,6 +393,7 @@ const BOppApp = (() => {
         const btn = e.target.closest('.bopp-ov-item');
         if (!btn) return;
         el('bopp-acc-name').value = btn.dataset.name;
+        el('bopp-acc-name').classList.remove('is-invalid');
         populateCompanies(btn.dataset.name, null);
         closeOverlay();
     });
@@ -419,7 +421,7 @@ const BOppApp = (() => {
         el('bopp-account-id').value = sel.value;
     }
 
-    el('bopp-company-sel').addEventListener('change', function() { el('bopp-account-id').value = this.value; });
+    el('bopp-company-sel').addEventListener('change', function() { el('bopp-account-id').value = this.value; this.classList.remove('is-invalid'); });
 
     // ── QT helpers ────────────────────────────────────────────────────────────
     function genQTNum() {
@@ -803,6 +805,22 @@ const BOppApp = (() => {
     async function handleSubmit(e) {
         e.preventDefault();
         el('bopp-form').classList.add('was-validated');
+        // manual check: account + company (disabled/readonly ไม่ถูก checkValidity จับ)
+        const accInp = el('bopp-acc-name'), compSel = el('bopp-company-sel');
+        if (!el('bopp-account-id').value) {
+            accInp.classList.add('is-invalid');
+            accInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            accInp.click();
+            return;
+        }
+        accInp.classList.remove('is-invalid');
+        if (!compSel.value) {
+            compSel.classList.add('is-invalid');
+            compSel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            compSel.focus();
+            return;
+        }
+        compSel.classList.remove('is-invalid');
         if (!el('bopp-form').checkValidity()) {
             const first = el('bopp-form').querySelector(':invalid');
             if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
