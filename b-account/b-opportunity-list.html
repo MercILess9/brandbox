@@ -693,9 +693,11 @@
     }
 
     // ── Init ──────────────────────────────────────────────────────────────────
+    document.getElementById('globalSearch').addEventListener('input', function() {
+        document.getElementById('searchClear').style.display = this.value ? '' : 'none';
+    });
     document.getElementById('globalSearch').addEventListener('input', debounce(e => {
         _searchText = e.target.value.trim().toLowerCase();
-        document.getElementById('searchClear').style.display = _searchText ? '' : 'none';
         applyFilters();
     }, 300));
 
