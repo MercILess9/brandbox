@@ -137,6 +137,9 @@ const B_OPP_MODAL_HTML = `
     .bopp-footer { padding: 13px 28px; display: flex; align-items: center; gap: 10px; background: #fff; border-top: 1px solid #f1f5f9; }
     .bopp-btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 0 18px; border-radius: 10px; font-weight: 700; height: 40px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-family: inherit; display: none; align-items: center; gap: 6px; }
     .bopp-btn-del:hover { background: #fecaca; }
+    .bopp-btn-undo { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 16px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+    .bopp-btn-undo:hover { background: #f8fafc; border-color: #94a3b8; color: #334155; }
+    .bopp-btn-undo:disabled { opacity: 0.3; pointer-events: none; }
     .bopp-btn-cancel { border: 1px solid #e2e8f0; background: #fff; color: #64748b; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 18px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: 0.2s; }
     .bopp-btn-cancel:hover { background: #f8fafc; border-color: #cbd5e1; }
     .bopp-btn-save { background: #1e293b; color: #bdc432; border: none; padding: 0 24px; border-radius: 10px; font-weight: 800; height: 40px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); font-family: inherit; }
@@ -302,6 +305,7 @@ const B_OPP_MODAL_HTML = `
                         <i class="bi bi-trash3"></i> Delete
                     </button>
                     <div style="flex:1"></div>
+                    <button type="button" class="bopp-btn-undo" id="bopp-btn-undo" disabled onclick="BOppApp.undo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
                     <button type="button" class="bopp-btn-cancel" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="bopp-btn-save" id="bopp-btn-save">
                         <i class="bi bi-plus-circle-fill" id="bopp-save-icon"></i>
@@ -337,6 +341,7 @@ const BOppApp = (() => {
     let _leadList  = [];
     let _qts       = []; // [{tmpId, qt_id, qt_number, company_qt, items:[], _totAmt, _totGP}]
     let _qtCounter = 0;
+    let _undoStack = [];
 
     function getBsModal() {
         if (!_bsModal) _bsModal = new bootstrap.Modal(el('b-opp-modal'));
@@ -590,10 +595,19 @@ const BOppApp = (() => {
         el('bopp-qt-container').append(...tmp.children);
     }
 
+    function updateUndoBtn() {
+        const btn = el('bopp-btn-undo');
+        if (btn) btn.disabled = _undoStack.length === 0;
+    }
+
     function removeQT(tmpId) {
-        _qts = _qts.filter(q => q.tmpId !== tmpId);
+        const qtIdx = _qts.findIndex(q => q.tmpId === tmpId);
+        if (qtIdx < 0) return;
+        _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(_qts[qtIdx])) });
+        _qts.splice(qtIdx, 1);
         el('bopp-qt-container').querySelector(`[data-qt-card="${tmpId}"]`)?.remove();
         recalcTotals();
+        updateUndoBtn();
     }
 
     function addItem(qtTmpId) {
@@ -607,10 +621,30 @@ const BOppApp = (() => {
     function removeItem(qtTmpId, idx) {
         const qt = _qts.find(q => q.tmpId === qtTmpId);
         if (!qt || qt.items.length <= 1) return;
+        _undoStack.push({ type: 'item', qtTmpId, idx, item: { ...qt.items[idx] } });
         qt.items.splice(idx, 1);
-        qt.items.forEach((item, i) => { item.amount = Math.max(0, (+item.qty||0) * (+item.price||0) - (+item.discount||0)); });
+        qt.items.forEach((item) => { item.amount = Math.max(0, (+item.qty||0) * (+item.price||0) - (+item.discount||0)); });
         reRenderQTBody(qt);
         recalcTotals();
+        updateUndoBtn();
+    }
+
+    function undo() {
+        if (!_undoStack.length) return;
+        const action = _undoStack.pop();
+        if (action.type === 'item') {
+            const qt = _qts.find(q => q.tmpId === action.qtTmpId);
+            if (qt) {
+                qt.items.splice(action.idx, 0, action.item);
+                reRenderQTBody(qt);
+                recalcTotals();
+            }
+        } else if (action.type === 'qt') {
+            _qts.splice(action.qtIdx, 0, action.qt);
+            renderAllQTs();
+            recalcTotals();
+        }
+        updateUndoBtn();
     }
 
     function dupQT(srcTmpId) {
@@ -648,7 +682,8 @@ const BOppApp = (() => {
         el('bopp-grand-pct').textContent = '';
         el('bopp-grand-bar').style.width = '0%';
         el('bopp-qt-container').innerHTML = '';
-        _qts = []; _qtCounter = 0;
+        _qts = []; _qtCounter = 0; _undoStack = [];
+        updateUndoBtn();
     }
 
     // ── Open new ──────────────────────────────────────────────────────────────
@@ -875,5 +910,5 @@ const BOppApp = (() => {
     // Reset _editingId when modal closed
     el('b-opp-modal').addEventListener('hidden.bs.modal', () => { _editingId = null; });
 
-    return { openNew, openEdit, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT };
+    return { openNew, openEdit, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT, undo };
 })();
