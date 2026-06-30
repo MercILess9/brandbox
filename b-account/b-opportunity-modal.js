@@ -84,6 +84,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-qt-tval { font-size: 0.88rem; font-weight: 800; color: #1e293b; }
     .bopp-qt-tval.gp { color: #16a34a; }
     .bopp-qt-tlbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #94a3b8; }
+    .bopp-qt-tpct { color: #16a34a; font-weight: 800; }
     .bopp-qt-tdiv { width: 1px; height: 26px; background: #e2e8f0; }
     .bopp-qt-rm { border: none; background: none; color: #94a3b8; cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: 0.15s; display: flex; align-items: center; flex-shrink: 0; }
     .bopp-qt-rm:hover { background: #fee2e2; color: #ef4444; }
@@ -467,7 +468,7 @@ const BOppApp = (() => {
                     <div class="bopp-qt-tdiv"></div>
                     <div class="bopp-qt-tbox">
                         <span class="bopp-qt-tval gp" data-qt-gp>${fmtN(tGP)}</span>
-                        <span class="bopp-qt-tlbl">GP</span>
+                        <span class="bopp-qt-tlbl">GP <span class="bopp-qt-tpct" data-qt-pct>${tAmt>0&&tGP>0?`${(tGP/tAmt*100).toFixed(1)}%`:''}</span></span>
                     </div>
                 </div>
             </div>
@@ -522,6 +523,7 @@ const BOppApp = (() => {
             if (card) {
                 const aEl = card.querySelector('[data-qt-amt]'); if (aEl) aEl.textContent = fmtN(qAmt);
                 const gEl = card.querySelector('[data-qt-gp]');  if (gEl) gEl.textContent  = fmtN(qGP);
+                const pEl = card.querySelector('[data-qt-pct]');  if (pEl) pEl.textContent = qAmt>0&&qGP>0 ? `${(qGP/qAmt*100).toFixed(1)}%` : '';
             }
             grandAmt += qAmt; grandGP += qGP;
         });
