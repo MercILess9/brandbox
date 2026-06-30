@@ -414,7 +414,7 @@ const BOppApp = (() => {
             sel.innerHTML = opts;
             sel.value = companies[0].account_id;
         } else {
-            sel.innerHTML = `<option value="">Select company...</option>` + opts;
+            sel.innerHTML = `<option value="" disabled>Select company...</option>` + opts;
             sel.value = selectedId || '';
         }
         sel.disabled = false;
