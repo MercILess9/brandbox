@@ -33,8 +33,8 @@ const B_OPP_MODAL_HTML = `
     /* ── Section cards ── */
     .bopp-card { background: #fff; border-radius: 16px; border: 1px solid #eef2f7; padding: 15px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .bopp-card-hd { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 11px; display: flex; align-items: center; gap: 6px; }
-    .bopp-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-    .bopp-2col > .bopp-card { margin-bottom: 0; display: flex; flex-direction: column; gap: 10px; }
+    .bopp-3col { display: grid; grid-template-columns: 1.1fr 1fr 0.9fr; gap: 12px; margin-bottom: 12px; }
+    .bopp-3col > .bopp-card { margin-bottom: 0; display: flex; flex-direction: column; gap: 10px; }
 
     /* ── Grid ── */
     .bopp-row { display: flex; gap: 12px; margin-bottom: 10px; }
@@ -194,16 +194,25 @@ const B_OPP_MODAL_HTML = `
                         </div>
                     </div>
 
-                    <!-- 2-column: left = text fields, right = dropdowns -->
-                    <div class="bopp-2col">
+                    <!-- 3-column: name/remark | links/dates | dropdowns -->
+                    <div class="bopp-3col">
 
-                        <!-- LEFT: Opportunity Name + Links + Remark -->
+                        <!-- LEFT: Name + Remark -->
                         <div class="bopp-card">
                             <div class="bopp-card-hd"><i class="bi bi-briefcase"></i> Opportunity</div>
                             <div>
                                 <label class="bq-lbl">Opportunity Name <span style="color:#ef4444">*</span></label>
                                 <input type="text" id="bopp-opp-name" class="bq-inp" placeholder="Project name..." required>
                             </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label class="bq-lbl">Remark</label>
+                                <textarea id="bopp-remark" class="bq-inp bq-ta" style="flex:1; min-height:90px;" placeholder="Note..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- MIDDLE: Links + Dates -->
+                        <div class="bopp-card">
+                            <div class="bopp-card-hd"><i class="bi bi-link-45deg"></i> Links & Timeline</div>
                             <div>
                                 <label class="bq-lbl"><i class="bi bi-cloud-fill"></i> Materials</label>
                                 <input type="text" id="bopp-materials" class="bq-inp" placeholder="https://drive.google.com/...">
@@ -216,13 +225,17 @@ const B_OPP_MODAL_HTML = `
                                 <label class="bq-lbl"><i class="bi bi-megaphone-fill"></i> Campaign</label>
                                 <input type="text" id="bopp-campaign" class="bq-inp" placeholder="https://drive.google.com/...">
                             </div>
-                            <div style="flex:1; display:flex; flex-direction:column;">
-                                <label class="bq-lbl">Remark</label>
-                                <textarea id="bopp-remark" class="bq-inp bq-ta" style="flex:1; min-height:80px;" placeholder="Note..."></textarea>
+                            <div>
+                                <label class="bq-lbl">Signed Date</label>
+                                <input type="date" id="bopp-signed" class="bq-inp">
+                            </div>
+                            <div>
+                                <label class="bq-lbl">Launch Date</label>
+                                <input type="date" id="bopp-launch" class="bq-inp">
                             </div>
                         </div>
 
-                        <!-- RIGHT: Dropdowns / Classifications -->
+                        <!-- RIGHT: 5 Dropdowns -->
                         <div class="bopp-card">
                             <div class="bopp-card-hd"><i class="bi bi-sliders"></i> Details</div>
                             <div>
@@ -250,17 +263,9 @@ const B_OPP_MODAL_HTML = `
                                 <label class="bq-lbl">Sub AM</label>
                                 <select id="bopp-subam" class="bq-inp"><option value="">—</option></select>
                             </div>
-                            <div>
-                                <label class="bq-lbl">Signed Date</label>
-                                <input type="date" id="bopp-signed" class="bq-inp">
-                            </div>
-                            <div>
-                                <label class="bq-lbl">Launch Date</label>
-                                <input type="date" id="bopp-launch" class="bq-inp">
-                            </div>
                         </div>
 
-                    </div><!-- /bopp-2col -->
+                    </div><!-- /bopp-3col -->
 
                     <!-- Quotations -->
                     <div class="bopp-qt-lbl"><i class="bi bi-file-earmark-text"></i> Quotations</div>
