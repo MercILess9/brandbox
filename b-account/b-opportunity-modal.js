@@ -2,7 +2,7 @@ const B_OPP_MODAL_HTML = `
 <style>
     /* ── Modal shell ── */
     #b-opp-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.15); }
-    .bopp-modal-wrap { max-width: 1400px !important; }
+    .bopp-modal-wrap { max-width: 1200px !important; }
 
     /* ── Header ── */
     .bopp-header { background: #1e293b; padding: 15px 28px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
