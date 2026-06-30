@@ -5,31 +5,30 @@ const B_OPP_MODAL_HTML = `
     .bopp-modal-wrap { max-width: 1200px !important; }
 
     /* ── Header ── */
-    .bopp-header { background: #1e293b; display: flex; flex-direction: column; }
-    .bopp-header-r1 { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 28px; }
-    .bopp-header-r2 { display: flex; align-items: center; gap: 16px; padding: 9px 28px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .bopp-header { background: #1e293b; padding: 15px 28px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .bopp-header-left { display: flex; align-items: center; gap: 10px; }
     .bopp-header-bar { width: 4px; height: 22px; background: #bdc432; border-radius: 2px; flex-shrink: 0; }
     .bopp-header-icon { color: #bdc432; font-size: 1rem; }
     .bopp-header-title { color: #fff; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.2px; }
-    .bopp-opp-id { font-size: 0.72rem; font-weight: 700; color: rgba(189,196,50,0.7); letter-spacing: 0.3px; }
     .bopp-header-right { display: flex; align-items: center; gap: 12px; }
-    .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23e2e8f0' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; transition: 0.2s; }
+    .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23e2e8f0' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; display: none; transition: 0.2s; }
+    .bopp-status-sel.visible { display: block; }
     .bopp-status-sel:focus { border-color: #bdc432; }
     .bopp-status-sel option { background: #1e293b; }
 
-    /* ── Totals (in header row 2) ── */
+    /* ── Totals strip ── */
+    .bopp-totals { background: #fff; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; padding: 11px 28px; display: flex; align-items: center; gap: 20px; }
     .bopp-total-box { display: flex; flex-direction: column; gap: 2px; }
-    .bopp-total-lbl { font-size: 0.55rem; font-weight: 800; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.8px; }
-    .bopp-total-val { font-size: 0.88rem; font-weight: 800; color: #fff; }
-    .bopp-total-val.gp { color: #bdc432; }
-    .bopp-total-pct { font-size: 0.72rem; font-weight: 700; color: #bdc432; align-self: flex-end; margin-bottom: 2px; }
-    .bopp-total-bar-wrap { flex: 1; height: 3px; background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; align-self: flex-end; margin-bottom: 6px; }
+    .bopp-total-lbl { font-size: 0.58rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; }
+    .bopp-total-val { font-size: 0.9rem; font-weight: 800; color: #1e293b; }
+    .bopp-total-val.gp { color: #16a34a; }
+    .bopp-total-pct { font-size: 0.72rem; font-weight: 700; color: #16a34a; align-self: flex-end; margin-bottom: 2px; }
+    .bopp-total-bar-wrap { flex: 1; height: 3px; background: #e2e8f0; border-radius: 99px; overflow: hidden; align-self: flex-end; margin-bottom: 6px; }
     .bopp-total-bar-fill { height: 100%; background: linear-gradient(90deg, #bdc432, #a3b020); border-radius: 99px; transition: width 0.35s ease; }
-    .bopp-total-div { width: 1px; height: 28px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+    .bopp-total-div { width: 1px; height: 28px; background: #e2e8f0; flex-shrink: 0; }
 
     /* ── Body ── */
-    .bopp-body { padding: 18px 28px 12px; max-height: calc(100vh - 290px); overflow-y: auto; }
+    .bopp-body { padding: 18px 28px 12px; max-height: calc(100vh - 268px); overflow-y: auto; }
 
     /* ── Section cards ── */
     .bopp-card { background: #fff; border-radius: 16px; border: 1px solid #eef2f7; padding: 15px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
@@ -164,33 +163,14 @@ const B_OPP_MODAL_HTML = `
 
             <!-- Header -->
             <div class="bopp-header">
-                <div class="bopp-header-r1">
-                    <div class="bopp-header-left">
-                        <div class="bopp-header-bar"></div>
-                        <i class="bi bi-briefcase-fill bopp-header-icon"></i>
-                        <span class="bopp-header-title" id="bopp-modal-title">New Opportunity</span>
-                        <span class="bopp-opp-id" id="bopp-opp-id" style="display:none;"></span>
-                    </div>
-                    <div class="bopp-header-right">
-                        <select id="bopp-status-sel" class="bopp-status-sel"></select>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
+                <div class="bopp-header-left">
+                    <div class="bopp-header-bar"></div>
+                    <i class="bi bi-briefcase-fill bopp-header-icon"></i>
+                    <span class="bopp-header-title" id="bopp-modal-title">New Opportunity</span>
                 </div>
-                <div class="bopp-header-r2">
-                    <div class="bopp-total-box">
-                        <span class="bopp-total-lbl">Total Amount</span>
-                        <span class="bopp-total-val" id="bopp-grand-amt">0.00</span>
-                    </div>
-                    <div class="bopp-total-div"></div>
-                    <div class="bopp-total-bar-wrap">
-                        <div class="bopp-total-bar-fill" id="bopp-grand-bar" style="width:0%"></div>
-                    </div>
-                    <div class="bopp-total-div"></div>
-                    <div class="bopp-total-box">
-                        <span class="bopp-total-lbl">Total GP</span>
-                        <span class="bopp-total-val gp" id="bopp-grand-gp">0.00</span>
-                    </div>
-                    <span class="bopp-total-pct" id="bopp-grand-pct"></span>
+                <div class="bopp-header-right">
+                    <select id="bopp-status-sel" class="bopp-status-sel"></select>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
             </div>
 
@@ -297,6 +277,24 @@ const B_OPP_MODAL_HTML = `
                         <i class="bi bi-plus-circle"></i> Add Quotation
                     </button>
 
+                </div>
+
+                <!-- Totals strip -->
+                <div class="bopp-totals">
+                    <div class="bopp-total-box">
+                        <span class="bopp-total-lbl">Total Amount</span>
+                        <span class="bopp-total-val" id="bopp-grand-amt">0.00</span>
+                    </div>
+                    <div class="bopp-total-div"></div>
+                    <div class="bopp-total-bar-wrap">
+                        <div class="bopp-total-bar-fill" id="bopp-grand-bar" style="width:0%"></div>
+                    </div>
+                    <div class="bopp-total-div"></div>
+                    <div class="bopp-total-box">
+                        <span class="bopp-total-lbl">Total GP</span>
+                        <span class="bopp-total-val gp" id="bopp-grand-gp">0.00</span>
+                    </div>
+                    <span class="bopp-total-pct" id="bopp-grand-pct"></span>
                 </div>
 
                 <div class="bopp-footer">
@@ -642,9 +640,7 @@ const BOppApp = (() => {
         companySel.disabled = true;
         el('bopp-type').value = '';
         ['bopp-lead','bopp-owner','bopp-am','bopp-subam'].forEach(id => { const s = el(id); if (s) s.value = ''; });
-        el('bopp-status-sel').selectedIndex = 0;
-        el('bopp-opp-id').style.display = 'none';
-        el('bopp-opp-id').textContent = '';
+        el('bopp-status-sel').classList.remove('visible');
         el('bopp-grand-amt').textContent = '0.00';
         el('bopp-grand-gp').textContent  = '0.00';
         el('bopp-grand-pct').textContent = '';
@@ -703,8 +699,7 @@ const BOppApp = (() => {
         el('bopp-remark').value    = opp.remark    || '';
 
         el('bopp-status-sel').value = opp.status || (_statusList[0] || 'Active');
-        el('bopp-opp-id').textContent = '#' + oppId;
-        el('bopp-opp-id').style.display = '';
+        el('bopp-status-sel').classList.add('visible');
 
         // Load QTs
         const { data: qts } = await supabaseClient.from('b_opportunity_qt')
@@ -780,7 +775,7 @@ const BOppApp = (() => {
                 const { error } = await supabaseClient.from('b_opportunity_list').update(payload).eq('opportunity_id', _editingId);
                 if (error) throw error;
             } else {
-                payload.status    = el('bopp-status-sel').value || (_statusList[0] || 'Active');
+                payload.status    = 'Active';
                 payload.create_by = user?.codename || null;
                 const { data, error } = await supabaseClient.from('b_opportunity_list').insert(payload).select('opportunity_id').single();
                 if (error) throw error;
