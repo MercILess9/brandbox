@@ -46,7 +46,10 @@ const B_OPP_MODAL_HTML = `
     .bopp-iinp:focus { outline: none; border-color: #bdc432; background: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.12); }
     select.bopp-iinp { text-align: center; text-align-last: center; }
     input[type=date].bopp-iinp { text-align: center; }
-    #bopp-acc-name { text-align: center; }
+    .bopp-acc-wrap { position: relative; }
+    .bopp-acc-wrap::after { content: '\276F'; position: absolute; right: 13px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #bdc432; font-size: 0.75rem; font-weight: 900; pointer-events: none; }
+    #bopp-acc-name { text-align: center; border-color: #bdc432; background: #fffef5; padding-right: 30px; }
+    #bopp-acc-name:hover { background: #f4f7a1; }
     #bopp-company-sel { text-align: center; text-align-last: center; }
 
     /* ── Grid ── */
@@ -194,7 +197,9 @@ const B_OPP_MODAL_HTML = `
                             <div style="display:flex; gap:10px; margin-bottom:10px;">
                                 <div style="flex:1; min-width:0;">
                                     <label class="bq-lbl">Account Name <span style="color:#ef4444">*</span></label>
-                                    <input type="text" id="bopp-acc-name" class="bq-inp" placeholder="Select account..." readonly required onclick="BOppApp.openOverlay()" style="cursor:pointer;">
+                                    <div class="bopp-acc-wrap">
+                                        <input type="text" id="bopp-acc-name" class="bq-inp" placeholder="Select account..." readonly required onclick="BOppApp.openOverlay()" style="cursor:pointer; width:100%;">
+                                    </div>
                                 </div>
                                 <div style="flex:1; min-width:0;">
                                     <label class="bq-lbl">Company <span style="color:#ef4444">*</span></label>
