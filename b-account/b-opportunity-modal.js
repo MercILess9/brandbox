@@ -42,7 +42,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-right-col .bopp-card { border-left: 3px solid #1e293b; }
     .bopp-irow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .bopp-irow:last-child { margin-bottom: 0; }
-    .bopp-ilbl { font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; min-width: 88px; white-space: nowrap; }
+    .bopp-ilbl { font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; width: 112px; flex-shrink: 0; white-space: nowrap; }
     .bopp-iinp { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 10px; font-size: 0.82rem; color: #334155; height: 32px; font-family: inherit; box-sizing: border-box; transition: 0.2s; }
     .bopp-iinp:focus { outline: none; border-color: #bdc432; background: #fff; box-shadow: 0 0 0 3px rgba(189,196,50,0.12); }
     select.bopp-iinp { text-align: center; text-align-last: center; }
