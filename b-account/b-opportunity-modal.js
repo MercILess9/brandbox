@@ -311,10 +311,10 @@ const B_OPP_MODAL_HTML = `
 
                 <div class="bopp-footer">
                     <button type="button" class="bopp-btn-undo" id="bopp-btn-undo" style="display:none;" onclick="BOppApp.undo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
+                    <div style="flex:1"></div>
                     <button type="button" class="bopp-btn-del" id="bopp-btn-del">
                         <i class="bi bi-trash3"></i> Delete
                     </button>
-                    <div style="flex:1"></div>
                     <button type="submit" class="bopp-btn-save" id="bopp-btn-save">
                         <i class="bi bi-plus-circle-fill" id="bopp-save-icon"></i>
                         <span id="bopp-save-label">Create Opportunity</span>
