@@ -110,6 +110,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-item-amt { font-size: 0.78rem; font-weight: 700; color: #1e293b; text-align: right; white-space: nowrap; }
     .bopp-item-disc { font-size: 0.78rem; color: #ef4444; text-align: right; white-space: nowrap; }
     .bopp-item-gp-val { font-size: 0.78rem; font-weight: 700; text-align: right; white-space: nowrap; }
+    .bopp-item-gp-pct { font-size: 0.63rem; font-weight: 700; color: #16a34a; text-align: right; line-height: 1; margin-top: 2px; }
     .bopp-item-no { color: #94a3b8; font-size: 0.7rem; font-weight: 700; }
     .bopp-item-rm { border: none; background: none; color: #cbd5e1; cursor: pointer; padding: 2px 5px; border-radius: 4px; font-size: 0.9rem; transition: 0.15s; }
     .bopp-item-rm:hover { background: #fee2e2; color: #ef4444; }
@@ -444,7 +445,7 @@ const BOppApp = (() => {
             <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"></td>
             <td><input type="number" class="bopp-item-inp r bopp-item-disc-inp" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"></td>
             <td class="bopp-item-amt" data-amt>${amt > 0 ? fmtN(amt) : '0'}</td>
-            <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"></td>
+            <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"><div class="bopp-item-gp-pct" data-gp-pct>${amt>0&&gp>0?`${(gp/amt*100).toFixed(1)}%`:''}</div></td>
             <td class="c"><button type="button" class="bopp-item-rm" onclick="BOppApp.removeItem('${escA(qtTmpId)}',${idx})" title="Delete row"><i class="bi bi-trash3"></i></button></td>
         </tr>`;
     }
@@ -553,8 +554,14 @@ const BOppApp = (() => {
                 item.amount = Math.max(0, item.qty * item.price - item.discount);
                 const amtCell = row.querySelector('[data-amt]');
                 if (amtCell) amtCell.textContent = item.amount > 0 ? fmtN(item.amount) : '0';
+                const pctEl = row.querySelector('[data-gp-pct]');
+                if (pctEl) pctEl.textContent = item.amount > 0 && item.gp > 0 ? `${(item.gp/item.amount*100).toFixed(1)}%` : '';
             }
-            if (field === 'gp') inp.style.color = item.gp > 0 ? '#16a34a' : '#cbd5e1';
+            if (field === 'gp') {
+                inp.style.color = item.gp > 0 ? '#16a34a' : '#cbd5e1';
+                const pctEl = row.querySelector('[data-gp-pct]');
+                if (pctEl) pctEl.textContent = item.amount > 0 && item.gp > 0 ? `${(item.gp/item.amount*100).toFixed(1)}%` : '';
+            }
             recalcTotals();
             return;
         }
