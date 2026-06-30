@@ -1,7 +1,7 @@
 const B_OPP_MODAL_HTML = `
 <style>
     /* ── Modal shell ── */
-    #b-opp-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.15); }
+    #b-opp-modal .modal-content { background: #f8fafc; border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.15); display: flex; flex-direction: column; max-height: calc(100vh - 56px); }
     .bopp-modal-wrap { max-width: 1200px !important; }
 
     /* ── Header ── */
@@ -26,7 +26,7 @@ const B_OPP_MODAL_HTML = `
 
 
     /* ── Body ── */
-    .bopp-body { padding: 18px 28px 12px; max-height: calc(100vh - 180px); overflow-y: auto; }
+    .bopp-body { padding: 18px 28px 12px; flex: 1; min-height: 0; overflow-y: auto; }
 
     /* ── Section cards ── */
     .bopp-card { background: #fff; border-radius: 16px; border: 1px solid #eef2f7; padding: 15px 18px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
