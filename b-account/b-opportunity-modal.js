@@ -798,19 +798,21 @@ const BOppApp = (() => {
             if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
             return;
         }
-        if (!el('bopp-account-id').value) { notify('แจ้งเตือน', 'กรุณาเลือก Account', 'warning'); return; }
         if (!_qts.length) { notify('แจ้งเตือน', 'กรุณาเพิ่ม QT อย่างน้อย 1 รายการ', 'warning'); return; }
         const qtContainer = el('bopp-qt-container');
-        const invalidQT = _qts.find(qt => {
+        // รอบ 1: ชื่อ QT — กรอบแดง ไม่มี toast
+        let firstEmptyName = null;
+        _qts.forEach(qt => {
             const card = qtContainer.querySelector(`[data-qt-card="${qt.tmpId}"]`);
-            const numVal = card?.querySelector('.bopp-qt-num')?.value.trim() || '';
-            return !numVal || !(qt._totAmt > 0);
-        });
-        if (invalidQT) {
-            const card = qtContainer.querySelector(`[data-qt-card="${invalidQT.tmpId}"]`);
             const numInp = card?.querySelector('.bopp-qt-num');
-            if (numInp) { numInp.classList.add('is-invalid'); numInp.scrollIntoView({ behavior: 'smooth', block: 'center' }); numInp.focus(); }
-            notify('แจ้งเตือน', 'แต่ละ QT ต้องมีชื่อ QT และยอดเงิน', 'warning');
+            if (numInp && !numInp.value.trim()) { numInp.classList.add('is-invalid'); if (!firstEmptyName) firstEmptyName = numInp; }
+        });
+        if (firstEmptyName) { firstEmptyName.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstEmptyName.focus(); return; }
+        // รอบ 2: ยอดเงิน — toast เตือน
+        const noAmtQT = _qts.find(qt => !(qt._totAmt > 0));
+        if (noAmtQT) {
+            notify('แจ้งเตือน', 'แต่ละ QT ต้องมียอดเงิน', 'warning');
+            qtContainer.querySelector(`[data-qt-card="${noAmtQT.tmpId}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
 
