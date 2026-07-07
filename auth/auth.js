@@ -69,6 +69,12 @@ async function handleSignup(email, password, metadata) {
 
         if (error) throw error;
 
+        // Supabase returns user:null when email already exists but unconfirmed
+        if (!data?.user) {
+            Swal.fire("Failed", "This email may already be registered or unconfirmed. Please sign in or contact admin.", "error");
+            return;
+        }
+
         Swal.fire({
             icon: "success",
             title: "Registration Complete!",
@@ -78,10 +84,16 @@ async function handleSignup(email, password, metadata) {
         });
 
     } catch (err) {
-        const msg = err.message?.toLowerCase() || '';
-        const friendly = msg.includes('already registered') || msg.includes('already been registered')
-            ? 'This email is already registered. Please sign in instead.'
-            : err.message;
+        console.error('Signup error:', err);
+        const msg = (err.message || '').toLowerCase();
+        let friendly;
+        if (msg.includes('already registered') || msg.includes('already been registered')) {
+            friendly = 'This email is already registered. Please sign in instead.';
+        } else if (msg.includes('database error') || msg.includes('unexpected_failure') || !msg || msg === '{}') {
+            friendly = 'Registration failed — Employee ID or codename may already be taken. Please contact admin.';
+        } else {
+            friendly = err.message;
+        }
         Swal.fire("Failed", friendly, "error");
     }
 }
