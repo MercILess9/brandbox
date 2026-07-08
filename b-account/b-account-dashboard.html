@@ -273,20 +273,24 @@ async function loadData() {
     const [
         { data: opps,     error: e1 },
         { data: qts,      error: e2 },
-        { data: statuses, error: e3 }
+        { data: items,    error: e3 },
+        { data: statuses }
     ] = await Promise.all([
         supabaseClient.from('b_opportunity_list')
             .select('opportunity_id, status, business_type, total_amount, total_gp, create_date, owner, company')
             .limit(3000),
         supabaseClient.from('b_opportunity_qt')
-            .select('opportunity_id, qt_type, b_opportunity_qt_item(bu, qty, price, discount, gp)')
-            .limit(10000),
+            .select('qt_id, opportunity_id, qt_type')
+            .limit(5000),
+        supabaseClient.from('b_opportunity_qt_item')
+            .select('qt_id, bu, qty, price, discount, gp')
+            .limit(20000),
         supabaseClient.from('b_opp_config')
             .select('value').eq('type','status').order('value')
     ]);
 
     btn.classList.remove('spin');
-    if (e1 || e2) { console.error('[dash]', e1 || e2); return; }
+    if (e1 || e2 || e3) { console.error('[dash]', e1 || e2 || e3); return; }
 
     _opps = opps || [];
 
@@ -299,10 +303,20 @@ async function loadData() {
         sSel.appendChild(o);
     });
 
+    // Build qtMap: oppId → [{qt_type, b_opportunity_qt_item:[]}]
+    const itemsByQT = new Map();
+    (items || []).forEach(item => {
+        if (!itemsByQT.has(item.qt_id)) itemsByQT.set(item.qt_id, []);
+        itemsByQT.get(item.qt_id).push(item);
+    });
+
     _qtMap.clear();
     (qts || []).forEach(qt => {
         if (!_qtMap.has(qt.opportunity_id)) _qtMap.set(qt.opportunity_id, []);
-        _qtMap.get(qt.opportunity_id).push(qt);
+        _qtMap.get(qt.opportunity_id).push({
+            qt_type: qt.qt_type,
+            b_opportunity_qt_item: itemsByQT.get(qt.qt_id) || []
+        });
     });
 
     document.getElementById('dashUpdated').textContent =
