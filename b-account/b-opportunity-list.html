@@ -123,9 +123,9 @@
         .op-qt-group.churn-group .op-qt-card { border-left: 3px solid #f97316; }
         .op-qt-group.sign-group { border: 1px solid #e2e8f0; background: #fafafa; opacity: 0.55; pointer-events: none; }
         .op-qt-group.sign-group .op-qt-group-label { color: #94a3b8; }
-        .op-churn-summary { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-        .op-churn-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.3); border-radius: 20px; padding: 3px 12px; font-size: 0.72rem; font-weight: 700; color: #f97316; white-space: nowrap; }
-        .op-churn-badge-lbl { font-size: 0.6rem; font-weight: 600; color: rgba(249,115,22,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
+        .op-churn-summary { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .op-churn-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.4); border-radius: 20px; padding: 3px 12px; font-size: 0.72rem; font-weight: 800; color: #c2410c; white-space: nowrap; }
+        .op-churn-badge-lbl { font-size: 0.6rem; font-weight: 700; color: #9a3412; text-transform: uppercase; letter-spacing: 0.05em; }
         .op-qt-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f0f1f9; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
         .op-qt-num { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); display: flex; align-items: center; gap: 6px; }
         .op-qt-co { font-size: 0.68rem; font-weight: 800; background: #1e293b; color: #bdc432; border-radius: 6px; padding: 3px 9px; }
@@ -629,8 +629,8 @@
                 const rec      = _cardData.get(oppId);
                 const cDate    = rec?.churn_date ? fmtDate(rec.churn_date) : '';
                 const summary  = `<div class="op-churn-summary">
-                    ${cAmt ? `<span class="op-churn-badge"><span class="op-churn-badge-lbl">Churn Amt</span>${fmtAmt(cAmt)}</span>` : ''}
-                    ${cGP  ? `<span class="op-churn-badge"><span class="op-churn-badge-lbl">Churn GP</span>${fmtAmt(cGP)}</span>` : ''}
+                    ${cAmt ? `<span class="op-churn-badge"><span class="op-churn-badge-lbl">Churn Amt</span>-${fmtAmt(cAmt)}</span>` : ''}
+                    ${cGP  ? `<span class="op-churn-badge"><span class="op-churn-badge-lbl">Churn GP</span>-${fmtAmt(cGP)}</span>` : ''}
                     ${cDate ? `<span class="op-churn-badge"><span class="op-churn-badge-lbl">Churn Date</span>${cDate}</span>` : ''}
                 </div>`;
                 zone.innerHTML = `
