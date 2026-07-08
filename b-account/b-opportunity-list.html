@@ -464,10 +464,10 @@
 
     function renderAmtBlock(o, hasAmt, hasGP, pct, pctNum) {
         if (!hasAmt) return '';
-        return `<div class="omb-amt">
-            <div class="omb-amt-row"><span class="omb-lbl amt">Amount</span><span class="omb-val amt">${fmtAmt(o.total_amount)}</span></div>
-            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP${pct ? ` <span class="omb-bar-pct">${pct}</span>` : ''}</span><span class="omb-val gp">${fmtAmt(o.total_gp)}</span></div>
-            <div class="omb-bar-wrap"><div class="omb-bar-fill" style="width:${pctNum}%"></div></div>` : ''}
+        return `<div class="omb-amt" data-amt-block>
+            <div class="omb-amt-row"><span class="omb-lbl amt">Amount</span><span class="omb-val amt" data-amt-val>${fmtAmt(o.total_amount)}</span></div>
+            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP<span class="omb-bar-pct" data-gp-pct>${pct || ''}</span></span><span class="omb-val gp" data-gp-val>${fmtAmt(o.total_gp)}</span></div>
+            <div class="omb-bar-wrap"><div class="omb-bar-fill" data-bar-fill style="width:${pctNum}%"></div></div>` : ''}
         </div>`;
     }
 
@@ -629,6 +629,23 @@
                         <div class="op-qt-group-label">SIGN</div>
                         ${signQTs.length ? signQTs.map(renderQT).join('') : '<p class="op-qt-empty">No sign quotations</p>'}
                     </div>`;
+                // Update summary to show churn totals
+                const card = zone.closest('.op-card');
+                if (card && churnQTs.length) {
+                    const allItems = churnQTs.flatMap(q => q.b_opportunity_qt_item || []);
+                    const cAmt = allItems.reduce((s, i) => s + (+i.amount || 0), 0);
+                    const cGP  = allItems.reduce((s, i) => s + (+i.gp  || 0), 0);
+                    const cPct = cAmt > 0 && cGP > 0 ? `${(cGP / cAmt * 100).toFixed(1)}%` : '';
+                    const cPctNum = cAmt > 0 && cGP > 0 ? Math.min(cGP / cAmt * 100, 100).toFixed(1) : 0;
+                    const amtEl  = card.querySelector('[data-amt-val]');
+                    const gpEl   = card.querySelector('[data-gp-val]');
+                    const pctEl  = card.querySelector('[data-gp-pct]');
+                    const barEl  = card.querySelector('[data-bar-fill]');
+                    if (amtEl) amtEl.textContent = fmtAmt(cAmt);
+                    if (gpEl)  gpEl.textContent  = fmtAmt(cGP);
+                    if (pctEl) pctEl.textContent = cPct;
+                    if (barEl) barEl.style.width = cPctNum + '%';
+                }
             } else {
                 zone.innerHTML = data.map(renderQT).join('');
             }
