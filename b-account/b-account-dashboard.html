@@ -6,29 +6,637 @@
     <title>B-ACCOUNT | Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="/system/config.js"></script>
     <script src="/system/system.js"></script>
     <script src="b-account.js"></script>
     <link rel="stylesheet" href="b-account.css">
     <style>
-        .coming-soon { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; color: #94a3b8; gap: 16px; }
-        .coming-soon i { font-size: 3rem; }
-        .coming-soon h2 { font-size: 1.1rem; font-weight: 800; color: #64748b; margin: 0; }
-        .coming-soon p { font-size: 0.85rem; margin: 0; }
+        body { padding-bottom: 80px; }
+
+        /* ── Filter bar ── */
+        .dash-ctrl { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 10px 20px; position: sticky; top: 0; z-index: 100; }
+        .dash-ctrl-inner { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .year-tabs { display: flex; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+        .year-tab { border: none; border-right: 1.5px solid #e2e8f0; background: #fff; padding: 0 14px; height: 34px; font-size: 0.75rem; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; font-family: inherit; white-space: nowrap; }
+        .year-tab:last-child { border-right: none; }
+        .year-tab.active { background: #1e293b; color: #bdc432; }
+        .dash-sep { width: 1px; height: 20px; background: #e2e8f0; flex-shrink: 0; }
+        .dash-sel { border: 1.5px solid #e2e8f0; border-radius: 10px; background: #fff; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 0 12px; height: 34px; font-family: inherit; cursor: pointer; transition: 0.2s; }
+        .dash-sel:focus { outline: none; border-color: #bdc432; }
+        .dash-sel.active-filter { border-color: #bdc432; background: #fffef0; color: #7a8500; }
+        .dash-refresh-btn { border: 1.5px solid #e2e8f0; background: #fff; border-radius: 10px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: 0.2s; margin-left: auto; flex-shrink: 0; }
+        .dash-refresh-btn:hover { background: #f8fafc; color: #1e293b; border-color: #cbd5e1; }
+        .dash-refresh-btn.spin i { animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .dash-updated { font-size: 0.65rem; color: #94a3b8; white-space: nowrap; flex-shrink: 0; }
+
+        /* ── Wrap ── */
+        .dash-wrap { max-width: 1320px; margin: 0 auto; padding: 18px 20px 0; }
+
+        /* ── KPI Row ── */
+        .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 18px; }
+        @media (max-width: 1100px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 640px)  { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+        .kpi-card { background: #fff; border: 1px solid #eef2f7; border-radius: 16px; padding: 15px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border-left: 4px solid #e2e8f0; }
+        .kpi-card.c-blue   { border-left-color: #3b82f6; }
+        .kpi-card.c-accent { border-left-color: #bdc432; }
+        .kpi-card.c-green  { border-left-color: #16a34a; }
+        .kpi-card.c-lime   { border-left-color: #a3b020; }
+        .kpi-card.c-orange { border-left-color: #f97316; }
+        .kpi-card.c-slate  { border-left-color: #64748b; }
+        .kpi-label { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+        .kpi-val { font-size: 1.3rem; font-weight: 800; color: #1e293b; line-height: 1.1; letter-spacing: -0.5px; }
+        .kpi-val.blue   { color: #3b82f6; }
+        .kpi-val.green  { color: #16a34a; }
+        .kpi-val.orange { color: #f97316; }
+        .kpi-sub { font-size: 0.63rem; color: #94a3b8; margin-top: 3px; }
+
+        /* ── Section header ── */
+        .sec-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .sec-hd-bar { width: 4px; height: 18px; background: #bdc432; border-radius: 2px; flex-shrink: 0; }
+        .sec-hd-title { font-size: 0.75rem; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sec-hd-sub { font-size: 0.68rem; color: #94a3b8; margin-left: auto; }
+
+        /* ── Cards ── */
+        .dash-card { background: #fff; border: 1px solid #eef2f7; border-radius: 16px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+
+        /* ── Main grid: BU table + Status donut ── */
+        .main-grid { display: grid; grid-template-columns: 1fr 320px; gap: 14px; margin-bottom: 14px; align-items: start; }
+        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+        /* ── BU Table ── */
+        .bu-tbl { width: 100%; border-collapse: collapse; }
+        .bu-tbl th { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.6px; padding: 0 10px 10px; border-bottom: 2px solid #f1f5f9; white-space: nowrap; }
+        .bu-tbl th:first-child { text-align: left; }
+        .bu-tbl th:not(:first-child) { text-align: right; }
+        .bu-tbl td { padding: 9px 10px; border-bottom: 1px solid #f8fafc; font-size: 0.79rem; vertical-align: middle; }
+        .bu-tbl td:first-child { font-weight: 700; color: #1e293b; min-width: 100px; }
+        .bu-tbl td:not(:first-child) { text-align: right; color: #475569; font-variant-numeric: tabular-nums; }
+        .bu-tbl tr:last-child td { border-bottom: none; }
+        .bu-tbl tbody tr:hover td { background: #f8fafc; }
+        .bu-gp { color: #16a34a; font-weight: 700; }
+        .bu-gp-pct { font-size: 0.65rem; color: #16a34a; font-weight: 700; display: block; }
+        .bu-churn { color: #f97316; font-weight: 700; }
+        .bu-bar-wrap { width: 72px; height: 3px; background: #f1f5f9; border-radius: 99px; margin-top: 4px; }
+        .bu-bar-fill { height: 100%; background: linear-gradient(90deg,#bdc432,#a3b020); border-radius: 99px; }
+        .bu-tbl tfoot td { font-weight: 800; color: #1e293b !important; background: #f8fafc; border-top: 2px solid #e2e8f0 !important; border-bottom: none !important; font-size: 0.8rem; }
+        .bu-tbl tfoot .bu-gp  { color: #16a34a !important; }
+        .bu-tbl tfoot .bu-churn { color: #f97316 !important; }
+
+        /* ── Status donut ── */
+        .donut-wrap { display: flex; align-items: center; justify-content: center; padding: 4px 0 8px; }
+        .status-legend { display: flex; flex-direction: column; gap: 7px; }
+        .leg-row { display: flex; align-items: center; gap: 8px; }
+        .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .leg-name { font-size: 0.74rem; font-weight: 600; color: #475569; flex: 1; }
+        .leg-cnt  { font-size: 0.72rem; font-weight: 700; color: #1e293b; width: 22px; text-align: right; }
+        .leg-pct  { font-size: 0.65rem; color: #94a3b8; width: 34px; text-align: right; }
+
+        /* ── Monthly chart ── */
+        .monthly-wrap { height: 210px; }
+
+        /* ── Bottom row ── */
+        .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+        @media (max-width: 860px) { .bottom-row { grid-template-columns: 1fr; } }
+
+        /* ── Bar rows (type/owner) ── */
+        .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .bar-row:last-child { margin-bottom: 0; }
+        .bar-name { font-size: 0.74rem; font-weight: 700; color: #475569; width: 100px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bar-track { flex: 1; height: 6px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+        .bar-fill  { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+        .bar-amt   { font-size: 0.72rem; font-weight: 700; color: #1e293b; width: 80px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+        .bar-cnt   { font-size: 0.64rem; color: #94a3b8; width: 50px; text-align: right; flex-shrink: 0; }
+
+        /* ── Empty / loading ── */
+        .dash-empty { display: flex; align-items: center; justify-content: center; height: 100px; color: #94a3b8; font-size: 0.78rem; gap: 7px; }
+        .dash-spinner { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body>
-<div class="coming-soon">
-    <i class="bi bi-pie-chart-fill"></i>
-    <h2>Dashboard</h2>
-    <p>This section is under construction.</p>
+
+<div class="dash-ctrl">
+    <div class="dash-ctrl-inner">
+        <div class="year-tabs" id="yearTabs"></div>
+        <div class="dash-sep"></div>
+        <select class="dash-sel" id="dashStatus" onchange="onFilterChange()">
+            <option value="">All Status</option>
+        </select>
+        <select class="dash-sel" id="dashType" onchange="onFilterChange()">
+            <option value="">All Type</option>
+            <option value="New Business">New Business</option>
+            <option value="Retention">Retention</option>
+            <option value="Up Sale">Up Sale</option>
+        </select>
+        <button class="dash-refresh-btn" id="dashRefreshBtn" onclick="loadData()" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+        <span class="dash-updated" id="dashUpdated"></span>
+    </div>
 </div>
+
+<div class="dash-wrap">
+
+    <!-- KPIs -->
+    <div class="kpi-row" id="kpiRow">
+        <div class="kpi-card c-blue"><div class="dash-empty dash-spinner" style="height:50px"><i class="bi bi-arrow-repeat"></i></div></div>
+        <div class="kpi-card c-accent"></div>
+        <div class="kpi-card c-green"></div>
+        <div class="kpi-card c-lime"></div>
+        <div class="kpi-card c-orange"></div>
+        <div class="kpi-card c-slate"></div>
+    </div>
+
+    <!-- BU Table + Status Donut -->
+    <div class="main-grid">
+        <div class="dash-card">
+            <div class="sec-hd">
+                <div class="sec-hd-bar"></div>
+                <span class="sec-hd-title">BU Breakdown</span>
+                <span class="sec-hd-sub" id="buCount"></span>
+            </div>
+            <div id="buTableWrap">
+                <div class="dash-empty"><i class="bi bi-arrow-repeat dash-spinner"></i> Loading…</div>
+            </div>
+        </div>
+        <div class="dash-card">
+            <div class="sec-hd">
+                <div class="sec-hd-bar"></div>
+                <span class="sec-hd-title">Status</span>
+            </div>
+            <div class="donut-wrap"><canvas id="statusChart" width="180" height="180"></canvas></div>
+            <div class="status-legend" id="statusLegend"></div>
+        </div>
+    </div>
+
+    <!-- Monthly Trend -->
+    <div class="dash-card" style="margin-bottom:14px">
+        <div class="sec-hd">
+            <div class="sec-hd-bar"></div>
+            <span class="sec-hd-title">Monthly Trend</span>
+            <span class="sec-hd-sub">Amount &amp; GP by create date</span>
+        </div>
+        <div class="monthly-wrap"><canvas id="monthlyChart"></canvas></div>
+    </div>
+
+    <!-- Type + Owner -->
+    <div class="bottom-row">
+        <div class="dash-card">
+            <div class="sec-hd">
+                <div class="sec-hd-bar"></div>
+                <span class="sec-hd-title">Business Type</span>
+            </div>
+            <div id="typeBreakdown"><div class="dash-empty"><i class="bi bi-arrow-repeat dash-spinner"></i></div></div>
+        </div>
+        <div class="dash-card">
+            <div class="sec-hd">
+                <div class="sec-hd-bar"></div>
+                <span class="sec-hd-title">Top Owners</span>
+            </div>
+            <div id="ownerBreakdown"><div class="dash-empty"><i class="bi bi-arrow-repeat dash-spinner"></i></div></div>
+        </div>
+    </div>
+
+</div>
+
 <script>
-    async function initPage() {
-        sessionStorage.removeItem('bx_perms_baccount');
-        await initLayout(B_ACCOUNT_CONFIG);
+// ── State ─────────────────────────────────────────────────────────────────────
+let _opps  = [];
+let _qtMap = new Map(); // oppId → [{qt_type, b_opportunity_qt_item:[{bu,qty,price,discount,gp}]}]
+let _yearFilter   = String(new Date().getFullYear());
+let _statusFilter = '';
+let _typeFilter   = '';
+let _chartStatus  = null;
+let _chartMonthly = null;
+
+const STATUS_CLR = {
+    'Active':       '#16a34a',
+    'Won':          '#bdc432',
+    'Churn':        '#f97316',
+    'Lost':         '#ef4444',
+    'Pending':      '#f59e0b',
+    'In Progress':  '#3b82f6',
+    'End Contact':  '#64748b',
+};
+const TYPE_CLR = { 'New Business': '#3b82f6', 'Retention': '#8b5cf6', 'Up Sale': '#0d9488' };
+const MONTHS   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── Format helpers ─────────────────────────────────────────────────────────────
+function fmtK(n) {
+    if (!n || isNaN(+n) || +n === 0) return '—';
+    const v = +n;
+    if (v >= 1e6) return (v/1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (v >= 1e3) return (v/1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+    return v.toLocaleString('en-US');
+}
+function fmtN(n) {
+    if (!n || isNaN(+n) || +n === 0) return '—';
+    return Number(n).toLocaleString('en-US');
+}
+function pctStr(a, b) {
+    if (!a || !b || +b === 0) return null;
+    return (+a / +b * 100).toFixed(1) + '%';
+}
+
+// ── Year tabs ─────────────────────────────────────────────────────────────────
+function initYearTabs() {
+    const cur = new Date().getFullYear();
+    const years = [];
+    for (let y = 2024; y <= cur; y++) years.push(y);
+    document.getElementById('yearTabs').innerHTML = years.map(y =>
+        `<button class="year-tab${y == _yearFilter ? ' active' : ''}" onclick="setYear(${y})">${y}</button>`
+    ).join('');
+}
+
+function setYear(y) {
+    _yearFilter = String(y);
+    document.querySelectorAll('.year-tab').forEach(b =>
+        b.classList.toggle('active', b.textContent.trim() === _yearFilter)
+    );
+    render();
+}
+
+function onFilterChange() {
+    _statusFilter = document.getElementById('dashStatus').value;
+    _typeFilter   = document.getElementById('dashType').value;
+    document.getElementById('dashStatus').classList.toggle('active-filter', !!_statusFilter);
+    document.getElementById('dashType').classList.toggle('active-filter', !!_typeFilter);
+    render();
+}
+
+// ── Load data ─────────────────────────────────────────────────────────────────
+async function loadData() {
+    const btn = document.getElementById('dashRefreshBtn');
+    btn.classList.add('spin');
+
+    const [
+        { data: opps,     error: e1 },
+        { data: qts,      error: e2 },
+        { data: statuses, error: e3 }
+    ] = await Promise.all([
+        supabaseClient.from('b_opportunity_list')
+            .select('opportunity_id, status, business_type, total_amount, total_gp, create_date, owner, company')
+            .limit(3000),
+        supabaseClient.from('b_opportunity_qt')
+            .select('opportunity_id, qt_type, b_opportunity_qt_item(bu, qty, price, discount, gp)')
+            .limit(10000),
+        supabaseClient.from('b_opp_config')
+            .select('value').eq('type','status').order('value')
+    ]);
+
+    btn.classList.remove('spin');
+    if (e1 || e2) { console.error('[dash]', e1 || e2); return; }
+
+    _opps = opps || [];
+
+    // Populate status dropdown
+    const sSel = document.getElementById('dashStatus');
+    while (sSel.options.length > 1) sSel.remove(1);
+    (statuses || []).forEach(s => {
+        const o = document.createElement('option');
+        o.value = o.textContent = s.value;
+        sSel.appendChild(o);
+    });
+
+    _qtMap.clear();
+    (qts || []).forEach(qt => {
+        if (!_qtMap.has(qt.opportunity_id)) _qtMap.set(qt.opportunity_id, []);
+        _qtMap.get(qt.opportunity_id).push(qt);
+    });
+
+    document.getElementById('dashUpdated').textContent =
+        'Updated ' + new Date().toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
+
+    render();
+}
+
+// ── Compute aggregates ─────────────────────────────────────────────────────────
+function computeData() {
+    const filtered = _opps.filter(o => {
+        if (_yearFilter && !(o.create_date || '').startsWith(_yearFilter)) return false;
+        if (_statusFilter && o.status !== _statusFilter) return false;
+        if (_typeFilter   && o.business_type !== _typeFilter)   return false;
+        return true;
+    });
+
+    let totalDeals = filtered.length;
+    let activeDeals = 0;
+    let grandOrigAmt = 0, grandOrigGP = 0, grandChurnAmt = 0;
+
+    const buMap     = new Map(); // bu     → { deals:Set, origAmt, origGP, churnAmt }
+    const statusMap = new Map(); // status → { count, amt, gp }
+    const monthMap  = new Map(); // YYYY-MM → { amt, gp }
+    const typeMap   = new Map(); // type   → { count, amt, gp }
+    const ownerMap  = new Map(); // owner  → { count, amt, gp }
+
+    for (const opp of filtered) {
+        if (opp.status === 'Active') activeDeals++;
+
+        if (!statusMap.has(opp.status)) statusMap.set(opp.status, { count: 0, amt: 0, gp: 0 });
+        statusMap.get(opp.status).count++;
+
+        const type  = opp.business_type || 'Other';
+        const owner = opp.owner         || 'Unknown';
+        const month = (opp.create_date || '').slice(0, 7);
+
+        if (!typeMap.has(type))   typeMap.set(type,  { count: 0, amt: 0, gp: 0 });
+        if (!ownerMap.has(owner)) ownerMap.set(owner, { count: 0, amt: 0, gp: 0 });
+        typeMap.get(type).count++;
+        ownerMap.get(owner).count++;
+
+        if (month && !monthMap.has(month)) monthMap.set(month, { amt: 0, gp: 0 });
+
+        const qts = _qtMap.get(opp.opportunity_id) || [];
+        for (const qt of qts) {
+            for (const item of (qt.b_opportunity_qt_item || [])) {
+                const amt = Math.max(0, (+(item.qty) || 0) * (+(item.price) || 0) - (+(item.discount) || 0));
+                const gp  = +(item.gp) || 0;
+                const bu  = item.bu || 'Other';
+
+                if (!buMap.has(bu)) buMap.set(bu, { deals: new Set(), origAmt: 0, origGP: 0, churnAmt: 0 });
+                buMap.get(bu).deals.add(opp.opportunity_id);
+
+                if (qt.qt_type === 'churn') {
+                    grandChurnAmt += amt;
+                    buMap.get(bu).churnAmt += amt;
+                } else {
+                    grandOrigAmt += amt;
+                    grandOrigGP  += gp;
+                    buMap.get(bu).origAmt += amt;
+                    buMap.get(bu).origGP  += gp;
+                    statusMap.get(opp.status).amt += amt;
+                    statusMap.get(opp.status).gp  += gp;
+                    typeMap.get(type).amt += amt;
+                    typeMap.get(type).gp  += gp;
+                    ownerMap.get(owner).amt += amt;
+                    ownerMap.get(owner).gp  += gp;
+                    if (month) { monthMap.get(month).amt += amt; monthMap.get(month).gp += gp; }
+                }
+            }
+        }
     }
-    initPage();
+
+    return { totalDeals, activeDeals, grandOrigAmt, grandOrigGP, grandChurnAmt, buMap, statusMap, monthMap, typeMap, ownerMap };
+}
+
+// ── Render all ────────────────────────────────────────────────────────────────
+function render() {
+    const d = computeData();
+    renderKPIs(d);
+    renderBUTable(d);
+    renderStatusChart(d);
+    renderMonthlyChart(d);
+    renderTypeBreakdown(d);
+    renderOwnerBreakdown(d);
+}
+
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+function renderKPIs({ totalDeals, activeDeals, grandOrigAmt, grandOrigGP, grandChurnAmt }) {
+    const gpP = pctStr(grandOrigGP, grandOrigAmt);
+    const net  = grandOrigAmt - grandChurnAmt;
+    document.getElementById('kpiRow').innerHTML = `
+        <div class="kpi-card c-blue">
+            <div class="kpi-label"><i class="bi bi-briefcase-fill"></i> Deals</div>
+            <div class="kpi-val blue">${totalDeals}</div>
+            <div class="kpi-sub">${activeDeals} active</div>
+        </div>
+        <div class="kpi-card c-accent">
+            <div class="kpi-label"><i class="bi bi-currency-exchange"></i> Amount</div>
+            <div class="kpi-val">${fmtK(grandOrigAmt)}</div>
+            <div class="kpi-sub">${fmtN(grandOrigAmt)} ฿</div>
+        </div>
+        <div class="kpi-card c-green">
+            <div class="kpi-label"><i class="bi bi-graph-up-arrow"></i> GP</div>
+            <div class="kpi-val green">${fmtK(grandOrigGP)}</div>
+            <div class="kpi-sub">${fmtN(grandOrigGP)} ฿</div>
+        </div>
+        <div class="kpi-card c-lime">
+            <div class="kpi-label"><i class="bi bi-percent"></i> GP%</div>
+            <div class="kpi-val">${gpP || '—'}</div>
+            <div class="kpi-sub">of total amount</div>
+        </div>
+        <div class="kpi-card c-orange">
+            <div class="kpi-label"><i class="bi bi-arrow-down-circle-fill"></i> Churn</div>
+            <div class="kpi-val orange">${fmtK(grandChurnAmt)}</div>
+            <div class="kpi-sub">${fmtN(grandChurnAmt)} ฿</div>
+        </div>
+        <div class="kpi-card c-slate">
+            <div class="kpi-label"><i class="bi bi-check2-circle"></i> Net Amount</div>
+            <div class="kpi-val">${fmtK(net)}</div>
+            <div class="kpi-sub">after churn</div>
+        </div>
+    `;
+}
+
+// ── BU Table ──────────────────────────────────────────────────────────────────
+function renderBUTable({ buMap, grandOrigAmt }) {
+    const rows = [...buMap.entries()].sort((a, b) => b[1].origAmt - a[1].origAmt);
+    document.getElementById('buCount').textContent = rows.length + (rows.length === 1 ? ' BU' : ' BUs');
+
+    if (!rows.length) {
+        document.getElementById('buTableWrap').innerHTML = '<div class="dash-empty">No data</div>';
+        return;
+    }
+
+    const tRows = rows.map(([bu, d]) => {
+        const gPct = pctStr(d.origGP, d.origAmt);
+        const barW = grandOrigAmt > 0 ? Math.min(100, Math.round(d.origAmt / grandOrigAmt * 100)) : 0;
+        return `<tr>
+            <td>
+                <div>${bu}</div>
+                <div class="bu-bar-wrap"><div class="bu-bar-fill" style="width:${barW}%"></div></div>
+            </td>
+            <td style="color:#94a3b8">${d.deals.size}</td>
+            <td>${fmtN(d.origAmt) !== '—' ? fmtN(d.origAmt) : '—'}</td>
+            <td class="bu-gp">
+                ${fmtN(d.origGP)}
+                ${gPct ? `<span class="bu-gp-pct">${gPct}</span>` : ''}
+            </td>
+            <td class="bu-churn">${d.churnAmt > 0 ? fmtN(d.churnAmt) : '—'}</td>
+        </tr>`;
+    }).join('');
+
+    const totAmt   = rows.reduce((s,[,d]) => s + d.origAmt, 0);
+    const totGP    = rows.reduce((s,[,d]) => s + d.origGP, 0);
+    const totChurn = rows.reduce((s,[,d]) => s + d.churnAmt, 0);
+    const totDeals = new Set(rows.flatMap(([,d]) => [...d.deals])).size;
+
+    document.getElementById('buTableWrap').innerHTML = `
+        <table class="bu-tbl">
+            <thead>
+                <tr>
+                    <th>BU</th>
+                    <th>Deals</th>
+                    <th>Amount</th>
+                    <th>GP</th>
+                    <th>Churn</th>
+                </tr>
+            </thead>
+            <tbody>${tRows}</tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td>${totDeals}</td>
+                    <td>${fmtN(totAmt)}</td>
+                    <td class="bu-gp">${fmtN(totGP)} ${pctStr(totGP, totAmt) ? `<span class="bu-gp-pct">${pctStr(totGP, totAmt)}</span>` : ''}</td>
+                    <td class="bu-churn">${totChurn > 0 ? fmtN(totChurn) : '—'}</td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+}
+
+// ── Status Donut ──────────────────────────────────────────────────────────────
+function renderStatusChart({ statusMap }) {
+    const entries = [...statusMap.entries()].sort((a, b) => b[1].count - a[1].count);
+    const labels  = entries.map(([s]) => s);
+    const counts  = entries.map(([,d]) => d.count);
+    const colors  = labels.map(s => STATUS_CLR[s] || '#94a3b8');
+    const total   = counts.reduce((s,c) => s+c, 0);
+
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    if (_chartStatus) _chartStatus.destroy();
+    _chartStatus = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: counts,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#fff',
+                hoverBorderWidth: 3
+            }]
+        },
+        options: {
+            cutout: '68%',
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => ` ${c.label}: ${c.parsed} deals` } }
+            },
+            animation: { duration: 500 }
+        }
+    });
+
+    document.getElementById('statusLegend').innerHTML = entries.map(([s, d]) => `
+        <div class="leg-row">
+            <div class="leg-dot" style="background:${STATUS_CLR[s]||'#94a3b8'}"></div>
+            <span class="leg-name">${s}</span>
+            <span class="leg-cnt">${d.count}</span>
+            <span class="leg-pct">${total ? Math.round(d.count/total*100)+'%' : ''}</span>
+        </div>
+    `).join('');
+}
+
+// ── Monthly Trend ─────────────────────────────────────────────────────────────
+function renderMonthlyChart({ monthMap }) {
+    const sorted = [...monthMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    const labels = sorted.map(([m]) => {
+        const [y, mo] = m.split('-');
+        return MONTHS[+mo-1] + ' ' + y.slice(2);
+    });
+    const amts = sorted.map(([,d]) => d.amt);
+    const gps  = sorted.map(([,d]) => d.gp);
+
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+    if (_chartMonthly) _chartMonthly.destroy();
+    _chartMonthly = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Amount',
+                    data: amts,
+                    borderColor: '#1e293b',
+                    backgroundColor: 'rgba(30,41,59,0.07)',
+                    borderWidth: 2.5,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#1e293b',
+                    tension: 0.35,
+                    fill: true,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'GP',
+                    data: gps,
+                    borderColor: '#bdc432',
+                    backgroundColor: 'rgba(189,196,50,0.07)',
+                    borderWidth: 2.5,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#bdc432',
+                    tension: 0.35,
+                    fill: false,
+                    yAxisID: 'y'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: {
+                    position: 'top', align: 'end',
+                    labels: { boxWidth: 12, boxHeight: 12, borderRadius: 3, useBorderRadius: true, font: { size: 11, weight: 700 }, padding: 14 }
+                },
+                tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${Number(c.raw).toLocaleString('en-US')} ฿` } }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#94a3b8' } },
+                y: {
+                    grid: { color: '#f1f5f9' },
+                    ticks: { font: { size: 10 }, color: '#94a3b8', callback: v => fmtK(v) },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// ── Business Type ─────────────────────────────────────────────────────────────
+function renderTypeBreakdown({ typeMap }) {
+    const rows = [...typeMap.entries()].sort((a, b) => b[1].amt - a[1].amt);
+    const maxAmt = Math.max(...rows.map(r => r[1].amt), 1);
+    document.getElementById('typeBreakdown').innerHTML = rows.length ? rows.map(([type, d]) => `
+        <div class="bar-row">
+            <span class="bar-name">${type}</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width:${Math.round(d.amt/maxAmt*100)}%;background:${TYPE_CLR[type]||'#94a3b8'}"></div>
+            </div>
+            <span class="bar-amt">${fmtK(d.amt)}</span>
+            <span class="bar-cnt">${d.count} deals</span>
+        </div>
+    `).join('') : '<div class="dash-empty">No data</div>';
+}
+
+// ── Top Owners ────────────────────────────────────────────────────────────────
+function renderOwnerBreakdown({ ownerMap }) {
+    const rows = [...ownerMap.entries()]
+        .sort((a, b) => b[1].amt - a[1].amt)
+        .slice(0, 8);
+    const maxAmt = Math.max(...rows.map(r => r[1].amt), 1);
+    document.getElementById('ownerBreakdown').innerHTML = rows.length ? rows.map(([owner, d]) => `
+        <div class="bar-row">
+            <span class="bar-name">${owner}</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width:${Math.round(d.amt/maxAmt*100)}%;background:#1e293b"></div>
+            </div>
+            <span class="bar-amt">${fmtK(d.amt)}</span>
+            <span class="bar-cnt">${d.count} deals</span>
+        </div>
+    `).join('') : '<div class="dash-empty">No data</div>';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function initPage() {
+    sessionStorage.removeItem('bx_perms_baccount');
+    await initLayout(B_ACCOUNT_CONFIG);
+    initYearTabs();
+    await loadData();
+}
+initPage();
 </script>
 </body>
 </html>
