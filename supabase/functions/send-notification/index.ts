@@ -9,9 +9,9 @@ const LOGO_URL = 'https://hdulohaxociujwaziszy.supabase.co/storage/v1/object/pub
 
 // action config
 const ACTION_CFG: Record<string, { label: string; color: string; bg: string; desc: string }> = {
-  new:    { label: 'NEW OPPORTUNITY', color: '#fff',     bg: '#16a34a', desc: 'มี Opportunity ใหม่เข้ามา' },
-  churn:  { label: 'CHURN',           color: '#fff',     bg: '#f97316', desc: 'สถานะเปลี่ยนเป็น Churn' },
-  delete: { label: 'DELETED',         color: '#fff',     bg: '#ef4444', desc: 'Opportunity ถูกลบออกจากระบบ' },
+  new:    { label: 'NEW OPPORTUNITY', color: '#fff', bg: '#16a34a', desc: 'A new opportunity has been created' },
+  churn:  { label: 'CHURN',           color: '#fff', bg: '#f97316', desc: 'Opportunity status changed to Churn' },
+  delete: { label: 'DELETED',         color: '#fff', bg: '#ef4444', desc: 'Opportunity has been deleted from the system' },
 }
 
 function fNum(n: number | null | undefined): string {
@@ -22,7 +22,7 @@ function fNum(n: number | null | undefined): string {
 function fDate(d: string | null | undefined): string {
   if (!d) return '—'
   try {
-    return new Date(d).toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' })
+    return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   } catch { return d }
 }
 
@@ -50,28 +50,25 @@ serve(async (req) => {
 
     const cfg = ACTION_CFG[action] || ACTION_CFG.new
 
-    // ── Amount / GP summary zone ────────────────────────────────────────────
+    // ── Amount / GP badge strip (inside header) ──────────────────────────────
     const pct = gpPct(+gp, +amount)
-    const summaryZone = `
-    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin:24px 0;border-radius:12px;overflow:hidden;border:1.5px solid #e2e8f0">
+    const summaryBadges = `
       <tr>
-        <td width="33%" align="center" style="padding:18px 10px;border-right:1px solid #e2e8f0;background:#fff">
-          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Amount</div>
-          <div style="font-size:20px;font-weight:800;color:#1e293b;letter-spacing:-0.5px">${fNum(amount)}</div>
-          <div style="font-size:11px;color:#94a3b8;margin-top:2px">บาท</div>
+        <td style="padding:10px 32px 18px">
+          <span style="display:inline-block;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:4px 14px;margin-right:8px">
+            <span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;text-transform:uppercase;letter-spacing:0.5px">Amount </span>
+            <span style="font-size:13px;color:#fff;font-weight:800">${fNum(amount)} ฿</span>
+          </span>
+          <span style="display:inline-block;background:rgba(22,163,74,0.25);border:1px solid rgba(22,163,74,0.4);border-radius:20px;padding:4px 14px;margin-right:8px">
+            <span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;text-transform:uppercase;letter-spacing:0.5px">GP </span>
+            <span style="font-size:13px;color:#4ade80;font-weight:800">${fNum(gp)} ฿</span>
+          </span>
+          <span style="display:inline-block;background:rgba(189,196,50,0.2);border:1px solid rgba(189,196,50,0.35);border-radius:20px;padding:4px 14px">
+            <span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;text-transform:uppercase;letter-spacing:0.5px">GP% </span>
+            <span style="font-size:13px;color:#bdc432;font-weight:800">${pct}</span>
+          </span>
         </td>
-        <td width="33%" align="center" style="padding:18px 10px;border-right:1px solid #e2e8f0;background:#fff">
-          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">GP</div>
-          <div style="font-size:20px;font-weight:800;color:#16a34a;letter-spacing:-0.5px">${fNum(gp)}</div>
-          <div style="font-size:11px;color:#94a3b8;margin-top:2px">บาท</div>
-        </td>
-        <td width="34%" align="center" style="padding:18px 10px;background:#fff">
-          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">GP%</div>
-          <div style="font-size:20px;font-weight:800;color:#bdc432;letter-spacing:-0.5px">${pct}</div>
-          <div style="font-size:11px;color:#94a3b8;margin-top:2px">of amount</div>
-        </td>
-      </tr>
-    </table>`
+      </tr>`
 
     // ── QT sections ─────────────────────────────────────────────────────────
     const qtSections = (qts as any[]).map(qt => {
@@ -179,6 +176,7 @@ serve(async (req) => {
       </table>
     </td>
   </tr>
+  ${summaryBadges}
 
   <!-- BODY -->
   <tr>
@@ -243,9 +241,6 @@ serve(async (req) => {
         </tr>
       </table>
 
-      <!-- Amount / GP / GP% summary -->
-      ${summaryZone}
-
       <!-- QT sections -->
       ${qts.length ? `
       <div style="margin-bottom:12px">
@@ -261,7 +256,7 @@ serve(async (req) => {
   <tr>
     <td style="background:#f8fafc;padding:12px 32px;border-top:1px solid #f1f5f9;text-align:center">
       <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:0.5px">BRANDBOX · B-ACCOUNT</div>
-      <div style="font-size:10px;color:#cbd5e1;margin-top:3px">${new Date().toLocaleString('th-TH')}</div>
+      <div style="font-size:10px;color:#cbd5e1;margin-top:3px">${new Date().toLocaleString('en-GB')}</div>
     </td>
   </tr>
 
