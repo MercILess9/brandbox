@@ -19,8 +19,10 @@ const B_OPP_MODAL_HTML = `
     .bopp-hdr-tlbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.4); }
     .bopp-hdr-pct-badge { background: #bdc432; color: #1e293b; border-radius: 100px; padding: 5px 10px; font-size: 0.85rem; font-weight: 800; line-height: 1; white-space: nowrap; }
     .bopp-hdr-pct-badge:empty { display: none; }
-    .bopp-hdr-tval.lost { color: #f97316; }
-    .bopp-hdr-lost-wrap { display: none; align-items: center; gap: 14px; }
+    .bopp-hdr-lost-zone { display: none; align-items: center; gap: 12px; border: 1px solid rgba(249,115,22,0.45); border-radius: 10px; padding: 5px 14px; background: rgba(249,115,22,0.08); margin-right: 6px; }
+    .bopp-hdr-lost-zone .bopp-hdr-tval { color: #f97316; }
+    .bopp-hdr-lost-zone .bopp-hdr-tlbl { color: rgba(249,115,22,0.6); }
+    .bopp-hdr-lost-zone .bopp-hdr-tdiv { background: rgba(249,115,22,0.3); }
     .bopp-hdr-tdiv { width: 1px; height: 26px; background: rgba(255,255,255,0.15); }
     .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; transition: background-color 0.2s, border-color 0.2s, color 0.2s; text-align: center; text-align-last: center; }
     .bopp-status-sel:focus { border-color: rgba(255,255,255,0.4); }
@@ -195,12 +197,16 @@ const B_OPP_MODAL_HTML = `
                 </div>
                 <div class="bopp-header-right">
                     <div class="bopp-hdr-totals" id="bopp-hdr-totals">
-                        <div class="bopp-hdr-lost-wrap" id="bopp-hdr-lost-wrap">
+                        <div class="bopp-hdr-lost-zone" id="bopp-hdr-lost-wrap">
                             <div class="bopp-hdr-tbox">
-                                <span class="bopp-hdr-tval lost" id="bopp-hdr-lost">0</span>
-                                <span class="bopp-hdr-tlbl">Churn Lost</span>
+                                <span class="bopp-hdr-tval" id="bopp-hdr-lost-amt">0</span>
+                                <span class="bopp-hdr-tlbl">Lost Amt</span>
                             </div>
                             <div class="bopp-hdr-tdiv"></div>
+                            <div class="bopp-hdr-tbox">
+                                <span class="bopp-hdr-tval" id="bopp-hdr-lost-gp">0</span>
+                                <span class="bopp-hdr-tlbl">Lost GP</span>
+                            </div>
                         </div>
                         <div class="bopp-hdr-tbox">
                             <span class="bopp-hdr-tval" id="bopp-hdr-amt">0</span>
@@ -584,8 +590,12 @@ const BOppApp = (() => {
         const lostWrap = el('bopp-hdr-lost-wrap');
         if (isChurnMode()) {
             const signAmt = _qts.reduce((s,qt) => s + qt._totAmt, 0);
-            const lost = signAmt - totAmt;
-            el('bopp-hdr-lost').textContent = (lost >= 0 ? '-' : '+') + fmtN(Math.abs(lost));
+            const signGP  = _qts.reduce((s,qt) => s + qt._totGP,  0);
+            const lostAmt = signAmt - totAmt;
+            const lostGP  = signGP  - totGP;
+            const fmt = v => (v >= 0 ? '-' : '+') + fmtN(Math.abs(v));
+            el('bopp-hdr-lost-amt').textContent = fmt(lostAmt);
+            el('bopp-hdr-lost-gp').textContent  = fmt(lostGP);
             lostWrap.style.display = 'flex';
         } else {
             lostWrap.style.display = 'none';
