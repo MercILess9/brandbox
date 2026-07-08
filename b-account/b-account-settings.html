@@ -48,6 +48,7 @@
         .cfg-row.is-del .cfg-row-del { color: #86efac; }
         .cfg-row.is-del .cfg-row-del:hover { background: #f0fdf4; color: #16a34a; }
         .cfg-empty { padding: 16px 18px; font-size: 0.78rem; color: #cbd5e1; font-weight: 600; }
+        .cfg-list--grid { display: grid; grid-template-columns: 1fr 1fr; }
 
         .cfg-add-row { display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--c-border); background: #fafbfc; }
         .cfg-add-input { flex: 1; border: 1px solid var(--c-border); border-radius: 10px; padding: 7px 12px; font-size: 0.82rem; outline: none; font-family: inherit; transition: 0.2s; background: #fff; }
@@ -215,11 +216,11 @@
 
     // ── Config State ──────────────────────────────────────────────
     const CFG_TYPES = [
-        { key: 'business_type', label: 'Business Type', icon: 'bi-briefcase-fill' },
+        { key: 'status',        label: 'Status',             icon: 'bi-circle-fill' },
+        { key: 'business_type', label: 'Business Type',      icon: 'bi-briefcase-fill' },
+        { key: 'company',       label: 'Company QT',         icon: 'bi-building-fill' },
         { key: 'bu',            label: 'Business Unit (BU)', icon: 'bi-grid-fill' },
-        { key: 'company',       label: 'Company QT', icon: 'bi-building-fill' },
-        { key: 'lead_source',   label: 'Lead Source', icon: 'bi-funnel-fill' },
-        { key: 'status',        label: 'Status', icon: 'bi-circle-fill' },
+        { key: 'lead_source',   label: 'Lead Source',        icon: 'bi-funnel-fill', full: true },
     ];
 
     const _cfg = {};  // _cfg[key] = { original: [], toAdd: [], toDelete: Set }
@@ -230,12 +231,14 @@
 
     function renderCfgCard(type, values) {
         _cfg[type.key] = { original: [...values], toAdd: [], toDelete: new Set() };
-        return `<div class="cfg-card" id="cfgCard-${type.key}">
+        const spanStyle = type.full ? ' style="grid-column:span 2"' : '';
+        const listClass = type.full ? 'cfg-list cfg-list--grid' : 'cfg-list';
+        return `<div class="cfg-card" id="cfgCard-${type.key}"${spanStyle}>
             <div class="cfg-card-head">
                 <div class="cfg-card-title"><i class="bi ${type.icon}"></i>${type.label} <span class="cfg-dirty-dot"></span></div>
                 <button class="btn-cfg-save" onclick="saveCfg('${type.key}')"><i class="bi bi-check2"></i> Save</button>
             </div>
-            <div class="cfg-list" id="cfgTags-${type.key}"></div>
+            <div class="${listClass}" id="cfgTags-${type.key}"></div>
             <div class="cfg-add-row">
                 <input type="text" class="cfg-add-input" id="cfgInput-${type.key}" placeholder="Add new value..." onkeydown="if(event.key==='Enter')addCfgTag('${type.key}')">
                 <button class="btn-cfg-add" onclick="addCfgTag('${type.key}')"><i class="bi bi-plus-lg"></i> Add</button>
