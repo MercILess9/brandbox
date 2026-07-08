@@ -935,7 +935,9 @@ const BOppApp = (() => {
     async function _deleteOppQTs(oppId) {
         const { data: oldQts } = await supabaseClient.from('b_opportunity_qt').select('qt_id').eq('opportunity_id', oppId);
         if (oldQts?.length) {
-            await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', oldQts.map(q => q.qt_id));
+            const qtIds = oldQts.map(q => q.qt_id);
+            await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', qtIds);
+            await supabaseClient.from('b_finance_qt').delete().in('qt_id', qtIds);
             await supabaseClient.from('b_opportunity_qt').delete().eq('opportunity_id', oppId);
         }
     }
@@ -961,6 +963,11 @@ const BOppApp = (() => {
         if (itemRows.length) {
             const { error: itemErr } = await supabaseClient.from('b_opportunity_qt_item').insert(itemRows);
             if (itemErr) throw itemErr;
+        }
+        if (qtType === 'original') {
+            supabaseClient.from('b_finance_qt')
+                .insert({ qt_id: qtRow.qt_id, sub_index: 1, quotation_sub: qt.qt_number.trim() || qtRow.qt_id })
+                .then(({ error }) => { if (error) console.warn('[finance auto-create]', error); });
         }
     }
 

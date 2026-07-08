@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>B-FINANCE</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/system/config.js"></script>
+    <script src="/system/system.js"></script>
+    <script src="b-finance.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="b-finance.css">
+</head>
+<body>
+
+<div class="finance-layout">
+    <!-- Left Panel -->
+    <div class="fin-left">
+        <div class="fin-left-top">
+            <div class="fin-search-wrap">
+                <i class="bi bi-search fin-search-icon"></i>
+                <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search account...">
+            </div>
+        </div>
+        <div class="fin-tree" id="acctTree">
+            <div style="padding:20px;text-align:center;color:#cbd5e1;font-size:0.78rem">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="fin-right" id="finRight">
+        <div class="fin-empty" id="finEmpty">
+            <i class="bi bi-wallet2"></i>
+            <p>Select a company to view Finance QTs</p>
+        </div>
+        <div id="finContent" style="display:none">
+            <div class="fin-company-hdr" id="finCompanyHdr"></div>
+            <div id="finOppList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Bar -->
+<div class="fin-save-bar" id="finSaveBar">
+    <div class="save-bar-left">
+        <div class="save-bar-dot"></div>
+        <span class="save-bar-text" id="finSaveCount"></span>
+    </div>
+    <div class="save-bar-btns">
+        <button class="btn-save-discard" onclick="discardChanges()">Discard</button>
+        <button class="btn-save-confirm" onclick="saveChanges()">Save</button>
+    </div>
+</div>
+
+<script>
+const esc  = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fNum = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleString('en-US') : '—';
+const fDate = d => { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } };
+
+let _allAccounts   = [];
+let _selectedAccId = null;
+let _selectedCoName = '';
+let _selectedAcName = '';
+let _changes       = new Map(); // id → { field: value }
+let _pendingNew    = [];        // new rows not yet in DB
+let _pendingDel    = new Set(); // ids to delete
+
+function updateSaveBar() {
+    const n = _changes.size + _pendingNew.length + _pendingDel.size;
+    const bar = document.getElementById('finSaveBar');
+    if (n > 0) {
+        bar.classList.add('visible');
+        document.getElementById('finSaveCount').textContent = `${n} unsaved change${n > 1 ? 's' : ''}`;
+    } else {
+        bar.classList.remove('visible');
+    }
+}
+
+function trackChange(rowId, field, value) {
+    if (!_changes.has(rowId)) _changes.set(rowId, {});
+    _changes.get(rowId)[field] = value === '' ? null : value;
+    const tr = document.querySelector(`[data-fin-id="${rowId}"]`);
+    if (tr) tr.classList.add('is-dirty');
+    updateSaveBar();
+}
+
+function trackNewChange(tempId, field, value) {
+    const row = _pendingNew.find(r => r._tempId === tempId);
+    if (row) row[field] = value === '' ? null : value;
+    updateSaveBar();
+}
+
+// ── Left Panel ─────────────────────────────────────────────────────────────
+async function loadLeftPanel() {
+    const { data, error } = await supabaseClient
+        .from('b_account_list')
+        .select('account_id, account_name, company_name')
+        .order('account_name');
+    if (error || !data) { document.getElementById('acctTree').innerHTML = '<div style="padding:16px;color:#ef4444;font-size:0.75rem">Error loading accounts</div>'; return; }
+    _allAccounts = data;
+    renderTree('');
+    document.getElementById('acctSearch').addEventListener('input', e => renderTree(e.target.value.toLowerCase()));
+}
+
+function renderTree(search) {
+    const tree = {};
+    _allAccounts.forEach(a => {
+        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search)) return;
+        if (!tree[a.account_name]) tree[a.account_name] = [];
+        tree[a.account_name].push(a);
+    });
+
+    const html = Object.entries(tree).map(([acName, companies]) => `
+        <div class="acct-group">
+            <div class="acct-hdr${search ? ' open' : ''}" onclick="this.classList.toggle('open')">
+                <i class="bi bi-chevron-right acct-chevron"></i>
+                <span class="acct-label">${esc(acName)}</span>
+                <span class="acct-badge">${companies.length}</span>
+            </div>
+            <div class="acct-companies">
+                ${companies.map(c => `
+                    <div class="company-item${_selectedAccId === c.account_id ? ' active' : ''}"
+                         data-acc-id="${esc(c.account_id)}"
+                         onclick="selectCompany('${esc(c.account_id)}','${esc(c.company_name||c.account_id)}','${esc(acName)}')">
+                        ${esc(c.company_name || c.account_id)}
+                    </div>`).join('')}
+            </div>
+        </div>`).join('');
+
+    document.getElementById('acctTree').innerHTML = html || '<div style="padding:16px;color:#cbd5e1;font-size:0.75rem">No results</div>';
+}
+
+// ── Right Panel ─────────────────────────────────────────────────────────────
+async function selectCompany(accountId, companyName, accountName) {
+    if (_changes.size + _pendingNew.length + _pendingDel.size > 0) {
+        const { isConfirmed } = await Swal.fire({ title: 'Unsaved Changes', text: 'Switch company without saving?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Discard & Switch', confirmButtonColor: '#ef4444', cancelButtonText: 'Stay' });
+        if (!isConfirmed) return;
+    }
+    _changes.clear(); _pendingNew = []; _pendingDel.clear(); updateSaveBar();
+
+    _selectedAccId = accountId;
+    _selectedCoName = companyName;
+    _selectedAcName = accountName;
+
+    // highlight selected
+    document.querySelectorAll('.company-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.accId === accountId);
+    });
+
+    document.getElementById('finEmpty').style.display = 'none';
+    document.getElementById('finContent').style.display = 'block';
+    document.getElementById('finOppList').innerHTML = '<div style="padding:24px;color:#cbd5e1;font-size:0.82rem;text-align:center"><i class="bi bi-arrow-clockwise"></i> Loading...</div>';
+
+    document.getElementById('finCompanyHdr').innerHTML =
+        `<span class="fin-company-name">${esc(companyName)}</span>
+         <span class="fin-account-name">· ${esc(accountName)}</span>`;
+
+    await loadRightPanel(accountId);
+}
+
+async function loadRightPanel(accountId) {
+    // Step 1: get opps
+    const { data: opps, error: oppErr } = await supabaseClient
+        .from('b_opportunity_list')
+        .select('opportunity_id, opportunity_name, status, total_amount, total_gp')
+        .eq('account_id', accountId)
+        .order('opportunity_id', { ascending: false });
+
+    if (oppErr || !opps?.length) {
+        document.getElementById('finOppList').innerHTML = '<div style="padding:32px;text-align:center;color:#cbd5e1;font-size:0.82rem">No opportunities found</div>';
+        return;
+    }
+
+    const oppIds = opps.map(o => o.opportunity_id);
+
+    // Step 2: get QTs (original only)
+    const { data: qts } = await supabaseClient
+        .from('b_opportunity_qt')
+        .select('qt_id, opportunity_id, qt_number, company_qt')
+        .in('opportunity_id', oppIds)
+        .eq('qt_type', 'original')
+        .order('qt_id');
+
+    const qtIds = (qts||[]).map(q => q.qt_id);
+
+    // Step 3: items + finance rows in parallel
+    const [{ data: items }, { data: finRows }] = await Promise.all([
+        qtIds.length ? supabaseClient.from('b_opportunity_qt_item').select('qt_id, qty, price, discount, gp, amount').in('qt_id', qtIds) : Promise.resolve({ data: [] }),
+        qtIds.length ? supabaseClient.from('b_finance_qt').select('*').in('qt_id', qtIds).order('qt_id').order('sub_index') : Promise.resolve({ data: [] }),
+    ]);
+
+    // Build Maps
+    const saleMap = new Map();
+    (items||[]).forEach(i => {
+        const amt = +i.amount || Math.max(0, (+i.qty||1) * (+i.price||0) - (+i.discount||0));
+        saleMap.set(i.qt_id, (saleMap.get(i.qt_id)||0) + amt);
+    });
+
+    const finMap = new Map();
+    (finRows||[]).forEach(r => {
+        if (!finMap.has(r.qt_id)) finMap.set(r.qt_id, []);
+        finMap.get(r.qt_id).push(r);
+    });
+
+    const qtByOpp = new Map();
+    (qts||[]).forEach(q => {
+        if (!qtByOpp.has(q.opportunity_id)) qtByOpp.set(q.opportunity_id, []);
+        qtByOpp.get(q.opportunity_id).push({ ...q, saleAmt: saleMap.get(q.qt_id)||0, finRows: finMap.get(q.qt_id)||[] });
+    });
+
+    renderRightPanel(opps, qtByOpp);
+}
+
+function oppStatusClass(status) {
+    if (!status) return 'pending';
+    const s = status.toLowerCase();
+    if (s === 'signed' || s === 'active') return 'signed';
+    if (s === 'churn') return 'churn';
+    return 'pending';
+}
+
+function getRowStatus(row) {
+    if (row.receipt_date) return { label: 'Received', cls: 'received', dot: '●' };
+    if (row.bill_date)    return { label: 'Invoiced',  cls: 'invoiced',  dot: '◑' };
+    return                       { label: 'Pending',   cls: 'pending',   dot: '○' };
+}
+
+function getQtStatus(finRows) {
+    if (!finRows.length) return { label: 'Pending', cls: 'pending', dot: '○' };
+    if (finRows.every(r => r.receipt_date)) return { label: 'Received', cls: 'received', dot: '●' };
+    if (finRows.some(r => r.bill_date))     return { label: 'Invoiced',  cls: 'invoiced',  dot: '◑' };
+    return { label: 'Pending', cls: 'pending', dot: '○' };
+}
+
+function renderRightPanel(opps, qtByOpp) {
+    const html = opps.map(opp => {
+        const qts    = qtByOpp.get(opp.opportunity_id) || [];
+        const totSale = qts.reduce((s,q) => s + q.saleAmt, 0);
+        const totAct  = qts.reduce((s,q) => s + q.finRows.reduce((ss,r) => ss + (+r.actual_amount||0), 0), 0);
+        const stCls   = oppStatusClass(opp.status);
+
+        return `
+        <div class="opp-block">
+            <div class="opp-hdr" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
+                <div class="opp-meta">
+                    <div class="opp-id">${esc(opp.opportunity_id)}</div>
+                    <div class="opp-name">${esc(opp.opportunity_name||'—')}</div>
+                </div>
+                <div class="opp-nums">
+                    <div class="opp-num-item">
+                        <div class="opp-num-label">Sale</div>
+                        <div class="opp-num-val">${fNum(totSale)} ฿</div>
+                    </div>
+                    <div class="opp-num-item">
+                        <div class="opp-num-label">Actual</div>
+                        <div class="opp-num-val green">${fNum(totAct)} ฿</div>
+                    </div>
+                </div>
+                <span class="opp-status-badge ${stCls}">${esc(opp.status||'—')}</span>
+                <i class="bi bi-chevron-down opp-chevron"></i>
+            </div>
+            <div class="opp-body">
+                ${qts.length ? qts.map(qt => renderQtBlock(qt)).join('') : '<div class="no-finance">No QTs</div>'}
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('finOppList').innerHTML = html;
+}
+
+function renderQtBlock(qt) {
+    const qtStatus = getQtStatus(qt.finRows);
+    const totAct   = qt.finRows.reduce((s,r) => s + (+r.actual_amount||0), 0);
+    const qtId     = qt.qt_id;
+
+    return `
+    <div class="qt-block">
+        <div class="qt-hdr" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
+            <span class="qt-num">${esc(qt.qt_number||qt.qt_id)}</span>
+            ${qt.company_qt ? `<span class="qt-co-badge">${esc(qt.company_qt)}</span>` : ''}
+            <div class="qt-nums">
+                <span class="qt-sale-val">Sale <span>${fNum(qt.saleAmt)} ฿</span></span>
+                <span class="qt-actual-val ${qtStatus.cls}">Actual ${fNum(totAct)} ฿</span>
+            </div>
+            <span class="qt-status-dot ${qtStatus.cls}">${qtStatus.dot} ${qtStatus.label}</span>
+            <i class="bi bi-chevron-down qt-chevron"></i>
+        </div>
+        <div class="qt-body" id="qtBody-${esc(qtId)}">
+            ${renderFinTable(qt.finRows, qtId, qt.qt_number)}
+        </div>
+    </div>`;
+}
+
+function renderFinTable(finRows, qtId, qtNumber) {
+    const canEdit = canFinance('edit');
+    const ro      = canEdit ? '' : ' readonly';
+
+    const rowsHtml = finRows.map(r => renderFinRow(r, canEdit)).join('');
+    const addBtn   = canEdit
+        ? `<div class="fin-add-row"><button class="btn-add-sub" onclick="addSubRow('${esc(qtId)}','${esc(qtNumber||qtId)}',${finRows.length ? Math.max(...finRows.map(r=>r.sub_index)) : 0})"><i class="bi bi-plus"></i> Add Sub</button></div>`
+        : '';
+
+    return `
+    <div class="fin-table-wrap">
+        <table class="fin-table">
+            <thead class="fin-thead">
+                <tr>
+                    <th>#</th>
+                    <th>QT Sub</th>
+                    <th>Invoice</th>
+                    <th class="col-num">Actual Amount</th>
+                    <th>Detail</th>
+                    <th>Bill Date</th>
+                    <th>Receipt No</th>
+                    <th>Receipt Date</th>
+                    <th>Remark</th>
+                    <th>Status</th>
+                    ${canEdit ? '<th></th>' : ''}
+                </tr>
+            </thead>
+            <tbody id="finBody-${esc(qtId)}">
+                ${rowsHtml || `<tr><td colspan="${canEdit?11:10}" class="no-finance">No finance data — add a sub row</td></tr>`}
+            </tbody>
+        </table>
+        ${addBtn}
+    </div>`;
+}
+
+function renderFinRow(r, canEdit) {
+    const st   = getRowStatus(r);
+    const id   = r.id;
+    const ro   = canEdit ? '' : ' readonly';
+    const delBtn = canEdit ? `<td class="fin-td-del"><button class="btn-del-row" onclick="deleteSubRow('${esc(id)}',this)" title="Delete"><i class="bi bi-trash3"></i></button></td>` : '';
+
+    return `
+    <tr class="fin-tr" data-fin-id="${esc(id)}">
+        <td class="fin-td-idx">${r.sub_index}</td>
+        <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.quotation_sub||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','quotation_sub',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.invoice||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','invoice',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="number" value="${r.actual_amount??''}" placeholder="0" ${ro} onchange="trackChange('${esc(id)}','actual_amount',this.value?+this.value:null)" style="text-align:right"></td>
+        <td class="fin-td" style="min-width:160px"><input class="fin-input" type="text" value="${esc(r.detail||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','detail',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="date" value="${r.bill_date||''}" ${ro} onchange="trackChange('${esc(id)}','bill_date',this.value||null);refreshRowStatus('${esc(id)}',this.closest('tr'))"></td>
+        <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.receipt_no||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','receipt_no',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="date" value="${r.receipt_date||''}" ${ro} onchange="trackChange('${esc(id)}','receipt_date',this.value||null);refreshRowStatus('${esc(id)}',this.closest('tr'))"></td>
+        <td class="fin-td" style="min-width:120px"><input class="fin-input" type="text" value="${esc(r.remark||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','remark',this.value)"></td>
+        <td class="fin-td fin-status-cell"><span class="fin-status ${st.cls}" id="st-${esc(id)}">${st.dot} ${st.label}</span></td>
+        ${delBtn}
+    </tr>`;
+}
+
+function refreshRowStatus(id, tr) {
+    // re-derive status from current input values in the row
+    const billDate    = tr.querySelector('input[type="date"]:nth-of-type(1)')?.value;
+    const receiptDate = tr.querySelector('input[type="date"]:nth-of-type(2)')?.value;
+    const st = receiptDate ? { label:'Received',cls:'received',dot:'●' }
+             : billDate    ? { label:'Invoiced', cls:'invoiced', dot:'◑' }
+             :               { label:'Pending',  cls:'pending',  dot:'○' };
+    const badge = document.getElementById(`st-${id}`);
+    if (badge) { badge.className = `fin-status ${st.cls}`; badge.textContent = `${st.dot} ${st.label}`; }
+}
+
+function addSubRow(qtId, qtNumber, maxIndex) {
+    const tempId  = `new-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+    const newIdx  = maxIndex + 1;
+    const subNum  = newIdx === 1 ? qtNumber : `${qtNumber}-${newIdx}`;
+    const newRow  = { _tempId: tempId, qt_id: qtId, sub_index: newIdx, quotation_sub: subNum, invoice: null, actual_amount: null, detail: null, bill_date: null, receipt_no: null, receipt_date: null, remark: null };
+    _pendingNew.push(newRow);
+
+    const tbody = document.getElementById(`finBody-${qtId}`);
+    if (!tbody) return;
+
+    // remove empty-state row if present
+    const emptyRow = tbody.querySelector('td.no-finance')?.closest('tr');
+    if (emptyRow) emptyRow.remove();
+
+    const canEdit = canFinance('edit');
+    const tr = document.createElement('tr');
+    tr.className = 'fin-tr is-new';
+    tr.dataset.tempId = tempId;
+    tr.innerHTML = `
+        <td class="fin-td-idx">${newIdx}</td>
+        <td class="fin-td"><input class="fin-input" type="text" value="${esc(subNum)}" oninput="trackNewChange('${tempId}','quotation_sub',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','invoice',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="number" placeholder="0" style="text-align:right" oninput="trackNewChange('${tempId}','actual_amount',this.value?+this.value:null)"></td>
+        <td class="fin-td" style="min-width:160px"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','detail',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="date" oninput="trackNewChange('${tempId}','bill_date',this.value||null)"></td>
+        <td class="fin-td"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','receipt_no',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="date" oninput="trackNewChange('${tempId}','receipt_date',this.value||null)"></td>
+        <td class="fin-td" style="min-width:120px"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','remark',this.value)"></td>
+        <td class="fin-td fin-status-cell"><span class="fin-status pending">○ Pending</span></td>
+        <td class="fin-td-del"><button class="btn-del-row" onclick="cancelNewRow('${tempId}',this.closest('tr'))"><i class="bi bi-x"></i></button></td>`;
+    tbody.appendChild(tr);
+    updateSaveBar();
+    tr.querySelector('input').focus();
+}
+
+function cancelNewRow(tempId, tr) {
+    _pendingNew = _pendingNew.filter(r => r._tempId !== tempId);
+    tr.remove();
+    updateSaveBar();
+}
+
+async function deleteSubRow(id, btn) {
+    const { isConfirmed } = await Swal.fire({ title: 'Delete this row?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancel' });
+    if (!isConfirmed) return;
+    _pendingDel.add(id);
+    const tr = document.querySelector(`[data-fin-id="${id}"]`);
+    if (tr) { tr.style.opacity = '0.3'; tr.style.pointerEvents = 'none'; }
+    updateSaveBar();
+}
+
+async function saveChanges() {
+    try {
+        // Delete
+        for (const id of _pendingDel) {
+            const { error } = await supabaseClient.from('b_finance_qt').delete().eq('id', id);
+            if (error) throw error;
+        }
+
+        // Insert new
+        const inserts = _pendingNew.map(r => { const { _tempId, ...clean } = r; return clean; });
+        if (inserts.length) {
+            const { error } = await supabaseClient.from('b_finance_qt').insert(inserts);
+            if (error) throw error;
+        }
+
+        // Update changed
+        for (const [id, changes] of _changes) {
+            const { error } = await supabaseClient.from('b_finance_qt').update(changes).eq('id', id);
+            if (error) throw error;
+        }
+
+        _changes.clear(); _pendingNew = []; _pendingDel.clear(); updateSaveBar();
+        notify('success', 'Saved successfully');
+        await loadRightPanel(_selectedAccId);
+    } catch (err) {
+        notify('error', err.message || 'Save failed');
+    }
+}
+
+async function discardChanges() {
+    _changes.clear(); _pendingNew = []; _pendingDel.clear(); updateSaveBar();
+    if (_selectedAccId) await loadRightPanel(_selectedAccId);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+async function initPage() {
+    sessionStorage.removeItem('bx_perms_bfinance');
+    await initLayout(B_FINANCE_CONFIG);
+    if (!canFinance('view')) { window.location.replace('/index.html'); return; }
+    await loadLeftPanel();
+}
+
+initPage();
+</script>
+</body>
+</html>
