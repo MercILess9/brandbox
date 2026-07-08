@@ -93,14 +93,28 @@ function trackNewChange(tempId, field, value) {
 
 // ── Left Panel ─────────────────────────────────────────────────────────────
 async function loadLeftPanel() {
-    const { data, error } = await supabaseClient
-        .from('b_account_list')
-        .select('account_id, account_name, company_name')
-        .order('account_name');
-    if (error || !data) { document.getElementById('acctTree').innerHTML = '<div style="padding:16px;color:#ef4444;font-size:0.75rem">Error loading accounts</div>'; return; }
-    _allAccounts = data;
-    renderTree('');
-    document.getElementById('acctSearch').addEventListener('input', e => renderTree(e.target.value.toLowerCase()));
+    const tree = document.getElementById('acctTree');
+    try {
+        const { data, error } = await supabaseClient
+            .from('b_account_list')
+            .select('account_id, account_name, company_name')
+            .order('account_name');
+        if (error) {
+            tree.innerHTML = `<div style="padding:16px;color:#ef4444;font-size:0.75rem">Error: ${error.message}</div>`;
+            console.error('[Finance] loadLeftPanel error:', error);
+            return;
+        }
+        if (!data || !data.length) {
+            tree.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:0.75rem">No accounts found</div>';
+            return;
+        }
+        _allAccounts = data;
+        renderTree('');
+        document.getElementById('acctSearch').addEventListener('input', e => renderTree(e.target.value.toLowerCase()));
+    } catch (e) {
+        if (tree) tree.innerHTML = `<div style="padding:16px;color:#ef4444;font-size:0.75rem">JS Error: ${e.message}</div>`;
+        console.error('[Finance] loadLeftPanel exception:', e);
+    }
 }
 
 function renderTree(search) {
@@ -452,7 +466,11 @@ async function initPage() {
     await loadLeftPanel();
 }
 
-initPage();
+initPage().catch(e => {
+    console.error('[Finance] initPage failed:', e);
+    const tree = document.getElementById('acctTree');
+    if (tree) tree.innerHTML = `<div style="padding:16px;color:#ef4444;font-size:0.75rem">Init Error: ${e.message}</div>`;
+});
 </script>
 </body>
 </html>
