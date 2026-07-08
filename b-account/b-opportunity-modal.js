@@ -195,6 +195,13 @@ const B_OPP_MODAL_HTML = `
                 </div>
                 <div class="bopp-header-right">
                     <div class="bopp-hdr-totals" id="bopp-hdr-totals">
+                        <div class="bopp-hdr-lost-wrap" id="bopp-hdr-lost-wrap">
+                            <div class="bopp-hdr-tbox">
+                                <span class="bopp-hdr-tval lost" id="bopp-hdr-lost">0</span>
+                                <span class="bopp-hdr-tlbl">Churn Lost</span>
+                            </div>
+                            <div class="bopp-hdr-tdiv"></div>
+                        </div>
                         <div class="bopp-hdr-tbox">
                             <span class="bopp-hdr-tval" id="bopp-hdr-amt">0</span>
                             <span class="bopp-hdr-tlbl">Amount</span>
@@ -205,13 +212,6 @@ const B_OPP_MODAL_HTML = `
                             <span class="bopp-hdr-tlbl">GP</span>
                         </div>
                         <span class="bopp-hdr-pct-badge" id="bopp-hdr-pct"></span>
-                        <div class="bopp-hdr-lost-wrap" id="bopp-hdr-lost-wrap">
-                            <div class="bopp-hdr-tdiv"></div>
-                            <div class="bopp-hdr-tbox">
-                                <span class="bopp-hdr-tval lost" id="bopp-hdr-lost">0</span>
-                                <span class="bopp-hdr-tlbl">Churn Lost</span>
-                            </div>
-                        </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
