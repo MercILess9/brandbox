@@ -466,7 +466,7 @@ const BOppApp = (() => {
         const da = disabled ? ' disabled' : '';
         return `<tr data-qt="${escA(qtTmpId)}" data-item="${idx}">
             <td class="bopp-item-no c">${idx+1}</td>
-            <td><select class="bopp-item-sel" data-field="bu"${da}>${buOpts}</select></td>
+            <td class="c"><select class="bopp-item-sel" data-field="bu"${da}>${buOpts}</select></td>
             <td><textarea class="bopp-item-inp bopp-item-ta" data-field="detail" placeholder="Description..." rows="3"${da}>${escH(item.detail||'')}</textarea></td>
             <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0" step="1" inputmode="numeric"${da}></td>
             <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"${da}></td>
