@@ -1087,6 +1087,19 @@ const BOppApp = (() => {
                 oppId = data.opportunity_id;
                 _newOppId = oppId;
                 for (const qt of _qts) await insertQTToDB(oppId, qt, 'original');
+                // fire-and-forget email notification
+                fetch('https://hdulohaxociujwaziszy.supabase.co/functions/v1/send-notification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        opportunity_name: payload.opportunity_name,
+                        account_name:     el('bopp-acc-name').value,
+                        owner:            payload.owner,
+                        amount:           grandAmt,
+                        gp:               grandGP,
+                        opp_id:           oppId,
+                    }),
+                }).catch(err => console.warn('[notify]', err));
             }
 
             getBsModal().hide();
