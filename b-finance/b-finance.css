@@ -17,8 +17,7 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 /* ── Split Layout ── */
 .finance-layout {
     display: flex;
-    height: calc(100vh - var(--header-h));
-    margin-top: var(--header-h);
+    height: calc(100vh - 64px);
     overflow: hidden;
 }
 
