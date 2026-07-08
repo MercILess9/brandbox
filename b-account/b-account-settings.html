@@ -216,11 +216,11 @@
 
     // ── Config State ──────────────────────────────────────────────
     const CFG_TYPES = [
-        { key: 'status',        label: 'Status',             icon: 'bi-circle-fill' },
-        { key: 'business_type', label: 'Business Type',      icon: 'bi-briefcase-fill' },
-        { key: 'company',       label: 'Company QT',         icon: 'bi-building-fill' },
-        { key: 'bu',            label: 'Business Unit (BU)', icon: 'bi-grid-fill' },
-        { key: 'lead_source',   label: 'Lead Source',        icon: 'bi-funnel-fill', full: true },
+        { key: 'status',        label: 'Status',             icon: 'bi-circle-fill',    bg: '#1e293b', fg: '#bdc432' },
+        { key: 'business_type', label: 'Business Type',      icon: 'bi-briefcase-fill', bg: '#4f46e5', fg: '#fff' },
+        { key: 'company',       label: 'Company QT',         icon: 'bi-building-fill',  bg: '#0891b2', fg: '#fff' },
+        { key: 'bu',            label: 'Business Unit (BU)', icon: 'bi-grid-fill',      bg: '#059669', fg: '#fff' },
+        { key: 'lead_source',   label: 'Lead Source',        icon: 'bi-funnel-fill',    bg: '#d97706', fg: '#fff', full: true },
     ];
 
     const _cfg = {};  // _cfg[key] = { original: [], toAdd: [], toDelete: Set }
@@ -234,9 +234,9 @@
         const spanStyle = type.full ? ' style="grid-column:span 2"' : '';
         const listClass = type.full ? 'cfg-list cfg-list--grid' : 'cfg-list';
         return `<div class="cfg-card" id="cfgCard-${type.key}"${spanStyle}>
-            <div class="cfg-card-head">
-                <div class="cfg-card-title"><i class="bi ${type.icon}"></i>${type.label} <span class="cfg-dirty-dot"></span></div>
-                <button class="btn-cfg-save" onclick="saveCfg('${type.key}')"><i class="bi bi-check2"></i> Save</button>
+            <div class="cfg-card-head" style="background:${type.bg}">
+                <div class="cfg-card-title" style="color:${type.fg}"><i class="bi ${type.icon}"></i>${type.label} <span class="cfg-dirty-dot" style="background:#f59e0b"></span></div>
+                <button class="btn-cfg-save" style="background:rgba(255,255,255,0.15);color:${type.fg};border:1px solid rgba(255,255,255,0.25)" onclick="saveCfg('${type.key}')"><i class="bi bi-check2"></i> Save</button>
             </div>
             <div class="${listClass}" id="cfgTags-${type.key}"></div>
             <div class="cfg-add-row">
