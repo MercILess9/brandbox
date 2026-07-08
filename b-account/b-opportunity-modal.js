@@ -157,6 +157,13 @@ const B_OPP_MODAL_HTML = `
     .bopp-btn-save:hover { background: #0f172a; transform: translateY(-2px) scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,0.22); }
     .bopp-btn-save:active { transform: translateY(0) scale(0.97); box-shadow: none; transition-duration: 0.1s; }
     .bopp-btn-save:disabled { opacity: 0.6; pointer-events: none; }
+
+    /* ── Churn sections ── */
+    .bopp-churn-wrap { border: 1.5px solid rgba(189,196,50,0.5); border-radius: 14px; padding: 16px; position: relative; background: rgba(189,196,50,0.03); margin-bottom: 16px; }
+    .bopp-churn-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #bdc432; letter-spacing: 0.08em; text-transform: uppercase; }
+    .bopp-original-wrap { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; position: relative; margin-bottom: 16px; }
+    .bopp-original-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase; }
+    .bopp-qt-card--disabled { pointer-events: none; opacity: 0.6; }
 </style>
 
 <div class="modal fade" id="b-opp-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -299,7 +306,7 @@ const B_OPP_MODAL_HTML = `
                     <!-- Quotations -->
                     <div class="bopp-qt-lbl"><i class="bi bi-file-earmark-text"></i> Quotations</div>
                     <div id="bopp-qt-container"></div>
-                    <div class="bopp-add-qt-row">
+                    <div class="bopp-add-qt-row" id="bopp-add-qt-row-outer">
                         <button type="button" class="bopp-btn-add-qt" onclick="BOppApp.addQT()">
                             <i class="bi bi-plus-circle"></i> Add Quotation
                         </button>
@@ -339,9 +346,10 @@ const BOppApp = (() => {
     let _bsModal = null, _editingId = null, _loaded = false;
     let _accounts = [], _accNames = [], _profiles = [];
     let _buList = [], _statusList = [], _leadList = [];
-    let _qts = [], _qtCounter = 0, _undoStack = [];
+    let _qts = [], _churnQTs = [], _qtCounter = 0, _undoStack = [];
 
-    const findQT    = id  => _qts.find(q => q.tmpId === id);
+    const findQT     = id  => _qts.find(q => q.tmpId === id) || _churnQTs.find(q => q.tmpId === id);
+    const isChurnMode = ()  => el('bopp-status-sel').value === 'Churn';
     const getBsModal = () => _bsModal || (_bsModal = new bootstrap.Modal(el('b-opp-modal')));
     const buildOpts  = (list, sel = '') => list.map(v => `<option value="${escA(v)}"${v === sel ? ' selected' : ''}>${escH(v)}</option>`).join('');
 
@@ -433,30 +441,33 @@ const BOppApp = (() => {
 
     const newItem = () => ({ item_id: null, bu: '', detail: '', qty: 1, price: 0, discount: 0, amount: 0, gp: 0 });
 
-    function renderItemRow(qtTmpId, item, idx) {
+    function renderItemRow(qtTmpId, item, idx, disabled = false) {
         const amt = +item.amount || 0, gp = +item.gp || 0;
         const buOpts = '<option value="">—</option>' + _buList.map(b => `<option value="${escA(b)}"${item.bu === b ? ' selected' : ''}>${escH(b)}</option>`).join('');
+        const da = disabled ? ' disabled' : '';
         return `<tr data-qt="${escA(qtTmpId)}" data-item="${idx}">
             <td class="bopp-item-no c">${idx+1}</td>
-            <td><select class="bopp-item-sel" data-field="bu">${buOpts}</select></td>
-            <td><textarea class="bopp-item-inp bopp-item-ta" data-field="detail" placeholder="Description..." rows="3">${escH(item.detail||'')}</textarea></td>
-            <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0" step="1" inputmode="numeric"></td>
-            <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"></td>
-            <td><input type="number" class="bopp-item-inp r bopp-item-disc-inp" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"></td>
+            <td><select class="bopp-item-sel" data-field="bu"${da}>${buOpts}</select></td>
+            <td><textarea class="bopp-item-inp bopp-item-ta" data-field="detail" placeholder="Description..." rows="3"${da}>${escH(item.detail||'')}</textarea></td>
+            <td><input type="number" class="bopp-item-inp r" data-field="qty" value="${item.qty||1}" min="0" step="1" inputmode="numeric"${da}></td>
+            <td><input type="number" class="bopp-item-inp r" data-field="price" value="${item.price||''}" min="0" placeholder="0"${da}></td>
+            <td><input type="number" class="bopp-item-inp r bopp-item-disc-inp" data-field="discount" value="${item.discount||''}" min="0" placeholder="0"${da}></td>
             <td class="bopp-item-amt" data-amt>${amt > 0 ? fmtN(amt) : '0'}</td>
-            <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"></td>
-            <td class="c"><button type="button" class="bopp-item-rm" onclick="BOppApp.removeItem('${escA(qtTmpId)}',${idx})" title="Delete row"><i class="bi bi-trash3"></i></button></td>
+            <td><input type="number" class="bopp-item-inp r bopp-item-gp-inp" data-field="gp" value="${item.gp||''}" min="0" placeholder="0" style="color:${gp>0?'#16a34a':'#cbd5e1'}; font-weight:700;"${da}></td>
+            <td class="c">${disabled ? '' : `<button type="button" class="bopp-item-rm" onclick="BOppApp.removeItem('${escA(qtTmpId)}',${idx})" title="Delete row"><i class="bi bi-trash3"></i></button>`}</td>
         </tr>`;
     }
 
-    function renderQTCard(qt, idx = 0) {
+    function renderQTCard(qt, idx = 0, disabled = false) {
         const tAmt = qt._totAmt || 0, tGP = qt._totGP || 0;
         const buOpts = `<option value="" disabled${!qt.company_qt ? ' selected' : ''} hidden>— Company QT —</option>` + buildOpts(_buList, qt.company_qt);
-        return `<div class="bopp-qt-card" data-qt-card="${escA(qt.tmpId)}">
+        const da = disabled ? ' disabled' : '';
+        const pct = tAmt > 0 && tGP > 0 ? `${(tGP/tAmt*100).toFixed(1)}%` : '';
+        return `<div class="bopp-qt-card${disabled ? ' bopp-qt-card--disabled' : ''}" data-qt-card="${escA(qt.tmpId)}">
             <div class="bopp-qt-head">
                 <i class="bi bi-file-earmark-text" style="color:#94a3b8;font-size:0.9rem;flex-shrink:0;"></i>
-                <input type="text" class="bopp-qt-num" value="${escA(qt.qt_number)}" data-field="qt_number" placeholder="QT....">
-                <select class="bopp-qt-co" data-field="company_qt">${buOpts}</select>
+                <input type="text" class="bopp-qt-num" value="${escA(qt.qt_number)}" data-field="qt_number" placeholder="QT...."${da}>
+                <select class="bopp-qt-co" data-field="company_qt"${da}>${buOpts}</select>
                 <div class="bopp-qt-totals">
                     <div class="bopp-qt-tbox">
                         <span class="bopp-qt-tval" data-qt-amt>${fmtN(tAmt)}</span>
@@ -467,7 +478,7 @@ const BOppApp = (() => {
                         <span class="bopp-qt-tval gp" data-qt-gp>${fmtN(tGP)}</span>
                         <span class="bopp-qt-tlbl">GP</span>
                     </div>
-                    <span class="bopp-qt-pct-badge" data-qt-pct>${tAmt>0&&tGP>0?`${(tGP/tAmt*100).toFixed(1)}%`:''}</span>
+                    <span class="bopp-qt-pct-badge" data-qt-pct>${pct}</span>
                 </div>
             </div>
             <div class="bopp-item-wrap">
@@ -483,16 +494,16 @@ const BOppApp = (() => {
                         <th class="r" style="width:96px">GP</th>
                         <th style="width:36px"></th>
                     </tr></thead>
-                    <tbody id="bopp-tbody-${escA(qt.tmpId)}">${qt.items.map((item, idx) => renderItemRow(qt.tmpId, item, idx)).join('')}</tbody>
+                    <tbody id="bopp-tbody-${escA(qt.tmpId)}">${qt.items.map((item, i) => renderItemRow(qt.tmpId, item, i, disabled)).join('')}</tbody>
                 </table>
             </div>
-            <div class="bopp-qt-foot">
+            ${disabled ? '' : `<div class="bopp-qt-foot">
                 <button type="button" class="bopp-btn-add-item" onclick="BOppApp.addItem('${escA(qt.tmpId)}')"><i class="bi bi-plus"></i> Add Item</button>
                 <div style="display:flex;gap:6px;align-items:center;">
                     <button type="button" class="bopp-btn-dup" onclick="BOppApp.dupQT('${escA(qt.tmpId)}')"><i class="bi bi-copy"></i> Duplicate</button>
                     <button type="button" class="bopp-btn-del-qt" onclick="BOppApp.removeQT('${escA(qt.tmpId)}')"><i class="bi bi-trash3"></i> Delete</button>
                 </div>
-            </div>
+            </div>`}
         </div>`;
     }
 
@@ -506,13 +517,35 @@ const BOppApp = (() => {
 
     function renderAllQTs() {
         const container = el('bopp-qt-container');
-        if (!_qts.length) { container.innerHTML = ''; return; }
-        const tmp = document.createElement('div');
-        tmp.innerHTML = _qts.map((qt, i) => renderQTCard(qt, i)).join('');
-        container.innerHTML = '';
-        container.append(...tmp.children);
-        updateQTDeleteBtns();
-        _qts.forEach(updateItemTrashBtns);
+        const outerBtn = el('bopp-add-qt-row-outer');
+        if (isChurnMode()) {
+            const churnCards = _churnQTs.map((qt, i) => renderQTCard(qt, i, false)).join('');
+            const origCards  = _qts.map((qt, i) => renderQTCard(qt, i, true)).join('');
+            container.innerHTML = `
+                <div class="bopp-churn-wrap">
+                    <span class="bopp-churn-label">CHURN</span>
+                    ${churnCards}
+                    <div class="bopp-add-qt-row" style="margin-top:4px;">
+                        <button type="button" class="bopp-btn-add-qt" onclick="BOppApp.addQT()"><i class="bi bi-plus-circle"></i> Add Quotation</button>
+                    </div>
+                </div>
+                <div class="bopp-original-wrap">
+                    <span class="bopp-original-label">ORIGINAL</span>
+                    ${origCards}
+                </div>`;
+            if (outerBtn) outerBtn.style.display = 'none';
+            updateQTDeleteBtns();
+            _churnQTs.forEach(updateItemTrashBtns);
+        } else {
+            if (outerBtn) outerBtn.style.display = '';
+            if (!_qts.length) { container.innerHTML = ''; return; }
+            const tmp = document.createElement('div');
+            tmp.innerHTML = _qts.map((qt, i) => renderQTCard(qt, i, false)).join('');
+            container.innerHTML = '';
+            container.append(...tmp.children);
+            updateQTDeleteBtns();
+            _qts.forEach(updateItemTrashBtns);
+        }
     }
 
     const reRenderQTBody = qt => {
@@ -523,7 +556,7 @@ const BOppApp = (() => {
     // ── Totals ────────────────────────────────────────────────────────────────
     function recalcTotals() {
         const container = el('bopp-qt-container');
-        _qts.forEach(qt => {
+        [..._qts, ..._churnQTs].forEach(qt => {
             qt._totAmt = qt.items.reduce((s,i) => s + (+i.amount||0), 0);
             qt._totGP  = qt.items.reduce((s,i) => s + (+i.gp||0), 0);
             const card = container.querySelector(`[data-qt-card="${qt.tmpId}"]`);
@@ -532,8 +565,9 @@ const BOppApp = (() => {
             card.querySelector('[data-qt-gp]').textContent  = fmtN(qt._totGP);
             card.querySelector('[data-qt-pct]').textContent = qt._totAmt > 0 && qt._totGP > 0 ? `${(qt._totGP/qt._totAmt*100).toFixed(1)}%` : '';
         });
-        const totAmt = _qts.reduce((s,qt) => s + qt._totAmt, 0);
-        const totGP  = _qts.reduce((s,qt) => s + qt._totGP, 0);
+        const srcQTs = isChurnMode() ? _churnQTs : _qts;
+        const totAmt = srcQTs.reduce((s,qt) => s + qt._totAmt, 0);
+        const totGP  = srcQTs.reduce((s,qt) => s + qt._totGP, 0);
         el('bopp-hdr-amt').textContent = fmtN(totAmt);
         el('bopp-hdr-gp').textContent  = fmtN(totGP);
         el('bopp-hdr-pct').textContent = totAmt > 0 && totGP > 0 ? `${(totGP/totAmt*100).toFixed(1)}%` : '';
@@ -594,7 +628,13 @@ const BOppApp = (() => {
     const updateUndoBtn      = () => { const b = el('bopp-btn-undo'); if (b) b.style.display = _undoStack.length ? '' : 'none'; };
     const isEmptyItem        = item => !item.detail?.trim() && (+item.price||0) === 0 && (+item.qty||0) <= 1 && (+item.discount||0) === 0 && (+item.gp||0) === 0;
     const isEmptyQT          = qt   => !qt.qt_number?.trim() && !qt.company_qt && qt.items.every(isEmptyItem);
-    const updateQTDeleteBtns = ()   => document.querySelectorAll('.bopp-btn-del-qt').forEach(b => { b.style.display = _qts.length > 1 ? '' : 'none'; });
+    const updateQTDeleteBtns = () => {
+        if (isChurnMode()) {
+            document.querySelectorAll('.bopp-churn-wrap .bopp-btn-del-qt').forEach(b => { b.style.display = _churnQTs.length > 1 ? '' : 'none'; });
+        } else {
+            document.querySelectorAll('.bopp-btn-del-qt').forEach(b => { b.style.display = _qts.length > 1 ? '' : 'none'; });
+        }
+    };
 
     function updateItemTrashBtns(qt) {
         const tbody = el(`bopp-tbody-${qt.tmpId}`);
@@ -607,14 +647,22 @@ const BOppApp = (() => {
     function addQT() {
         _qtCounter++;
         const qt = { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: '', company_qt: '', items: [newItem()], _totAmt: 0, _totGP: 0 };
-        _qts.push(qt);
-        _appendQTToDOM(qt);
+        if (isChurnMode()) {
+            _churnQTs.push(qt);
+            renderAllQTs();
+            recalcTotals();
+        } else {
+            _qts.push(qt);
+            _appendQTToDOM(qt);
+        }
     }
 
     async function removeQT(tmpId) {
-        const qtIdx = _qts.findIndex(q => q.tmpId === tmpId);
+        const inChurn = _churnQTs.some(q => q.tmpId === tmpId);
+        const arr = inChurn ? _churnQTs : _qts;
+        const qtIdx = arr.findIndex(q => q.tmpId === tmpId);
         if (qtIdx < 0) return;
-        const qt = _qts[qtIdx];
+        const qt = arr[qtIdx];
         if (!isEmptyQT(qt)) {
             const label = qt.qt_number ? `QT "${qt.qt_number}"` : 'this quotation';
             const { isConfirmed } = await Swal.fire({
@@ -624,10 +672,14 @@ const BOppApp = (() => {
                 reverseButtons: true
             });
             if (!isConfirmed) return;
-            _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(qt)) });
+            _undoStack.push({ type: 'qt', qtIdx, qt: JSON.parse(JSON.stringify(qt)), isChurn: inChurn });
         }
-        _qts.splice(qtIdx, 1);
-        el('bopp-qt-container').querySelector(`[data-qt-card="${tmpId}"]`)?.remove();
+        arr.splice(qtIdx, 1);
+        if (inChurn) {
+            renderAllQTs();
+        } else {
+            el('bopp-qt-container').querySelector(`[data-qt-card="${tmpId}"]`)?.remove();
+        }
         recalcTotals();
         updateQTDeleteBtns();
         updateUndoBtn();
@@ -636,6 +688,7 @@ const BOppApp = (() => {
     function addItem(qtTmpId) {
         const qt = findQT(qtTmpId);
         if (!qt) return;
+        if (isChurnMode() && !_churnQTs.some(q => q.tmpId === qtTmpId)) return;
         qt.items.push(newItem());
         reRenderQTBody(qt);
         updateItemTrashBtns(qt);
@@ -645,7 +698,8 @@ const BOppApp = (() => {
     function removeItem(qtTmpId, idx) {
         const qt = findQT(qtTmpId);
         if (!qt || qt.items.length <= 1) return;
-        if (!isEmptyItem(qt.items[idx])) _undoStack.push({ type: 'item', qtTmpId, idx, item: { ...qt.items[idx] } });
+        if (isChurnMode() && !_churnQTs.some(q => q.tmpId === qtTmpId)) return;
+        if (!isEmptyItem(qt.items[idx])) _undoStack.push({ type: 'item', qtTmpId, idx, item: { ...qt.items[idx] }, isChurn: _churnQTs.some(q => q.tmpId === qtTmpId) });
         qt.items.splice(idx, 1);
         qt.items.forEach(i => { i.amount = Math.max(0, (+i.qty||0) * (+i.price||0) - (+i.discount||0)); });
         reRenderQTBody(qt);
@@ -661,7 +715,8 @@ const BOppApp = (() => {
             const qt = findQT(action.qtTmpId);
             if (qt) { qt.items.splice(action.idx, 0, action.item); reRenderQTBody(qt); updateItemTrashBtns(qt); recalcTotals(); }
         } else if (action.type === 'qt') {
-            _qts.splice(action.qtIdx, 0, action.qt);
+            const arr = action.isChurn ? _churnQTs : _qts;
+            arr.splice(action.qtIdx, 0, action.qt);
             renderAllQTs();
             recalcTotals();
         }
@@ -671,10 +726,16 @@ const BOppApp = (() => {
     function dupQT(srcTmpId) {
         const src = findQT(srcTmpId);
         if (!src) return;
+        const inChurn = _churnQTs.some(q => q.tmpId === srcTmpId);
         _qtCounter++;
         const dup = { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: genQTNum(), company_qt: src.company_qt, items: src.items.map(i => ({ ...i, item_id: null })), _totAmt: src._totAmt, _totGP: src._totGP };
-        _qts.push(dup);
-        _appendQTToDOM(dup);
+        if (inChurn) {
+            _churnQTs.push(dup);
+            renderAllQTs();
+        } else {
+            _qts.push(dup);
+            _appendQTToDOM(dup);
+        }
         recalcTotals();
     }
 
@@ -703,7 +764,24 @@ const BOppApp = (() => {
         }
     }
 
-    el('bopp-status-sel').addEventListener('change', updateStatusColor);
+    el('bopp-status-sel').addEventListener('change', function() {
+        const wasChurn = _churnQTs.length > 0;
+        const nowChurn = this.value === 'Churn';
+        if (nowChurn && !wasChurn && _qts.length) {
+            _churnQTs = _qts.map(qt => {
+                _qtCounter++;
+                return { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: qt.qt_number, company_qt: qt.company_qt,
+                    items: qt.items.map(i => ({...i, item_id: null})), _totAmt: qt._totAmt, _totGP: qt._totGP };
+            });
+            renderAllQTs();
+            recalcTotals();
+        } else if (!nowChurn && wasChurn) {
+            _churnQTs = [];
+            renderAllQTs();
+            recalcTotals();
+        }
+        updateStatusColor();
+    });
 
     // ── Modal mode / Reset ────────────────────────────────────────────────────
     function _setModalMode(isEdit, oppId) {
@@ -727,7 +805,9 @@ const BOppApp = (() => {
         el('bopp-status-sel').selectedIndex = 0;
         el('bopp-status-sel').style.display  = 'none';
         el('bopp-qt-container').innerHTML = '';
-        _qts = []; _qtCounter = 0; _undoStack = [];
+        const outerBtn = el('bopp-add-qt-row-outer');
+        if (outerBtn) outerBtn.style.display = '';
+        _qts = []; _churnQTs = []; _qtCounter = 0; _undoStack = [];
         recalcTotals();
         updateUndoBtn();
     }
@@ -774,19 +854,35 @@ const BOppApp = (() => {
             .eq('opportunity_id', oppId)
             .order('qt_number');
 
-        if (qts?.length) {
-            qts.forEach(qt => {
+        const origQTs  = (qts || []).filter(q => q.qt_type !== 'churn');
+        const churnQTs = (qts || []).filter(q => q.qt_type === 'churn');
+
+        const _loadIntoArr = (qtList, arr) => {
+            qtList.forEach(qt => {
                 _qtCounter++;
                 const items = (qt.b_opportunity_qt_item || [])
                     .sort((a,b) => (a.no||0)-(b.no||0))
                     .map(i => ({ item_id: i.item_id, bu: i.bu||'', detail: i.detail||'', qty: +i.qty||1, price: +i.price||0, discount: +i.discount||0, amount: +i.amount||0, gp: +i.gp||0 }));
-                _qts.push({ tmpId: `qt-${_qtCounter}`, qt_id: qt.qt_id, qt_number: qt.qt_number||'', company_qt: qt.company_qt||'',
+                arr.push({ tmpId: `qt-${_qtCounter}`, qt_id: qt.qt_id, qt_number: qt.qt_number||'', company_qt: qt.company_qt||'',
                     items: items.length ? items : [newItem()],
                     _totAmt: items.reduce((s,i) => s+(+i.amount||0), 0),
                     _totGP:  items.reduce((s,i) => s+(+i.gp||0), 0) });
             });
-        } else {
-            addQT();
+        };
+
+        if (origQTs.length) { _loadIntoArr(origQTs, _qts); } else { addQT(); }
+
+        if (opp.status === 'Churn') {
+            if (churnQTs.length) {
+                _loadIntoArr(churnQTs, _churnQTs);
+            } else {
+                // clone originals if no churn QTs saved yet
+                _churnQTs = _qts.map(qt => {
+                    _qtCounter++;
+                    return { tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: qt.qt_number, company_qt: qt.company_qt,
+                        items: qt.items.map(i => ({...i, item_id: null})), _totAmt: qt._totAmt, _totGP: qt._totGP };
+                });
+            }
         }
 
         renderAllQTs();
@@ -801,6 +897,30 @@ const BOppApp = (() => {
         if (oldQts?.length) {
             await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', oldQts.map(q => q.qt_id));
             await supabaseClient.from('b_opportunity_qt').delete().eq('opportunity_id', oppId);
+        }
+    }
+
+    async function _deleteChurnQTs(oppId) {
+        const { data: rows } = await supabaseClient.from('b_opportunity_qt').select('qt_id').eq('opportunity_id', oppId).eq('qt_type', 'churn');
+        if (rows?.length) {
+            await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', rows.map(q => q.qt_id));
+            await supabaseClient.from('b_opportunity_qt').delete().in('qt_id', rows.map(q => q.qt_id));
+        }
+    }
+
+    async function insertQTToDB(oppId, qt, qtType = 'original') {
+        const validItems = qt.items.filter(i => i.detail.trim() || +i.price > 0 || +i.qty > 1);
+        if (!qt.qt_number.trim() && !validItems.length) return;
+        const { data: qtRow, error: qtErr } = await supabaseClient.from('b_opportunity_qt')
+            .insert({ opportunity_id: oppId, qt_number: qt.qt_number.trim() || null, company_qt: qt.company_qt || null, qt_type: qtType })
+            .select('qt_id').single();
+        if (qtErr) throw qtErr;
+        const itemRows = qt.items
+            .filter(i => i.detail.trim() || +i.price > 0)
+            .map((i, idx) => ({ qt_id: qtRow.qt_id, no: idx+1, bu: i.bu||null, detail: i.detail.trim()||null, qty: +i.qty||null, price: +i.price||null, discount: +i.discount||null, gp: +i.gp||null }));
+        if (itemRows.length) {
+            const { error: itemErr } = await supabaseClient.from('b_opportunity_qt_item').insert(itemRows);
+            if (itemErr) throw itemErr;
         }
     }
 
@@ -828,26 +948,27 @@ const BOppApp = (() => {
             if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
             return;
         }
-        if (!_qts.length) { notify('','กรุณาเพิ่ม QT อย่างน้อย 1 รายการ', 'warning'); return; }
+        const activeQTs = isChurnMode() ? _churnQTs : _qts;
+        if (!activeQTs.length) { notify('','กรุณาเพิ่ม QT อย่างน้อย 1 รายการ', 'warning'); return; }
         const qtContainer = el('bopp-qt-container');
-        // รอบ 1: ชื่อ QT — กรอบแดง ไม่มี toast
+        // รอบ 1: ชื่อ QT
         let firstEmptyName = null;
-        _qts.forEach(qt => {
+        activeQTs.forEach(qt => {
             const card = qtContainer.querySelector(`[data-qt-card="${qt.tmpId}"]`);
             const numInp = card?.querySelector('.bopp-qt-num');
             if (numInp && !numInp.value.trim()) { numInp.classList.add('is-invalid'); if (!firstEmptyName) firstEmptyName = numInp; }
         });
         if (firstEmptyName) { firstEmptyName.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstEmptyName.focus(); return; }
-        // รอบ 1.5: Company QT — กรอบแดง ไม่มี toast
+        // รอบ 1.5: Company QT
         let firstEmptyCoQT = null;
-        _qts.forEach(qt => {
+        activeQTs.forEach(qt => {
             const card = qtContainer.querySelector(`[data-qt-card="${qt.tmpId}"]`);
             const coSel = card?.querySelector('.bopp-qt-co');
             if (coSel && !coSel.value) { coSel.classList.add('is-invalid'); if (!firstEmptyCoQT) firstEmptyCoQT = coSel; }
         });
         if (firstEmptyCoQT) { firstEmptyCoQT.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstEmptyCoQT.focus(); return; }
-        // รอบ 2: ยอดเงิน — toast เตือน
-        const noAmtQT = _qts.find(qt => !(qt._totAmt > 0));
+        // รอบ 2: ยอดเงิน
+        const noAmtQT = activeQTs.find(qt => !(qt._totAmt > 0));
         if (noAmtQT) {
             notify('','Quotation amount required', 'warning');
             qtContainer.querySelector(`[data-qt-card="${noAmtQT.tmpId}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -858,8 +979,8 @@ const BOppApp = (() => {
         const saveBtn = el('bopp-btn-save');
         saveBtn.disabled = true;
 
-        const grandAmt = _qts.reduce((s,qt) => s + qt.items.reduce((ss,i) => ss + (+i.amount||0), 0), 0);
-        const grandGP  = _qts.reduce((s,qt) => s + qt.items.reduce((ss,i) => ss + (+i.gp||0), 0), 0);
+        const grandAmt = activeQTs.reduce((s,qt) => s + qt.items.reduce((ss,i) => ss + (+i.amount||0), 0), 0);
+        const grandGP  = activeQTs.reduce((s,qt) => s + qt.items.reduce((ss,i) => ss + (+i.gp||0), 0), 0);
 
         const payload = {
             account_id:       el('bopp-account-id').value,
@@ -888,7 +1009,18 @@ const BOppApp = (() => {
                 payload.update_date = new Date().toISOString();
                 const { error } = await supabaseClient.from('b_opportunity_list').update(payload).eq('opportunity_id', _editingId);
                 if (error) throw error;
-                await _deleteOppQTs(_editingId);
+
+                if (isChurnMode()) {
+                    await _deleteChurnQTs(_editingId);
+                    const { data: existingOrig } = await supabaseClient.from('b_opportunity_qt').select('qt_id').eq('opportunity_id', _editingId).eq('qt_type', 'original');
+                    if (!existingOrig?.length) {
+                        for (const qt of _qts) await insertQTToDB(oppId, qt, 'original');
+                    }
+                    for (const qt of _churnQTs) await insertQTToDB(oppId, qt, 'churn');
+                } else {
+                    await _deleteOppQTs(_editingId);
+                    for (const qt of _qts) await insertQTToDB(oppId, qt, 'original');
+                }
             } else {
                 const now = new Date().toISOString();
                 payload.status      = 'Active';
@@ -900,27 +1032,7 @@ const BOppApp = (() => {
                 if (error) throw error;
                 oppId = data.opportunity_id;
                 _newOppId = oppId;
-            }
-
-            for (const qt of _qts) {
-                const validItems = qt.items.filter(i => i.detail.trim() || +i.price > 0 || +i.qty > 1);
-                if (!qt.qt_number.trim() && !validItems.length) continue;
-                const { data: qtRow, error: qtErr } = await supabaseClient.from('b_opportunity_qt')
-                    .insert({ opportunity_id: oppId, qt_number: qt.qt_number.trim() || null, company_qt: qt.company_qt || null })
-                    .select('qt_id').single();
-                if (qtErr) throw qtErr;
-                const itemRows = qt.items
-                    .filter(i => i.detail.trim() || +i.price > 0)
-                    .map((i, idx) => ({
-                        qt_id: qtRow.qt_id, no: idx+1,
-                        bu: i.bu || null, detail: i.detail.trim() || null,
-                        qty: +i.qty || null, price: +i.price || null,
-                        discount: +i.discount || null, gp: +i.gp || null,
-                    }));
-                if (itemRows.length) {
-                    const { error: itemErr } = await supabaseClient.from('b_opportunity_qt_item').insert(itemRows);
-                    if (itemErr) throw itemErr;
-                }
+                for (const qt of _qts) await insertQTToDB(oppId, qt, 'original');
             }
 
             getBsModal().hide();
