@@ -116,6 +116,13 @@
         .op-qt-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
         .op-qt-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
         .op-qt-card:last-child { margin-bottom: 0; }
+        .op-qt-group { border-radius: 12px; padding: 10px 12px 12px; position: relative; margin-bottom: 12px; }
+        .op-qt-group-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+        .op-qt-group.churn-group { border: 1.5px solid rgba(249,115,22,0.45); background: rgba(249,115,22,0.03); }
+        .op-qt-group.churn-group .op-qt-group-label { color: #f97316; }
+        .op-qt-group.churn-group .op-qt-card { border-left: 3px solid #f97316; }
+        .op-qt-group.sign-group { border: 1px solid #e2e8f0; background: #fafafa; opacity: 0.55; pointer-events: none; }
+        .op-qt-group.sign-group .op-qt-group-label { color: #94a3b8; }
         .op-qt-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f0f1f9; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
         .op-qt-num { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); display: flex; align-items: center; gap: 6px; }
         .op-qt-co { font-size: 0.68rem; font-weight: 800; background: #1e293b; color: #bdc432; border-radius: 6px; padding: 3px 9px; }
@@ -601,7 +608,7 @@
         </div>`;
     }
 
-    async function loadQTs(oppId, zone) {
+    async function loadQTs(oppId, zone, status) {
         if (!zone) return;
         try {
             const { data } = await supabaseClient
@@ -609,9 +616,22 @@
                 .select('*, b_opportunity_qt_item(*)')
                 .eq('opportunity_id', oppId)
                 .order('qt_number');
-            zone.innerHTML = (data && data.length)
-                ? data.map(renderQT).join('')
-                : '<p class="op-qt-empty">No quotations yet</p>';
+            if (!data || !data.length) { zone.innerHTML = '<p class="op-qt-empty">No quotations yet</p>'; return; }
+            if (status === 'Churn') {
+                const churnQTs = data.filter(q => q.qt_type === 'churn');
+                const signQTs  = data.filter(q => q.qt_type !== 'churn');
+                zone.innerHTML = `
+                    <div class="op-qt-group churn-group">
+                        <div class="op-qt-group-label">CHURN</div>
+                        ${churnQTs.length ? churnQTs.map(renderQT).join('') : '<p class="op-qt-empty">No churn quotations</p>'}
+                    </div>
+                    <div class="op-qt-group sign-group">
+                        <div class="op-qt-group-label">SIGN</div>
+                        ${signQTs.length ? signQTs.map(renderQT).join('') : '<p class="op-qt-empty">No sign quotations</p>'}
+                    </div>`;
+            } else {
+                zone.innerHTML = data.map(renderQT).join('');
+            }
         } catch {
             zone.innerHTML = '<p class="op-qt-empty">Failed to load quotations</p>';
         }
@@ -638,7 +658,7 @@
             const rec = _cardData.get(card.dataset.id);
             if (rec) {
                 detail.innerHTML = renderDetail(rec);
-                loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'));
+                loadQTs(rec.opportunity_id, detail.querySelector('.op-qt-zone'), rec.status);
             }
         }
         const h = detail.scrollHeight;
