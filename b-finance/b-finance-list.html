@@ -54,7 +54,6 @@
 </div>
 
 <script>
-const esc  = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fNum = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleString('en-US') : '—';
 const fDate = d => { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } };
 
