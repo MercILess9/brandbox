@@ -19,6 +19,8 @@ const B_OPP_MODAL_HTML = `
     .bopp-hdr-tlbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.4); }
     .bopp-hdr-pct-badge { background: #bdc432; color: #1e293b; border-radius: 100px; padding: 5px 10px; font-size: 0.85rem; font-weight: 800; line-height: 1; white-space: nowrap; }
     .bopp-hdr-pct-badge:empty { display: none; }
+    .bopp-hdr-tval.lost { color: #f97316; }
+    .bopp-hdr-lost-wrap { display: none; align-items: center; gap: 14px; }
     .bopp-hdr-tdiv { width: 1px; height: 26px; background: rgba(255,255,255,0.15); }
     .bopp-status-sel { border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.78rem; font-weight: 700; padding: 0 28px 0 12px; height: 34px; cursor: pointer; font-family: inherit; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; transition: background-color 0.2s, border-color 0.2s, color 0.2s; text-align: center; text-align-last: center; }
     .bopp-status-sel:focus { border-color: rgba(255,255,255,0.4); }
@@ -203,6 +205,13 @@ const B_OPP_MODAL_HTML = `
                             <span class="bopp-hdr-tlbl">GP</span>
                         </div>
                         <span class="bopp-hdr-pct-badge" id="bopp-hdr-pct"></span>
+                        <div class="bopp-hdr-lost-wrap" id="bopp-hdr-lost-wrap">
+                            <div class="bopp-hdr-tdiv"></div>
+                            <div class="bopp-hdr-tbox">
+                                <span class="bopp-hdr-tval lost" id="bopp-hdr-lost">0</span>
+                                <span class="bopp-hdr-tlbl">Churn Lost</span>
+                            </div>
+                        </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -572,6 +581,15 @@ const BOppApp = (() => {
         el('bopp-hdr-amt').textContent = fmtN(totAmt);
         el('bopp-hdr-gp').textContent  = fmtN(totGP);
         el('bopp-hdr-pct').textContent = totAmt > 0 && totGP > 0 ? `${(totGP/totAmt*100).toFixed(1)}%` : '';
+        const lostWrap = el('bopp-hdr-lost-wrap');
+        if (isChurnMode()) {
+            const signAmt = _qts.reduce((s,qt) => s + qt._totAmt, 0);
+            const lost = signAmt - totAmt;
+            el('bopp-hdr-lost').textContent = (lost >= 0 ? '-' : '+') + fmtN(Math.abs(lost));
+            lostWrap.style.display = 'flex';
+        } else {
+            lostWrap.style.display = 'none';
+        }
     }
 
     // ── QT event delegation ───────────────────────────────────────────────────
