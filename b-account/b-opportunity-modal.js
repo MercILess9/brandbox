@@ -364,7 +364,7 @@ const BOppApp = (() => {
 
     let _bsModal = null, _editingId = null, _loaded = false;
     let _accounts = [], _accNames = [], _profiles = [];
-    let _buList = [], _statusList = [], _leadList = [];
+    let _buList = [], _companyList = [], _statusList = [], _leadList = [];
     let _qts = [], _churnQTs = [], _qtCounter = 0, _undoStack = [], _churnDate = '';
 
     const findQT     = id  => _qts.find(q => q.tmpId === id) || _churnQTs.find(q => q.tmpId === id);
@@ -378,13 +378,14 @@ const BOppApp = (() => {
         const [{ data: accs }, { data: profs }, { data: cfg }] = await Promise.all([
             supabaseClient.from('b_account_list').select('account_id, account_name, company_name').order('account_name'),
             supabaseClient.from('profiles').select('codename').neq('level','god').order('codename'),
-            supabaseClient.from('b_opp_config').select('type, value').in('type',['bu','status','lead_source']).order('value')
+            supabaseClient.from('b_opp_config').select('type, value').in('type',['bu','company','status','lead_source']).order('value')
         ]);
-        _accounts   = accs || [];
-        _profiles   = (profs || []).map(p => p.codename).filter(Boolean);
-        _buList     = (cfg || []).filter(c => c.type === 'bu').map(c => c.value);
-        _statusList = (cfg || []).filter(c => c.type === 'status').map(c => c.value);
-        _leadList   = (cfg || []).filter(c => c.type === 'lead_source').map(c => c.value);
+        _accounts     = accs || [];
+        _profiles     = (profs || []).map(p => p.codename).filter(Boolean);
+        _buList       = (cfg || []).filter(c => c.type === 'bu').map(c => c.value);
+        _companyList  = (cfg || []).filter(c => c.type === 'company').map(c => c.value);
+        _statusList   = (cfg || []).filter(c => c.type === 'status').map(c => c.value);
+        _leadList     = (cfg || []).filter(c => c.type === 'lead_source').map(c => c.value);
         _accNames   = [...new Set(_accounts.map(a => a.account_name).filter(Boolean))].sort((a,b) => a.localeCompare(b,'th'));
         _loaded = true;
         buildDropdowns();
@@ -479,7 +480,7 @@ const BOppApp = (() => {
 
     function renderQTCard(qt, idx = 0, disabled = false) {
         const tAmt = qt._totAmt || 0, tGP = qt._totGP || 0;
-        const buOpts = `<option value="" disabled${!qt.company_qt ? ' selected' : ''} hidden>— Company QT —</option>` + buildOpts(_buList, qt.company_qt);
+        const buOpts = `<option value="" disabled${!qt.company_qt ? ' selected' : ''} hidden>— Company QT —</option>` + buildOpts(_companyList, qt.company_qt);
         const da = disabled ? ' disabled' : '';
         const pct = tAmt > 0 && tGP > 0 ? `${(tGP/tAmt*100).toFixed(1)}%` : '';
         return `<div class="bopp-qt-card${disabled ? ' bopp-qt-card--disabled' : ''}" data-qt-card="${escA(qt.tmpId)}">
