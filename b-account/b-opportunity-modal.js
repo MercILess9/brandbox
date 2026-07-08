@@ -75,6 +75,7 @@ const B_OPP_MODAL_HTML = `
     .bq-inp.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-qt-num.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
     .bopp-qt-co.is-invalid { border-color: #dc3545 !important; background: #fff8f8; }
+    .bopp-item-sel.is-invalid { outline: 1px solid #dc3545; background: #fff8f8 !important; border-radius: 4px; }
     .bopp-search-btn { width: 42px; height: 35px; flex-shrink: 0; border: 1px solid #bdc432; border-left: none; border-radius: 0 10px 10px 0; background: #f4f7a1; color: #7a8500; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
     .bopp-search-btn:hover { background: #bdc432; color: #1e293b; }
 
@@ -651,6 +652,7 @@ const BOppApp = (() => {
         if (row && field === 'bu') {
             const qt = findQT(row.dataset.qt), idx = +row.dataset.item;
             if (qt && idx < qt.items.length) qt.items[idx].bu = inp.value;
+            inp.classList.remove('is-invalid');
             return;
         }
         if (field === 'company_qt') {
@@ -1005,6 +1007,19 @@ const BOppApp = (() => {
             if (coSel && !coSel.value) { coSel.classList.add('is-invalid'); if (!firstEmptyCoQT) firstEmptyCoQT = coSel; }
         });
         if (firstEmptyCoQT) { firstEmptyCoQT.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstEmptyCoQT.focus(); return; }
+        // รอบ 1.6: BU ในทุก item
+        let firstEmptyBU = null;
+        activeQTs.forEach(qt => {
+            const card = qtContainer.querySelector(`[data-qt-card="${qt.tmpId}"]`);
+            qt.items.forEach((item, idx) => {
+                if (!item.bu && (item.detail?.trim() || +item.price > 0)) {
+                    const row = card?.querySelector(`tr[data-qt="${qt.tmpId}"][data-item="${idx}"]`);
+                    const buSel = row?.querySelector('.bopp-item-sel[data-field="bu"]');
+                    if (buSel) { buSel.classList.add('is-invalid'); if (!firstEmptyBU) firstEmptyBU = buSel; }
+                }
+            });
+        });
+        if (firstEmptyBU) { firstEmptyBU.scrollIntoView({ behavior: 'smooth', block: 'center' }); notify('', 'กรุณาเลือก BU ให้ครบทุก item', 'warning'); return; }
         // รอบ 2: ยอดเงิน
         const noAmtQT = activeQTs.find(qt => !(qt._totAmt > 0));
         if (noAmtQT) {
