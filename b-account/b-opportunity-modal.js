@@ -365,7 +365,7 @@ const BOppApp = (() => {
     let _bsModal = null, _editingId = null, _loaded = false;
     let _accounts = [], _accNames = [], _profiles = [];
     let _buList = [], _statusList = [], _leadList = [];
-    let _qts = [], _churnQTs = [], _qtCounter = 0, _undoStack = [];
+    let _qts = [], _churnQTs = [], _qtCounter = 0, _undoStack = [], _churnDate = '';
 
     const findQT     = id  => _qts.find(q => q.tmpId === id) || _churnQTs.find(q => q.tmpId === id);
     const isChurnMode = ()  => el('bopp-status-sel').value === 'Churn';
@@ -545,7 +545,7 @@ const BOppApp = (() => {
                     <span class="bopp-churn-label">CHURN</span>
                     <div class="bopp-churn-date-wrap">
                         <span class="bopp-churn-date-lbl">Churn Date</span>
-                        <input type="date" id="bopp-churn-date" class="bopp-churn-date-inp">
+                        <input type="date" class="bopp-churn-date-inp" value="${_churnDate}" onchange="_churnDate=this.value">
                     </div>
                     ${churnCards}
                     <div class="bopp-add-qt-row" style="margin-top:4px;">
@@ -832,7 +832,7 @@ const BOppApp = (() => {
     function resetForm() {
         el('bopp-form').classList.remove('was-validated');
         ['bopp-editing-id','bopp-account-id','bopp-acc-name','bopp-opp-name',
-         'bopp-signed','bopp-launch','bopp-churn-date','bopp-materials','bopp-proposal','bopp-campaign','bopp-remark']
+         'bopp-signed','bopp-launch','bopp-materials','bopp-proposal','bopp-campaign','bopp-remark']
             .forEach(id => { const e = el(id); if (e) e.value = ''; });
         const companySel = el('bopp-company-sel');
         companySel.innerHTML = '<option value="">Select company...</option>';
@@ -843,7 +843,7 @@ const BOppApp = (() => {
         el('bopp-qt-container').innerHTML = '';
         const outerBtn = el('bopp-add-qt-row-outer');
         if (outerBtn) outerBtn.style.display = '';
-        _qts = []; _churnQTs = []; _qtCounter = 0; _undoStack = [];
+        _qts = []; _churnQTs = []; _qtCounter = 0; _undoStack = []; _churnDate = '';
         recalcTotals();
         updateUndoBtn();
     }
@@ -881,9 +881,9 @@ const BOppApp = (() => {
          ['bopp-materials','materials'],['bopp-proposal','proposal'],['bopp-campaign','campaign'],['bopp-remark','remark']]
             .forEach(([id, field]) => { el(id).value = opp[field] || ''; });
 
-        el('bopp-signed').value     = opp.signed_date  ? String(opp.signed_date).slice(0,10)  : '';
-        el('bopp-launch').value     = opp.launch_date  ? String(opp.launch_date).slice(0,10)  : '';
-        el('bopp-churn-date').value = opp.churn_date   ? String(opp.churn_date).slice(0,10)   : '';
+        el('bopp-signed').value = opp.signed_date ? String(opp.signed_date).slice(0,10) : '';
+        el('bopp-launch').value = opp.launch_date ? String(opp.launch_date).slice(0,10) : '';
+        _churnDate = opp.churn_date ? String(opp.churn_date).slice(0,10) : '';
         el('bopp-status-sel').value = opp.status || (_statusList[0] || 'Active');
 
         const { data: qts } = await supabaseClient.from('b_opportunity_qt')
@@ -1029,7 +1029,7 @@ const BOppApp = (() => {
             sub_am:           el('bopp-subam').value   || null,
             signed_date:      el('bopp-signed').value      || null,
             launch_date:      el('bopp-launch').value      || null,
-            churn_date:       isChurnMode() ? (el('bopp-churn-date').value || new Date().toISOString().slice(0,10)) : null,
+            churn_date:       isChurnMode() ? (_churnDate || new Date().toISOString().slice(0,10)) : null,
             materials:        el('bopp-materials').value.trim() || null,
             proposal:         el('bopp-proposal').value.trim()  || null,
             campaign:         el('bopp-campaign').value.trim()  || null,
