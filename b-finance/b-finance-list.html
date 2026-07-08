@@ -90,39 +90,56 @@ function trackNewChange(tempId, field, value) {
     updateSaveBar();
 }
 
-// ── Left Panel (only accounts with original QTs) ───────────────────────────
+// ── Left Panel (Finance-first: only accounts with actual b_finance_qt rows) ──
 async function loadLeftPanel() {
     const treeEl = document.getElementById('acctTree');
     try {
-        // Get opportunity_ids that have at least one original QT
-        const { data: qts, error: e1 } = await supabaseClient
-            .from('b_opportunity_qt')
-            .select('opportunity_id')
-            .eq('qt_type', 'original');
+        // Step 1: Get distinct qt_ids that have finance data
+        const { data: finRows, error: e1 } = await supabaseClient
+            .from('b_finance_qt')
+            .select('qt_id');
         if (e1) throw e1;
 
-        const oppIds = [...new Set((qts || []).map(q => q.opportunity_id).filter(Boolean))];
-        if (!oppIds.length) {
-            treeEl.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:0.82rem;text-align:center">No QT data found</div>';
+        const finQtIds = [...new Set((finRows||[]).map(r => r.qt_id).filter(Boolean))];
+        if (!finQtIds.length) {
+            treeEl.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:0.82rem;text-align:center">No finance data found</div>';
             return;
         }
 
-        // Get account_ids for those opportunities
-        const { data: opps, error: e2 } = await supabaseClient
+        // Step 2: Get opportunity_ids for those qt_ids (original QTs only)
+        const { data: bqts, error: e2 } = await supabaseClient
+            .from('b_opportunity_qt')
+            .select('opportunity_id')
+            .in('qt_id', finQtIds)
+            .eq('qt_type', 'original');
+        if (e2) throw e2;
+
+        const oppIds = [...new Set((bqts||[]).map(q => q.opportunity_id).filter(Boolean))];
+        if (!oppIds.length) {
+            treeEl.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:0.82rem;text-align:center">No linked opportunities</div>';
+            return;
+        }
+
+        // Step 3: Get account_ids from opportunities
+        const { data: opps, error: e3 } = await supabaseClient
             .from('b_opportunity_list')
             .select('account_id')
             .in('opportunity_id', oppIds);
-        if (e2) throw e2;
+        if (e3) throw e3;
 
-        const accIds = [...new Set((opps || []).map(o => o.account_id).filter(Boolean))];
+        const accIds = [...new Set((opps||[]).map(o => o.account_id).filter(Boolean))];
+        if (!accIds.length) {
+            treeEl.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:0.82rem;text-align:center">No accounts found</div>';
+            return;
+        }
 
-        // Get account info
-        const { data: accounts, error: e3 } = await supabaseClient
+        // Step 4: Get account/company info
+        const { data: accounts, error: e4 } = await supabaseClient
             .from('b_account_list')
             .select('account_id, account_name, company_name')
             .in('account_id', accIds)
             .order('account_name');
-        if (e3) throw e3;
+        if (e4) throw e4;
 
         _allAccounts = accounts || [];
         renderTree('');
