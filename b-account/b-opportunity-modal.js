@@ -159,8 +159,8 @@ const B_OPP_MODAL_HTML = `
     .bopp-btn-save:disabled { opacity: 0.6; pointer-events: none; }
 
     /* ── Churn sections ── */
-    .bopp-churn-wrap { border: 1.5px solid rgba(189,196,50,0.5); border-radius: 14px; padding: 16px; position: relative; background: rgba(189,196,50,0.03); margin-bottom: 16px; }
-    .bopp-churn-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #bdc432; letter-spacing: 0.08em; text-transform: uppercase; }
+    .bopp-churn-wrap { border: 1.5px solid rgba(249,115,22,0.5); border-radius: 14px; padding: 16px; position: relative; background: rgba(249,115,22,0.03); margin-bottom: 16px; }
+    .bopp-churn-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #f97316; letter-spacing: 0.08em; text-transform: uppercase; }
     .bopp-original-wrap { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; position: relative; margin-bottom: 16px; }
     .bopp-original-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase; }
     .bopp-qt-card--disabled { pointer-events: none; opacity: 0.6; }
