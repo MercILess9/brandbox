@@ -531,7 +531,7 @@ const BOppApp = (() => {
                     </div>
                 </div>
                 <div class="bopp-original-wrap">
-                    <span class="bopp-original-label">ORIGINAL</span>
+                    <span class="bopp-original-label">SIGN</span>
                     ${origCards}
                 </div>`;
             if (outerBtn) outerBtn.style.display = 'none';
