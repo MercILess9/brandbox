@@ -168,7 +168,7 @@ const B_OPP_MODAL_HTML = `
     .bopp-churn-wrap .bopp-qt-card { border-left-color: #f97316; }
     .bopp-churn-date-wrap { position: absolute; top: -11px; right: 14px; background: #f8fafc; padding: 0 6px; display: flex; align-items: center; gap: 6px; }
     .bopp-churn-date-lbl { font-size: 0.62rem; font-weight: 700; color: rgba(249,115,22,0.7); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
-    .bopp-churn-date-inp { border: 1px solid rgba(249,115,22,0.35); border-radius: 7px; background: #fff; color: #f97316; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; height: 22px; outline: none; font-family: inherit; cursor: pointer; }
+    .bopp-churn-date-inp { border: 1px solid rgba(249,115,22,0.35); border-radius: 7px; background: #fff; color: #f97316; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; height: 22px; outline: none; font-family: inherit; cursor: pointer; text-align: center; }
     .bopp-original-wrap { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; position: relative; margin-bottom: 16px; }
     .bopp-original-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase; }
     .bopp-qt-card--disabled { pointer-events: none; opacity: 0.6; }
@@ -545,7 +545,7 @@ const BOppApp = (() => {
                     <span class="bopp-churn-label">CHURN</span>
                     <div class="bopp-churn-date-wrap">
                         <span class="bopp-churn-date-lbl">Churn Date</span>
-                        <input type="date" class="bopp-churn-date-inp" value="${_churnDate}" onchange="_churnDate=this.value">
+                        <input type="date" class="bopp-churn-date-inp" value="${_churnDate}" onchange="BOppApp.setChurnDate(this.value)">
                     </div>
                     ${churnCards}
                     <div class="bopp-add-qt-row" style="margin-top:4px;">
@@ -1120,5 +1120,6 @@ const BOppApp = (() => {
     el('bopp-btn-del').addEventListener('click', handleDelete);
     el('b-opp-modal').addEventListener('hidden.bs.modal', () => { _editingId = null; });
 
-    return { openNew, openEdit, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT, undo };
+    function setChurnDate(v) { _churnDate = v; }
+    return { openNew, openEdit, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT, undo, setChurnDate };
 })();
