@@ -204,7 +204,7 @@
 // ── State ─────────────────────────────────────────────────────────────────────
 let _opps  = [];
 let _qtMap = new Map(); // oppId → [{qt_type, b_opportunity_qt_item:[{bu,qty,price,discount,gp}]}]
-let _yearFilter   = String(new Date().getFullYear());
+let _yearFilter   = '';
 let _statusFilter = '';
 let _typeFilter   = '';
 let _chartStatus  = null;
@@ -244,16 +244,19 @@ function initYearTabs() {
     const cur = new Date().getFullYear();
     const years = [];
     for (let y = 2024; y <= cur; y++) years.push(y);
-    document.getElementById('yearTabs').innerHTML = years.map(y =>
+    const allBtn = `<button class="year-tab${_yearFilter === '' ? ' active' : ''}" onclick="setYear('')">All</button>`;
+    const yearBtns = years.map(y =>
         `<button class="year-tab${y == _yearFilter ? ' active' : ''}" onclick="setYear(${y})">${y}</button>`
     ).join('');
+    document.getElementById('yearTabs').innerHTML = allBtn + yearBtns;
 }
 
 function setYear(y) {
     _yearFilter = String(y);
-    document.querySelectorAll('.year-tab').forEach(b =>
-        b.classList.toggle('active', b.textContent.trim() === _yearFilter)
-    );
+    document.querySelectorAll('.year-tab').forEach(b => {
+        const val = b.textContent.trim();
+        b.classList.toggle('active', val === 'All' ? _yearFilter === '' : val === _yearFilter);
+    });
     render();
 }
 
@@ -318,6 +321,9 @@ async function loadData() {
             b_opportunity_qt_item: itemsByQT.get(qt.qt_id) || []
         });
     });
+
+    console.log('[dash] opps:', _opps.length, '| qts:', (qts||[]).length, '| items:', (items||[]).length);
+    console.log('[dash] sample item:', (items||[])[0]);
 
     document.getElementById('dashUpdated').textContent =
         'Updated ' + new Date().toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
