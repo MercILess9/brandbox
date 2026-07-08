@@ -166,6 +166,9 @@ const B_OPP_MODAL_HTML = `
     .bopp-churn-wrap { border: 1.5px solid rgba(249,115,22,0.5); border-radius: 14px; padding: 16px; position: relative; background: rgba(249,115,22,0.03); margin-bottom: 16px; }
     .bopp-churn-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #f97316; letter-spacing: 0.08em; text-transform: uppercase; }
     .bopp-churn-wrap .bopp-qt-card { border-left-color: #f97316; }
+    .bopp-churn-date-wrap { position: absolute; top: -11px; right: 14px; background: #f8fafc; padding: 0 6px; display: flex; align-items: center; gap: 6px; }
+    .bopp-churn-date-lbl { font-size: 0.62rem; font-weight: 700; color: rgba(249,115,22,0.7); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+    .bopp-churn-date-inp { border: 1px solid rgba(249,115,22,0.35); border-radius: 7px; background: #fff; color: #f97316; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; height: 22px; outline: none; font-family: inherit; cursor: pointer; }
     .bopp-original-wrap { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; position: relative; margin-bottom: 16px; }
     .bopp-original-label { position: absolute; top: -10px; left: 14px; background: #f8fafc; padding: 0 8px; font-size: 0.68rem; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase; }
     .bopp-qt-card--disabled { pointer-events: none; opacity: 0.6; }
@@ -540,6 +543,10 @@ const BOppApp = (() => {
             container.innerHTML = `
                 <div class="bopp-churn-wrap">
                     <span class="bopp-churn-label">CHURN</span>
+                    <div class="bopp-churn-date-wrap">
+                        <span class="bopp-churn-date-lbl">Churn Date</span>
+                        <input type="date" id="bopp-churn-date" class="bopp-churn-date-inp">
+                    </div>
                     ${churnCards}
                     <div class="bopp-add-qt-row" style="margin-top:4px;">
                         <button type="button" class="bopp-btn-add-qt" onclick="BOppApp.addQT()"><i class="bi bi-plus-circle"></i> Add Quotation</button>
@@ -825,7 +832,7 @@ const BOppApp = (() => {
     function resetForm() {
         el('bopp-form').classList.remove('was-validated');
         ['bopp-editing-id','bopp-account-id','bopp-acc-name','bopp-opp-name',
-         'bopp-signed','bopp-launch','bopp-materials','bopp-proposal','bopp-campaign','bopp-remark']
+         'bopp-signed','bopp-launch','bopp-churn-date','bopp-materials','bopp-proposal','bopp-campaign','bopp-remark']
             .forEach(id => { const e = el(id); if (e) e.value = ''; });
         const companySel = el('bopp-company-sel');
         companySel.innerHTML = '<option value="">Select company...</option>';
@@ -874,8 +881,9 @@ const BOppApp = (() => {
          ['bopp-materials','materials'],['bopp-proposal','proposal'],['bopp-campaign','campaign'],['bopp-remark','remark']]
             .forEach(([id, field]) => { el(id).value = opp[field] || ''; });
 
-        el('bopp-signed').value = opp.signed_date ? String(opp.signed_date).slice(0,10) : '';
-        el('bopp-launch').value = opp.launch_date ? String(opp.launch_date).slice(0,10) : '';
+        el('bopp-signed').value     = opp.signed_date  ? String(opp.signed_date).slice(0,10)  : '';
+        el('bopp-launch').value     = opp.launch_date  ? String(opp.launch_date).slice(0,10)  : '';
+        el('bopp-churn-date').value = opp.churn_date   ? String(opp.churn_date).slice(0,10)   : '';
         el('bopp-status-sel').value = opp.status || (_statusList[0] || 'Active');
 
         const { data: qts } = await supabaseClient.from('b_opportunity_qt')
@@ -1019,8 +1027,9 @@ const BOppApp = (() => {
             owner:            el('bopp-owner').value   || null,
             am:               el('bopp-am').value      || null,
             sub_am:           el('bopp-subam').value   || null,
-            signed_date:      el('bopp-signed').value  || null,
-            launch_date:      el('bopp-launch').value  || null,
+            signed_date:      el('bopp-signed').value      || null,
+            launch_date:      el('bopp-launch').value      || null,
+            churn_date:       isChurnMode() ? (el('bopp-churn-date').value || new Date().toISOString().slice(0,10)) : null,
             materials:        el('bopp-materials').value.trim() || null,
             proposal:         el('bopp-proposal').value.trim()  || null,
             campaign:         el('bopp-campaign').value.trim()  || null,
