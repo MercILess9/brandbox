@@ -277,7 +277,7 @@ async function loadData() {
         { data: statuses }
     ] = await Promise.all([
         supabaseClient.from('b_opportunity_list')
-            .select('opportunity_id, status, business_type, total_amount, total_gp, create_date, owner, company')
+            .select('opportunity_id, status, business_type, total_amount, total_gp, create_date, owner')
             .limit(3000),
         supabaseClient.from('b_opportunity_qt')
             .select('qt_id, opportunity_id, qt_type')
