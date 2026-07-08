@@ -463,7 +463,7 @@ const BOppApp = (() => {
 
     function renderItemRow(qtTmpId, item, idx, disabled = false) {
         const amt = +item.amount || 0, gp = +item.gp || 0;
-        const buOpts = '<option value="">—</option>' + _buList.map(b => `<option value="${escA(b)}"${item.bu === b ? ' selected' : ''}>${escH(b)}</option>`).join('');
+        const buOpts = `<option value=""${!item.bu ? ' selected' : ''} disabled hidden></option>` + _buList.map(b => `<option value="${escA(b)}"${item.bu === b ? ' selected' : ''}>${escH(b)}</option>`).join('');
         const da = disabled ? ' disabled' : '';
         return `<tr data-qt="${escA(qtTmpId)}" data-item="${idx}">
             <td class="bopp-item-no c">${idx+1}</td>
