@@ -91,29 +91,47 @@ function trackNewChange(tempId, field, value) {
     updateSaveBar();
 }
 
-// ── Left Panel ─────────────────────────────────────────────────────────────
+// ── Left Panel (Finance-first: only accounts with finance rows) ─────────────
 async function loadLeftPanel() {
-    const tree = document.getElementById('acctTree');
+    const treeEl = document.getElementById('acctTree');
     try {
-        const { data, error } = await supabaseClient
-            .from('b_account_list')
-            .select('account_id, account_name, company_name')
-            .order('account_name');
-        if (error) {
-            tree.innerHTML = `<div style="padding:16px;color:#ef4444;font-size:0.75rem">Error: ${error.message}</div>`;
-            console.error('[Finance] loadLeftPanel error:', error);
+        // Step 1: qt_ids that have finance rows
+        const { data: finRows, error: e1 } = await supabaseClient
+            .from('b_finance_qt').select('qt_id');
+        if (e1) throw e1;
+
+        const qtIds = [...new Set((finRows || []).map(r => r.qt_id))];
+        if (!qtIds.length) {
+            treeEl.innerHTML = '<div style="padding:20px;text-align:center;color:#cbd5e1;font-size:0.78rem">No finance data yet</div>';
             return;
         }
-        if (!data || !data.length) {
-            tree.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:0.75rem">No accounts found</div>';
-            return;
-        }
-        _allAccounts = data;
+
+        // Step 2: opportunity_ids for those qt_ids
+        const { data: qts, error: e2 } = await supabaseClient
+            .from('b_opportunity_qt').select('qt_id, opportunity_id').in('qt_id', qtIds);
+        if (e2) throw e2;
+
+        const oppIds = [...new Set((qts || []).map(q => q.opportunity_id).filter(Boolean))];
+
+        // Step 3: account_ids for those opportunities
+        const { data: opps, error: e3 } = await supabaseClient
+            .from('b_opportunity_list').select('opportunity_id, account_id').in('opportunity_id', oppIds);
+        if (e3) throw e3;
+
+        const accIds = [...new Set((opps || []).map(o => o.account_id).filter(Boolean))];
+
+        // Step 4: account info
+        const { data: accounts, error: e4 } = await supabaseClient
+            .from('b_account_list').select('account_id, account_name, company_name')
+            .in('account_id', accIds).order('account_name');
+        if (e4) throw e4;
+
+        _allAccounts = accounts || [];
         renderTree('');
         document.getElementById('acctSearch').addEventListener('input', e => renderTree(e.target.value.toLowerCase()));
     } catch (e) {
-        if (tree) tree.innerHTML = `<div style="padding:16px;color:#ef4444;font-size:0.75rem">JS Error: ${e.message}</div>`;
-        console.error('[Finance] loadLeftPanel exception:', e);
+        treeEl.innerHTML = `<div style="padding:16px;color:#ef4444;font-size:0.75rem">Error: ${e.message}</div>`;
+        console.error('[Finance] loadLeftPanel error:', e);
     }
 }
 
