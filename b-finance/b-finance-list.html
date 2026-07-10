@@ -182,40 +182,46 @@ function renderTree(search) {
 // ── Account Detail Card ──────────────────────────────────────────────────────
 async function loadAccountDetail(accountId) {
     const el = document.getElementById('acctDetail');
-    try {
-        const { data: acct, error: acctErr } = await supabaseClient
-            .from('b_account_list')
-            .select('status, tax_id, address, contact, payment, remark')
-            .eq('account_id', accountId)
-            .maybeSingle();
-        console.log('[Finance] acctDetail', accountId, acct, acctErr);
-        if (!acct) { el.innerHTML = ''; return; }
+    const chip = (label, val) => val
+        ? `<div class="acct-chip"><span class="acct-chip-label">${label}</span><span class="acct-chip-val">${esc(val)}</span></div>`
+        : '';
 
-        const chip = (label, val) => val
-            ? `<div class="acct-chip"><span class="acct-chip-label">${label}</span><span class="acct-chip-val">${esc(val)}</span></div>`
-            : '';
+    // Render immediately from cached data
+    const base = _allAccounts.find(a => a.account_id === accountId) || {};
+    el.innerHTML = `
+    <div class="acct-detail-card" id="acctDetailCard">
+        <div class="acct-detail-top">
+            <span class="acct-detail-id">${esc(accountId)}</span>
+        </div>
+    </div>`;
 
-        const stMap = { active:'signed', signed:'signed', churn:'churn' };
-        const stCls = stMap[(acct.status||'').toLowerCase()] || 'pending';
-        const hasDetail = acct.tax_id || acct.address || acct.contact || acct.payment || acct.remark;
+    // Enhance with DB fields
+    const { data } = await supabaseClient
+        .from('b_account_list')
+        .select('status, tax_id, address, contact, payment, remark')
+        .eq('account_id', accountId)
+        .maybeSingle();
 
-        el.innerHTML = `
-        <div class="acct-detail-card">
-            <div class="acct-detail-top">
-                ${acct.status ? `<span class="opp-status-badge ${stCls}">${esc(acct.status)}</span>` : ''}
-                ${acct.tax_id ? `<span class="acct-tax-id"><i class="bi bi-building"></i> ${esc(acct.tax_id)}</span>` : ''}
-                <span class="acct-detail-id">${esc(accountId)}</span>
-            </div>
-            ${hasDetail ? `<div class="acct-detail-chips">
-                ${chip('Address', acct.address)}
-                ${chip('Contact', acct.contact)}
-                ${chip('Payment', acct.payment)}
-                ${chip('Remark',  acct.remark)}
-            </div>` : ''}
-        </div>`;
-    } catch(e) {
-        el.innerHTML = '';
-    }
+    const card = document.getElementById('acctDetailCard');
+    if (!card) return;
+
+    const d = data || {};
+    const stMap = { active:'signed', signed:'signed', churn:'churn' };
+    const stCls = stMap[(d.status||'').toLowerCase()] || 'pending';
+    const hasDetail = d.tax_id || d.address || d.contact || d.payment || d.remark;
+
+    card.innerHTML = `
+        <div class="acct-detail-top">
+            ${d.status ? `<span class="opp-status-badge ${stCls}">${esc(d.status)}</span>` : ''}
+            ${d.tax_id ? `<span class="acct-tax-id"><i class="bi bi-building"></i> ${esc(d.tax_id)}</span>` : ''}
+            <span class="acct-detail-id">${esc(accountId)}</span>
+        </div>
+        ${hasDetail ? `<div class="acct-detail-chips">
+            ${chip('Address', d.address)}
+            ${chip('Contact', d.contact)}
+            ${chip('Payment', d.payment)}
+            ${chip('Remark',  d.remark)}
+        </div>` : ''}`;
 }
 
 // ── Right Panel ─────────────────────────────────────────────────────────────
