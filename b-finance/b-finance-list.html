@@ -36,6 +36,7 @@
         </div>
         <div id="finContent" style="display:none">
             <div class="fin-company-hdr" id="finCompanyHdr"></div>
+            <div id="acctDetail"></div>
             <div id="finOppList"></div>
         </div>
     </div>
@@ -178,6 +179,38 @@ function renderTree(search) {
     document.getElementById('acctTree').innerHTML = html || '<div style="padding:16px;color:#cbd5e1;font-size:0.75rem">No results</div>';
 }
 
+// ── Account Detail Card ──────────────────────────────────────────────────────
+async function loadAccountDetail(accountId) {
+    const el = document.getElementById('acctDetail');
+    const { data: acct } = await supabaseClient
+        .from('b_account_list')
+        .select('status, tax_id, address, contact, payment, remark')
+        .eq('account_id', accountId)
+        .single();
+    if (!acct) { el.innerHTML = ''; return; }
+
+    const row = (label, val) => val
+        ? `<div class="acct-detail-row"><span class="acct-detail-label">${label}</span><span class="acct-detail-val">${esc(val)}</span></div>`
+        : '';
+
+    const stMap = { active:'signed', signed:'signed', churn:'churn' };
+    const stCls = stMap[(acct.status||'').toLowerCase()] || 'pending';
+
+    el.innerHTML = `
+    <div class="acct-detail-card">
+        <div class="acct-detail-top">
+            ${acct.status ? `<span class="opp-status-badge ${stCls}">${esc(acct.status)}</span>` : ''}
+            ${acct.tax_id ? `<span class="acct-tax-id"><i class="bi bi-building"></i> ${esc(acct.tax_id)}</span>` : ''}
+        </div>
+        <div class="acct-detail-grid">
+            ${row('Address', acct.address)}
+            ${row('Contact', acct.contact)}
+            ${row('Payment', acct.payment)}
+            ${row('Remark',  acct.remark)}
+        </div>
+    </div>`;
+}
+
 // ── Right Panel ─────────────────────────────────────────────────────────────
 async function selectCompany(accountId, companyName, accountName) {
     if (_changes.size + _pendingNew.length + _pendingDel.size > 0) {
@@ -197,13 +230,14 @@ async function selectCompany(accountId, companyName, accountName) {
 
     document.getElementById('finEmpty').style.display = 'none';
     document.getElementById('finContent').style.display = 'block';
+    document.getElementById('acctDetail').innerHTML = '';
     document.getElementById('finOppList').innerHTML = '<div style="padding:24px;color:#cbd5e1;font-size:0.82rem;text-align:center"><i class="bi bi-arrow-clockwise"></i> Loading...</div>';
 
     document.getElementById('finCompanyHdr').innerHTML =
         `<span class="fin-company-name">${esc(companyName)}</span>
          <span class="fin-account-name">· ${esc(accountName)}</span>`;
 
-    await loadRightPanel(accountId);
+    await Promise.all([loadAccountDetail(accountId), loadRightPanel(accountId)]);
 }
 
 async function loadRightPanel(accountId) {
