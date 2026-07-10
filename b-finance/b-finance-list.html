@@ -182,8 +182,11 @@ function renderTree(search) {
 // ── Account Detail Card ──────────────────────────────────────────────────────
 async function loadAccountDetail(accountId, companyName, accountName) {
     const el = document.getElementById('acctDetail');
-    const cell = (label, val, full) => val
-        ? `<div class="acct-data-cell${full ? ' full' : ''}"><span class="acct-data-lbl">${label}</span><span class="acct-data-val">${esc(val)}</span></div>`
+    const cell = (icon, label, val, full) => val
+        ? `<div class="acct-data-cell${full ? ' full' : ''}">
+               <span class="acct-data-lbl"><i class="bi ${icon}"></i>${label}</span>
+               <span class="acct-data-val">${esc(val)}</span>
+           </div>`
         : '';
 
     // Render immediately from cached names
@@ -210,7 +213,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
     const d = data || {};
     const stMap = { active:'signed', signed:'signed', churn:'churn' };
     const stCls = stMap[(d.status||'').toLowerCase()] || 'pending';
-    const hasGrid = d.tax_id || d.address || d.contact || d.payment || d.remark;
+    const hasGrid = d.address || d.tax_id || d.contact || d.payment || d.remark;
 
     zone.innerHTML = `
         <div class="acct-hdr-title">
@@ -223,11 +226,11 @@ async function loadAccountDetail(accountId, companyName, accountName) {
             <span class="acct-hdr-id">${esc(accountId)}</span>
         </div>
         ${hasGrid ? `<div class="acct-data-grid">
-            ${cell('Tax ID', d.tax_id)}
-            ${cell('Contact', d.contact)}
-            ${cell('Address', d.address)}
-            ${cell('Payment', d.payment)}
-            ${cell('Remark', d.remark, true)}
+            ${cell('bi-geo-alt',     'Address', d.address, true)}
+            ${cell('bi-hash',        'Tax ID',  d.tax_id)}
+            ${cell('bi-telephone',   'Contact', d.contact)}
+            ${cell('bi-credit-card', 'Payment', d.payment)}
+            ${cell('bi-chat-left-text', 'Remark', d.remark)}
         </div>` : ''}`;
 }
 
