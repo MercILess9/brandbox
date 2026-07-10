@@ -198,7 +198,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
 
     const { data } = await supabaseClient
         .from('b_account_list')
-        .select('status, tax_id, address, contact, payment, remark')
+        .select('status, tax_id, address, contact, document, payment, remark')
         .eq('account_id', accountId)
         .maybeSingle();
 
@@ -211,7 +211,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
     const box = (label, val) => val
         ? `<div class="acct-info-box"><span class="acct-box-lbl">${label}</span><span class="acct-box-val">${esc(val)}</span></div>`
         : '';
-    const boxes = [box('Contact', d.contact), box('Payment', d.payment), box('Remark', d.remark)].join('');
+    const boxes = [box('Contact', d.contact), box('Document', d.document), box('Payment', d.payment), box('Remark', d.remark)].join('');
 
     zone.innerHTML = `
         <div class="acct-hdr-row1">
