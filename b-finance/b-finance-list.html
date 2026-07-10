@@ -182,16 +182,14 @@ function renderTree(search) {
 // ── Account Detail Card ──────────────────────────────────────────────────────
 async function loadAccountDetail(accountId, companyName, accountName) {
     const el = document.getElementById('acctDetail');
-    const f = (label, val) => val
-        ? `<span class="acct-hdr-field"><span class="acct-hdr-lbl">${label}</span><span class="acct-hdr-val">${esc(val)}</span></span>`
+    const cell = (label, val, full) => val
+        ? `<div class="acct-data-cell${full ? ' full' : ''}"><span class="acct-data-lbl">${label}</span><span class="acct-data-val">${esc(val)}</span></div>`
         : '';
 
     // Render immediately from cached names
     el.innerHTML = `
     <div class="acct-hdr-zone" id="acctHdrZone">
-        <div class="acct-hdr-title">
-            <span class="acct-hdr-company">${esc(companyName)}</span>
-        </div>
+        <div class="acct-hdr-title"><span class="acct-hdr-company">${esc(companyName)}</span></div>
         <div class="acct-hdr-sub">
             <span>${esc(accountName)}</span>
             <span class="acct-hdr-sep">·</span>
@@ -212,7 +210,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
     const d = data || {};
     const stMap = { active:'signed', signed:'signed', churn:'churn' };
     const stCls = stMap[(d.status||'').toLowerCase()] || 'pending';
-    const hasFields = d.tax_id || d.address || d.contact || d.payment || d.remark;
+    const hasGrid = d.tax_id || d.address || d.contact || d.payment || d.remark;
 
     zone.innerHTML = `
         <div class="acct-hdr-title">
@@ -224,12 +222,12 @@ async function loadAccountDetail(accountId, companyName, accountName) {
             <span class="acct-hdr-sep">·</span>
             <span class="acct-hdr-id">${esc(accountId)}</span>
         </div>
-        ${hasFields ? `<div class="acct-hdr-fields">
-            ${f('Tax ID', d.tax_id)}
-            ${f('Address', d.address)}
-            ${f('Contact', d.contact)}
-            ${f('Payment', d.payment)}
-            ${f('Remark', d.remark)}
+        ${hasGrid ? `<div class="acct-data-grid">
+            ${cell('Tax ID', d.tax_id)}
+            ${cell('Contact', d.contact)}
+            ${cell('Address', d.address)}
+            ${cell('Payment', d.payment)}
+            ${cell('Remark', d.remark, true)}
         </div>` : ''}`;
 }
 
