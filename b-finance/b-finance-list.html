@@ -180,18 +180,24 @@ function renderTree(search) {
 }
 
 // ── Account Detail Card ──────────────────────────────────────────────────────
-async function loadAccountDetail(accountId) {
+async function loadAccountDetail(accountId, companyName, accountName) {
     const el = document.getElementById('acctDetail');
-    const chip = (label, val) => val
-        ? `<div class="acct-chip"><span class="acct-chip-label">${label}</span><span class="acct-chip-val">${esc(val)}</span></div>`
+    const field = (label, val) => val
+        ? `<span class="acct-info-field"><span class="acct-info-lbl">${label}</span><span class="acct-info-val">${esc(val)}</span></span>`
         : '';
 
-    // Render immediately from cached data
-    const base = _allAccounts.find(a => a.account_id === accountId) || {};
+    // Render immediately from cached names
     el.innerHTML = `
-    <div class="acct-detail-card" id="acctDetailCard">
-        <div class="acct-detail-top">
-            <span class="acct-detail-id">${esc(accountId)}</span>
+    <div class="acct-info-banner" id="acctInfoBanner">
+        <div class="acct-info-top">
+            <div>
+                <div class="acct-info-company">${esc(companyName)}</div>
+                <div class="acct-info-sub">
+                    <span>${esc(accountName)}</span>
+                    <span class="acct-info-sep">·</span>
+                    <span class="acct-info-id">${esc(accountId)}</span>
+                </div>
+            </div>
         </div>
     </div>`;
 
@@ -202,25 +208,32 @@ async function loadAccountDetail(accountId) {
         .eq('account_id', accountId)
         .maybeSingle();
 
-    const card = document.getElementById('acctDetailCard');
-    if (!card) return;
+    const banner = document.getElementById('acctInfoBanner');
+    if (!banner) return;
 
     const d = data || {};
     const stMap = { active:'signed', signed:'signed', churn:'churn' };
     const stCls = stMap[(d.status||'').toLowerCase()] || 'pending';
-    const hasDetail = d.tax_id || d.address || d.contact || d.payment || d.remark;
+    const hasRow = d.tax_id || d.address || d.contact || d.payment || d.remark;
 
-    card.innerHTML = `
-        <div class="acct-detail-top">
+    banner.innerHTML = `
+        <div class="acct-info-top">
+            <div>
+                <div class="acct-info-company">${esc(companyName)}</div>
+                <div class="acct-info-sub">
+                    <span>${esc(accountName)}</span>
+                    <span class="acct-info-sep">·</span>
+                    <span class="acct-info-id">${esc(accountId)}</span>
+                </div>
+            </div>
             ${d.status ? `<span class="opp-status-badge ${stCls}">${esc(d.status)}</span>` : ''}
-            ${d.tax_id ? `<span class="acct-tax-id"><i class="bi bi-building"></i> ${esc(d.tax_id)}</span>` : ''}
-            <span class="acct-detail-id">${esc(accountId)}</span>
         </div>
-        ${hasDetail ? `<div class="acct-detail-chips">
-            ${chip('Address', d.address)}
-            ${chip('Contact', d.contact)}
-            ${chip('Payment', d.payment)}
-            ${chip('Remark',  d.remark)}
+        ${hasRow ? `<div class="acct-info-row">
+            ${field('Tax ID', d.tax_id)}
+            ${field('Address', d.address)}
+            ${field('Contact', d.contact)}
+            ${field('Payment', d.payment)}
+            ${field('Remark', d.remark)}
         </div>` : ''}`;
 }
 
@@ -246,11 +259,9 @@ async function selectCompany(accountId, companyName, accountName) {
     document.getElementById('acctDetail').innerHTML = '';
     document.getElementById('finOppList').innerHTML = '<div style="padding:24px;color:#cbd5e1;font-size:0.82rem;text-align:center"><i class="bi bi-arrow-clockwise"></i> Loading...</div>';
 
-    document.getElementById('finCompanyHdr').innerHTML =
-        `<span class="fin-company-name">${esc(companyName)}</span>
-         <span class="fin-account-name">· ${esc(accountName)}</span>`;
+    document.getElementById('finCompanyHdr').innerHTML = '';
 
-    await Promise.all([loadAccountDetail(accountId), loadRightPanel(accountId)]);
+    await Promise.all([loadAccountDetail(accountId, companyName, accountName), loadRightPanel(accountId)]);
 }
 
 async function loadRightPanel(accountId) {

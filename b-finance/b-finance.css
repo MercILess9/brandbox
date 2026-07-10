@@ -92,46 +92,46 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 .fin-empty i { font-size: 2.5rem; opacity: 0.3; }
 .fin-empty p { font-size: 0.88rem; font-weight: 600; margin: 0; }
 
-/* Company header in right panel */
-.fin-company-hdr {
-    display: flex; align-items: baseline; gap: 10px;
-    margin-bottom: 20px;
+/* Company header — now unused (banner owns the header) */
+.fin-company-hdr:not(:empty) {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px;
 }
+.fin-company-hdr:empty { display: none; }
 .fin-company-name { font-size: 1.05rem; font-weight: 800; color: var(--c-dark); }
 .fin-account-name { font-size: 0.78rem; font-weight: 600; color: var(--c-muted); }
 
-/* ── Account Detail Card ── */
-.acct-detail-card {
-    background: #fff; border: 1px solid var(--c-border); border-radius: 16px;
-    padding: 14px 18px; margin-bottom: 16px;
+/* ── Account Info Banner ── */
+.acct-info-banner {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-left: 4px solid #bdc432;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
 }
-.acct-detail-top {
-    display: flex; align-items: center; gap: 10px;
+.acct-info-top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
 }
-.acct-tax-id {
-    font-size: 0.72rem; font-weight: 600; color: var(--c-muted);
-    display: flex; align-items: center; gap: 5px;
+.acct-info-company {
+    font-size: 1rem; font-weight: 800; color: var(--c-dark);
+    line-height: 1.3; margin-bottom: 4px;
 }
-.acct-detail-id {
-    font-size: 0.68rem; font-weight: 700; color: var(--c-muted);
-    margin-left: auto;
+.acct-info-sub {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.76rem; font-weight: 600; color: var(--c-muted);
 }
-.acct-detail-chips {
-    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
-    padding-top: 12px; border-top: 1px solid var(--c-border);
+.acct-info-sep { opacity: 0.4; }
+.acct-info-id { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3px; }
+.acct-info-row {
+    display: flex; flex-wrap: wrap; gap: 6px 20px;
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--c-border);
 }
-.acct-chip {
-    display: flex; flex-direction: column; gap: 2px;
-    background: var(--c-bg); border: 1px solid var(--c-border);
-    border-radius: 10px; padding: 6px 12px; min-width: 120px;
+.acct-info-field { display: flex; align-items: baseline; gap: 5px; }
+.acct-info-lbl {
+    font-size: 0.58rem; font-weight: 800; color: var(--c-muted);
+    text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
 }
-.acct-chip-label {
-    font-size: 0.56rem; font-weight: 800; color: var(--c-muted);
-    text-transform: uppercase; letter-spacing: 0.6px;
-}
-.acct-chip-val {
-    font-size: 0.78rem; font-weight: 600; color: var(--c-dark); line-height: 1.4;
-}
+.acct-info-val { font-size: 0.76rem; font-weight: 600; color: var(--c-dark); line-height: 1.4; }
 
 /* ── OPP Block ── */
 .opp-block {
