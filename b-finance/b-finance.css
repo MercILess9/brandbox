@@ -100,38 +100,35 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 .fin-company-name { font-size: 1.05rem; font-weight: 800; color: var(--c-dark); }
 .fin-account-name { font-size: 0.78rem; font-weight: 600; color: var(--c-muted); }
 
-/* ── Account Info Banner ── */
-.acct-info-banner {
-    background: #fff;
-    border: 1px solid var(--c-border);
-    border-left: 4px solid #bdc432;
-    border-radius: 12px;
-    padding: 14px 18px;
+/* ── Account Header Zone (flat, not a card) ── */
+.acct-hdr-zone {
+    padding-bottom: 18px;
     margin-bottom: 20px;
+    border-bottom: 2px solid var(--c-border);
 }
-.acct-info-top {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+.acct-hdr-title {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 3px;
 }
-.acct-info-company {
-    font-size: 1rem; font-weight: 800; color: var(--c-dark);
-    line-height: 1.3; margin-bottom: 4px;
+.acct-hdr-company {
+    font-size: 1.08rem; font-weight: 800; color: var(--c-dark); line-height: 1.3;
 }
-.acct-info-sub {
+.acct-hdr-sub {
     display: flex; align-items: center; gap: 6px;
     font-size: 0.76rem; font-weight: 600; color: var(--c-muted);
+    margin-bottom: 10px;
 }
-.acct-info-sep { opacity: 0.4; }
-.acct-info-id { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3px; }
-.acct-info-row {
-    display: flex; flex-wrap: wrap; gap: 6px 20px;
-    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--c-border);
+.acct-hdr-sep { opacity: 0.4; }
+.acct-hdr-id { font-size: 0.68rem; font-weight: 700; }
+.acct-hdr-fields {
+    display: flex; flex-wrap: wrap; align-items: baseline;
+    gap: 3px 14px; font-size: 0.8rem; color: var(--c-dark);
 }
-.acct-info-field { display: flex; align-items: baseline; gap: 5px; }
-.acct-info-lbl {
-    font-size: 0.58rem; font-weight: 800; color: var(--c-muted);
-    text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+.acct-hdr-field { display: flex; align-items: baseline; gap: 5px; }
+.acct-hdr-lbl {
+    font-size: 0.62rem; font-weight: 800; color: var(--c-muted);
+    text-transform: uppercase; letter-spacing: 0.4px; flex-shrink: 0;
 }
-.acct-info-val { font-size: 0.76rem; font-weight: 600; color: var(--c-dark); line-height: 1.4; }
+.acct-hdr-val { font-weight: 600; }
 
 /* ── OPP Block ── */
 .opp-block {

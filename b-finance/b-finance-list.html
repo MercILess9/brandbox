@@ -182,22 +182,20 @@ function renderTree(search) {
 // ── Account Detail Card ──────────────────────────────────────────────────────
 async function loadAccountDetail(accountId, companyName, accountName) {
     const el = document.getElementById('acctDetail');
-    const field = (label, val) => val
-        ? `<span class="acct-info-field"><span class="acct-info-lbl">${label}</span><span class="acct-info-val">${esc(val)}</span></span>`
+    const f = (label, val) => val
+        ? `<span class="acct-hdr-field"><span class="acct-hdr-lbl">${label}</span><span class="acct-hdr-val">${esc(val)}</span></span>`
         : '';
 
     // Render immediately from cached names
     el.innerHTML = `
-    <div class="acct-info-banner" id="acctInfoBanner">
-        <div class="acct-info-top">
-            <div>
-                <div class="acct-info-company">${esc(companyName)}</div>
-                <div class="acct-info-sub">
-                    <span>${esc(accountName)}</span>
-                    <span class="acct-info-sep">·</span>
-                    <span class="acct-info-id">${esc(accountId)}</span>
-                </div>
-            </div>
+    <div class="acct-hdr-zone" id="acctHdrZone">
+        <div class="acct-hdr-title">
+            <span class="acct-hdr-company">${esc(companyName)}</span>
+        </div>
+        <div class="acct-hdr-sub">
+            <span>${esc(accountName)}</span>
+            <span class="acct-hdr-sep">·</span>
+            <span class="acct-hdr-id">${esc(accountId)}</span>
         </div>
     </div>`;
 
@@ -208,32 +206,30 @@ async function loadAccountDetail(accountId, companyName, accountName) {
         .eq('account_id', accountId)
         .maybeSingle();
 
-    const banner = document.getElementById('acctInfoBanner');
-    if (!banner) return;
+    const zone = document.getElementById('acctHdrZone');
+    if (!zone) return;
 
     const d = data || {};
     const stMap = { active:'signed', signed:'signed', churn:'churn' };
     const stCls = stMap[(d.status||'').toLowerCase()] || 'pending';
-    const hasRow = d.tax_id || d.address || d.contact || d.payment || d.remark;
+    const hasFields = d.tax_id || d.address || d.contact || d.payment || d.remark;
 
-    banner.innerHTML = `
-        <div class="acct-info-top">
-            <div>
-                <div class="acct-info-company">${esc(companyName)}</div>
-                <div class="acct-info-sub">
-                    <span>${esc(accountName)}</span>
-                    <span class="acct-info-sep">·</span>
-                    <span class="acct-info-id">${esc(accountId)}</span>
-                </div>
-            </div>
+    zone.innerHTML = `
+        <div class="acct-hdr-title">
+            <span class="acct-hdr-company">${esc(companyName)}</span>
             ${d.status ? `<span class="opp-status-badge ${stCls}">${esc(d.status)}</span>` : ''}
         </div>
-        ${hasRow ? `<div class="acct-info-row">
-            ${field('Tax ID', d.tax_id)}
-            ${field('Address', d.address)}
-            ${field('Contact', d.contact)}
-            ${field('Payment', d.payment)}
-            ${field('Remark', d.remark)}
+        <div class="acct-hdr-sub">
+            <span>${esc(accountName)}</span>
+            <span class="acct-hdr-sep">·</span>
+            <span class="acct-hdr-id">${esc(accountId)}</span>
+        </div>
+        ${hasFields ? `<div class="acct-hdr-fields">
+            ${f('Tax ID', d.tax_id)}
+            ${f('Address', d.address)}
+            ${f('Contact', d.contact)}
+            ${f('Payment', d.payment)}
+            ${f('Remark', d.remark)}
         </div>` : ''}`;
 }
 
