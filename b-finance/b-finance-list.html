@@ -183,11 +183,12 @@ function renderTree(search) {
 async function loadAccountDetail(accountId) {
     const el = document.getElementById('acctDetail');
     try {
-        const { data: acct } = await supabaseClient
+        const { data: acct, error: acctErr } = await supabaseClient
             .from('b_account_list')
             .select('status, tax_id, address, contact, payment, remark')
             .eq('account_id', accountId)
-            .single();
+            .maybeSingle();
+        console.log('[Finance] acctDetail', accountId, acct, acctErr);
         if (!acct) { el.innerHTML = ''; return; }
 
         const chip = (label, val) => val
