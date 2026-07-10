@@ -149,10 +149,10 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     font-variant-numeric: tabular-nums;
 }
 
-/* Info boxes row */
+/* Info boxes — 2x2 grid */
 .acct-info-boxes {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 7px;
 }
 .acct-info-box {
