@@ -264,6 +264,7 @@ async function loadLeftPanel() {
         renderTree('');
         document.getElementById('acctSearch').addEventListener('input', e => {
             document.getElementById('acctSearchClear').style.display = e.target.value ? 'block' : 'none';
+            deselectAccount();
             renderTree(e.target.value.toLowerCase());
         });
     } catch (e) {
@@ -276,6 +277,7 @@ function clearAcctSearch() {
     const inp = document.getElementById('acctSearch');
     inp.value = '';
     document.getElementById('acctSearchClear').style.display = 'none';
+    deselectAccount();
     renderTree('');
 }
 
@@ -476,6 +478,15 @@ async function loadRightPanel(accountId) {
 }
 
 
+function deselectAccount() {
+    _selectedAccId = null;
+    document.getElementById('finEmpty').style.display   = '';
+    document.getElementById('finContent').style.display = 'none';
+    document.getElementById('financeLayout').classList.add('sidebar-pinned');
+    document.getElementById('sidebarToggle').classList.add('active');
+    _sidebarAutoPinned = false;
+}
+
 function onFilterChange() {
     _filterDateFrom = document.getElementById('filterDateFrom').value;
     _filterDateTo   = document.getElementById('filterDateTo').value;
@@ -486,32 +497,8 @@ function onFilterChange() {
     document.getElementById('fltStatusBox').classList.toggle('active-filter', !!_filterStatus);
     syncQuickDateButtons();
 
+    deselectAccount();
     renderTree(document.getElementById('acctSearch').value.toLowerCase());
-
-    if (_selectedAccId) {
-        const stillVisible = _allAccounts.some(a => {
-            if (a.account_id !== _selectedAccId) return false;
-            if (_filterBU     && !a.buses.has(_filterBU))         return false;
-            if (_filterStatus && !a.statuses.has(_filterStatus))  return false;
-            if (_filterDateFrom || _filterDateTo) {
-                const inRange = [...a.billdates].some(d =>
-                    (!_filterDateFrom || d >= _filterDateFrom) && (!_filterDateTo || d <= _filterDateTo)
-                );
-                if (!inRange) return false;
-            }
-            return true;
-        });
-        if (!stillVisible) {
-            _selectedAccId = null;
-            document.getElementById('finEmpty').style.display   = '';
-            document.getElementById('finContent').style.display = 'none';
-            document.getElementById('financeLayout').classList.add('sidebar-pinned');
-            document.getElementById('sidebarToggle').classList.add('active');
-            _sidebarAutoPinned = false;
-            return;
-        }
-        applyFinFilters();
-    }
 }
 
 function setQuickDate(type) {
