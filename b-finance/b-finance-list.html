@@ -46,7 +46,7 @@
             </select>
         </div>
         <div class="fin-toolbar-spacer"></div>
-        <button class="flt-btn-quick" id="btnQtDetail" onclick="toggleQtDetail()" title="Show / hide QT detail">
+        <button class="flt-btn-quick active" id="btnQtDetail" onclick="toggleQtDetail()" title="Show / hide QT detail">
             <i class="bi bi-table"></i> QT Detail
         </button>
     </div>
@@ -104,7 +104,7 @@ let _filterDateFrom = '';
 let _filterDateTo   = '';
 let _filterBU       = '';
 let _filterStatus   = '';
-let _qtDetailOpen   = false;
+let _qtDetailOpen   = true;
 let _cachedOpps     = [];
 let _cachedQtByOpp  = new Map();
 let _cachedBuByOpp  = new Map();

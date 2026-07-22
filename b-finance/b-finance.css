@@ -63,7 +63,7 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     cursor: pointer; transition: all 0.15s; font-size: 1rem;
 }
 .fin-sidebar-toggle:hover { background: var(--c-bg); color: var(--c-dark); border-color: var(--c-dark); }
-.fin-sidebar-toggle.active { background: var(--c-dark); color: var(--c-accent); border-color: var(--c-dark); }
+.fin-sidebar-toggle.active { background: var(--c-accent-light); border-color: var(--c-accent); color: #7a8500; }
 
 .fin-search-wrap { position: relative; width: 240px; }
 .fin-search-input {
