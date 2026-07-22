@@ -423,23 +423,36 @@ function renderQtBlock(qt) {
             <i class="bi bi-chevron-down qt-chevron"></i>
         </div>
         <div class="qt-body" id="qtBody-${esc(qtId)}">
-            ${renderFinTable(qt.finRows, qtId, qt.qt_number)}
+            ${renderFinTable(qt.finRows, qtId, qt.qt_number, qt.saleAmt)}
         </div>
     </div>`;
 }
 
-function renderFinTable(finRows, qtId, qtNumber) {
+function renderFinTable(finRows, qtId, qtNumber, saleAmt) {
     const canEdit = canFinance('edit');
     const ro      = canEdit ? '' : ' readonly';
+    const maxIdx  = finRows.length ? Math.max(...finRows.map(r => r.sub_index)) : 0;
 
     const rowsHtml = finRows.map(r => renderFinRow(r, canEdit)).join('');
     const addBtn   = canEdit
-        ? `<div class="fin-add-row"><button class="btn-add-sub" onclick="addSubRow('${esc(qtId)}','${esc(qtNumber||qtId)}',${finRows.length ? Math.max(...finRows.map(r=>r.sub_index)) : 0})"><i class="bi bi-plus"></i> Add Sub</button></div>`
+        ? `<div class="fin-add-row"><button class="btn-add-sub" onclick="addSubRow('${esc(qtId)}','${esc(qtNumber||qtId)}',${maxIdx},${saleAmt||0})"><i class="bi bi-plus"></i> Add Sub</button></div>`
         : '';
 
     return `
     <div class="fin-table-wrap">
         <table class="fin-table">
+            <colgroup>
+                <col style="width:36px">
+                <col style="width:175px">
+                <col style="width:135px">
+                <col style="width:115px">
+                <col>
+                <col style="width:125px">
+                <col style="width:120px">
+                <col style="width:125px">
+                <col style="width:155px">
+                ${canEdit ? '<col style="width:38px">' : ''}
+            </colgroup>
             <thead class="fin-thead">
                 <tr>
                     <th>#</th>
@@ -473,21 +486,22 @@ function renderFinRow(r, canEdit) {
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.quotation_sub||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','quotation_sub',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.invoice||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','invoice',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="number" value="${r.actual_amount??''}" placeholder="0" ${ro} onchange="trackChange('${esc(id)}','actual_amount',this.value?+this.value:null)" style="text-align:right"></td>
-        <td class="fin-td" style="min-width:160px"><input class="fin-input" type="text" value="${esc(r.detail||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','detail',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.detail||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','detail',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="date" value="${r.bill_date||''}" ${ro} onchange="trackChange('${esc(id)}','bill_date',this.value||null)"></td>
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.receipt_no||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','receipt_no',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="date" value="${r.receipt_date||''}" ${ro} onchange="trackChange('${esc(id)}','receipt_date',this.value||null)"></td>
-        <td class="fin-td" style="min-width:120px"><input class="fin-input" type="text" value="${esc(r.remark||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','remark',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.remark||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','remark',this.value)"></td>
         ${delBtn}
     </tr>`;
 }
 
 
-function addSubRow(qtId, qtNumber, maxIndex) {
+function addSubRow(qtId, qtNumber, maxIndex, saleAmt) {
     const tempId  = `new-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
     const newIdx  = maxIndex + 1;
     const subNum  = newIdx === 1 ? qtNumber : `${qtNumber}-${newIdx}`;
-    const newRow  = { _tempId: tempId, qt_id: qtId, sub_index: newIdx, quotation_sub: subNum, invoice: null, actual_amount: null, detail: null, bill_date: null, receipt_no: null, receipt_date: null, remark: null };
+    const defAmt  = (maxIndex === 0 && saleAmt) ? saleAmt : null;
+    const newRow  = { _tempId: tempId, qt_id: qtId, sub_index: newIdx, quotation_sub: subNum, invoice: null, actual_amount: defAmt, detail: null, bill_date: null, receipt_no: null, receipt_date: null, remark: null };
     _pendingNew.push(newRow);
 
     const tbody = document.getElementById(`finBody-${qtId}`);
@@ -505,8 +519,8 @@ function addSubRow(qtId, qtNumber, maxIndex) {
         <td class="fin-td-idx">${newIdx}</td>
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(subNum)}" oninput="trackNewChange('${tempId}','quotation_sub',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','invoice',this.value)"></td>
-        <td class="fin-td"><input class="fin-input" type="number" placeholder="0" style="text-align:right" oninput="trackNewChange('${tempId}','actual_amount',this.value?+this.value:null)"></td>
-        <td class="fin-td" style="min-width:160px"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','detail',this.value)"></td>
+        <td class="fin-td"><input class="fin-input" type="number" value="${defAmt != null ? defAmt : ''}" placeholder="0" style="text-align:right" oninput="trackNewChange('${tempId}','actual_amount',this.value?+this.value:null)"></td>
+        <td class="fin-td"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','detail',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="date" oninput="trackNewChange('${tempId}','bill_date',this.value||null)"></td>
         <td class="fin-td"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','receipt_no',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="date" oninput="trackNewChange('${tempId}','receipt_date',this.value||null)"></td>
