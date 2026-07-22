@@ -359,10 +359,10 @@ async function loadAccountDetail(accountId, companyName, accountName) {
                 <span class="acct-hdr-company">${esc(companyName)}</span>
                 <span class="acct-hdr-dot">·</span>
                 <span class="acct-hdr-acname">${esc(accountName)}</span>
-                ${d.tax_id ? `<span class="acct-taxid-badge"><i class="bi bi-hash"></i>${esc(d.tax_id)}</span>` : ''}
             </div>
             <div class="acct-hdr-badges">
                 <span class="acct-id-badge">${esc(accountId)}</span>
+                ${d.tax_id ? `<span class="acct-taxid-badge"><i class="bi bi-hash"></i>${esc(d.tax_id)}</span>` : ''}
                 ${boxes ? `<button class="acct-boxes-toggle" id="acctBoxToggle" onclick="toggleAcctBoxes()" title="Toggle details"><i class="bi bi-chevron-up"></i></button>` : ''}
             </div>
         </div>
