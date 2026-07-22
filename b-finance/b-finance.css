@@ -75,6 +75,8 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 }
 .fin-search-input:focus { border-color: var(--c-accent); background: #fff; }
 .fin-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: 0.78rem; pointer-events: none; }
+.flt-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: none; font-size: 0.82rem; line-height: 1; }
+.flt-search-clear:hover { color: #475569; }
 
 /* ── Split Layout ── */
 .finance-layout {

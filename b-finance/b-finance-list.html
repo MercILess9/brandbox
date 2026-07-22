@@ -24,6 +24,7 @@
         <div class="fin-search-wrap">
             <i class="bi bi-search fin-search-icon"></i>
             <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search...">
+            <button class="flt-search-clear" id="acctSearchClear" onclick="clearAcctSearch()" tabindex="-1"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="fin-filter-divider"></div>
         <div class="flt-date-group">
@@ -258,11 +259,21 @@ async function loadLeftPanel() {
         document.getElementById('filterStatus').innerHTML = '<option value="">All</option>' + allStatuses.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
 
         renderTree('');
-        document.getElementById('acctSearch').addEventListener('input', e => renderTree(e.target.value.toLowerCase()));
+        document.getElementById('acctSearch').addEventListener('input', e => {
+            document.getElementById('acctSearchClear').style.display = e.target.value ? 'block' : 'none';
+            renderTree(e.target.value.toLowerCase());
+        });
     } catch (e) {
         treeEl.innerHTML = `<div style="padding:16px;color:#ef4444;font-size:0.82rem">Error: ${e.message}</div>`;
         console.error('[Finance] loadLeftPanel error:', e);
     }
+}
+
+function clearAcctSearch() {
+    const inp = document.getElementById('acctSearch');
+    inp.value = '';
+    document.getElementById('acctSearchClear').style.display = 'none';
+    renderTree('');
 }
 
 function renderTree(search) {
