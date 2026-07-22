@@ -166,7 +166,7 @@ async function loadLeftPanel() {
         // Step 1: Get qt_ids + bill_dates that have finance data
         const { data: finRows, error: e1 } = await supabaseClient
             .from('b_finance_qt')
-            .select('qt_id, bill_date');
+            .select('qt_id, bill_date, actual_amount, receipt_date, receipt_no');
         if (e1) throw e1;
 
         const finQtIds = [...new Set((finRows||[]).map(r => r.qt_id).filter(Boolean))];
@@ -186,7 +186,7 @@ async function loadLeftPanel() {
         // Step 2: Get qt_id + opportunity_ids for those qt_ids (original QTs only)
         const { data: bqts, error: e2 } = await supabaseClient
             .from('b_opportunity_qt')
-            .select('qt_id, opportunity_id')
+            .select('qt_id, opportunity_id, qt_number')
             .in('qt_id', finQtIds)
             .eq('qt_type', 'original');
         if (e2) throw e2;
@@ -228,33 +228,63 @@ async function loadLeftPanel() {
             dates.forEach(d => datesByOpp.get(oppId).add(d));
         });
 
-        // Build account → {statuses, buses, billdates, oppNames} map
+        // Build opportunity_id → account_id map
+        const oppToAcct = new Map((opps||[]).map(o => [o.opportunity_id, o.account_id]));
+
+        // Build account → {statuses, buses, billdates, oppNames, oppIds, searchTerms} map
         const acctMeta = new Map();
+        const initMeta = () => ({ statuses: new Set(), buses: new Set(), billdates: new Set(), oppNames: new Set(), oppIds: new Set(), searchTerms: new Set() });
         (opps||[]).forEach(o => {
-            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set(), billdates: new Set(), oppNames: new Set(), oppIds: new Set() });
+            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, initMeta());
             if (o.status)           acctMeta.get(o.account_id).statuses.add(o.status);
             if (o.opportunity_name) acctMeta.get(o.account_id).oppNames.add(o.opportunity_name.toLowerCase());
             if (o.opportunity_id)   acctMeta.get(o.account_id).oppIds.add(o.opportunity_id.toLowerCase());
             buByOpp.get(o.opportunity_id)?.forEach(bu => acctMeta.get(o.account_id).buses.add(bu));
             datesByOpp.get(o.opportunity_id)?.forEach(d => acctMeta.get(o.account_id).billdates.add(d));
         });
+        // Index qt_number per account
+        (bqts||[]).forEach(q => {
+            const accId = oppToAcct.get(q.opportunity_id);
+            if (!accId || !q.qt_number) return;
+            acctMeta.get(accId)?.searchTerms.add(q.qt_number.toLowerCase());
+        });
+        // Index amounts, dates, receipt_no per account
+        (finRows||[]).forEach(r => {
+            const oppId = qtToOpp.get(r.qt_id);
+            const accId = oppToAcct.get(oppId);
+            if (!accId) return;
+            const m = acctMeta.get(accId);
+            if (!m) return;
+            if (r.actual_amount) m.searchTerms.add(String(r.actual_amount));
+            if (r.bill_date)     m.searchTerms.add(r.bill_date);
+            if (r.receipt_date)  m.searchTerms.add(r.receipt_date);
+            if (r.receipt_no)    m.searchTerms.add(r.receipt_no.toLowerCase());
+        });
 
         // Step 4: Get account/company info
         const { data: accounts, error: e4 } = await supabaseClient
             .from('b_account_list')
-            .select('account_id, account_name, company_name')
+            .select('account_id, account_name, company_name, tax_id, contact, document, payment, remark')
             .in('account_id', accIds)
             .order('account_name');
         if (e4) throw e4;
 
-        _allAccounts = (accounts||[]).map(a => ({
-            ...a,
-            statuses:  acctMeta.get(a.account_id)?.statuses  || new Set(),
-            buses:     acctMeta.get(a.account_id)?.buses     || new Set(),
-            billdates: acctMeta.get(a.account_id)?.billdates || new Set(),
-            oppNames:  acctMeta.get(a.account_id)?.oppNames  || new Set(),
-            oppIds:    acctMeta.get(a.account_id)?.oppIds    || new Set(),
-        }));
+        _allAccounts = (accounts||[]).map(a => {
+            const m = acctMeta.get(a.account_id);
+            // Append account detail fields into searchTerms
+            const extra = [a.tax_id, a.contact, a.document, a.payment, a.remark].filter(Boolean).map(s => s.toLowerCase());
+            const searchTerms = m?.searchTerms || new Set();
+            extra.forEach(s => searchTerms.add(s));
+            return {
+                ...a,
+                statuses:    m?.statuses    || new Set(),
+                buses:       m?.buses       || new Set(),
+                billdates:   m?.billdates   || new Set(),
+                oppNames:    m?.oppNames    || new Set(),
+                oppIds:      m?.oppIds      || new Set(),
+                searchTerms,
+            };
+        });
 
         // Populate BU & Status dropdowns from ALL data
         const allBus      = [...new Set((buItems||[]).map(i => i.bu).filter(Boolean))].sort();
@@ -285,7 +315,7 @@ function clearAcctSearch() {
 function renderTree(search) {
     const tree = {};
     _allAccounts.forEach(a => {
-        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search) && !a.account_id.toLowerCase().includes(search) && ![...a.oppNames].some(n => n.includes(search)) && ![...a.oppIds].some(n => n.includes(search))) return;
+        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search) && !a.account_id.toLowerCase().includes(search) && ![...a.oppNames].some(n => n.includes(search)) && ![...a.oppIds].some(n => n.includes(search)) && ![...a.searchTerms].some(n => n.includes(search))) return;
         if (_filterBU     && !a.buses.has(_filterBU))          return;
         if (_filterStatus && !a.statuses.has(_filterStatus))  return;
         if (_filterDateFrom || _filterDateTo) {
