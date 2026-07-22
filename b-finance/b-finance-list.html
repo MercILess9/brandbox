@@ -593,8 +593,9 @@ function renderRightPanel(opps, qtByOpp) {
                     <div class="opp-num-div"></div>
                     <div class="opp-num-item">
                         <div class="opp-num-val green">${fNum(totAct)} ฿</div>
-                        <div class="opp-num-label green">Actual${totSale > 0 && totAct > 0 ? ` <span class="opp-pct-badge">${(totAct/totSale*100).toFixed(1)}%</span>` : ''}</div>
+                        <div class="opp-num-label green">Actual</div>
                     </div>
+                    ${totSale > 0 && totAct > 0 ? `<span class="opp-pct-badge">${(totAct/totSale*100).toFixed(1)}%</span>` : ''}
                 </div>
                 <i class="bi bi-chevron-down opp-chevron"></i>
             </div>
