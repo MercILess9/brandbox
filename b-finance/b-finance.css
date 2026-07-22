@@ -90,8 +90,9 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     z-index: 1;
 }
 .fin-sidebar-rail i {
-    font-size: 1.1rem;
-    color: rgba(30,41,59,0.55);
+    font-size: 1.3rem;
+    color: #fff;
+    -webkit-text-stroke: 0.5px rgba(30,41,59,0.3);
 }
 
 .fin-left:hover .fin-sidebar-rail,
@@ -112,7 +113,13 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     transition: none;
 }
 
-.fin-tree { flex: 1; overflow-y: auto; padding: 6px 0; }
+.fin-tree {
+    flex: 1; overflow-y: auto; padding: 6px 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.fin-left:hover .fin-tree,
+.finance-layout.sidebar-pinned .fin-left .fin-tree { opacity: 1; }
 
 /* Account group */
 .acct-group { }
