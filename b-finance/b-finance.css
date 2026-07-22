@@ -250,12 +250,10 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 /* Boxes toggle button */
 .acct-boxes-toggle {
     display: flex; align-items: center; justify-content: center;
-    width: 26px; height: 26px; flex-shrink: 0;
-    border-radius: 6px; border: 1px solid var(--c-border);
-    background: transparent; color: var(--c-muted);
-    cursor: pointer; transition: all 0.15s; font-size: 0.7rem;
+    border: none; background: transparent; color: var(--c-muted);
+    cursor: pointer; transition: color 0.15s; font-size: 0.7rem; padding: 0;
 }
-.acct-boxes-toggle:hover { background: var(--c-bg); color: var(--c-dark); }
+.acct-boxes-toggle:hover { color: var(--c-dark); }
 
 /* Info boxes — 4-col horizontal row */
 .acct-info-boxes {
