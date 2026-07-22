@@ -67,8 +67,10 @@
 </div>
 
 <script>
-const fNum = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleString('en-US') : '—';
-const fDate = d => { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } };
+const fNum    = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleString('en-US') : '—';
+const fDate   = d => { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } };
+const fmtAmt  = v => (v != null && v !== '') ? Number(v).toLocaleString('en-US') : '';
+const parseAmt = s => { const n = parseFloat(String(s).replace(/,/g,'')); return isNaN(n) ? null : n; };
 
 let _allAccounts    = [];
 let _boxesCollapsed = false;
@@ -375,7 +377,7 @@ function renderRightPanel(opps, qtByOpp) {
     const html = opps.map(opp => {
         const qts    = qtByOpp.get(opp.opportunity_id) || [];
         const totSale = qts.reduce((s,q) => s + q.saleAmt, 0);
-        const totAct  = qts.reduce((s,q) => s + q.finRows.reduce((ss,r) => ss + (+r.actual_amount||0), 0), 0);
+        const totAct  = qts.reduce((s,q) => s + q.finRows.filter(r => r.receipt_no).reduce((ss,r) => ss + (+r.actual_amount||0), 0), 0);
         const stCls   = oppStatusClass(opp.status);
 
         return `
@@ -409,7 +411,7 @@ function renderRightPanel(opps, qtByOpp) {
 
 function renderQtBlock(qt) {
     const qtStatus = getQtStatus(qt.finRows);
-    const totAct   = qt.finRows.reduce((s,r) => s + (+r.actual_amount||0), 0);
+    const totAct   = qt.finRows.filter(r => r.receipt_no).reduce((s,r) => s + (+r.actual_amount||0), 0);
     const qtId     = qt.qt_id;
 
     return `
@@ -507,7 +509,7 @@ function renderFinRow(r, canEdit, showSub) {
         <td class="fin-td-idx">${r.sub_index}</td>
         ${showSub ? `<td class="fin-td"><input class="fin-input" type="text" value="${esc(r.quotation_sub||'')}" placeholder="—" ${ro} ${on('quotation_sub')}></td>` : ''}
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.invoice||'')}" placeholder="—" ${ro} ${on('invoice')}></td>
-        <td class="fin-td"><input class="fin-input" type="number" value="${r.actual_amount??''}" placeholder="0" ${ro} ${on('actual_amount','this.value?+this.value:null')} style="text-align:right"></td>
+        <td class="fin-td"><input class="fin-input" type="text" value="${fmtAmt(r.actual_amount)}" placeholder="0" inputmode="numeric" ${ro} ${on('actual_amount','parseAmt(this.value)')} style="text-align:right"></td>
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.detail||'')}" placeholder="—" ${ro} ${on('detail')}></td>
         <td class="fin-td"><input class="fin-input" type="date" value="${r.bill_date||''}" ${ro} ${on('bill_date','this.value||null')}></td>
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.receipt_no||'')}" placeholder="—" ${ro} ${on('receipt_no')}></td>
