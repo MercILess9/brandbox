@@ -600,7 +600,7 @@ function renderRightPanel(opps, qtByOpp) {
                 <i class="bi bi-chevron-down opp-chevron"></i>
             </div>
             <div class="opp-body" style="display:block">
-                ${qts.length ? qts.map(qt => renderQtBlock(qt)).join('') : '<div class="no-finance">No QTs</div>'}
+                ${qts.length ? qts.map(qt => renderQtBlock(qt, qts.length)).join('') : '<div class="no-finance">No QTs</div>'}
             </div>
         </div>`;
     }).join('');
@@ -608,7 +608,7 @@ function renderRightPanel(opps, qtByOpp) {
     document.getElementById('finOppList').innerHTML = html;
 }
 
-function renderQtBlock(qt) {
+function renderQtBlock(qt, qtCount) {
     const qtStatus = getQtStatus(qt.finRows);
     const totAct   = qt.finRows.filter(r => r.receipt_no).reduce((s,r) => s + (+r.actual_amount||0), 0);
     const qtId     = qt.qt_id;
@@ -619,7 +619,7 @@ function renderQtBlock(qt) {
         <div class="qt-hdr${autoOpen ? ' open' : ''}" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
             <span class="qt-num">${esc(qt.qt_number||qt.qt_id)}</span>
             ${qt.company_qt ? `<span class="qt-co-badge">${esc(qt.company_qt)}</span>` : ''}
-            <div class="qt-nums">
+            ${qtCount > 1 ? `<div class="qt-nums">
                 <div class="qt-num-item">
                     <div class="qt-num-val">${fNum(qt.saleAmt)} ฿</div>
                     <div class="qt-num-label">Sale</div>
@@ -630,7 +630,7 @@ function renderQtBlock(qt) {
                     <div class="qt-num-label received">Actual</div>
                 </div>
                 ${qt.saleAmt > 0 && totAct > 0 ? `<span class="qt-pct-badge ${qtStatus.cls}">${(totAct/qt.saleAmt*100).toFixed(1)}%</span>` : ''}
-            </div>
+            </div>` : ''}
             <i class="bi bi-chevron-down qt-chevron"></i>
         </div>
         <div class="qt-body" id="qtBody-${esc(qtId)}" style="${autoOpen ? 'display:block' : ''}">
