@@ -181,12 +181,31 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     font-variant-numeric: tabular-nums;
 }
 
+/* Boxes toggle button */
+.acct-boxes-toggle {
+    display: flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; flex-shrink: 0;
+    border-radius: 6px; border: 1px solid var(--c-border);
+    background: transparent; color: var(--c-muted);
+    cursor: pointer; transition: all 0.15s; font-size: 0.7rem;
+}
+.acct-boxes-toggle:hover { background: var(--c-bg); color: var(--c-dark); }
+
 /* Info boxes — 4-col horizontal row */
 .acct-info-boxes {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
     margin-top: 12px;
+    overflow: hidden;
+    max-height: 300px;
+    opacity: 1;
+    transition: max-height 0.22s ease, opacity 0.18s ease, margin-top 0.22s ease;
+}
+.acct-hdr-zone.boxes-collapsed .acct-info-boxes {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
 }
 .acct-info-box {
     display: flex; flex-direction: column; gap: 8px;

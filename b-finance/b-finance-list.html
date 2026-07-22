@@ -71,12 +71,21 @@ const fNum = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleStri
 const fDate = d => { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } };
 
 let _allAccounts   = [];
+let _boxesCollapsed = false;
 let _selectedAccId = null;
 let _selectedCoName = '';
 let _selectedAcName = '';
 let _changes       = new Map(); // id → { field: value }
 let _pendingNew    = [];        // new rows not yet in DB
 let _pendingDel    = new Set(); // ids to delete
+
+function toggleAcctBoxes() {
+    _boxesCollapsed = !_boxesCollapsed;
+    const zone = document.getElementById('acctHdrZone');
+    const btn  = document.getElementById('acctBoxToggle');
+    if (zone) zone.classList.toggle('boxes-collapsed', _boxesCollapsed);
+    if (btn)  btn.querySelector('i').className = `bi bi-chevron-${_boxesCollapsed ? 'down' : 'up'}`;
+}
 
 function toggleSidebar() {
     const layout = document.getElementById('financeLayout');
@@ -247,6 +256,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
             <div class="acct-hdr-badges">
                 <span class="acct-id-badge">${esc(accountId)}</span>
                 ${d.status ? `<span class="opp-status-badge ${stCls}">${esc(d.status)}</span>` : ''}
+                ${boxes ? `<button class="acct-boxes-toggle" id="acctBoxToggle" onclick="toggleAcctBoxes()" title="Toggle details"><i class="bi bi-chevron-up"></i></button>` : ''}
             </div>
         </div>
         ${(d.address || d.tax_id) ? `<div class="acct-hdr-row2">
@@ -254,6 +264,12 @@ async function loadAccountDetail(accountId, companyName, accountName) {
             ${d.tax_id ? `<span class="acct-taxid-badge"><i class="bi bi-hash"></i>${esc(d.tax_id)}</span>` : ''}
         </div>` : ''}
         ${boxes ? `<div class="acct-info-boxes">${boxes}</div>` : ''}`;
+
+    if (_boxesCollapsed) {
+        zone.classList.add('boxes-collapsed');
+        const btn = document.getElementById('acctBoxToggle');
+        if (btn) btn.querySelector('i').className = 'bi bi-chevron-down';
+    }
 }
 
 // ── Right Panel ─────────────────────────────────────────────────────────────
