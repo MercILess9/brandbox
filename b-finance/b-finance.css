@@ -132,11 +132,13 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 .fin-company-name { font-size: 1.05rem; font-weight: 800; color: var(--c-dark); }
 .fin-account-name { font-size: 0.78rem; font-weight: 600; color: var(--c-muted); }
 
-/* ── Account Header Zone ── */
+/* ── Account Header Zone — white card on grey page bg ── */
 .acct-hdr-zone {
-    padding-bottom: 16px;
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-radius: 14px;
+    padding: 18px 20px 16px;
     margin-bottom: 20px;
-    border-bottom: 2px solid var(--c-border);
 }
 
 /* Row 1: Company · Account Name  ————  [ID badge] [Status badge] */
@@ -209,8 +211,8 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 }
 .acct-info-box {
     display: flex; flex-direction: column; gap: 8px;
-    background: #fff; border: 1px solid var(--c-border);
-    border-radius: 12px; padding: 14px 16px; min-height: 80px;
+    background: var(--c-bg); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px 14px;
 }
 .acct-box-lbl {
     display: flex; align-items: center; gap: 6px;
@@ -225,8 +227,15 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 
 /* Opportunities section title */
 .fin-opp-title {
-    font-size: 0.95rem; font-weight: 700; color: var(--c-dark);
-    margin: 20px 0 10px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.72rem; font-weight: 800; color: var(--c-muted);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin: 0 0 12px;
+}
+.fin-opp-title::before {
+    content: ''; display: inline-block;
+    width: 3px; height: 14px;
+    background: #bdc432; border-radius: 2px; flex-shrink: 0;
 }
 
 /* ── OPP Block ── */
