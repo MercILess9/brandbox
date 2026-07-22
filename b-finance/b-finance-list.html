@@ -52,7 +52,7 @@
         </button>
     </div>
 
-    <div class="finance-layout sidebar-pinned" id="financeLayout">
+    <div class="finance-layout sidebar-forced" id="financeLayout">
         <!-- Left Panel -->
         <div class="fin-left" id="finLeft">
             <div class="fin-sidebar-rail"><i class="bi bi-chevron-right"></i></div>
@@ -102,7 +102,6 @@ const parseAmt = s => { const n = parseFloat(String(s).replace(/,/g,'')); return
 let _allAccounts    = [];
 let _boxesCollapsed = false;
 let _selectedAccId  = null;
-let _sidebarAutoPinned = true;
 
 let _filterDateFrom = '';
 let _filterDateTo   = '';
@@ -381,11 +380,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
 
 // ── Right Panel ─────────────────────────────────────────────────────────────
 async function selectCompany(accountId, companyName, accountName) {
-    if (_sidebarAutoPinned) {
-        document.getElementById('financeLayout').classList.remove('sidebar-pinned');
-        document.getElementById('sidebarToggle').classList.remove('active');
-        _sidebarAutoPinned = false;
-    }
+    document.getElementById('financeLayout').classList.remove('sidebar-forced');
     if (_changes.size + _pendingNew.length + _pendingDel.size > 0) {
         const { isConfirmed } = await Swal.fire({ title: 'Unsaved Changes', text: 'Switch company without saving?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Discard & Switch', confirmButtonColor: '#ef4444', cancelButtonText: 'Stay' });
         if (!isConfirmed) return;
@@ -482,9 +477,7 @@ function deselectAccount() {
     _selectedAccId = null;
     document.getElementById('finEmpty').style.display   = '';
     document.getElementById('finContent').style.display = 'none';
-    document.getElementById('financeLayout').classList.add('sidebar-pinned');
-    document.getElementById('sidebarToggle').classList.add('active');
-    _sidebarAutoPinned = false;
+    document.getElementById('financeLayout').classList.add('sidebar-forced');
 }
 
 function onFilterChange() {

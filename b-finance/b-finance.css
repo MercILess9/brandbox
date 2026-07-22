@@ -116,20 +116,23 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 }
 
 .fin-left:hover .fin-sidebar-rail,
-.finance-layout.sidebar-pinned .fin-left .fin-sidebar-rail {
+.finance-layout.sidebar-pinned .fin-left .fin-sidebar-rail,
+.finance-layout.sidebar-forced .fin-left .fin-sidebar-rail {
     opacity: 0;
     visibility: hidden;
 }
 
 .fin-left:hover,
-.finance-layout.sidebar-pinned .fin-left {
+.finance-layout.sidebar-pinned .fin-left,
+.finance-layout.sidebar-forced .fin-left {
     width: var(--left-w);
     min-width: var(--left-w);
     background: #fff;
     border-right: 1px solid var(--c-border);
     cursor: default;
 }
-.finance-layout.sidebar-pinned .fin-left {
+.finance-layout.sidebar-pinned .fin-left,
+.finance-layout.sidebar-forced .fin-left {
     transition: none;
 }
 
@@ -139,7 +142,8 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     transition: opacity 0.15s;
 }
 .fin-left:hover .fin-tree,
-.finance-layout.sidebar-pinned .fin-left .fin-tree { opacity: 1; }
+.finance-layout.sidebar-pinned .fin-left .fin-tree,
+.finance-layout.sidebar-forced .fin-left .fin-tree { opacity: 1; }
 
 /* Account group */
 .acct-group { }
