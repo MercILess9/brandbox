@@ -160,13 +160,21 @@ function trackNewChange(tempId, field, value) {
 async function loadLeftPanel() {
     const treeEl = document.getElementById('acctTree');
     try {
-        // Step 1: Get distinct qt_ids that have finance data
+        // Step 1: Get qt_ids + bill_dates that have finance data
         const { data: finRows, error: e1 } = await supabaseClient
             .from('b_finance_qt')
-            .select('qt_id');
+            .select('qt_id, bill_date');
         if (e1) throw e1;
 
         const finQtIds = [...new Set((finRows||[]).map(r => r.qt_id).filter(Boolean))];
+
+        // Map qt_id → Set<bill_date>
+        const finDatesByQt = new Map();
+        (finRows||[]).forEach(r => {
+            if (!r.bill_date) return;
+            if (!finDatesByQt.has(r.qt_id)) finDatesByQt.set(r.qt_id, new Set());
+            finDatesByQt.get(r.qt_id).add(r.bill_date);
+        });
         if (!finQtIds.length) {
             treeEl.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:0.82rem;text-align:center">No finance data found</div>';
             return;
@@ -199,9 +207,10 @@ async function loadLeftPanel() {
             return;
         }
 
-        // Build opportunity_id → Set<bu>
+        // Build opportunity_id → Set<bu> and Set<bill_date>
         const qtToOpp = new Map((bqts||[]).map(q => [q.qt_id, q.opportunity_id]));
-        const buByOpp = new Map();
+        const buByOpp   = new Map();
+        const datesByOpp = new Map();
         (buItems||[]).forEach(i => {
             if (!i.bu) return;
             const oppId = qtToOpp.get(i.qt_id);
@@ -209,13 +218,20 @@ async function loadLeftPanel() {
             if (!buByOpp.has(oppId)) buByOpp.set(oppId, new Set());
             buByOpp.get(oppId).add(i.bu);
         });
+        finDatesByQt.forEach((dates, qtId) => {
+            const oppId = qtToOpp.get(qtId);
+            if (!oppId) return;
+            if (!datesByOpp.has(oppId)) datesByOpp.set(oppId, new Set());
+            dates.forEach(d => datesByOpp.get(oppId).add(d));
+        });
 
-        // Build account → {statuses, buses} map
+        // Build account → {statuses, buses, billdates} map
         const acctMeta = new Map();
         (opps||[]).forEach(o => {
-            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set() });
+            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set(), billdates: new Set() });
             if (o.status) acctMeta.get(o.account_id).statuses.add(o.status);
             buByOpp.get(o.opportunity_id)?.forEach(bu => acctMeta.get(o.account_id).buses.add(bu));
+            datesByOpp.get(o.opportunity_id)?.forEach(d => acctMeta.get(o.account_id).billdates.add(d));
         });
 
         // Step 4: Get account/company info
@@ -228,8 +244,9 @@ async function loadLeftPanel() {
 
         _allAccounts = (accounts||[]).map(a => ({
             ...a,
-            statuses: acctMeta.get(a.account_id)?.statuses || new Set(),
-            buses:    acctMeta.get(a.account_id)?.buses    || new Set(),
+            statuses:  acctMeta.get(a.account_id)?.statuses  || new Set(),
+            buses:     acctMeta.get(a.account_id)?.buses     || new Set(),
+            billdates: acctMeta.get(a.account_id)?.billdates || new Set(),
         }));
 
         // Populate BU & Status dropdowns from ALL data
@@ -250,8 +267,14 @@ function renderTree(search) {
     const tree = {};
     _allAccounts.forEach(a => {
         if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search)) return;
-        if (_filterBU     && !a.buses.has(_filterBU))         return;
-        if (_filterStatus && !a.statuses.has(_filterStatus)) return;
+        if (_filterBU     && !a.buses.has(_filterBU))          return;
+        if (_filterStatus && !a.statuses.has(_filterStatus))  return;
+        if (_filterDateFrom || _filterDateTo) {
+            const inRange = [...a.billdates].some(d =>
+                (!_filterDateFrom || d >= _filterDateFrom) && (!_filterDateTo || d <= _filterDateTo)
+            );
+            if (!inRange) return;
+        }
         if (!tree[a.account_name]) tree[a.account_name] = [];
         tree[a.account_name].push(a);
     });
@@ -453,7 +476,13 @@ function onFilterChange() {
         const stillVisible = _allAccounts.some(a => {
             if (a.account_id !== _selectedAccId) return false;
             if (_filterBU     && !a.buses.has(_filterBU))         return false;
-            if (_filterStatus && !a.statuses.has(_filterStatus))   return false;
+            if (_filterStatus && !a.statuses.has(_filterStatus))  return false;
+            if (_filterDateFrom || _filterDateTo) {
+                const inRange = [...a.billdates].some(d =>
+                    (!_filterDateFrom || d >= _filterDateFrom) && (!_filterDateTo || d <= _filterDateTo)
+                );
+                if (!inRange) return false;
+            }
             return true;
         });
         if (!stillVisible) {
