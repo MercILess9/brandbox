@@ -82,26 +82,25 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     position: absolute;
     inset: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0;
     pointer-events: none;
     opacity: 1;
     transition: opacity 0.15s;
     z-index: 1;
 }
-.fin-sidebar-rail::before {
-    content: '';
-    width: 3px;
-    height: 48px;
+.fin-sidebar-bar {
+    width: 8px;
+    height: 64px;
     background: var(--c-accent);
-    border-radius: 2px;
-    margin-bottom: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.fin-sidebar-rail i {
-    font-size: 0.75rem;
-    color: var(--c-accent);
+.fin-sidebar-bar i {
+    font-size: 0.55rem;
+    color: rgba(30,41,59,0.6);
 }
 
 .fin-left:hover .fin-sidebar-rail,
