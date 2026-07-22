@@ -94,9 +94,10 @@
 </div>
 
 <script>
-const fNum    = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—';
+const _fmt2   = n => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fNum    = n => (n != null && !isNaN(+n) && +n !== 0) ? _fmt2(+n) : '—';
 const fDate   = d => { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } };
-const fmtAmt  = v => (v != null && v !== '') ? Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+const fmtAmt  = v => (v != null && v !== '') ? _fmt2(+v) : '';
 const parseAmt = s => { const n = parseFloat(String(s).replace(/,/g,'')); return isNaN(n) ? null : n; };
 
 let _allAccounts    = [];
@@ -289,7 +290,7 @@ async function loadLeftPanel() {
         // Step 4: Get account/company info
         const { data: accounts, error: e4 } = await supabaseClient
             .from('b_account_list')
-            .select('account_id, account_name, company_name, tax_id, contact, document, payment, remark')
+            .select('account_id, account_name, company_name, tax_id, address, contact, document, payment, remark')
             .in('account_id', accIds)
             .order('account_name');
         if (e4) throw e4;
@@ -337,18 +338,27 @@ function clearAcctSearch() {
     renderTree('');
 }
 
+function inDateRange(d, from, to) {
+    return (!from || d >= from) && (!to || d <= to);
+}
+
+function accountMatchesSearch(a, s) {
+    if (!s) return true;
+    return a.account_name.toLowerCase().includes(s)
+        || (a.company_name||'').toLowerCase().includes(s)
+        || a.account_id.toLowerCase().includes(s)
+        || [...a.oppNames].some(n => n.includes(s))
+        || [...a.oppIds].some(n => n.includes(s))
+        || [...a.searchTerms].some(n => n.includes(s));
+}
+
 function renderTree(search) {
     const tree = {};
     _allAccounts.forEach(a => {
-        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search) && !a.account_id.toLowerCase().includes(search) && ![...a.oppNames].some(n => n.includes(search)) && ![...a.oppIds].some(n => n.includes(search)) && ![...a.searchTerms].some(n => n.includes(search))) return;
-        if (_filterBU     && !a.buses.has(_filterBU))          return;
+        if (!accountMatchesSearch(a, search)) return;
+        if (_filterBU     && !a.buses.has(_filterBU))         return;
         if (_filterStatus && !a.statuses.has(_filterStatus))  return;
-        if (_filterDateFrom || _filterDateTo) {
-            const inRange = [...a.billdates].some(d =>
-                (!_filterDateFrom || d >= _filterDateFrom) && (!_filterDateTo || d <= _filterDateTo)
-            );
-            if (!inRange) return;
-        }
+        if ((_filterDateFrom || _filterDateTo) && ![...a.billdates].some(d => inDateRange(d, _filterDateFrom, _filterDateTo))) return;
         if (!tree[a.account_name]) tree[a.account_name] = [];
         tree[a.account_name].push(a);
     });
@@ -373,44 +383,21 @@ function renderTree(search) {
     document.getElementById('acctTree').innerHTML = html || '<div style="padding:16px;color:#cbd5e1;font-size:0.75rem">No results</div>';
 }
 
-// ── Account Detail Card ──────────────────────────────────────────────────────
-async function loadAccountDetail(accountId, companyName, accountName) {
-    const el = document.getElementById('acctDetail');
-
-    // Immediate skeleton
-    el.innerHTML = `
-    <div class="acct-hdr-zone" id="acctHdrZone">
-        <div class="acct-hdr-row1">
-            <div class="acct-hdr-names">
-                <span class="acct-hdr-company">${esc(companyName)}</span>
-                <span class="acct-hdr-dot">·</span>
-                <span class="acct-hdr-acname">${esc(accountName)}</span>
-            </div>
-            <div class="acct-hdr-badges"><span class="acct-id-badge">${esc(accountId)}</span></div>
-        </div>
-    </div>`;
-
-    const { data } = await supabaseClient
-        .from('b_account_list')
-        .select('tax_id, address, contact, document, payment, remark')
-        .eq('account_id', accountId)
-        .maybeSingle();
-
-    const zone = document.getElementById('acctHdrZone');
-    if (!zone) return;
-
-    const d = data || {};
+// ── Account Detail Card — uses cached _allAccounts (no extra DB call) ────────
+function loadAccountDetail(accountId, companyName, accountName) {
+    const d = _allAccounts.find(a => a.account_id === accountId) || {};
     const box = (icon, label, val) => val
         ? `<div class="acct-info-box"><span class="acct-box-lbl"><i class="bi ${icon}"></i>${label}</span><span class="acct-box-val">${esc(val)}</span></div>`
         : '';
     const boxes = [
-        box('bi-person',          'Contact',   d.contact),
-        box('bi-credit-card',     'Payment',   d.payment),
-        box('bi-file-earmark',    'Documents', d.document),
-        box('bi-chat-left-text',  'Remarks',   d.remark),
+        box('bi-person',         'Contact',   d.contact),
+        box('bi-credit-card',    'Payment',   d.payment),
+        box('bi-file-earmark',   'Documents', d.document),
+        box('bi-chat-left-text', 'Remarks',   d.remark),
     ].join('');
 
-    zone.innerHTML = `
+    document.getElementById('acctDetail').innerHTML = `
+    <div class="acct-hdr-zone${_boxesCollapsed ? ' boxes-collapsed' : ''}" id="acctHdrZone">
         <div class="acct-hdr-row1">
             <div class="acct-hdr-names">
                 <span class="acct-hdr-company">${esc(companyName)}</span>
@@ -420,19 +407,12 @@ async function loadAccountDetail(accountId, companyName, accountName) {
             <div class="acct-hdr-badges">
                 ${d.tax_id ? `<span class="acct-taxid-badge"><span class="taxid-lbl">Tax ID</span><span class="taxid-val">${esc(d.tax_id)}</span></span>` : ''}
                 <span class="acct-id-badge">${esc(accountId)}</span>
-                ${boxes ? `<button class="acct-boxes-toggle" id="acctBoxToggle" onclick="toggleAcctBoxes()" title="Toggle details"><i class="bi bi-chevron-up"></i></button>` : ''}
+                ${boxes ? `<button class="acct-boxes-toggle" id="acctBoxToggle" onclick="toggleAcctBoxes()" title="Toggle details"><i class="bi bi-chevron-${_boxesCollapsed ? 'down' : 'up'}"></i></button>` : ''}
             </div>
         </div>
-        ${d.address ? `<div class="acct-hdr-row2">
-            <span class="acct-hdr-address">${esc(d.address)}</span>
-        </div>` : ''}
-        ${boxes ? `<div class="acct-info-boxes">${boxes}</div>` : ''}`;
-
-    if (_boxesCollapsed) {
-        zone.classList.add('boxes-collapsed');
-        const btn = document.getElementById('acctBoxToggle');
-        if (btn) btn.querySelector('i').className = 'bi bi-chevron-down';
-    }
+        ${d.address ? `<div class="acct-hdr-row2"><span class="acct-hdr-address">${esc(d.address)}</span></div>` : ''}
+        ${boxes ? `<div class="acct-info-boxes">${boxes}</div>` : ''}
+    </div>`;
 }
 
 // ── Right Panel ─────────────────────────────────────────────────────────────
@@ -456,7 +436,8 @@ async function selectCompany(accountId, companyName, accountName) {
 
     document.getElementById('finCompanyHdr').innerHTML = '';
 
-    await Promise.all([loadAccountDetail(accountId, companyName, accountName), loadRightPanel(accountId)]);
+    loadAccountDetail(accountId, companyName, accountName);
+    await loadRightPanel(accountId);
 }
 
 async function loadRightPanel(accountId) {
@@ -528,6 +509,7 @@ async function loadRightPanel(accountId) {
 
 function deselectAccount() {
     _selectedAccId = null;
+    _qtFinRows.clear();
     document.getElementById('finEmpty').style.display   = '';
     document.getElementById('finContent').style.display = 'none';
     document.getElementById('financeLayout').classList.add('sidebar-forced');
@@ -585,15 +567,11 @@ function applyFinFilters() {
     if (_filterBU)     opps = opps.filter(o => { const bus = _cachedBuByOpp.get(o.opportunity_id); return bus && bus.has(_filterBU); });
 
     if (_filterDateFrom || _filterDateTo) {
-        opps = opps.filter(opp => {
-            const qts = _cachedQtByOpp.get(opp.opportunity_id) || [];
-            return qts.some(qt => qt.finRows.some(r => {
-                if (!r.bill_date) return false;
-                if (_filterDateFrom && r.bill_date < _filterDateFrom) return false;
-                if (_filterDateTo   && r.bill_date > _filterDateTo)   return false;
-                return true;
-            }));
-        });
+        opps = opps.filter(opp =>
+            (_cachedQtByOpp.get(opp.opportunity_id) || []).some(qt =>
+                qt.finRows.some(r => r.bill_date && inDateRange(r.bill_date, _filterDateFrom, _filterDateTo))
+            )
+        );
     }
 
     renderRightPanel(opps, _cachedQtByOpp);
@@ -605,12 +583,6 @@ function oppStatusClass(status) {
     if (s === 'signed' || s === 'active') return 'signed';
     if (s === 'churn') return 'churn';
     return 'pending';
-}
-
-function getRowStatus(row) {
-    if (row.receipt_date) return { label: 'Received', cls: 'received', dot: '●' };
-    if (row.bill_date)    return { label: 'Invoiced',  cls: 'invoiced',  dot: '◑' };
-    return                       { label: 'Pending',   cls: 'pending',   dot: '○' };
 }
 
 function getQtStatus(finRows) {

@@ -132,7 +132,6 @@ function renderPermBody(search = '') {
 
     body.innerHTML = visible.map(r => {
         const p   = _allProfiles.find(x => x.codename === r.codename);
-        const ini = (r.codename||'?')[0].toUpperCase();
         const cls = [r.is_new ? 'is-new' : '', r.is_deleted ? 'is-deleted' : ''].join(' ').trim();
         const checks = PERM_COLS.map(col => `
             <div class="perm-check-cell">
@@ -181,9 +180,10 @@ function removeMember(codename) {
 function filterMembers(val) { renderPermBody(val.toLowerCase()); }
 
 function updateSaveBar() {
-    const dirty = _rows.some(r => r.is_new || r.is_deleted || PERM_COLS.some(c => r[c] !== r._orig?.[c]));
-    document.getElementById('saveBar').classList.toggle('visible', dirty);
-    if (dirty) document.getElementById('saveBarInfo').textContent = `${_rows.filter(r=>r.is_new||r.is_deleted||PERM_COLS.some(c=>r[c]!==r._orig?.[c])).length} unsaved change(s)`;
+    const isDirty = r => r.is_new || r.is_deleted || PERM_COLS.some(c => r[c] !== r._orig?.[c]);
+    const dirty = _rows.filter(isDirty);
+    document.getElementById('saveBar').classList.toggle('visible', dirty.length > 0);
+    if (dirty.length) document.getElementById('saveBarInfo').textContent = `${dirty.length} unsaved change(s)`;
 }
 
 // ── Save ───────────────────────────────────────────────────────────────────
