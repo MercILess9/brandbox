@@ -181,10 +181,10 @@ async function loadLeftPanel() {
             return;
         }
 
-        // Step 3: Get account_ids from opportunities
+        // Step 3: Get account_ids + owner + status from opportunities
         const { data: opps, error: e3 } = await supabaseClient
             .from('b_opportunity_list')
-            .select('account_id')
+            .select('account_id, owner, status')
             .in('opportunity_id', oppIds);
         if (e3) throw e3;
 
@@ -194,6 +194,14 @@ async function loadLeftPanel() {
             return;
         }
 
+        // Build account → {owners, statuses} map
+        const acctMeta = new Map();
+        (opps||[]).forEach(o => {
+            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { owners: new Set(), statuses: new Set() });
+            if (o.owner)  acctMeta.get(o.account_id).owners.add(o.owner);
+            if (o.status) acctMeta.get(o.account_id).statuses.add(o.status);
+        });
+
         // Step 4: Get account/company info
         const { data: accounts, error: e4 } = await supabaseClient
             .from('b_account_list')
@@ -202,7 +210,18 @@ async function loadLeftPanel() {
             .order('account_name');
         if (e4) throw e4;
 
-        _allAccounts = accounts || [];
+        _allAccounts = (accounts||[]).map(a => ({
+            ...a,
+            owners:   acctMeta.get(a.account_id)?.owners   || new Set(),
+            statuses: acctMeta.get(a.account_id)?.statuses || new Set(),
+        }));
+
+        // Populate owner & status dropdowns from ALL data (not per-account)
+        const allOwners   = [...new Set((opps||[]).map(o => o.owner).filter(Boolean))].sort();
+        const allStatuses = [...new Set((opps||[]).map(o => o.status).filter(Boolean))].sort();
+        document.getElementById('filterOwner').innerHTML  = '<option value="">Owner</option>'  + allOwners.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+        document.getElementById('filterStatus').innerHTML = '<option value="">Status</option>' + allStatuses.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+
         renderTree('');
         document.getElementById('acctSearch').addEventListener('input', e => renderTree(e.target.value.toLowerCase()));
     } catch (e) {
@@ -215,6 +234,8 @@ function renderTree(search) {
     const tree = {};
     _allAccounts.forEach(a => {
         if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search)) return;
+        if (_filterOwner  && !a.owners.has(_filterOwner))   return;
+        if (_filterStatus && !a.statuses.has(_filterStatus)) return;
         if (!tree[a.account_name]) tree[a.account_name] = [];
         tree[a.account_name].push(a);
     });
@@ -407,7 +428,8 @@ function onFilterChange() {
     _filterDateTo   = document.getElementById('filterDateTo').value;
     _filterOwner    = document.getElementById('filterOwner').value;
     _filterStatus   = document.getElementById('filterStatus').value;
-    applyFinFilters();
+    renderTree(document.getElementById('acctSearch').value.toLowerCase());
+    if (_selectedAccId) applyFinFilters();
 }
 
 function setQtDetailMode(on) {
