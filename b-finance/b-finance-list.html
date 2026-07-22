@@ -231,9 +231,10 @@ async function loadLeftPanel() {
         // Build account → {statuses, buses, billdates, oppNames} map
         const acctMeta = new Map();
         (opps||[]).forEach(o => {
-            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set(), billdates: new Set(), oppNames: new Set() });
+            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set(), billdates: new Set(), oppNames: new Set(), oppIds: new Set() });
             if (o.status)           acctMeta.get(o.account_id).statuses.add(o.status);
             if (o.opportunity_name) acctMeta.get(o.account_id).oppNames.add(o.opportunity_name.toLowerCase());
+            if (o.opportunity_id)   acctMeta.get(o.account_id).oppIds.add(o.opportunity_id.toLowerCase());
             buByOpp.get(o.opportunity_id)?.forEach(bu => acctMeta.get(o.account_id).buses.add(bu));
             datesByOpp.get(o.opportunity_id)?.forEach(d => acctMeta.get(o.account_id).billdates.add(d));
         });
@@ -252,6 +253,7 @@ async function loadLeftPanel() {
             buses:     acctMeta.get(a.account_id)?.buses     || new Set(),
             billdates: acctMeta.get(a.account_id)?.billdates || new Set(),
             oppNames:  acctMeta.get(a.account_id)?.oppNames  || new Set(),
+            oppIds:    acctMeta.get(a.account_id)?.oppIds    || new Set(),
         }));
 
         // Populate BU & Status dropdowns from ALL data
@@ -283,7 +285,7 @@ function clearAcctSearch() {
 function renderTree(search) {
     const tree = {};
     _allAccounts.forEach(a => {
-        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search) && ![...a.oppNames].some(n => n.includes(search))) return;
+        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search) && !a.account_id.toLowerCase().includes(search) && ![...a.oppNames].some(n => n.includes(search)) && ![...a.oppIds].some(n => n.includes(search))) return;
         if (_filterBU     && !a.buses.has(_filterBU))          return;
         if (_filterStatus && !a.statuses.has(_filterStatus))  return;
         if (_filterDateFrom || _filterDateTo) {
