@@ -965,9 +965,62 @@ const BOppApp = (() => {
             if (itemErr) throw itemErr;
         }
         if (qtType === 'original') {
+            const saleAmt = qt.items.reduce((s,i) => s + (+i.amount||0), 0);
             supabaseClient.from('b_finance_qt')
-                .insert({ qt_id: qtRow.qt_id, sub_index: 1, quotation_sub: qt.qt_number.trim() || qtRow.qt_id })
+                .insert({ qt_id: qtRow.qt_id, sub_index: 1, quotation_sub: qt.qt_number.trim() || qtRow.qt_id, actual_amount: saleAmt || null })
                 .then(({ error }) => { if (error) console.warn('[finance auto-create]', error); });
+        }
+    }
+
+    async function _saveOppQTs(oppId, qts) {
+        const { data: existingQTs } = await supabaseClient
+            .from('b_opportunity_qt').select('qt_id').eq('opportunity_id', oppId).eq('qt_type', 'original');
+        const existingIds = new Set((existingQTs || []).map(q => q.qt_id));
+        const keepIds    = new Set(qts.filter(q => q.qt_id).map(q => q.qt_id));
+
+        // Delete QTs removed from modal
+        const toDelete = [...existingIds].filter(id => !keepIds.has(id));
+        if (toDelete.length) {
+            await supabaseClient.from('b_opportunity_qt_item').delete().in('qt_id', toDelete);
+            await supabaseClient.from('b_finance_qt').delete().in('qt_id', toDelete);
+            await supabaseClient.from('b_opportunity_qt').delete().in('qt_id', toDelete);
+        }
+
+        for (const qt of qts) {
+            const saleAmt = qt.items.reduce((s,i) => s + (+i.amount||0), 0);
+            const qtNum   = qt.qt_number.trim() || null;
+
+            if (qt.qt_id) {
+                // Update existing QT in place
+                await supabaseClient.from('b_opportunity_qt')
+                    .update({ qt_number: qtNum, company_qt: qt.company_qt || null })
+                    .eq('qt_id', qt.qt_id);
+
+                // Replace items (no downstream dependency)
+                await supabaseClient.from('b_opportunity_qt_item').delete().eq('qt_id', qt.qt_id);
+                const itemRows = qt.items
+                    .filter(i => i.detail.trim() || +i.price > 0)
+                    .map((i, idx) => ({ qt_id: qt.qt_id, no: idx+1, bu: i.bu||null, detail: i.detail.trim()||null, qty: +i.qty||null, price: +i.price||null, discount: +i.discount||null, gp: +i.gp||null }));
+                if (itemRows.length) await supabaseClient.from('b_opportunity_qt_item').insert(itemRows);
+
+                // Sync finance row only if still empty
+                const { data: finRows } = await supabaseClient
+                    .from('b_finance_qt')
+                    .select('sub_index, invoice, bill_date, receipt_no, receipt_date, remark')
+                    .eq('qt_id', qt.qt_id);
+                const isEmpty = finRows?.length === 1
+                    && !finRows[0].invoice && !finRows[0].bill_date
+                    && !finRows[0].receipt_no && !finRows[0].receipt_date && !finRows[0].remark;
+                if (isEmpty) {
+                    supabaseClient.from('b_finance_qt')
+                        .update({ actual_amount: saleAmt || null, quotation_sub: qtNum || qt.qt_id })
+                        .eq('qt_id', qt.qt_id)
+                        .then(({ error }) => { if (error) console.warn('[finance sync]', error); });
+                }
+            } else {
+                // New QT
+                await insertQTToDB(oppId, qt, 'original');
+            }
         }
     }
 
@@ -1079,8 +1132,7 @@ const BOppApp = (() => {
                     }
                     for (const qt of _churnQTs) await insertQTToDB(oppId, qt, 'churn');
                 } else {
-                    await _deleteOppQTs(_editingId);
-                    for (const qt of _qts) await insertQTToDB(oppId, qt, 'original');
+                    await _saveOppQTs(oppId, _qts);
                 }
             } else {
                 const now = new Date().toISOString();
