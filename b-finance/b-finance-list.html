@@ -29,7 +29,7 @@
         <!-- future filters slot -->
     </div>
 
-    <div class="finance-layout" id="financeLayout">
+    <div class="finance-layout sidebar-pinned" id="financeLayout">
         <!-- Left Panel -->
         <div class="fin-left" id="finLeft">
             <div class="fin-tree" id="acctTree">
@@ -75,6 +75,7 @@ const parseAmt = s => { const n = parseFloat(String(s).replace(/,/g,'')); return
 let _allAccounts    = [];
 let _boxesCollapsed = false;
 let _selectedAccId  = null;
+let _sidebarAutoPinned = true;
 let _selectedCoName = '';
 let _selectedAcName = '';
 let _changes        = new Map();  // id → { field: value }
@@ -275,6 +276,11 @@ async function loadAccountDetail(accountId, companyName, accountName) {
 
 // ── Right Panel ─────────────────────────────────────────────────────────────
 async function selectCompany(accountId, companyName, accountName) {
+    if (_sidebarAutoPinned) {
+        document.getElementById('financeLayout').classList.remove('sidebar-pinned');
+        document.getElementById('sidebarToggle').classList.remove('active');
+        _sidebarAutoPinned = false;
+    }
     if (_changes.size + _pendingNew.length + _pendingDel.size > 0) {
         const { isConfirmed } = await Swal.fire({ title: 'Unsaved Changes', text: 'Switch company without saving?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Discard & Switch', confirmButtonColor: '#ef4444', cancelButtonText: 'Stay' });
         if (!isConfirmed) return;
