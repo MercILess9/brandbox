@@ -14,32 +14,43 @@
 </head>
 <body>
 
-<div class="finance-layout">
-    <!-- Left Panel -->
-    <div class="fin-left">
-        <div class="fin-left-top">
-            <div class="fin-search-wrap">
-                <i class="bi bi-search fin-search-icon"></i>
-                <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search account...">
+<div class="fin-page">
+
+    <!-- Toolbar -->
+    <div class="fin-toolbar">
+        <button class="fin-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">
+            <i class="bi bi-layout-sidebar"></i>
+        </button>
+        <div class="fin-search-wrap">
+            <i class="bi bi-search fin-search-icon"></i>
+            <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search account...">
+        </div>
+        <div class="fin-toolbar-spacer"></div>
+        <!-- future filters slot -->
+    </div>
+
+    <div class="finance-layout" id="financeLayout">
+        <!-- Left Panel -->
+        <div class="fin-left" id="finLeft">
+            <div class="fin-tree" id="acctTree">
+                <div style="padding:20px;text-align:center;color:#cbd5e1;font-size:0.78rem">Loading...</div>
             </div>
         </div>
-        <div class="fin-tree" id="acctTree">
-            <div style="padding:20px;text-align:center;color:#cbd5e1;font-size:0.78rem">Loading...</div>
+
+        <!-- Right Panel -->
+        <div class="fin-right" id="finRight">
+            <div class="fin-empty" id="finEmpty">
+                <i class="bi bi-wallet2"></i>
+                <p>Select a company to view Finance QTs</p>
+            </div>
+            <div id="finContent" style="display:none">
+                <div class="fin-company-hdr" id="finCompanyHdr"></div>
+                <div id="acctDetail"></div>
+                <div id="finOppList"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Right Panel -->
-    <div class="fin-right" id="finRight">
-        <div class="fin-empty" id="finEmpty">
-            <i class="bi bi-wallet2"></i>
-            <p>Select a company to view Finance QTs</p>
-        </div>
-        <div id="finContent" style="display:none">
-            <div class="fin-company-hdr" id="finCompanyHdr"></div>
-            <div id="acctDetail"></div>
-            <div id="finOppList"></div>
-        </div>
-    </div>
 </div>
 
 <!-- Save Bar -->
@@ -65,6 +76,13 @@ let _selectedAcName = '';
 let _changes       = new Map(); // id → { field: value }
 let _pendingNew    = [];        // new rows not yet in DB
 let _pendingDel    = new Set(); // ids to delete
+
+function toggleSidebar() {
+    const layout = document.getElementById('financeLayout');
+    const btn    = document.getElementById('sidebarToggle');
+    const hidden = layout.classList.toggle('sidebar-hidden');
+    btn.classList.toggle('active', hidden);
+}
 
 function updateSaveBar() {
     const n = _changes.size + _pendingNew.length + _pendingDel.size;
