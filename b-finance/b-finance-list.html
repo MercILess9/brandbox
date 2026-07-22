@@ -23,7 +23,7 @@
         </button>
         <div class="fin-search-wrap">
             <i class="bi bi-search fin-search-icon"></i>
-            <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search account...">
+            <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search...">
         </div>
         <div class="fin-filter-divider"></div>
         <div class="flt-date-group">
@@ -196,7 +196,7 @@ async function loadLeftPanel() {
 
         // Step 3: Get account_ids + status + BU items in parallel
         const [{ data: opps, error: e3 }, { data: buItems }] = await Promise.all([
-            supabaseClient.from('b_opportunity_list').select('opportunity_id, account_id, status').in('opportunity_id', oppIds),
+            supabaseClient.from('b_opportunity_list').select('opportunity_id, account_id, status, opportunity_name').in('opportunity_id', oppIds),
             supabaseClient.from('b_opportunity_qt_item').select('qt_id, bu').in('qt_id', finQtIds),
         ]);
         if (e3) throw e3;
@@ -225,11 +225,12 @@ async function loadLeftPanel() {
             dates.forEach(d => datesByOpp.get(oppId).add(d));
         });
 
-        // Build account → {statuses, buses, billdates} map
+        // Build account → {statuses, buses, billdates, oppNames} map
         const acctMeta = new Map();
         (opps||[]).forEach(o => {
-            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set(), billdates: new Set() });
-            if (o.status) acctMeta.get(o.account_id).statuses.add(o.status);
+            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set(), billdates: new Set(), oppNames: new Set() });
+            if (o.status)           acctMeta.get(o.account_id).statuses.add(o.status);
+            if (o.opportunity_name) acctMeta.get(o.account_id).oppNames.add(o.opportunity_name.toLowerCase());
             buByOpp.get(o.opportunity_id)?.forEach(bu => acctMeta.get(o.account_id).buses.add(bu));
             datesByOpp.get(o.opportunity_id)?.forEach(d => acctMeta.get(o.account_id).billdates.add(d));
         });
@@ -247,6 +248,7 @@ async function loadLeftPanel() {
             statuses:  acctMeta.get(a.account_id)?.statuses  || new Set(),
             buses:     acctMeta.get(a.account_id)?.buses     || new Set(),
             billdates: acctMeta.get(a.account_id)?.billdates || new Set(),
+            oppNames:  acctMeta.get(a.account_id)?.oppNames  || new Set(),
         }));
 
         // Populate BU & Status dropdowns from ALL data
@@ -266,7 +268,7 @@ async function loadLeftPanel() {
 function renderTree(search) {
     const tree = {};
     _allAccounts.forEach(a => {
-        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search)) return;
+        if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search) && ![...a.oppNames].some(n => n.includes(search))) return;
         if (_filterBU     && !a.buses.has(_filterBU))          return;
         if (_filterStatus && !a.statuses.has(_filterStatus))  return;
         if (_filterDateFrom || _filterDateTo) {
