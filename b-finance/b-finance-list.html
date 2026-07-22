@@ -503,10 +503,9 @@ function renderRightPanel(opps, qtByOpp) {
         const totAct  = qts.reduce((s,q) => s + q.finRows.filter(r => r.receipt_no).reduce((ss,r) => ss + (+r.actual_amount||0), 0), 0);
         const stCls   = oppStatusClass(opp.status);
 
-        const autoOpen = _qtDetailOpen;
         return `
         <div class="opp-block">
-            <div class="opp-hdr${autoOpen ? ' open' : ''}" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
+            <div class="opp-hdr open" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
                 <div class="opp-meta">
                     <div class="opp-id">${esc(opp.opportunity_id)}</div>
                     <div class="opp-name">${esc(opp.opportunity_name||'—')}</div>
@@ -524,7 +523,7 @@ function renderRightPanel(opps, qtByOpp) {
                 <span class="opp-status-badge ${stCls}">${esc(opp.status||'—')}</span>
                 <i class="bi bi-chevron-down opp-chevron"></i>
             </div>
-            <div class="opp-body" style="${autoOpen ? 'display:block' : ''}">
+            <div class="opp-body" style="display:block">
                 ${qts.length ? qts.map(qt => renderQtBlock(qt)).join('') : '<div class="no-finance">No QTs</div>'}
             </div>
         </div>`;
