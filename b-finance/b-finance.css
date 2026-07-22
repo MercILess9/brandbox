@@ -362,13 +362,18 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     font-size: 0.68rem; font-weight: 800; color: #bdc432;
     background: #1e293b; border-radius: 6px; padding: 3px 9px; flex-shrink: 0;
 }
-.qt-nums { display: flex; align-items: center; gap: 24px; margin-left: auto; flex-shrink: 0; }
-.qt-sale-val  { font-size: 0.78rem; color: var(--c-slate); }
-.qt-sale-val span { font-weight: 700; color: var(--c-dark); }
-.qt-actual-val { font-size: 0.82rem; font-weight: 800; }
-.qt-actual-val.received { color: #16a34a; }
-.qt-actual-val.invoiced  { color: #f59e0b; }
-.qt-actual-val.pending   { color: var(--c-muted); }
+.qt-nums { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-shrink: 0; }
+.qt-num-item { text-align: right; }
+.qt-num-val { font-size: 0.82rem; font-weight: 800; color: var(--c-dark); line-height: 1.2; }
+.qt-num-val.received { color: #16a34a; }
+.qt-num-val.invoiced  { color: #f59e0b; }
+.qt-num-val.pending   { color: var(--c-muted); }
+.qt-num-label { font-size: 0.55rem; font-weight: 700; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+.qt-num-label.received { color: #16a34a; }
+.qt-num-label.invoiced  { color: #f59e0b; }
+.qt-num-div { width: 1px; height: 26px; background: #e2e8f0; flex-shrink: 0; }
+.qt-pct-badge { font-size: 0.6rem; font-weight: 700; border-radius: 20px; padding: 1px 6px; background: #dcfce7; color: #16a34a; }
+.qt-pct-badge.invoiced { background: #fef3c7; color: #d97706; }
 
 .qt-body { display: none; }
 .qt-hdr.open + .qt-body { display: block; }

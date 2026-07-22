@@ -620,8 +620,16 @@ function renderQtBlock(qt) {
             <span class="qt-num">${esc(qt.qt_number||qt.qt_id)}</span>
             ${qt.company_qt ? `<span class="qt-co-badge">${esc(qt.company_qt)}</span>` : ''}
             <div class="qt-nums">
-                <span class="qt-sale-val">Sale <span>${fNum(qt.saleAmt)} ฿</span></span>
-                <span class="qt-actual-val ${qtStatus.cls}">Actual ${fNum(totAct)} ฿</span>
+                <div class="qt-num-item">
+                    <div class="qt-num-val">${fNum(qt.saleAmt)} ฿</div>
+                    <div class="qt-num-label">Sale</div>
+                </div>
+                <div class="qt-num-div"></div>
+                <div class="qt-num-item">
+                    <div class="qt-num-val ${qtStatus.cls}">${fNum(totAct)} ฿</div>
+                    <div class="qt-num-label ${qtStatus.cls}">Actual</div>
+                </div>
+                ${qt.saleAmt > 0 && totAct > 0 ? `<span class="qt-pct-badge ${qtStatus.cls}">${(totAct/qt.saleAmt*100).toFixed(1)}%</span>` : ''}
             </div>
             <i class="bi bi-chevron-down qt-chevron"></i>
         </div>
