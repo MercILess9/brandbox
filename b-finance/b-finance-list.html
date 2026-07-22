@@ -199,7 +199,7 @@ async function loadLeftPanel() {
 
         // Step 3: Get account_ids + status + BU items in parallel
         const [{ data: opps, error: e3 }, { data: buItems }] = await Promise.all([
-            supabaseClient.from('b_opportunity_list').select('opportunity_id, account_id, status, opportunity_name').in('opportunity_id', oppIds),
+            supabaseClient.from('b_opportunity_list').select('opportunity_id, account_id, status, opportunity_name, owner').in('opportunity_id', oppIds),
             supabaseClient.from('b_opportunity_qt_item').select('qt_id, bu').in('qt_id', finQtIds),
         ]);
         if (e3) throw e3;
@@ -239,6 +239,7 @@ async function loadLeftPanel() {
             if (o.status)           acctMeta.get(o.account_id).statuses.add(o.status);
             if (o.opportunity_name) acctMeta.get(o.account_id).oppNames.add(o.opportunity_name.toLowerCase());
             if (o.opportunity_id)   acctMeta.get(o.account_id).oppIds.add(o.opportunity_id.toLowerCase());
+            if (o.owner)            acctMeta.get(o.account_id).searchTerms.add(o.owner.toLowerCase());
             buByOpp.get(o.opportunity_id)?.forEach(bu => acctMeta.get(o.account_id).buses.add(bu));
             datesByOpp.get(o.opportunity_id)?.forEach(d => acctMeta.get(o.account_id).billdates.add(d));
         });
