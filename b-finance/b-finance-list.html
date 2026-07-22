@@ -81,12 +81,15 @@
 <!-- Save Bar -->
 <div class="fin-save-bar" id="finSaveBar">
     <div class="save-bar-left">
-        <div class="save-bar-dot"></div>
-        <span class="save-bar-text" id="finSaveCount"></span>
+        <i class="bi bi-pencil-square"></i>
+        <div>
+            <div class="save-bar-label">Unsaved changes</div>
+            <div class="save-bar-sub" id="finSaveCount"></div>
+        </div>
     </div>
     <div class="save-bar-btns">
         <button class="btn-save-discard" onclick="discardChanges()">Discard</button>
-        <button class="btn-save-confirm" onclick="saveChanges()">Save</button>
+        <button class="btn-save-confirm" onclick="saveChanges()"><i class="bi bi-check2"></i> Save</button>
     </div>
 </div>
 
@@ -137,7 +140,7 @@ function updateSaveBar() {
     const bar = document.getElementById('finSaveBar');
     if (n > 0) {
         bar.classList.add('visible');
-        document.getElementById('finSaveCount').textContent = `${n} unsaved change${n > 1 ? 's' : ''}`;
+        document.getElementById('finSaveCount').textContent = `${n} row${n > 1 ? 's' : ''} pending`;
     } else {
         bar.classList.remove('visible');
     }
