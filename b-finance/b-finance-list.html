@@ -18,15 +18,33 @@
 
     <!-- Toolbar -->
     <div class="fin-toolbar">
-        <button class="fin-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">
+        <button class="fin-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Pin sidebar open">
             <i class="bi bi-layout-sidebar"></i>
         </button>
         <div class="fin-search-wrap">
             <i class="bi bi-search fin-search-icon"></i>
             <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search account...">
         </div>
+        <div class="fin-filter-divider"></div>
+        <div class="fin-filter-group">
+            <span class="fin-filter-label">Bill Date</span>
+            <input type="date" id="filterDateFrom" class="fin-filter-date" onchange="onFilterChange()">
+            <span class="fin-filter-sep">—</span>
+            <input type="date" id="filterDateTo" class="fin-filter-date" onchange="onFilterChange()">
+        </div>
+        <div class="fin-filter-divider"></div>
+        <select id="filterOwner" class="fin-filter-sel" onchange="onFilterChange()">
+            <option value="">Owner</option>
+        </select>
+        <select id="filterStatus" class="fin-filter-sel" onchange="onFilterChange()">
+            <option value="">Status</option>
+        </select>
         <div class="fin-toolbar-spacer"></div>
-        <!-- future filters slot -->
+        <label class="fin-toggle-wrap" title="Show / hide QT detail">
+            <span class="fin-toggle-label">QT Detail</span>
+            <input type="checkbox" id="toggleQtDetail" onchange="setQtDetailMode(this.checked)">
+            <span class="fin-toggle-track"></span>
+        </label>
     </div>
 
     <div class="finance-layout sidebar-pinned" id="financeLayout">
@@ -77,6 +95,14 @@ let _allAccounts    = [];
 let _boxesCollapsed = false;
 let _selectedAccId  = null;
 let _sidebarAutoPinned = true;
+
+let _filterDateFrom = '';
+let _filterDateTo   = '';
+let _filterOwner    = '';
+let _filterStatus   = '';
+let _qtDetailOpen   = false;
+let _cachedOpps     = [];
+let _cachedQtByOpp  = new Map();
 let _selectedCoName = '';
 let _selectedAcName = '';
 let _changes        = new Map();  // id → { field: value }
@@ -357,7 +383,57 @@ async function loadRightPanel(accountId) {
         qtByOpp.get(q.opportunity_id).push({ ...q, saleAmt: saleMap.get(q.qt_id)||0, finRows: finMap.get(q.qt_id)||[] });
     });
 
-    renderRightPanel(opps, qtByOpp);
+    _cachedOpps    = opps;
+    _cachedQtByOpp = qtByOpp;
+    populateFilterDropdowns(opps);
+    applyFinFilters();
+}
+
+function populateFilterDropdowns(opps) {
+    const owners   = [...new Set(opps.map(o => o.owner).filter(Boolean))].sort();
+    const statuses = [...new Set(opps.map(o => o.status).filter(Boolean))].sort();
+
+    const ownerSel = document.getElementById('filterOwner');
+    const cur = ownerSel.value;
+    ownerSel.innerHTML = '<option value="">Owner</option>' + owners.map(o => `<option value="${esc(o)}"${o===cur?' selected':''}>${esc(o)}</option>`).join('');
+
+    const statusSel = document.getElementById('filterStatus');
+    const curS = statusSel.value;
+    statusSel.innerHTML = '<option value="">Status</option>' + statuses.map(s => `<option value="${esc(s)}"${s===curS?' selected':''}>${esc(s)}</option>`).join('');
+}
+
+function onFilterChange() {
+    _filterDateFrom = document.getElementById('filterDateFrom').value;
+    _filterDateTo   = document.getElementById('filterDateTo').value;
+    _filterOwner    = document.getElementById('filterOwner').value;
+    _filterStatus   = document.getElementById('filterStatus').value;
+    applyFinFilters();
+}
+
+function setQtDetailMode(on) {
+    _qtDetailOpen = on;
+    applyFinFilters();
+}
+
+function applyFinFilters() {
+    let opps = _cachedOpps;
+
+    if (_filterStatus) opps = opps.filter(o => o.status === _filterStatus);
+    if (_filterOwner)  opps = opps.filter(o => o.owner  === _filterOwner);
+
+    if (_filterDateFrom || _filterDateTo) {
+        opps = opps.filter(opp => {
+            const qts = _cachedQtByOpp.get(opp.opportunity_id) || [];
+            return qts.some(qt => qt.finRows.some(r => {
+                if (!r.bill_date) return false;
+                if (_filterDateFrom && r.bill_date < _filterDateFrom) return false;
+                if (_filterDateTo   && r.bill_date > _filterDateTo)   return false;
+                return true;
+            }));
+        });
+    }
+
+    renderRightPanel(opps, _cachedQtByOpp);
 }
 
 function oppStatusClass(status) {
@@ -388,9 +464,10 @@ function renderRightPanel(opps, qtByOpp) {
         const totAct  = qts.reduce((s,q) => s + q.finRows.filter(r => r.receipt_no).reduce((ss,r) => ss + (+r.actual_amount||0), 0), 0);
         const stCls   = oppStatusClass(opp.status);
 
+        const autoOpen = _qtDetailOpen;
         return `
         <div class="opp-block">
-            <div class="opp-hdr" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
+            <div class="opp-hdr${autoOpen ? ' open' : ''}" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
                 <div class="opp-meta">
                     <div class="opp-id">${esc(opp.opportunity_id)}</div>
                     <div class="opp-name">${esc(opp.opportunity_name||'—')}</div>
@@ -408,7 +485,7 @@ function renderRightPanel(opps, qtByOpp) {
                 <span class="opp-status-badge ${stCls}">${esc(opp.status||'—')}</span>
                 <i class="bi bi-chevron-down opp-chevron"></i>
             </div>
-            <div class="opp-body">
+            <div class="opp-body" style="${autoOpen ? 'display:block' : ''}">
                 ${qts.length ? qts.map(qt => renderQtBlock(qt)).join('') : '<div class="no-finance">No QTs</div>'}
             </div>
         </div>`;
@@ -422,9 +499,10 @@ function renderQtBlock(qt) {
     const totAct   = qt.finRows.filter(r => r.receipt_no).reduce((s,r) => s + (+r.actual_amount||0), 0);
     const qtId     = qt.qt_id;
 
+    const autoOpen = _qtDetailOpen;
     return `
     <div class="qt-block">
-        <div class="qt-hdr" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
+        <div class="qt-hdr${autoOpen ? ' open' : ''}" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
             <span class="qt-num">${esc(qt.qt_number||qt.qt_id)}</span>
             ${qt.company_qt ? `<span class="qt-co-badge">${esc(qt.company_qt)}</span>` : ''}
             <div class="qt-nums">
@@ -433,7 +511,7 @@ function renderQtBlock(qt) {
             </div>
             <i class="bi bi-chevron-down qt-chevron"></i>
         </div>
-        <div class="qt-body" id="qtBody-${esc(qtId)}">
+        <div class="qt-body" id="qtBody-${esc(qtId)}" style="${autoOpen ? 'display:block' : ''}">
             ${renderFinTable(qt.finRows, qtId, qt.qt_number, qt.saleAmt)}
         </div>
     </div>`;
