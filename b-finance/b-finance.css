@@ -241,9 +241,11 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     font-size: 0.65rem; font-weight: 700; color: var(--c-muted);
     background: var(--c-bg); border: 1px solid var(--c-border);
     border-radius: 6px; padding: 3px 9px; flex-shrink: 0;
-    display: flex; align-items: center; gap: 3px;
+    display: flex; align-items: center; gap: 5px;
     font-variant-numeric: tabular-nums;
 }
+.taxid-lbl { user-select: none; font-weight: 600; opacity: 0.7; }
+.taxid-val { user-select: text; cursor: text; color: var(--c-dark); }
 
 /* Boxes toggle button */
 .acct-boxes-toggle {
