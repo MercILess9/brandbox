@@ -126,8 +126,8 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 .finance-layout.sidebar-pinned .fin-left {
     width: var(--left-w);
     min-width: var(--left-w);
-    background: #fff;
-    border-right: 1px solid var(--c-border);
+    background: #1e293b;
+    border-right: 1px solid #0f172a;
     cursor: default;
 }
 .finance-layout.sidebar-pinned .fin-left {
@@ -149,23 +149,23 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     padding: 8px 14px 8px 12px; cursor: pointer;
     transition: background 0.12s; user-select: none;
 }
-.acct-hdr:hover { background: #f8fafc; }
-.acct-chevron { font-size: 0.65rem; color: var(--c-muted); transition: transform 0.2s; flex-shrink: 0; }
+.acct-hdr:hover { background: rgba(255,255,255,0.05); }
+.acct-chevron { font-size: 0.65rem; color: rgba(255,255,255,0.3); transition: transform 0.2s; flex-shrink: 0; }
 .acct-hdr.open .acct-chevron { transform: rotate(90deg); }
-.acct-label { font-size: 0.7rem; font-weight: 800; color: var(--c-dark); text-transform: uppercase; letter-spacing: 0.5px; flex: 1; }
-.acct-badge { font-size: 0.62rem; font-weight: 700; color: var(--c-muted); background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 20px; padding: 1px 7px; flex-shrink: 0; }
+.acct-label { font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; flex: 1; }
+.acct-badge { font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 1px 7px; flex-shrink: 0; }
 
 .acct-companies { display: none; }
 .acct-hdr.open + .acct-companies { display: block; }
 
 .company-item {
-    padding: 7px 14px 7px 32px; font-size: 0.8rem; font-weight: 600; color: var(--c-slate);
+    padding: 7px 14px 7px 32px; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.65);
     cursor: pointer; transition: all 0.12s; border-radius: 8px; margin: 0 6px 1px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.company-item:hover { background: var(--c-bg); color: var(--c-dark); }
+.company-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
 .company-item.active {
-    background: #1e293b; color: #bdc432;
+    background: rgba(189,196,50,0.15); color: var(--c-accent);
     font-weight: 700;
 }
 
