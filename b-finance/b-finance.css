@@ -313,8 +313,10 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 .opp-hdr.open .opp-chevron { transform: rotate(180deg); }
 
 .opp-meta { flex: 1; min-width: 0; }
+.opp-id-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
 .opp-id { font-size: 0.68rem; font-weight: 700; color: var(--c-muted); letter-spacing: 0.5px; }
-.opp-name { font-size: 0.88rem; font-weight: 700; color: var(--c-dark); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.opp-owner-badge { font-size: 0.62rem; font-weight: 700; color: var(--c-slate); background: #f1f5f9; border-radius: 20px; padding: 2px 8px; white-space: nowrap; }
+.opp-name { font-size: 0.88rem; font-weight: 700; color: var(--c-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .opp-nums { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
 .opp-num-item { text-align: right; }
