@@ -31,19 +31,18 @@
             <span style="color:#cbd5e1;padding:0 4px">—</span>
             <input type="date" class="flt-date-input" id="filterDateTo" onchange="onFilterChange()">
         </div>
-        <button class="flt-btn-quick" id="btnToday" onclick="setQuickDate('today')"><i class="bi bi-calendar-check"></i> Today</button>
         <button class="flt-btn-quick" id="btnMonth" onclick="setQuickDate('month')"><i class="bi bi-calendar-range"></i> This Month</button>
         <div class="fin-filter-divider"></div>
         <div class="flt-select-box" id="fltOwnerBox">
             <span class="flt-select-tag">Owner</span>
             <select class="flt-select-input" id="filterOwner" onchange="onFilterChange()">
-                <option value="">All Owner</option>
+                <option value="">All</option>
             </select>
         </div>
         <div class="flt-select-box" id="fltStatusBox">
             <span class="flt-select-tag">Status</span>
             <select class="flt-select-input" id="filterStatus" onchange="onFilterChange()">
-                <option value="">All Status</option>
+                <option value="">All</option>
             </select>
         </div>
         <div class="fin-toolbar-spacer"></div>
@@ -462,12 +461,7 @@ function onFilterChange() {
 function setQuickDate(type) {
     const f = document.getElementById('filterDateFrom');
     const t = document.getElementById('filterDateTo');
-    const today = new Date().toISOString().slice(0, 10);
-    if (type === 'today') {
-        const active = document.getElementById('btnToday').classList.contains('active');
-        f.value = active ? '' : today;
-        t.value = active ? '' : today;
-    } else {
+    if (type === 'month') {
         const active = document.getElementById('btnMonth').classList.contains('active');
         if (active) { f.value = ''; t.value = ''; }
         else {
@@ -484,8 +478,6 @@ function setQuickDate(type) {
 function syncQuickDateButtons() {
     const f = document.getElementById('filterDateFrom').value;
     const t = document.getElementById('filterDateTo').value;
-    const today = new Date().toISOString().slice(0, 10);
-    document.getElementById('btnToday').classList.toggle('active', f === today && t === today);
     const d = new Date(), y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0');
     const last = String(new Date(y, d.getMonth() + 1, 0).getDate()).padStart(2, '0');
     document.getElementById('btnMonth').classList.toggle('active', f === `${y}-${m}-01` && t === `${y}-${m}-${last}`);
