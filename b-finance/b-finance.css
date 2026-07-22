@@ -368,6 +368,8 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 }
 .btn-del-row:hover { background: #fee2e2; color: #ef4444; }
 
+.fin-empty-sub { padding: 8px 14px 14px; }
+
 .fin-add-row {
     padding: 8px 12px; border-top: 1px solid var(--c-border); background: #fafbfc;
     display: flex;

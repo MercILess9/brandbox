@@ -438,6 +438,11 @@ function renderFinTable(finRows, qtId, qtNumber, saleAmt) {
         ? `<div class="fin-add-row"><button class="btn-add-sub" onclick="addSubRow('${esc(qtId)}','${esc(qtNumber||qtId)}',${maxIdx},${saleAmt||0})"><i class="bi bi-plus"></i> Add Sub</button></div>`
         : '';
 
+    // No sub-rows yet — skip table entirely, just show add button
+    if (!finRows.length) {
+        return `<div class="fin-empty-sub">${addBtn}</div>`;
+    }
+
     return `
     <div class="fin-table-wrap">
         <table class="fin-table">
@@ -468,7 +473,7 @@ function renderFinTable(finRows, qtId, qtNumber, saleAmt) {
                 </tr>
             </thead>
             <tbody id="finBody-${esc(qtId)}">
-                ${rowsHtml || `<tr><td colspan="${canEdit?10:9}" class="no-finance">No finance data — add a sub row</td></tr>`}
+                ${rowsHtml}
             </tbody>
         </table>
         ${addBtn}
