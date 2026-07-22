@@ -226,7 +226,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
 
     const { data } = await supabaseClient
         .from('b_account_list')
-        .select('status, tax_id, address, contact, document, payment, remark')
+        .select('tax_id, address, contact, document, payment, remark')
         .eq('account_id', accountId)
         .maybeSingle();
 
@@ -234,8 +234,6 @@ async function loadAccountDetail(accountId, companyName, accountName) {
     if (!zone) return;
 
     const d = data || {};
-    const stMap = { active:'signed', signed:'signed', churn:'churn' };
-    const stCls = stMap[(d.status||'').toLowerCase()] || 'pending';
     const box = (icon, label, val) => val
         ? `<div class="acct-info-box"><span class="acct-box-lbl"><i class="bi ${icon}"></i>${label}</span><span class="acct-box-val">${esc(val)}</span></div>`
         : '';
@@ -255,7 +253,6 @@ async function loadAccountDetail(accountId, companyName, accountName) {
             </div>
             <div class="acct-hdr-badges">
                 <span class="acct-id-badge">${esc(accountId)}</span>
-                ${d.status ? `<span class="opp-status-badge ${stCls}">${esc(d.status)}</span>` : ''}
                 ${boxes ? `<button class="acct-boxes-toggle" id="acctBoxToggle" onclick="toggleAcctBoxes()" title="Toggle details"><i class="bi bi-chevron-up"></i></button>` : ''}
             </div>
         </div>
