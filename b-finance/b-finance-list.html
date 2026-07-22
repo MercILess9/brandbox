@@ -627,7 +627,7 @@ function renderQtBlock(qt) {
                 <div class="qt-num-div"></div>
                 <div class="qt-num-item">
                     <div class="qt-num-val ${qtStatus.cls}">${fNum(totAct)} ฿</div>
-                    <div class="qt-num-label ${qtStatus.cls}">Actual</div>
+                    <div class="qt-num-label received">Actual</div>
                 </div>
                 ${qt.saleAmt > 0 && totAct > 0 ? `<span class="qt-pct-badge ${qtStatus.cls}">${(totAct/qt.saleAmt*100).toFixed(1)}%</span>` : ''}
             </div>
