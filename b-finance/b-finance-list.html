@@ -428,7 +428,25 @@ function onFilterChange() {
     _filterOwner    = document.getElementById('filterOwner').value;
     _filterStatus   = document.getElementById('filterStatus').value;
     renderTree(document.getElementById('acctSearch').value.toLowerCase());
-    if (_selectedAccId) applyFinFilters();
+
+    if (_selectedAccId) {
+        const stillVisible = _allAccounts.some(a => {
+            if (a.account_id !== _selectedAccId) return false;
+            if (_filterOwner  && !a.owners.has(_filterOwner))   return false;
+            if (_filterStatus && !a.statuses.has(_filterStatus)) return false;
+            return true;
+        });
+        if (!stillVisible) {
+            _selectedAccId = null;
+            document.getElementById('finEmpty').style.display   = '';
+            document.getElementById('finContent').style.display = 'none';
+            document.getElementById('financeLayout').classList.add('sidebar-pinned');
+            document.getElementById('sidebarToggle').classList.add('active');
+            _sidebarAutoPinned = false;
+            return;
+        }
+        applyFinFilters();
+    }
 }
 
 function setQtDetailMode(on) {
