@@ -222,7 +222,6 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .acct-hdr-badges { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.acct-badge-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
 .acct-id-badge {
     font-size: 0.65rem; font-weight: 800; letter-spacing: 0.4px;
     color: var(--c-muted); background: var(--c-bg);
