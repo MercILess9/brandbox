@@ -91,10 +91,11 @@ function toggleAcctBoxes() {
 }
 
 function toggleSidebar() {
-    const layout = document.getElementById('financeLayout');
-    const btn    = document.getElementById('sidebarToggle');
-    const hidden = layout.classList.toggle('sidebar-hidden');
-    btn.classList.toggle('active', hidden);
+    const layout  = document.getElementById('financeLayout');
+    const btn     = document.getElementById('sidebarToggle');
+    const pinned  = layout.classList.toggle('sidebar-pinned');
+    btn.classList.toggle('active', pinned);
+    btn.title = pinned ? 'Unpin sidebar' : 'Pin sidebar open';
 }
 
 function updateSaveBar() {
