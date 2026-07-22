@@ -33,9 +33,9 @@
         </div>
         <button class="flt-btn-quick" id="btnMonth" onclick="setQuickDate('month')"><i class="bi bi-calendar-range"></i> This Month</button>
         <div class="fin-filter-divider"></div>
-        <div class="flt-select-box" id="fltOwnerBox">
-            <span class="flt-select-tag">Owner</span>
-            <select class="flt-select-input" id="filterOwner" onchange="onFilterChange()">
+        <div class="flt-select-box" id="fltBuBox">
+            <span class="flt-select-tag">BU</span>
+            <select class="flt-select-input" id="filterBU" onchange="onFilterChange()">
                 <option value="">All</option>
             </select>
         </div>
@@ -102,11 +102,12 @@ let _sidebarAutoPinned = true;
 
 let _filterDateFrom = '';
 let _filterDateTo   = '';
-let _filterOwner    = '';
+let _filterBU       = '';
 let _filterStatus   = '';
 let _qtDetailOpen   = false;
 let _cachedOpps     = [];
 let _cachedQtByOpp  = new Map();
+let _cachedBuByOpp  = new Map();
 let _selectedCoName = '';
 let _selectedAcName = '';
 let _changes        = new Map();  // id → { field: value }
@@ -171,10 +172,10 @@ async function loadLeftPanel() {
             return;
         }
 
-        // Step 2: Get opportunity_ids for those qt_ids (original QTs only)
+        // Step 2: Get qt_id + opportunity_ids for those qt_ids (original QTs only)
         const { data: bqts, error: e2 } = await supabaseClient
             .from('b_opportunity_qt')
-            .select('opportunity_id')
+            .select('qt_id, opportunity_id')
             .in('qt_id', finQtIds)
             .eq('qt_type', 'original');
         if (e2) throw e2;
@@ -185,11 +186,11 @@ async function loadLeftPanel() {
             return;
         }
 
-        // Step 3: Get account_ids + owner + status from opportunities
-        const { data: opps, error: e3 } = await supabaseClient
-            .from('b_opportunity_list')
-            .select('account_id, owner, status')
-            .in('opportunity_id', oppIds);
+        // Step 3: Get account_ids + status + BU items in parallel
+        const [{ data: opps, error: e3 }, { data: buItems }] = await Promise.all([
+            supabaseClient.from('b_opportunity_list').select('opportunity_id, account_id, status').in('opportunity_id', oppIds),
+            supabaseClient.from('b_opportunity_qt_item').select('qt_id, bu').in('qt_id', finQtIds),
+        ]);
         if (e3) throw e3;
 
         const accIds = [...new Set((opps||[]).map(o => o.account_id).filter(Boolean))];
@@ -198,12 +199,23 @@ async function loadLeftPanel() {
             return;
         }
 
-        // Build account → {owners, statuses} map
+        // Build opportunity_id → Set<bu>
+        const qtToOpp = new Map((bqts||[]).map(q => [q.qt_id, q.opportunity_id]));
+        const buByOpp = new Map();
+        (buItems||[]).forEach(i => {
+            if (!i.bu) return;
+            const oppId = qtToOpp.get(i.qt_id);
+            if (!oppId) return;
+            if (!buByOpp.has(oppId)) buByOpp.set(oppId, new Set());
+            buByOpp.get(oppId).add(i.bu);
+        });
+
+        // Build account → {statuses, buses} map
         const acctMeta = new Map();
         (opps||[]).forEach(o => {
-            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { owners: new Set(), statuses: new Set() });
-            if (o.owner)  acctMeta.get(o.account_id).owners.add(o.owner);
+            if (!acctMeta.has(o.account_id)) acctMeta.set(o.account_id, { statuses: new Set(), buses: new Set() });
             if (o.status) acctMeta.get(o.account_id).statuses.add(o.status);
+            buByOpp.get(o.opportunity_id)?.forEach(bu => acctMeta.get(o.account_id).buses.add(bu));
         });
 
         // Step 4: Get account/company info
@@ -216,15 +228,15 @@ async function loadLeftPanel() {
 
         _allAccounts = (accounts||[]).map(a => ({
             ...a,
-            owners:   acctMeta.get(a.account_id)?.owners   || new Set(),
             statuses: acctMeta.get(a.account_id)?.statuses || new Set(),
+            buses:    acctMeta.get(a.account_id)?.buses    || new Set(),
         }));
 
-        // Populate owner & status dropdowns from ALL data (not per-account)
-        const allOwners   = [...new Set((opps||[]).map(o => o.owner).filter(Boolean))].sort();
+        // Populate BU & Status dropdowns from ALL data
+        const allBus      = [...new Set((buItems||[]).map(i => i.bu).filter(Boolean))].sort();
         const allStatuses = [...new Set((opps||[]).map(o => o.status).filter(Boolean))].sort();
-        document.getElementById('filterOwner').innerHTML  = '<option value="">Owner</option>'  + allOwners.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
-        document.getElementById('filterStatus').innerHTML = '<option value="">Status</option>' + allStatuses.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+        document.getElementById('filterBU').innerHTML     = '<option value="">All</option>' + allBus.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
+        document.getElementById('filterStatus').innerHTML = '<option value="">All</option>' + allStatuses.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
 
         renderTree('');
         document.getElementById('acctSearch').addEventListener('input', e => renderTree(e.target.value.toLowerCase()));
@@ -238,7 +250,7 @@ function renderTree(search) {
     const tree = {};
     _allAccounts.forEach(a => {
         if (search && !a.account_name.toLowerCase().includes(search) && !(a.company_name||'').toLowerCase().includes(search)) return;
-        if (_filterOwner  && !a.owners.has(_filterOwner))   return;
+        if (_filterBU     && !a.buses.has(_filterBU))         return;
         if (_filterStatus && !a.statuses.has(_filterStatus)) return;
         if (!tree[a.account_name]) tree[a.account_name] = [];
         tree[a.account_name].push(a);
@@ -385,7 +397,7 @@ async function loadRightPanel(accountId) {
 
     // Step 3: items + finance rows in parallel
     const [{ data: items }, { data: finRows }] = await Promise.all([
-        qtIds.length ? supabaseClient.from('b_opportunity_qt_item').select('qt_id, qty, price, discount, gp, amount').in('qt_id', qtIds) : Promise.resolve({ data: [] }),
+        qtIds.length ? supabaseClient.from('b_opportunity_qt_item').select('qt_id, bu, qty, price, discount, gp, amount').in('qt_id', qtIds) : Promise.resolve({ data: [] }),
         qtIds.length ? supabaseClient.from('b_finance_qt').select('*').in('qt_id', qtIds).order('qt_id').order('sub_index') : Promise.resolve({ data: [] }),
     ]);
 
@@ -402,6 +414,16 @@ async function loadRightPanel(accountId) {
         finMap.get(r.qt_id).push(r);
     });
 
+    const qtToOpp = new Map((qts||[]).map(q => [q.qt_id, q.opportunity_id]));
+    const buByOpp = new Map();
+    (items||[]).forEach(i => {
+        if (!i.bu) return;
+        const oppId = qtToOpp.get(i.qt_id);
+        if (!oppId) return;
+        if (!buByOpp.has(oppId)) buByOpp.set(oppId, new Set());
+        buByOpp.get(oppId).add(i.bu);
+    });
+
     const qtByOpp = new Map();
     (qts||[]).forEach(q => {
         if (!qtByOpp.has(q.opportunity_id)) qtByOpp.set(q.opportunity_id, []);
@@ -410,29 +432,18 @@ async function loadRightPanel(accountId) {
 
     _cachedOpps    = opps;
     _cachedQtByOpp = qtByOpp;
+    _cachedBuByOpp = buByOpp;
     applyFinFilters();
 }
 
-function populateFilterDropdowns(opps) {
-    const owners   = [...new Set(opps.map(o => o.owner).filter(Boolean))].sort();
-    const statuses = [...new Set(opps.map(o => o.status).filter(Boolean))].sort();
-
-    const ownerSel = document.getElementById('filterOwner');
-    const cur = ownerSel.value;
-    ownerSel.innerHTML = '<option value="">Owner</option>' + owners.map(o => `<option value="${esc(o)}"${o===cur?' selected':''}>${esc(o)}</option>`).join('');
-
-    const statusSel = document.getElementById('filterStatus');
-    const curS = statusSel.value;
-    statusSel.innerHTML = '<option value="">Status</option>' + statuses.map(s => `<option value="${esc(s)}"${s===curS?' selected':''}>${esc(s)}</option>`).join('');
-}
 
 function onFilterChange() {
     _filterDateFrom = document.getElementById('filterDateFrom').value;
     _filterDateTo   = document.getElementById('filterDateTo').value;
-    _filterOwner    = document.getElementById('filterOwner').value;
+    _filterBU       = document.getElementById('filterBU').value;
     _filterStatus   = document.getElementById('filterStatus').value;
 
-    document.getElementById('fltOwnerBox').classList.toggle('active-filter', !!_filterOwner);
+    document.getElementById('fltBuBox').classList.toggle('active-filter', !!_filterBU);
     document.getElementById('fltStatusBox').classList.toggle('active-filter', !!_filterStatus);
     syncQuickDateButtons();
 
@@ -441,8 +452,8 @@ function onFilterChange() {
     if (_selectedAccId) {
         const stillVisible = _allAccounts.some(a => {
             if (a.account_id !== _selectedAccId) return false;
-            if (_filterOwner  && !a.owners.has(_filterOwner))   return false;
-            if (_filterStatus && !a.statuses.has(_filterStatus)) return false;
+            if (_filterBU     && !a.buses.has(_filterBU))         return false;
+            if (_filterStatus && !a.statuses.has(_filterStatus))   return false;
             return true;
         });
         if (!stillVisible) {
@@ -493,7 +504,7 @@ function applyFinFilters() {
     let opps = _cachedOpps;
 
     if (_filterStatus) opps = opps.filter(o => o.status === _filterStatus);
-    if (_filterOwner)  opps = opps.filter(o => o.owner  === _filterOwner);
+    if (_filterBU)     opps = opps.filter(o => { const bus = _cachedBuByOpp.get(o.opportunity_id); return bus && bus.has(_filterBU); });
 
     if (_filterDateFrom || _filterDateTo) {
         opps = opps.filter(opp => {
