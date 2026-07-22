@@ -301,9 +301,9 @@ async function loadRightPanel(accountId) {
     // Step 1: get opps
     const { data: opps, error: oppErr } = await supabaseClient
         .from('b_opportunity_list')
-        .select('opportunity_id, opportunity_name, status, total_amount, total_gp')
+        .select('opportunity_id, opportunity_name, status, total_amount, total_gp, update_date')
         .eq('account_id', accountId)
-        .order('opportunity_id', { ascending: false });
+        .order('update_date', { ascending: false });
 
     if (oppErr || !opps?.length) {
         document.getElementById('finOppList').innerHTML = '<div style="padding:32px;text-align:center;color:#cbd5e1;font-size:0.82rem">No opportunities found</div>';
