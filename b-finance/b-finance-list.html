@@ -134,6 +134,19 @@ function toggleSidebar() {
     btn.title = pinned ? 'Unpin sidebar' : 'Pin sidebar open';
 }
 
+function hasPendingChanges() {
+    return _changes.size + _pendingNew.length + _pendingDel.size > 0;
+}
+
+function shakeSaveBar() {
+    const bar = document.getElementById('finSaveBar');
+    if (!bar || !bar.classList.contains('visible')) return;
+    bar.classList.remove('shake');
+    void bar.offsetHeight;
+    bar.classList.add('shake');
+    bar.addEventListener('animationend', () => bar.classList.remove('shake'), { once: true });
+}
+
 function updateSaveBar() {
     const n = _changes.size + _pendingNew.length + _pendingDel.size;
     const bar = document.getElementById('finSaveBar');
@@ -144,6 +157,17 @@ function updateSaveBar() {
         bar.classList.remove('visible');
     }
 }
+
+// Intercept all navigation links — shake save bar if pending
+document.addEventListener('click', e => {
+    if (!hasPendingChanges()) return;
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
+    e.preventDefault();
+    shakeSaveBar();
+}, true);
 
 function trackChange(rowId, field, value) {
     if (!_changes.has(rowId)) _changes.set(rowId, {});
@@ -414,28 +438,7 @@ async function loadAccountDetail(accountId, companyName, accountName) {
 // ── Right Panel ─────────────────────────────────────────────────────────────
 async function selectCompany(accountId, companyName, accountName) {
     document.getElementById('financeLayout').classList.remove('sidebar-forced');
-    if (_changes.size + _pendingNew.length + _pendingDel.size > 0) {
-        const { value } = await Swal.fire({
-            title: 'Unsaved Changes',
-            text: 'Save or discard before switching account?',
-            icon: 'warning',
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'Save & Switch',
-            denyButtonText: 'Discard',
-            cancelButtonText: 'Stay',
-            confirmButtonColor: '#1e293b',
-            denyButtonColor: '#ef4444',
-        });
-        if (value === true) {
-            const ok = await saveChanges();
-            if (!ok) return;
-        } else if (value === false) {
-            _changes.clear(); _pendingNew = []; _pendingDel.clear(); updateSaveBar();
-        } else {
-            return; // Stay
-        }
-    }
+    if (hasPendingChanges()) { shakeSaveBar(); return; }
 
     _selectedAccId = accountId;
     _selectedCoName = companyName;

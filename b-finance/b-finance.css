@@ -462,6 +462,16 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     transition: bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);
 }
 .fin-save-bar.visible { bottom: 24px; }
+@keyframes shake-save-bar {
+    0%,100% { transform: translateX(-50%); }
+    15%     { transform: translateX(calc(-50% + 10px)); }
+    30%     { transform: translateX(calc(-50% - 10px)); }
+    45%     { transform: translateX(calc(-50% + 7px)); }
+    60%     { transform: translateX(calc(-50% - 7px)); }
+    75%     { transform: translateX(calc(-50% + 3px)); }
+    90%     { transform: translateX(calc(-50% - 3px)); }
+}
+.fin-save-bar.shake { animation: shake-save-bar 0.5s ease; }
 
 .save-bar-left { display: flex; align-items: center; gap: 12px; }
 .save-bar-left > i { font-size: 1.3rem; color: var(--c-accent); }
