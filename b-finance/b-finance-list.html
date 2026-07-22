@@ -26,25 +26,30 @@
             <input type="text" id="acctSearch" class="fin-search-input" placeholder="Search account...">
         </div>
         <div class="fin-filter-divider"></div>
-        <div class="fin-filter-group">
-            <span class="fin-filter-label">Bill Date</span>
-            <input type="date" id="filterDateFrom" class="fin-filter-date" onchange="onFilterChange()">
-            <span class="fin-filter-sep">—</span>
-            <input type="date" id="filterDateTo" class="fin-filter-date" onchange="onFilterChange()">
+        <div class="flt-date-group">
+            <input type="date" class="flt-date-input" id="filterDateFrom" onchange="onFilterChange()">
+            <span style="color:#cbd5e1;padding:0 4px">—</span>
+            <input type="date" class="flt-date-input" id="filterDateTo" onchange="onFilterChange()">
         </div>
+        <button class="flt-btn-quick" id="btnToday" onclick="setQuickDate('today')"><i class="bi bi-calendar-check"></i> Today</button>
+        <button class="flt-btn-quick" id="btnMonth" onclick="setQuickDate('month')"><i class="bi bi-calendar-range"></i> This Month</button>
         <div class="fin-filter-divider"></div>
-        <select id="filterOwner" class="fin-filter-sel" onchange="onFilterChange()">
-            <option value="">Owner</option>
-        </select>
-        <select id="filterStatus" class="fin-filter-sel" onchange="onFilterChange()">
-            <option value="">Status</option>
-        </select>
+        <div class="flt-select-box" id="fltOwnerBox">
+            <span class="flt-select-tag">Owner</span>
+            <select class="flt-select-input" id="filterOwner" onchange="onFilterChange()">
+                <option value="">All Owner</option>
+            </select>
+        </div>
+        <div class="flt-select-box" id="fltStatusBox">
+            <span class="flt-select-tag">Status</span>
+            <select class="flt-select-input" id="filterStatus" onchange="onFilterChange()">
+                <option value="">All Status</option>
+            </select>
+        </div>
         <div class="fin-toolbar-spacer"></div>
-        <label class="fin-toggle-wrap" title="Show / hide QT detail">
-            <span class="fin-toggle-label">QT Detail</span>
-            <input type="checkbox" id="toggleQtDetail" onchange="setQtDetailMode(this.checked)">
-            <span class="fin-toggle-track"></span>
-        </label>
+        <button class="flt-btn-quick" id="btnQtDetail" onclick="toggleQtDetail()" title="Show / hide QT detail">
+            <i class="bi bi-table"></i> QT Detail
+        </button>
     </div>
 
     <div class="finance-layout sidebar-pinned" id="financeLayout">
@@ -427,6 +432,11 @@ function onFilterChange() {
     _filterDateTo   = document.getElementById('filterDateTo').value;
     _filterOwner    = document.getElementById('filterOwner').value;
     _filterStatus   = document.getElementById('filterStatus').value;
+
+    document.getElementById('fltOwnerBox').classList.toggle('active-filter', !!_filterOwner);
+    document.getElementById('fltStatusBox').classList.toggle('active-filter', !!_filterStatus);
+    syncQuickDateButtons();
+
     renderTree(document.getElementById('acctSearch').value.toLowerCase());
 
     if (_selectedAccId) {
@@ -449,8 +459,41 @@ function onFilterChange() {
     }
 }
 
-function setQtDetailMode(on) {
-    _qtDetailOpen = on;
+function setQuickDate(type) {
+    const f = document.getElementById('filterDateFrom');
+    const t = document.getElementById('filterDateTo');
+    const today = new Date().toISOString().slice(0, 10);
+    if (type === 'today') {
+        const active = document.getElementById('btnToday').classList.contains('active');
+        f.value = active ? '' : today;
+        t.value = active ? '' : today;
+    } else {
+        const active = document.getElementById('btnMonth').classList.contains('active');
+        if (active) { f.value = ''; t.value = ''; }
+        else {
+            const d = new Date();
+            const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0');
+            const last = new Date(y, d.getMonth() + 1, 0).getDate();
+            f.value = `${y}-${m}-01`;
+            t.value = `${y}-${m}-${String(last).padStart(2, '0')}`;
+        }
+    }
+    onFilterChange();
+}
+
+function syncQuickDateButtons() {
+    const f = document.getElementById('filterDateFrom').value;
+    const t = document.getElementById('filterDateTo').value;
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('btnToday').classList.toggle('active', f === today && t === today);
+    const d = new Date(), y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0');
+    const last = String(new Date(y, d.getMonth() + 1, 0).getDate()).padStart(2, '0');
+    document.getElementById('btnMonth').classList.toggle('active', f === `${y}-${m}-01` && t === `${y}-${m}-${last}`);
+}
+
+function toggleQtDetail() {
+    _qtDetailOpen = !_qtDetailOpen;
+    document.getElementById('btnQtDetail').classList.toggle('active', _qtDetailOpen);
     applyFinFilters();
 }
 
