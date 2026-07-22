@@ -415,10 +415,27 @@ async function loadAccountDetail(accountId, companyName, accountName) {
 async function selectCompany(accountId, companyName, accountName) {
     document.getElementById('financeLayout').classList.remove('sidebar-forced');
     if (_changes.size + _pendingNew.length + _pendingDel.size > 0) {
-        const { isConfirmed } = await Swal.fire({ title: 'Unsaved Changes', text: 'Switch company without saving?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Discard & Switch', confirmButtonColor: '#ef4444', cancelButtonText: 'Stay' });
-        if (!isConfirmed) return;
+        const { value } = await Swal.fire({
+            title: 'Unsaved Changes',
+            text: 'Save or discard before switching account?',
+            icon: 'warning',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Save & Switch',
+            denyButtonText: 'Discard',
+            cancelButtonText: 'Stay',
+            confirmButtonColor: '#1e293b',
+            denyButtonColor: '#ef4444',
+        });
+        if (value === true) {
+            const ok = await saveChanges();
+            if (!ok) return;
+        } else if (value === false) {
+            _changes.clear(); _pendingNew = []; _pendingDel.clear(); updateSaveBar();
+        } else {
+            return; // Stay
+        }
     }
-    _changes.clear(); _pendingNew = []; _pendingDel.clear(); updateSaveBar();
 
     _selectedAccId = accountId;
     _selectedCoName = companyName;
@@ -848,8 +865,10 @@ async function saveChanges() {
         _changes.clear(); _pendingNew = []; _pendingDel.clear(); updateSaveBar();
         notify('success', 'Saved successfully');
         await loadRightPanel(_selectedAccId);
+        return true;
     } catch (err) {
         notify('error', err.message || 'Save failed');
+        return false;
     }
 }
 
