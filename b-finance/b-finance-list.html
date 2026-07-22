@@ -420,7 +420,6 @@ function renderQtBlock(qt) {
                 <span class="qt-sale-val">Sale <span>${fNum(qt.saleAmt)} ฿</span></span>
                 <span class="qt-actual-val ${qtStatus.cls}">Actual ${fNum(totAct)} ฿</span>
             </div>
-            <span class="qt-status-dot ${qtStatus.cls}">${qtStatus.dot} ${qtStatus.label}</span>
             <i class="bi bi-chevron-down qt-chevron"></i>
         </div>
         <div class="qt-body" id="qtBody-${esc(qtId)}">
@@ -452,12 +451,11 @@ function renderFinTable(finRows, qtId, qtNumber) {
                     <th>Receipt No</th>
                     <th>Receipt Date</th>
                     <th>Remark</th>
-                    <th>Status</th>
                     ${canEdit ? '<th></th>' : ''}
                 </tr>
             </thead>
             <tbody id="finBody-${esc(qtId)}">
-                ${rowsHtml || `<tr><td colspan="${canEdit?11:10}" class="no-finance">No finance data — add a sub row</td></tr>`}
+                ${rowsHtml || `<tr><td colspan="${canEdit?10:9}" class="no-finance">No finance data — add a sub row</td></tr>`}
             </tbody>
         </table>
         ${addBtn}
@@ -465,7 +463,6 @@ function renderFinTable(finRows, qtId, qtNumber) {
 }
 
 function renderFinRow(r, canEdit) {
-    const st   = getRowStatus(r);
     const id   = r.id;
     const ro   = canEdit ? '' : ' readonly';
     const delBtn = canEdit ? `<td class="fin-td-del"><button class="btn-del-row" onclick="deleteSubRow('${esc(id)}',this)" title="Delete"><i class="bi bi-trash3"></i></button></td>` : '';
@@ -477,25 +474,14 @@ function renderFinRow(r, canEdit) {
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.invoice||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','invoice',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="number" value="${r.actual_amount??''}" placeholder="0" ${ro} onchange="trackChange('${esc(id)}','actual_amount',this.value?+this.value:null)" style="text-align:right"></td>
         <td class="fin-td" style="min-width:160px"><input class="fin-input" type="text" value="${esc(r.detail||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','detail',this.value)"></td>
-        <td class="fin-td"><input class="fin-input" type="date" value="${r.bill_date||''}" ${ro} onchange="trackChange('${esc(id)}','bill_date',this.value||null);refreshRowStatus('${esc(id)}',this.closest('tr'))"></td>
+        <td class="fin-td"><input class="fin-input" type="date" value="${r.bill_date||''}" ${ro} onchange="trackChange('${esc(id)}','bill_date',this.value||null)"></td>
         <td class="fin-td"><input class="fin-input" type="text" value="${esc(r.receipt_no||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','receipt_no',this.value)"></td>
-        <td class="fin-td"><input class="fin-input" type="date" value="${r.receipt_date||''}" ${ro} onchange="trackChange('${esc(id)}','receipt_date',this.value||null);refreshRowStatus('${esc(id)}',this.closest('tr'))"></td>
+        <td class="fin-td"><input class="fin-input" type="date" value="${r.receipt_date||''}" ${ro} onchange="trackChange('${esc(id)}','receipt_date',this.value||null)"></td>
         <td class="fin-td" style="min-width:120px"><input class="fin-input" type="text" value="${esc(r.remark||'')}" placeholder="—" ${ro} onchange="trackChange('${esc(id)}','remark',this.value)"></td>
-        <td class="fin-td fin-status-cell"><span class="fin-status ${st.cls}" id="st-${esc(id)}">${st.dot} ${st.label}</span></td>
         ${delBtn}
     </tr>`;
 }
 
-function refreshRowStatus(id, tr) {
-    // re-derive status from current input values in the row
-    const billDate    = tr.querySelector('input[type="date"]:nth-of-type(1)')?.value;
-    const receiptDate = tr.querySelector('input[type="date"]:nth-of-type(2)')?.value;
-    const st = receiptDate ? { label:'Received',cls:'received',dot:'●' }
-             : billDate    ? { label:'Invoiced', cls:'invoiced', dot:'◑' }
-             :               { label:'Pending',  cls:'pending',  dot:'○' };
-    const badge = document.getElementById(`st-${id}`);
-    if (badge) { badge.className = `fin-status ${st.cls}`; badge.textContent = `${st.dot} ${st.label}`; }
-}
 
 function addSubRow(qtId, qtNumber, maxIndex) {
     const tempId  = `new-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
@@ -525,7 +511,6 @@ function addSubRow(qtId, qtNumber, maxIndex) {
         <td class="fin-td"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','receipt_no',this.value)"></td>
         <td class="fin-td"><input class="fin-input" type="date" oninput="trackNewChange('${tempId}','receipt_date',this.value||null)"></td>
         <td class="fin-td" style="min-width:120px"><input class="fin-input" type="text" placeholder="—" oninput="trackNewChange('${tempId}','remark',this.value)"></td>
-        <td class="fin-td fin-status-cell"><span class="fin-status pending">○ Pending</span></td>
         <td class="fin-td-del"><button class="btn-del-row" onclick="cancelNewRow('${tempId}',this.closest('tr'))"><i class="bi bi-x"></i></button></td>`;
     tbody.appendChild(tr);
     updateSaveBar();
