@@ -94,9 +94,9 @@
 </div>
 
 <script>
-const fNum    = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleString('en-US') : '—';
+const fNum    = n => (n != null && !isNaN(+n) && +n !== 0) ? Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—';
 const fDate   = d => { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } };
-const fmtAmt  = v => (v != null && v !== '') ? Number(v).toLocaleString('en-US') : '';
+const fmtAmt  = v => (v != null && v !== '') ? Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
 const parseAmt = s => { const n = parseFloat(String(s).replace(/,/g,'')); return isNaN(n) ? null : n; };
 
 let _allAccounts    = [];
