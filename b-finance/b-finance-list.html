@@ -689,7 +689,7 @@ function _buildFinTable(dbRows, pendingRows, qtId, qtNumber, saleAmt) {
 
     if (!allRows.length) return `<div class="fin-empty-sub">${addBtn}</div>`;
 
-    const rowsHtml = allRows.map(r => renderFinRow(r, canEdit, showSub)).join('');
+    const rowsHtml = allRows.map(r => renderFinRow(r, canEdit, showSub, allRows.length)).join('');
 
     return `
     <div class="fin-table-wrap">
@@ -728,7 +728,7 @@ function _buildFinTable(dbRows, pendingRows, qtId, qtNumber, saleAmt) {
     </div>`;
 }
 
-function renderFinRow(r, canEdit, showSub) {
+function renderFinRow(r, canEdit, showSub, totalRows) {
     const isNew = !!r._tempId;
     const id    = isNew ? r._tempId : r.id;
     const ro    = canEdit ? '' : ' readonly';
@@ -743,7 +743,7 @@ function renderFinRow(r, canEdit, showSub) {
 
     const delBtn = !canEdit ? '' : isNew
         ? `<td class="fin-td-del"><button class="btn-del-row" onclick="cancelNewRow('${esc(id)}',this.closest('tr'))"><i class="bi bi-x"></i></button></td>`
-        : `<td class="fin-td-del"><button class="btn-del-row" onclick="deleteSubRow('${esc(id)}',this)" title="Delete"><i class="bi bi-trash3"></i></button></td>`;
+        : (totalRows > 1 ? `<td class="fin-td-del"><button class="btn-del-row" onclick="deleteSubRow('${esc(id)}',this)" title="Delete"><i class="bi bi-trash3"></i></button></td>` : '<td class="fin-td-del"></td>');
 
     return `
     <tr class="fin-tr${isNew ? ' is-new' : ''}" ${attr}>
