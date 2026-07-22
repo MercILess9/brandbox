@@ -66,14 +66,14 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 
 /* ── Left Panel ── */
 .fin-left {
-    width: 20px;
-    min-width: 20px;
-    background: #fff;
-    border-right: 1px solid var(--c-border);
+    width: 14px;
+    min-width: 14px;
+    background: var(--c-accent);
+    border-right: none;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: width 0.22s ease, min-width 0.22s ease;
+    transition: width 0.22s ease, min-width 0.22s ease, background 0.18s ease;
     cursor: e-resize;
     position: relative;
 }
@@ -86,21 +86,12 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
     justify-content: center;
     pointer-events: none;
     opacity: 1;
-    transition: opacity 0.15s;
+    transition: opacity 0.12s;
     z-index: 1;
 }
-.fin-sidebar-bar {
-    width: 8px;
-    height: 64px;
-    background: var(--c-accent);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.fin-sidebar-bar i {
-    font-size: 0.55rem;
-    color: rgba(30,41,59,0.6);
+.fin-sidebar-rail i {
+    font-size: 0.6rem;
+    color: rgba(30,41,59,0.45);
 }
 
 .fin-left:hover .fin-sidebar-rail,
@@ -110,6 +101,8 @@ body { font-family: 'Inter', 'Sarabun', sans-serif; background: var(--c-bg); col
 .finance-layout.sidebar-pinned .fin-left {
     width: var(--left-w);
     min-width: var(--left-w);
+    background: #fff;
+    border-right: 1px solid var(--c-border);
     cursor: default;
 }
 
