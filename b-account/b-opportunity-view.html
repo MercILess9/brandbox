@@ -30,28 +30,38 @@
         .a4-page { width: 210mm; min-height: 297mm; margin: 24px auto; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 14mm 16mm; box-sizing: border-box; }
 
         /* ── Header ── */
-        .ov-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 3px solid var(--c-dark); padding-bottom: 16px; margin-bottom: 20px; }
-        .ov-logo { height: 30px; flex-shrink: 0; margin-top: 2px; }
-        .ov-opp-name { font-size: 1.35rem; font-weight: 800; color: var(--c-text-main); line-height: 1.3; }
-        .ov-opp-sub { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
-        .ov-badge-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-        .ov-id-badge { font-size: 0.72rem; font-weight: 800; color: #64748b; letter-spacing: 0.5px; background: #f1f5f9; border-radius: 8px; padding: 4px 10px; }
-        .ov-type-badge { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; border: 1px solid; white-space: nowrap; }
-        .ov-type-badge.retention { background: #f5f3ff; color: #6d28d9; border-color: #c4b5fd; }
-        .ov-type-badge.new-biz   { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
-        .ov-type-badge.upsale    { background: #f0fdfa; color: #0d7a70; border-color: #5eead4; }
-        .ov-status-badge { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; border: 1px solid; white-space: nowrap; background: #f0fdf4; color: #15803d; border-color: #86efac; }
-        .ov-status-badge.churn  { background: #fff7ed; color: #c2410c; border-color: #fdba74; }
-        .ov-status-badge.ended  { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+        .ov-logo-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+        .ov-logo { height: 22px; }
+        .ov-head { display: grid; grid-template-columns: 1.7fr 1fr; gap: 26px; align-items: start; border-bottom: 2px solid #eef2f7; padding-bottom: 22px; margin-bottom: 22px; }
+        .ov-badge-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .ov-id-text { font-size: 0.76rem; font-weight: 700; color: #94a3b8; letter-spacing: 0.2px; }
+        .ov-type-badge { font-size: 0.64rem; font-weight: 800; border-radius: 20px; padding: 4px 11px; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
+        .ov-type-badge.retention { background: #f5f3ff; color: #6d28d9; }
+        .ov-type-badge.new-biz   { background: #eff6ff; color: #1d4ed8; }
+        .ov-type-badge.upsale    { background: #f0fdfa; color: #0d7a70; }
+        .ov-status-badge { font-size: 0.64rem; font-weight: 800; border-radius: 20px; padding: 4px 11px; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; background: #f0fdf4; color: #15803d; }
+        .ov-status-badge.churn  { background: #fff7ed; color: #c2410c; }
+        .ov-status-badge.ended  { background: #f1f5f9; color: #475569; }
 
-        /* ── Hero summary ── */
-        .ov-hero { display: flex; align-items: center; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 16px; padding: 22px 30px; margin-bottom: 22px; break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .ov-hero-item { flex: 1; }
-        .ov-hero-lbl { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
-        .ov-hero-val { font-size: 1.9rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-        .ov-hero-val.gp { color: var(--c-accent); }
-        .ov-hero-pct { display: inline-block; font-size: 0.8rem; font-weight: 800; background: rgba(189,196,50,0.18); color: var(--c-accent); border-radius: 20px; padding: 3px 11px; margin-left: 10px; vertical-align: middle; }
-        .ov-hero-div { width: 1px; align-self: stretch; background: rgba(255,255,255,0.15); margin: 0 28px; }
+        .ov-opp-name { font-size: 1.4rem; font-weight: 700; color: var(--c-text-main); line-height: 1.3; letter-spacing: -0.2px; margin-bottom: 16px; }
+        .ov-client-lbl { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 4px; }
+        .ov-client-val { font-size: 0.86rem; font-weight: 600; color: #475569; margin-bottom: 16px; }
+
+        .ov-meta-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+        .ov-pill { display: inline-flex; align-items: center; border: 1px solid #eef2f7; background: #fafbfc; border-radius: 20px; overflow: hidden; font-size: 0.74rem; }
+        .ov-pill-tag { padding: 5px 10px; color: #94a3b8; font-size: 0.56rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border-right: 1px solid #eef2f7; white-space: nowrap; }
+        .ov-pill-val { padding: 5px 12px; font-weight: 700; color: #334155; white-space: nowrap; }
+
+        /* ── Summary card ── */
+        .ov-sum-card { background: #fafbfc; border: 1px solid #eef2f7; border-radius: 16px; padding: 18px 22px; }
+        .ov-sum-lbl { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; }
+        .ov-sum-val { font-size: 1.4rem; font-weight: 800; color: var(--c-text-main); letter-spacing: -0.3px; margin-top: 5px; }
+        .ov-sum-val.gp { color: #16a34a; margin-bottom: 8px; }
+        .ov-sum-divider { height: 1px; background: #eef2f7; margin: 14px 0; }
+        .ov-sum-gp-row { display: flex; justify-content: space-between; align-items: baseline; }
+        .ov-sum-gp-pct { font-size: 0.76rem; font-weight: 800; color: #16a34a; }
+        .ov-sum-bar-wrap { height: 4px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+        .ov-sum-bar-fill { height: 100%; background: #16a34a; border-radius: 99px; }
 
         /* ── Section title (shared: Detail / Quotations) ── */
         .ov-section-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
@@ -261,30 +271,39 @@
         document.getElementById('ov-toolbar-id').textContent = o.opportunity_id;
         document.title = `${o.opportunity_id} | ${o.opportunity_name || ''}`;
 
+        const pctNum = o.total_amount > 0 && o.total_gp > 0 ? Math.min(+o.total_gp / +o.total_amount * 100, 100).toFixed(1) : 0;
+
         document.getElementById('ov-root').innerHTML = `
         <div class="a4-page">
-            <div class="ov-head">
-                <div>
-                    <div class="ov-opp-name">${esc(o.opportunity_name || '')}</div>
-                    <div class="ov-opp-sub">${sub}</div>
-                    <div class="ov-badge-row">
-                        <span class="ov-id-badge">${esc(o.opportunity_id)}</span>
-                        ${o.business_type ? `<span class="ov-type-badge ${typeClass(o.business_type)}">${esc(o.business_type)}</span>` : ''}
-                        <span class="ov-status-badge${statusClass(o.status)}">${esc(o.status || '')}</span>
-                    </div>
-                </div>
+            <div class="ov-logo-row">
                 <img src="${LOGO_URL}" class="ov-logo" onerror="this.style.display='none'">
             </div>
 
-            <div class="ov-hero">
-                <div class="ov-hero-item">
-                    <div class="ov-hero-lbl"><i class="bi bi-cash-stack"></i> Total Amount</div>
-                    <div class="ov-hero-val">${fmtAmt(o.total_amount)}</div>
+            <div class="ov-head">
+                <div>
+                    <div class="ov-badge-row">
+                        ${o.business_type ? `<span class="ov-type-badge ${typeClass(o.business_type)}">${esc(o.business_type)}</span>` : ''}
+                        <span class="ov-id-text">#${esc(o.opportunity_id)}</span>
+                        <span class="ov-status-badge${statusClass(o.status)}">${esc(o.status || '')}</span>
+                    </div>
+                    <div class="ov-opp-name">${esc(o.opportunity_name || '')}</div>
+                    <div class="ov-client-lbl">Client / Company</div>
+                    <div class="ov-client-val">${sub}</div>
+                    <div class="ov-meta-pills">
+                        <span class="ov-pill"><span class="ov-pill-tag">Create By</span><span class="ov-pill-val">${o.create_by ? esc(o.create_by) : '—'}</span></span>
+                        <span class="ov-pill"><span class="ov-pill-tag">Create Date</span><span class="ov-pill-val">${o.create_date ? fmtDate(o.create_date) : '—'}</span></span>
+                    </div>
                 </div>
-                <div class="ov-hero-div"></div>
-                <div class="ov-hero-item">
-                    <div class="ov-hero-lbl"><i class="bi bi-graph-up-arrow"></i> Total GP</div>
-                    <div class="ov-hero-val gp">${fmtGP(o.total_gp)}${pct ? `<span class="ov-hero-pct">${pct}</span>` : ''}</div>
+                <div class="ov-sum-card">
+                    <div class="ov-sum-lbl">Total Quotation Amount</div>
+                    <div class="ov-sum-val">${fmtAmt(o.total_amount)}</div>
+                    <div class="ov-sum-divider"></div>
+                    <div class="ov-sum-gp-row">
+                        <span class="ov-sum-lbl">Project GP</span>
+                        ${pct ? `<span class="ov-sum-gp-pct">${pct}</span>` : ''}
+                    </div>
+                    <div class="ov-sum-val gp">${fmtGP(o.total_gp)}</div>
+                    <div class="ov-sum-bar-wrap"><div class="ov-sum-bar-fill" style="width:${pctNum}%"></div></div>
                 </div>
             </div>
 
@@ -297,7 +316,6 @@
                     ${row('bi-signpost-split', 'Lead', o.lead_source)}
                 </div>
                 <div class="ov-info-col">
-                    ${row('bi-person-plus', 'Create By', o.create_by)}
                     ${row('bi-calendar-check', 'Signed', o.signed_date ? fmtDate(o.signed_date) : null)}
                     ${row('bi-rocket-takeoff', 'Launch', o.launch_date ? fmtDate(o.launch_date) : null)}
                     ${row('bi-calendar-x', 'Churn Date', o.churn_date ? fmtDate(o.churn_date) : null)}
