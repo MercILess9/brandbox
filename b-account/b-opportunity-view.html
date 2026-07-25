@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>B-ACCOUNT | Opportunity View</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/system/config.js"></script>
+    <script src="/system/system.js"></script>
+    <script src="b-account.js"></script>
+    <link rel="stylesheet" href="b-account.css">
+    <style>
+        body { background: #eef1f5; padding-bottom: 60px; }
+
+        /* ── Toolbar (screen only) ── */
+        .ov-toolbar { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 64px; z-index: 90; display: flex; justify-content: center; }
+        .ov-toolbar-inner { width: 210mm; max-width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .ov-id { font-size: 0.8rem; font-weight: 700; color: #64748b; }
+        .ov-print-btn { display: inline-flex; align-items: center; gap: 7px; border: none; background: var(--c-dark); color: #fff; border-radius: 10px; padding: 9px 18px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; }
+        .ov-print-btn:hover { background: #0f172a; }
+
+        /* ── Page ── */
+        .a4-page { width: 210mm; min-height: 297mm; margin: 24px auto; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 14mm 16mm; box-sizing: border-box; }
+
+        /* ── Header ── */
+        .ov-head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid var(--c-dark); padding-bottom: 14px; margin-bottom: 18px; }
+        .ov-logo { height: 34px; margin-bottom: 10px; }
+        .ov-opp-name { font-size: 1.3rem; font-weight: 800; color: var(--c-text-main); line-height: 1.3; max-width: 420px; }
+        .ov-opp-sub { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
+        .ov-head-right { text-align: right; flex-shrink: 0; }
+        .ov-badge-row { display: flex; gap: 6px; justify-content: flex-end; margin-bottom: 8px; }
+        .ov-id-badge { font-size: 0.72rem; font-weight: 800; color: #64748b; letter-spacing: 0.5px; background: #f1f5f9; border-radius: 8px; padding: 4px 10px; }
+        .ov-type-badge { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; border: 1px solid; white-space: nowrap; }
+        .ov-type-badge.retention { background: #f5f3ff; color: #6d28d9; border-color: #c4b5fd; }
+        .ov-type-badge.new-biz   { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+        .ov-type-badge.upsale    { background: #f0fdfa; color: #0d7a70; border-color: #5eead4; }
+        .ov-status-badge { font-size: 0.68rem; font-weight: 700; border-radius: 20px; padding: 4px 12px; border: 1px solid; white-space: nowrap; background: #f0fdf4; color: #15803d; border-color: #86efac; }
+        .ov-status-badge.churn  { background: #fff7ed; color: #c2410c; border-color: #fdba74; }
+        .ov-status-badge.ended  { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+
+        /* ── Summary strip ── */
+        .ov-summary { display: flex; gap: 10px; margin-bottom: 18px; }
+        .ov-sum-box { flex: 1; background: #fafbfc; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 16px; }
+        .ov-sum-lbl { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 4px; }
+        .ov-sum-val { font-size: 1.15rem; font-weight: 800; color: var(--c-text-main); }
+        .ov-sum-val.gp { color: #16a34a; }
+        .ov-sum-pct { font-size: 0.72rem; font-weight: 700; color: #16a34a; margin-left: 6px; }
+
+        /* ── Info grid ── */
+        .ov-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+        .ov-info-col { display: flex; flex-direction: column; gap: 7px; background: #fafbfc; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 16px; }
+        .ov-info-row { display: flex; align-items: baseline; gap: 8px; font-size: 0.82rem; }
+        .ov-info-lbl { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #94a3b8; min-width: 78px; flex-shrink: 0; }
+        .ov-info-val { font-weight: 700; color: #334155; }
+        .ov-info-val.nil { color: #cbd5e1; font-weight: 400; }
+
+        .ov-remark-box { background: #fafbfc; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; }
+        .ov-remark-lbl { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 6px; }
+        .ov-remark-val { font-size: 0.82rem; color: #334155; line-height: 1.6; white-space: pre-line; }
+
+        .ov-links-row { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+        .ov-link-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--c-border); background: #fff; border-radius: 10px; padding: 7px 14px; font-size: 0.78rem; font-weight: 700; color: var(--c-slate); text-decoration: none; }
+        .ov-link-btn.disabled { opacity: 1; pointer-events: none; border: 1px dashed #d1d5db; background: #f8fafc; color: #cbd5e1; }
+
+        /* ── QT section ── */
+        .ov-qt-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 10px; }
+        .ov-qt-card { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+        .ov-qt-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f0f1f9; border-bottom: 2px solid #e2e8f0; }
+        .ov-qt-num { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); }
+        .ov-qt-churn-tag { font-size: 0.6rem; font-weight: 800; color: #c2410c; background: rgba(249,115,22,0.12); border-radius: 6px; padding: 2px 8px; text-transform: uppercase; }
+        .ov-qt-totals { margin-left: auto; display: flex; gap: 14px; }
+        .ov-qt-stat { display: flex; flex-direction: column; align-items: flex-end; }
+        .ov-qt-stat-val { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); }
+        .ov-qt-stat-val.gp { color: #16a34a; }
+        .ov-qt-stat-lbl { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; }
+        .ov-qt-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .ov-qt-table th { padding: 7px 10px; text-align: left; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; background: #f8fafc; border-bottom: 1px solid #f1f5f9; }
+        .ov-qt-table th.r, .ov-qt-table td.r { text-align: right; }
+        .ov-qt-table th.c, .ov-qt-table td.c { text-align: center; }
+        .ov-qt-table td { padding: 7px 10px; color: #334155; border-bottom: 1px solid #f8fafc; }
+        .ov-qt-table tr:last-child td { border-bottom: none; }
+        .ov-qt-empty { padding: 18px; text-align: center; color: #cbd5e1; font-size: 0.8rem; }
+
+        .ov-footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.65rem; color: #cbd5e1; text-align: center; }
+
+        .ov-loading, .ov-error { text-align: center; padding: 100px 20px; color: #94a3b8; }
+        .ov-error i, .ov-loading i { font-size: 2.4rem; display: block; margin-bottom: 12px; }
+
+        /* ── Print ── */
+        @media print {
+            @page { size: A4; margin: 12mm 14mm; }
+            body { background: #fff; padding-bottom: 0; }
+            #sys-core-layout, header, .sys-header, .ov-toolbar { display: none !important; }
+            body { padding-top: 0 !important; }
+            .a4-page { width: auto; min-height: 0; margin: 0; box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ov-toolbar no-print">
+    <div class="ov-toolbar-inner">
+        <span class="ov-id" id="ov-toolbar-id"></span>
+        <button class="ov-print-btn" onclick="window.print()"><i class="bi bi-printer-fill"></i> Print / Save PDF</button>
+    </div>
+</div>
+
+<div id="ov-root">
+    <div class="ov-loading"><i class="bi bi-arrow-repeat"></i>Loading...</div>
+</div>
+
+<script>
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function fmtDate(d) {
+        if (!d) return '—';
+        const [yr, mo, dy] = String(d).substring(0, 10).split('-');
+        return `${+dy} ${MONTHS[+mo - 1]} ${+yr}`;
+    }
+    function fmtGP(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') + ' ฿' : '—'; }
+    function typeClass(t) {
+        if (t === 'Retention')    return 'retention';
+        if (t === 'New Business') return 'new-biz';
+        if (t === 'Up Sale')      return 'upsale';
+        return '';
+    }
+    function statusClass(status) {
+        if (status === 'Churn')       return ' churn';
+        if (status === 'End Contact') return ' ended';
+        return '';
+    }
+
+    function row(lbl, val) {
+        return `<div class="ov-info-row"><span class="ov-info-lbl">${lbl}</span><span class="ov-info-val${val ? '' : ' nil'}">${val ? esc(val) : '—'}</span></div>`;
+    }
+
+    function linkBtn(icon, label, url) {
+        const href = safeLink(url);
+        return `<a href="${href}" target="_blank" rel="noopener" class="ov-link-btn${href === '#' ? ' disabled' : ''}"><i class="bi ${icon}"></i>${label}</a>`;
+    }
+
+    function renderQT(qt) {
+        const items  = (qt.b_opportunity_qt_item || []).sort((a, b) => (a.no || 0) - (b.no || 0));
+        const totAmt = items.reduce((s, i) => s + (+i.amount || 0), 0);
+        const totGP  = items.reduce((s, i) => s + (+i.gp  || 0), 0);
+        const rows   = items.length
+            ? items.map(i => `<tr>
+                <td class="r">${i.no ?? ''}</td>
+                <td class="c">${esc(i.bu || '')}</td>
+                <td>${esc(i.detail || '')}</td>
+                <td class="r">${i.qty ?? ''}</td>
+                <td class="r">${i.price != null ? fmtNum(i.price) : ''}</td>
+                <td class="r">${+i.discount ? fmtNum(i.discount) : '—'}</td>
+                <td class="r">${i.amount != null ? fmtNum(i.amount) : ''}</td>
+                <td class="r">${i.gp != null && i.gp !== 0 ? fmtNum(i.gp) : '—'}</td>
+            </tr>`).join('')
+            : `<tr><td colspan="8" class="ov-qt-empty">No items</td></tr>`;
+        return `<div class="ov-qt-card">
+            <div class="ov-qt-head">
+                <span class="ov-qt-num">${esc(qt.qt_number || qt.qt_id)}</span>
+                ${qt.qt_type === 'churn' ? '<span class="ov-qt-churn-tag">Churn</span>' : ''}
+                <div class="ov-qt-totals">
+                    <div class="ov-qt-stat"><span class="ov-qt-stat-val">${fmtNum(totAmt)}</span><span class="ov-qt-stat-lbl">Amount</span></div>
+                    <div class="ov-qt-stat"><span class="ov-qt-stat-val gp">${fmtNum(totGP)}</span><span class="ov-qt-stat-lbl">GP</span></div>
+                </div>
+            </div>
+            <table class="ov-qt-table">
+                <thead><tr>
+                    <th class="r" style="width:36px">No.</th>
+                    <th class="c" style="width:60px">BU</th>
+                    <th>Detail</th>
+                    <th class="r" style="width:44px">Qty</th>
+                    <th class="r" style="width:90px">Price</th>
+                    <th class="r" style="width:90px">Discount</th>
+                    <th class="r" style="width:96px">Amount</th>
+                    <th class="r" style="width:90px">GP</th>
+                </tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+    }
+
+    function renderPage(o, qts) {
+        const sub = o._company_name
+            ? `${esc(o._account_name)} <span style="color:#e2e8f0">|</span> ${esc(o._company_name)}`
+            : esc(o._account_name);
+        const pct = gpPct(o.total_gp, o.total_amount);
+
+        document.getElementById('ov-toolbar-id').textContent = o.opportunity_id;
+        document.title = `${o.opportunity_id} | ${o.opportunity_name || ''}`;
+
+        document.getElementById('ov-root').innerHTML = `
+        <div class="a4-page">
+            <div class="ov-head">
+                <div>
+                    <img src="${LOGO_URL}" class="ov-logo" onerror="this.style.display='none'">
+                    <div class="ov-opp-name">${esc(o.opportunity_name || '')}</div>
+                    <div class="ov-opp-sub">${sub}</div>
+                </div>
+                <div class="ov-head-right">
+                    <div class="ov-badge-row">
+                        <span class="ov-id-badge">${esc(o.opportunity_id)}</span>
+                        ${o.business_type ? `<span class="ov-type-badge ${typeClass(o.business_type)}">${esc(o.business_type)}</span>` : ''}
+                        <span class="ov-status-badge${statusClass(o.status)}">${esc(o.status || '')}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ov-summary">
+                <div class="ov-sum-box">
+                    <div class="ov-sum-lbl">Total Amount</div>
+                    <div class="ov-sum-val">${fmtAmt(o.total_amount)}</div>
+                </div>
+                <div class="ov-sum-box">
+                    <div class="ov-sum-lbl">Total GP</div>
+                    <div class="ov-sum-val gp">${fmtGP(o.total_gp)}${pct ? `<span class="ov-sum-pct">${pct}</span>` : ''}</div>
+                </div>
+            </div>
+
+            <div class="ov-info-grid">
+                <div class="ov-info-col">
+                    ${row('Owner', o.owner)}
+                    ${row('AM', o.am)}
+                    ${row('Sub AM', o.sub_am)}
+                    ${row('Lead', o.lead_source)}
+                </div>
+                <div class="ov-info-col">
+                    ${row('Create By', o.create_by)}
+                    ${row('Signed', o.signed_date ? fmtDate(o.signed_date) : null)}
+                    ${row('Launch', o.launch_date ? fmtDate(o.launch_date) : null)}
+                    ${row('Churn Date', o.churn_date ? fmtDate(o.churn_date) : null)}
+                </div>
+            </div>
+
+            <div class="ov-remark-box">
+                <div class="ov-remark-lbl">Remark</div>
+                <div class="ov-remark-val">${o.remark ? esc(o.remark) : '<span style="color:#cbd5e1">No remark</span>'}</div>
+            </div>
+
+            <div class="ov-links-row">
+                ${linkBtn('bi-cloud-fill', 'Materials', o.materials)}
+                ${linkBtn('bi-file-earmark-text-fill', 'Proposal', o.proposal)}
+                ${linkBtn('bi-megaphone-fill', 'Campaign', o.campaign)}
+            </div>
+
+            <div class="ov-qt-title"><i class="bi bi-file-earmark-text"></i> Quotations</div>
+            ${qts.length ? qts.map(renderQT).join('') : '<div class="ov-qt-empty">No quotations</div>'}
+
+            <div class="ov-footer">Generated from Brandbox X Portal — ${esc(o.opportunity_id)}</div>
+        </div>`;
+    }
+
+    function renderError(msg) {
+        document.getElementById('ov-root').innerHTML = `<div class="ov-error"><i class="bi bi-exclamation-triangle"></i>${esc(msg)}</div>`;
+    }
+
+    async function loadOpportunity() {
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) { renderError('Missing opportunity id'); return; }
+
+        const { data: o, error } = await supabaseClient
+            .from('b_opportunity_list')
+            .select('*')
+            .eq('opportunity_id', id)
+            .single();
+        if (error || !o) { renderError('Opportunity not found'); return; }
+
+        if (o.account_id) {
+            const { data: acc } = await supabaseClient
+                .from('b_account_list')
+                .select('account_name, company_name')
+                .eq('account_id', o.account_id)
+                .single();
+            o._account_name = acc?.account_name || o.account_id;
+            o._company_name = acc?.company_name || '';
+        } else {
+            o._account_name = '';
+            o._company_name = '';
+        }
+
+        const { data: qts } = await supabaseClient
+            .from('b_opportunity_qt')
+            .select('*, b_opportunity_qt_item(*)')
+            .eq('opportunity_id', id)
+            .order('qt_number');
+
+        renderPage(o, qts || []);
+    }
+
+    async function initPage() {
+        await initLayout({ projectName: 'B-ACCOUNT' });
+        await loadOpportunity();
+    }
+
+    initPage();
+</script>
+</body>
+</html>
