@@ -130,7 +130,7 @@
 <script>
     let _oppId = null;
 
-    document.getElementById('ov-root').innerHTML = bxLoader('Loading...');
+    document.getElementById('ov-root').innerHTML = (typeof bxLoader === 'function') ? bxLoader('Loading...') : 'Loading...';
 
     async function shareLink() {
         try {
