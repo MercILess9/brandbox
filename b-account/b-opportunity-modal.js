@@ -952,8 +952,28 @@ const BOppApp = (() => {
         el('bopp-signed').value = opp.signed_date ? String(opp.signed_date).slice(0,10) : '';
         el('bopp-launch').value = opp.launch_date ? String(opp.launch_date).slice(0,10) : '';
 
-        // QT intentionally left blank — amounts always differ per deal, fill fresh
-        addQT();
+        // Copy QT structure (BU/detail/qty) but reset pricing — amounts always differ per deal
+        const { data: qts } = await supabaseClient.from('b_opportunity_qt')
+            .select('*, b_opportunity_qt_item(*)')
+            .eq('opportunity_id', oppId)
+            .order('qt_number');
+        const origQTs = (qts || []).filter(q => q.qt_type !== 'churn');
+
+        if (origQTs.length) {
+            origQTs.forEach(qt => {
+                _qtCounter++;
+                const items = (qt.b_opportunity_qt_item || [])
+                    .sort((a,b) => (a.no||0)-(b.no||0))
+                    .map(i => ({ item_id: null, bu: i.bu || '', detail: i.detail || '', qty: +i.qty || 1, price: 0, discount: 0, amount: 0, gp: 0 }));
+                _qts.push({ tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: '', company_qt: qt.company_qt || '',
+                    items: items.length ? items : [newItem()], _totAmt: 0, _totGP: 0 });
+            });
+            renderAllQTs();
+            recalcTotals();
+        } else {
+            addQT();
+        }
+
         _setModalMode(false);
         getBsModal().show();
     }
