@@ -17,7 +17,11 @@
       "Bash(node shot.js)",
       "Bash(node debug.js)",
       "Bash(lsof -ti:8123 -sTCP:LISTEN)",
-      "Bash(xargs -r kill)"
+      "Bash(xargs -r kill)",
+      "Bash(python3 - /private/tmp/claude-501/-Users-merciless-brandbox/cfca308f-eceb-457d-98c3-4230ee78bd25/scratchpad/list-preview.html)",
+      "Bash(sed 's/waitForSelector\\(.#b-opp-modal.show., { timeout: 8000 }\\)/waitForTimeout\\(3000\\)/' test-dup2.js)",
+      "Bash(node test-dup3.js)",
+      "Bash(node test-dup2.js)"
     ]
   }
 }
