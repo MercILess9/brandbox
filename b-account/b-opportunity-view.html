@@ -65,10 +65,10 @@
 
         /* ── QT section ── */
         .ov-qt-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 10px; }
-        .ov-qt-card { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+        .ov-qt-card { border: 1px solid #e2e8f0; border-left: 4px solid var(--c-accent); border-radius: 12px; margin-bottom: 12px; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+        .ov-qt-card:last-child { margin-bottom: 0; }
         .ov-qt-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f0f1f9; border-bottom: 2px solid #e2e8f0; }
         .ov-qt-num { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); }
-        .ov-qt-churn-tag { font-size: 0.6rem; font-weight: 800; color: #c2410c; background: rgba(249,115,22,0.12); border-radius: 6px; padding: 2px 8px; text-transform: uppercase; }
         .ov-qt-totals { margin-left: auto; display: flex; gap: 14px; }
         .ov-qt-stat { display: flex; flex-direction: column; align-items: flex-end; }
         .ov-qt-stat-val { font-size: 0.82rem; font-weight: 800; color: var(--c-text-main); }
@@ -81,6 +81,16 @@
         .ov-qt-table td { padding: 7px 10px; color: #334155; border-bottom: 1px solid #f8fafc; }
         .ov-qt-table tr:last-child td { border-bottom: none; }
         .ov-qt-empty { padding: 18px; text-align: center; color: #cbd5e1; font-size: 0.8rem; }
+
+        /* ── Churn / Sign groups ── */
+        .ov-churn-wrap, .ov-sign-wrap { border-radius: 14px; padding: 20px 16px 8px; position: relative; margin-bottom: 16px; break-inside: avoid; page-break-inside: avoid; }
+        .ov-churn-wrap { border: 1.5px solid rgba(249,115,22,0.5); background: rgba(249,115,22,0.03); }
+        .ov-churn-wrap .ov-qt-card { border-left-color: #f97316; }
+        .ov-sign-wrap { border: 1px solid #e2e8f0; }
+        .ov-churn-label, .ov-sign-label, .ov-churn-date-badge { position: absolute; top: -9px; background: #fff; padding: 0 8px; font-size: 0.64rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+        .ov-churn-label { left: 14px; color: #f97316; }
+        .ov-sign-label  { left: 14px; color: #94a3b8; }
+        .ov-churn-date-badge { right: 14px; color: #c2410c; font-weight: 700; }
 
         .ov-footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.65rem; color: #cbd5e1; text-align: center; }
 
@@ -158,7 +168,6 @@
         return `<div class="ov-qt-card">
             <div class="ov-qt-head">
                 <span class="ov-qt-num">${esc(qt.qt_number || qt.qt_id)}</span>
-                ${qt.qt_type === 'churn' ? '<span class="ov-qt-churn-tag">Churn</span>' : ''}
                 <div class="ov-qt-totals">
                     <div class="ov-qt-stat"><span class="ov-qt-stat-val">${fmtNum(totAmt)}</span><span class="ov-qt-stat-lbl">Amount</span></div>
                     <div class="ov-qt-stat"><span class="ov-qt-stat-val gp">${fmtNum(totGP)}</span><span class="ov-qt-stat-lbl">GP</span></div>
@@ -178,6 +187,26 @@
                 <tbody>${rows}</tbody>
             </table>
         </div>`;
+    }
+
+    function renderQTSection(o, qts) {
+        const churnQTs = qts.filter(q => q.qt_type === 'churn');
+        const signQTs  = qts.filter(q => q.qt_type !== 'churn');
+
+        if (!churnQTs.length) {
+            return qts.length ? qts.map(renderQT).join('') : '<div class="ov-qt-empty">No quotations</div>';
+        }
+
+        return `
+            <div class="ov-churn-wrap">
+                <span class="ov-churn-label">Churn</span>
+                ${o.churn_date ? `<span class="ov-churn-date-badge">Churn Date: ${fmtDate(o.churn_date)}</span>` : ''}
+                ${churnQTs.map(renderQT).join('')}
+            </div>
+            <div class="ov-sign-wrap">
+                <span class="ov-sign-label">Sign</span>
+                ${signQTs.length ? signQTs.map(renderQT).join('') : '<div class="ov-qt-empty">No sign quotations</div>'}
+            </div>`;
     }
 
     function renderPage(o, qts) {
@@ -244,7 +273,7 @@
             </div>
 
             <div class="ov-qt-title"><i class="bi bi-file-earmark-text"></i> Quotations</div>
-            ${qts.length ? qts.map(renderQT).join('') : '<div class="ov-qt-empty">No quotations</div>'}
+            ${renderQTSection(o, qts)}
 
             <div class="ov-footer">Generated from Brandbox X Portal — ${esc(o.opportunity_id)}</div>
         </div>`;
