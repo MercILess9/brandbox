@@ -931,6 +931,33 @@ const BOppApp = (() => {
         getBsModal().show();
     }
 
+    // ── Public: open duplicate ───────────────────────────────────────────────
+    async function openDuplicate(oppId) {
+        resetForm();
+        _editingId = null;
+        await loadHelpers();
+
+        const { data: opp, error } = await supabaseClient.from('b_opportunity_list').select('*').eq('opportunity_id', oppId).single();
+        if (error || !opp) { notify('', 'Load failed', 'error'); return; }
+
+        el('bopp-account-id').value = opp.account_id || '';
+        const acc = _accounts.find(a => a.account_id === opp.account_id);
+        if (acc) { el('bopp-acc-name').value = acc.account_name || ''; populateCompanies(acc.account_name, opp.account_id); }
+
+        [['bopp-opp-name','opportunity_name'],['bopp-type','business_type'],['bopp-lead','lead_source'],
+         ['bopp-owner','owner'],['bopp-am','am'],['bopp-subam','sub_am'],
+         ['bopp-materials','materials'],['bopp-proposal','proposal'],['bopp-campaign','campaign'],['bopp-remark','remark']]
+            .forEach(([id, field]) => { el(id).value = opp[field] || ''; });
+
+        el('bopp-signed').value = opp.signed_date ? String(opp.signed_date).slice(0,10) : '';
+        el('bopp-launch').value = opp.launch_date ? String(opp.launch_date).slice(0,10) : '';
+
+        // QT intentionally left blank — amounts always differ per deal, fill fresh
+        addQT();
+        _setModalMode(false);
+        getBsModal().show();
+    }
+
     // ── DB helpers ────────────────────────────────────────────────────────────
     async function _deleteOppQTs(oppId) {
         const { data: oldQts } = await supabaseClient.from('b_opportunity_qt').select('qt_id').eq('opportunity_id', oppId);
@@ -1229,5 +1256,5 @@ const BOppApp = (() => {
     el('b-opp-modal').addEventListener('hidden.bs.modal', () => { _editingId = null; });
 
     function setChurnDate(v) { _churnDate = v; }
-    return { openNew, openEdit, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT, undo, setChurnDate };
+    return { openNew, openEdit, openDuplicate, openOverlay, closeOverlay, addQT, addItem, removeItem, removeQT, dupQT, undo, setChurnDate };
 })();
