@@ -952,7 +952,8 @@ const BOppApp = (() => {
         el('bopp-signed').value = opp.signed_date ? String(opp.signed_date).slice(0,10) : '';
         el('bopp-launch').value = opp.launch_date ? String(opp.launch_date).slice(0,10) : '';
 
-        // Copy QT structure (BU/detail/qty) but reset pricing — amounts always differ per deal
+        // Copy QT items in full (bu/detail/qty/price/discount/gp) — only qt_number resets,
+        // since each quotation needs its own fresh number
         const { data: qts } = await supabaseClient.from('b_opportunity_qt')
             .select('*, b_opportunity_qt_item(*)')
             .eq('opportunity_id', oppId)
@@ -964,9 +965,11 @@ const BOppApp = (() => {
                 _qtCounter++;
                 const items = (qt.b_opportunity_qt_item || [])
                     .sort((a,b) => (a.no||0)-(b.no||0))
-                    .map(i => ({ item_id: null, bu: i.bu || '', detail: i.detail || '', qty: +i.qty || 1, price: 0, discount: 0, amount: 0, gp: 0 }));
+                    .map(i => ({ item_id: null, bu: i.bu || '', detail: i.detail || '', qty: +i.qty || 1, price: +i.price || 0, discount: +i.discount || 0, amount: +i.amount || 0, gp: +i.gp || 0 }));
                 _qts.push({ tmpId: `qt-${_qtCounter}`, qt_id: null, qt_number: '', company_qt: qt.company_qt || '',
-                    items: items.length ? items : [newItem()], _totAmt: 0, _totGP: 0 });
+                    items: items.length ? items : [newItem()],
+                    _totAmt: items.reduce((s,i) => s+(+i.amount||0), 0),
+                    _totGP:  items.reduce((s,i) => s+(+i.gp||0), 0) });
             });
             renderAllQTs();
             recalcTotals();
