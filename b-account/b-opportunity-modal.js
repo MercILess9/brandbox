@@ -1110,8 +1110,8 @@ const BOppApp = (() => {
             proposal:         el('bopp-proposal').value.trim()  || null,
             campaign:         el('bopp-campaign').value.trim()  || null,
             remark:           el('bopp-remark').value.trim()    || null,
-            total_amount:     grandAmt || null,
-            total_gp:         grandGP  || null,
+            total_amount:     grandAmt,
+            total_gp:         grandGP,
         };
 
         let _newOppId = null;

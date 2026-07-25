@@ -246,6 +246,7 @@
         const [yr, mo, dy] = String(d).substring(0, 10).split('-');
         return `${+dy} ${MONTHS[+mo - 1]} ${+yr}`;
     }
+    function fmtGP(n) { return n != null && !isNaN(+n) ? Number(n).toLocaleString('en-US') + ' ฿' : '—'; }
     function typeClass(t) {
         if (t === 'Retention')    return 'retention';
         if (t === 'New Business') return 'new-biz';
@@ -469,7 +470,7 @@
         if (!hasAmt) return '';
         return `<div class="omb-amt" data-amt-block>
             <div class="omb-amt-row"><span class="omb-lbl amt">Amount</span><span class="omb-val amt" data-amt-val>${fmtAmt(o.total_amount)}</span></div>
-            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP<span class="omb-bar-pct" data-gp-pct>${pct || ''}</span></span><span class="omb-val gp" data-gp-val>${fmtAmt(o.total_gp)}</span></div>
+            ${hasGP ? `<div class="omb-amt-row"><span class="omb-lbl gp">GP<span class="omb-bar-pct" data-gp-pct>${pct || ''}</span></span><span class="omb-val gp" data-gp-val>${fmtGP(o.total_gp)}</span></div>
             <div class="omb-bar-wrap"><div class="omb-bar-fill" data-bar-fill style="width:${pctNum}%"></div></div>` : ''}
         </div>`;
     }
@@ -484,7 +485,7 @@
 
     function renderCard(o) {
         const hasAmt = +o.total_amount > 0;
-        const hasGP  = +o.total_gp > 0;
+        const hasGP  = o.total_gp != null;
         const pct    = gpPct(o.total_gp, o.total_amount);
         const pctNum = hasGP && hasAmt ? Math.min(+o.total_gp / +o.total_amount * 100, 100).toFixed(1) : 0;
         const sub    = o._company_name
@@ -656,7 +657,7 @@
                     const pctEl  = card.querySelector('[data-gp-pct]');
                     const barEl  = card.querySelector('[data-bar-fill]');
                     if (amtEl) amtEl.textContent = fmtAmt(cAmt);
-                    if (gpEl)  gpEl.textContent  = fmtAmt(cGP);
+                    if (gpEl)  gpEl.textContent  = fmtGP(cGP);
                     if (pctEl) pctEl.textContent = cPct;
                     if (barEl) barEl.style.width = cPctNum + '%';
                 }
