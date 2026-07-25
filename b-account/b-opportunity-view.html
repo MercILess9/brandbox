@@ -6,6 +6,7 @@
     <title>B-ACCOUNT | Opportunity View</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="/system/config.js"></script>
     <script src="/system/system.js"></script>
     <script src="b-account.js"></script>
@@ -17,8 +18,12 @@
         .ov-toolbar { background: #fff; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 64px; z-index: 90; display: flex; justify-content: center; }
         .ov-toolbar-inner { width: 210mm; max-width: 100%; display: flex; justify-content: space-between; align-items: center; }
         .ov-id { font-size: 0.8rem; font-weight: 700; color: #64748b; }
-        .ov-print-btn { display: inline-flex; align-items: center; gap: 7px; border: none; background: var(--c-dark); color: #fff; border-radius: 10px; padding: 9px 18px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; }
-        .ov-print-btn:hover { background: #0f172a; }
+        .ov-toolbar-actions { display: flex; gap: 8px; }
+        .ov-tb-btn { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid #e2e8f0; background: #fff; color: var(--c-slate); border-radius: 10px; padding: 8px 16px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.15s; font-family: inherit; }
+        .ov-tb-btn:hover { border-color: #cbd5e1; background: var(--c-bg); }
+        .ov-tb-btn:disabled { opacity: 0.5; cursor: wait; }
+        .ov-tb-btn.primary { border: none; background: var(--c-dark); color: #fff; }
+        .ov-tb-btn.primary:hover { background: #0f172a; }
 
         /* ── Page ── */
         .a4-page { width: 210mm; min-height: 297mm; margin: 24px auto; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 14mm 16mm; box-sizing: border-box; }
@@ -112,7 +117,11 @@
 <div class="ov-toolbar no-print">
     <div class="ov-toolbar-inner">
         <span class="ov-id" id="ov-toolbar-id"></span>
-        <button class="ov-print-btn" onclick="window.print()"><i class="bi bi-printer-fill"></i> Print / Save PDF</button>
+        <div class="ov-toolbar-actions">
+            <button class="ov-tb-btn" id="ov-btn-share" onclick="shareLink()"><i class="bi bi-share-fill"></i> Share</button>
+            <button class="ov-tb-btn" id="ov-btn-image" onclick="downloadImage()"><i class="bi bi-file-earmark-image-fill"></i> Save Image</button>
+            <button class="ov-tb-btn primary" onclick="window.print()"><i class="bi bi-printer-fill"></i> Print / PDF</button>
+        </div>
     </div>
 </div>
 
@@ -121,6 +130,37 @@
 </div>
 
 <script>
+    let _oppId = null;
+
+    async function shareLink() {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            notify('', 'Copied link to clipboard', 'success');
+        } catch {
+            notify('', 'Could not copy link', 'error');
+        }
+    }
+
+    async function downloadImage() {
+        const btn = document.getElementById('ov-btn-image');
+        const target = document.querySelector('.a4-page');
+        if (!target) return;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Rendering...';
+        try {
+            const canvas = await html2canvas(target, { useCORS: true, scale: 2, backgroundColor: '#ffffff' });
+            const link = document.createElement('a');
+            link.download = `${_oppId || 'opportunity'}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+        } catch {
+            notify('', 'Could not generate image', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-file-earmark-image-fill"></i> Save Image';
+        }
+    }
+
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     function fmtDate(d) {
         if (!d) return '—';
@@ -215,6 +255,7 @@
             : esc(o._account_name);
         const pct = gpPct(o.total_gp, o.total_amount);
 
+        _oppId = o.opportunity_id;
         document.getElementById('ov-toolbar-id').textContent = o.opportunity_id;
         document.title = `${o.opportunity_id} | ${o.opportunity_name || ''}`;
 
