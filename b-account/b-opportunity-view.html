@@ -99,8 +99,8 @@
 
         .ov-footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.65rem; color: #cbd5e1; text-align: center; }
 
-        .ov-loading, .ov-error { text-align: center; padding: 100px 20px; color: #94a3b8; }
-        .ov-error i, .ov-loading i { font-size: 2.4rem; display: block; margin-bottom: 12px; }
+        .ov-error { text-align: center; padding: 100px 20px; color: #94a3b8; }
+        .ov-error i { font-size: 2.4rem; display: block; margin-bottom: 12px; }
 
         /* ── Print ── */
         @media print {
@@ -125,12 +125,12 @@
     </div>
 </div>
 
-<div id="ov-root">
-    <div class="ov-loading"><i class="bi bi-arrow-repeat"></i>Loading...</div>
-</div>
+<div id="ov-root"></div>
 
 <script>
     let _oppId = null;
+
+    document.getElementById('ov-root').innerHTML = bxLoader('Loading...');
 
     async function shareLink() {
         try {

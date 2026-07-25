@@ -9,6 +9,35 @@ if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_KEY !== 'undefined') 
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
+// ── BX Loader HTML (branded loading spinner — use for popups or inline placeholders) ──
+function bxLoader(label) {
+    return `
+        <svg width="0" height="0" style="position:absolute">
+            <defs>
+                <linearGradient id="bx-grad" x1="0" x2="1">
+                    <stop offset="0%"   stop-color="#b8d137" stop-opacity="0"/>
+                    <stop offset="100%" stop-color="#b8d137" stop-opacity="1"/>
+                </linearGradient>
+            </defs>
+        </svg>
+        <style>
+            .bx-loader { position:relative; width:160px; height:160px; margin:12px auto 20px; }
+            .bx-loader__arc { position:absolute; inset:0; width:100%; height:100%; animation:bx-rotate 1s linear infinite; }
+            .bx-loader__arc circle { fill:none; stroke:url(#bx-grad); stroke-width:6; stroke-linecap:round; stroke-dasharray:320; stroke-dashoffset:90; }
+            .bx-loader__logo { position:absolute; inset:0; width:80px; height:80px; object-fit:contain; margin:auto; top:0; left:0; right:0; bottom:0; }
+            @keyframes bx-rotate { to { transform: rotate(360deg); } }
+            .bx-label { font-size:1.5rem; font-weight:700; color:#1e293b; margin-top:4px; }
+        </style>
+        <div class="bx-loader" role="status" aria-label="Loading">
+            <svg class="bx-loader__arc" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="46"/>
+            </svg>
+            <img class="bx-loader__logo" src="/favicon.ico" alt=""/>
+        </div>
+        <div class="bx-label">${label}</div>
+    `;
+}
+
 function notify(title, text, icon = 'success') {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
